@@ -1,5 +1,6 @@
-# TikTok-Downloader
-TikTok Downloader GUI written in Qt, with php server backend 
+# WhatSie
+WhatSie is Light, feature rich WhatsApp web client written in Qt
 
 # Screenshot
-![TikTok Downloader for Linux Desktop](https://github.com/keshavbhatt/TikTok-Downloader/blob/main/screenshots/1.jpg?raw=true)
+![WhatSie for Linux Desktop Light Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/1.jpg?raw=true)
+![WhatSie for Linux Desktop Dark Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/2.jpg?raw=true)
