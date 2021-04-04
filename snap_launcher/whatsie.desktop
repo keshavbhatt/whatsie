@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+GenericName=WhatSie
+Name[en_US]=WhatSie
+Comment=Qt WhatsApp Client 
+Name=WhatSie
+Type=Application
+Icon=${SNAP}/meta/gui/icon.png
+Keywords=WhatSie;WhatsApp
+Exec=whatsie %F
+Categories=Network;Qt;
+Terminal=false
+StartupNotify=false
