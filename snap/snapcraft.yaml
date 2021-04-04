@@ -19,17 +19,29 @@ apps:
        DISABLE_WAYLAND: 1
     desktop: usr/share/applications/whatsie.desktop
     plugs:
-        - home
-        - unity7
-        - network
-        - opengl
-        - x11
-        - alsa
-        - audio-playback
+        - avahi-observe
+        - browser-support
+        - camera
         - desktop
-        - gsettings
-        - wayland
         - desktop-legacy
+        - gsettings
+        - home
+        - opengl
+        - audio-playback
+        - audio-record
+        - removable-media
+        - screen-inhibit-control
+        - u2f-devices
+        - unity7
+        - upower-observe
+        - x11
+        - hostname-control
+        - mount-observe
+        - network
+        - network-control
+        - network-observe
+        - network-bind
+        - wayland
 plugs:
   gsettings:
   gtk-3-themes:
