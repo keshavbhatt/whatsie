@@ -143,5 +143,6 @@
         <file>icons/others/tt_tbc_head.png</file>
         <file>icons/app/whatsapp-message.svg</file>
         <file>icons/app/whatsapp.svg</file>
+        <file>icons/wa_bg.png</file>
     </qresource>
 </RCC>
