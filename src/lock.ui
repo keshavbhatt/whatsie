@@ -83,11 +83,7 @@
         <item>
          <widget class="QWidget" name="widget_2" native="true">
           <property name="styleSheet">
-           <string notr="true">QWidget#widget_2{
-background-color: rgb(46, 52, 54);
-border-radius: 5px;
-background-image:url(:/icons/texture.png)
-}</string>
+           <string notr="true"/>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_4">
            <property name="spacing">
@@ -168,19 +164,10 @@ background-image:url(:/icons/texture.png)
            </item>
            <item>
             <widget class="QLabel" name="label_3">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>24</height>
-              </size>
-             </property>
              <property name="font">
               <font>
                <pointsize>14</pointsize>
               </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:transparent;</string>
              </property>
              <property name="text">
               <string>Set application lock passcode</string>
@@ -201,9 +188,6 @@ background-image:url(:/icons/texture.png)
                <height>30</height>
               </size>
              </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:transparent;</string>
-             </property>
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
              </property>
@@ -222,9 +206,6 @@ background-image:url(:/icons/texture.png)
                <width>0</width>
                <height>30</height>
               </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:transparent;</string>
              </property>
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>
@@ -404,11 +385,7 @@ background-image:url(:/icons/texture.png)
         <item>
          <widget class="QWidget" name="widget" native="true">
           <property name="styleSheet">
-           <string notr="true">QWidget#widget{
-background-color: rgb(46, 52, 54);
-border-radius: 5px;
-background-image:url(:/icons/texture.png)
-}</string>
+           <string notr="true"/>
           </property>
           <layout class="QVBoxLayout" name="verticalLayout_3">
            <property name="spacing">
@@ -550,19 +527,10 @@ background-image:url(:/icons/texture.png)
            </item>
            <item>
             <widget class="QLabel" name="label_4">
-             <property name="minimumSize">
-              <size>
-               <width>0</width>
-               <height>24</height>
-              </size>
-             </property>
              <property name="font">
               <font>
                <pointsize>14</pointsize>
               </font>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:transparent;</string>
              </property>
              <property name="text">
               <string>Enter your passcode to get access to app</string>
@@ -582,9 +550,6 @@ background-image:url(:/icons/texture.png)
                <width>0</width>
                <height>30</height>
               </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color:transparent;</string>
              </property>
              <property name="echoMode">
               <enum>QLineEdit::Password</enum>

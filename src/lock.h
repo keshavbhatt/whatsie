@@ -36,6 +36,7 @@ private slots:
 
 public slots:
     void lock_app();
+    void applyThemeQuirks();
 signals:
     void passwordSet();
     void passwordNotSet();

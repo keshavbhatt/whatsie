@@ -28,14 +28,31 @@ Lock::Lock(QWidget *parent) :
         lock_app();
     }
     checkCaps();
-    QString capsStyle = QString("background-color: rgba(0,170,0,20);"
+    QString capsStyle = QString("background-color: palette(window);"
                                 "padding:4px;"
-                                "border:1px solid rgba(78, 154, 6,50);"
-                                "border-radius: 2px;");
+                                "border:0px solid palette(highlight);"
+                                "border-radius: 2px;"
+                                "color:palette(window-text);");
     ui->caps1->setStyleSheet(capsStyle);
     ui->caps2->setStyleSheet(capsStyle);
     ui->signup_warning->setStyleSheet(capsStyle);
     ui->wrong->setStyleSheet(capsStyle);
+}
+
+void Lock::applyThemeQuirks(){
+    //little quirks
+
+    ui->label_4->setStyleSheet("color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
+    ui->label_3->setStyleSheet("color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
+
+    ui->widget_2->setStyleSheet("QWidget#widget{\nborder-radius: 5px;\nbackground-image:url(:/icons/texture.png);\nbackground-color:palette(shadow);\n}");
+    ui->widget->setStyleSheet("QWidget#widget{\nborder-radius: 5px;\nbackground-image:url(:/icons/texture.png);\nbackground-color:palette(shadow);\n}");
+    if(settings.value("windowTheme","light").toString() == "dark")
+    {
+
+    }else{
+
+    }
 }
 
 Lock::~Lock()
