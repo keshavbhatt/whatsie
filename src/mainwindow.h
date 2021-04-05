@@ -82,6 +82,7 @@ private:
 
     Lock *lockWidget = nullptr;
 
+    int correctlyLoaderRetries = 4;
 
 private slots:
 
@@ -111,6 +112,9 @@ private slots:
     void check_window_state();
     void init_lock();
     void lockApp();
+
+
+    void checkLoadedCorrectly();
 };
 
 #endif // MAINWINDOW_H

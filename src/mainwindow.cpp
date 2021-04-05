@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 
 #include <QRadioButton>
+#include <QtWebEngine>
 
 extern QString defaultUserAgentStr;
 
@@ -383,6 +384,7 @@ void MainWindow::init_lock()
         if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==true){
             lockWidget->lock_app();
         }
+        updateWindowTheme();
 }
 
 //check window state and set tray menus
@@ -409,6 +411,8 @@ void MainWindow::init_globalWebProfile()
 {
 
     QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
+    profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
+
     auto* webSettings = profile->settings();
     webSettings->setAttribute(QWebEngineSettings::AutoLoadImages, true);
     webSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
@@ -442,6 +446,8 @@ void MainWindow::createWebEngine()
     widgetSize.setVerticalPolicy(QSizePolicy::Expanding);
     widgetSize.setHorizontalStretch(1);
     widgetSize.setVerticalStretch(1);
+
+    QtWebEngine::initialize();
 
     QWebEngineView *webEngine = new QWebEngineView(this);
     setCentralWidget(webEngine);
@@ -523,10 +529,13 @@ void MainWindow::createWebPage(bool offTheRecord)
     //page should be set parent of profile to prevent
     //Release of profile requested but WebEnginePage still not deleted. Expect troubles !
     profile->setParent(page);
+
     profile->setSpellCheckEnabled(true);
-    //RequestInterceptor *interceptor = new RequestInterceptor(profile);
-    //profile->setUrlRequestInterceptor(interceptor);
-    page->setUrl(QUrl("https://web.whatsapp.com/"));
+//    RequestInterceptor *interceptor = new RequestInterceptor(profile);
+//    profile->setUrlRequestInterceptor(interceptor);
+    qsrand(time(NULL));
+    auto randomValue = qrand() % 300;
+    page->setUrl(QUrl("https://web.whatsapp.com?v="+QString::number(randomValue)));
 
     connect(profile, &QWebEngineProfile::downloadRequested,
         &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
@@ -574,7 +583,36 @@ void MainWindow::handleLoadFinished(bool loaded)
 {
     statusBar->hide();
     if(loaded){
+        //check if page has loaded correctly
+        checkLoadedCorrectly();
         updatePageTheme();
+    }
+}
+
+void MainWindow::checkLoadedCorrectly()
+{
+    if(webEngine && webEngine->page())
+    {
+        webEngine->page()->runJavaScript(
+            "document.getElementsByClassName('landing-title')[0].innerText",
+            [this](const QVariant &result){
+                qDebug()<<"Loaded correctly value:"<<result.toString();
+                if(result.toString().contains("Google Chrome",Qt::CaseInsensitive)){
+                    //contains ug message apply quirk
+                    if(correctlyLoaderRetries > -1){
+                        doReload();
+                        correctlyLoaderRetries--;
+                    }else{
+                        utils::delete_cache(webEngine->page()->profile()->cachePath());
+                        utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
+                        QMessageBox::information(this,QApplication::applicationName()+"| Page load error",
+                                              "Application restart required.\nPlease restart application.");
+                        quitAction->trigger();
+                    }
+                    //webEngine->page()->runJavaScript("this.window.location.replace('https://web.whatsapp.com?v=' + Math.floor((Math.random() * 1000) + 1).toString(), {});");
+                }
+            }
+        );
     }
 }
 
@@ -625,6 +663,7 @@ void MainWindow::messageClicked()
 
 void MainWindow::doAppReload()
 {
+
     if(this->webEngine->page()){
         this->webEngine->page()->disconnect();
     }
