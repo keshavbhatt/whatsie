@@ -40,12 +40,14 @@ VERSION = 1.0
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 SOURCES += \
+        about.cpp \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
         elidedlabel.cpp \
         lock.cpp \
         main.cpp \
         mainwindow.cpp \
+        rungaurd.cpp \
         settingswidget.cpp \
         utils.cpp \
         webenginepage.cpp \
@@ -55,6 +57,7 @@ RESOURCES += \
         icons.qrc
 
 HEADERS += \
+    about.h \
     common.h \
     downloadmanagerwidget.h \
     downloadwidget.h \
@@ -63,6 +66,7 @@ HEADERS += \
     mainwindow.h \
     notificationpopup.h \
     requestinterceptor.h \
+    rungaurd.h \
     settingswidget.h \
     utils.h \
     webenginepage.h \
@@ -88,6 +92,7 @@ desktop.path = $$DATADIR/applications/
 INSTALLS += target icon desktop
 
 FORMS += \
+    about.ui \
     certificateerrordialog.ui \
     downloadmanagerwidget.ui \
     downloadwidget.ui \
