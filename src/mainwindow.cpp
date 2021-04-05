@@ -270,7 +270,7 @@ void MainWindow::notify(QString title,QString message)
         if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
             activateWindow();
             raise();
-            show();
+            showNormal();
         }
     });
     popup->adjustSize();
@@ -447,8 +447,6 @@ void MainWindow::createWebEngine()
     widgetSize.setHorizontalStretch(1);
     widgetSize.setVerticalStretch(1);
 
-    QtWebEngine::initialize();
-
     QWebEngineView *webEngine = new QWebEngineView(this);
     setCentralWidget(webEngine);
     webEngine->setSizePolicy(widgetSize);
@@ -510,7 +508,7 @@ void MainWindow::createWebPage(bool offTheRecord)
             if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
                 activateWindow();
                 raise();
-                show();
+                showNormal();
             }
         });
         profile->setNotificationPresenter([=] (std::unique_ptr<QWebEngineNotification> notification)
@@ -596,10 +594,11 @@ void MainWindow::checkLoadedCorrectly()
         webEngine->page()->runJavaScript(
             "document.getElementsByClassName('landing-title')[0].innerText",
             [this](const QVariant &result){
-                qDebug()<<"Loaded correctly value:"<<result.toString();
+                qWarning()<<"Loaded correctly value:"<<result.toString();
                 if(result.toString().contains("Google Chrome",Qt::CaseInsensitive)){
                     //contains ug message apply quirk
                     if(correctlyLoaderRetries > -1){
+                        qWarning()<<"doReload()"<<correctlyLoaderRetries;
                         doReload();
                         correctlyLoaderRetries--;
                     }else{
