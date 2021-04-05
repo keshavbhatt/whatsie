@@ -301,6 +301,42 @@ void MainWindow::createTrayIcon()
             this, &MainWindow::iconActivated);
 }
 
+
+void MainWindow::init_lock()
+{
+//    if(lockWidget==nullptr){
+//        lockWidget = new Lock(this);
+//        lockWidget->setObjectName("lockWidget");
+//    }
+//        lockWidget->setWindowFlags(Qt::Widget);
+//        lockWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+//        lockWidget->setGeometry(this->rect());
+
+//        connect(lockWidget,&Lock::passwordNotSet,[=](){
+//            settings.setValue("lockscreen",false);
+//            ui->applock_checkbox->setChecked(false);
+//        });
+
+//        connect(lockWidget,&Lock::unLocked,[=]()
+//        {
+//            //unlock event
+//        });
+
+//        connect(lockWidget,&Lock::passwordSet,[=](){
+//            //enable disable lock screen
+//            if(settings.value("asdfg").isValid()){
+//                ui->current_password->setText("Current Password: <i>"+QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
+//            }else{
+//                ui->current_password->setText("Current Password: <i>Require setup</i>");
+//            }
+//            ui->applock_checkbox->setChecked(settings.value("lockscreen",false).toBool());
+//        });
+//        lockWidget->show();
+//        if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==true){
+//            lockWidget->lock_app();
+//        }
+}
+
 //check window state and set tray menus
 void MainWindow::check_window_state()
 {
@@ -428,7 +464,7 @@ void MainWindow::createWebPage(bool offTheRecord)
 
     QWebEnginePage *page = new WebEnginePage(profile,webEngine);
     if(settings.value("windowTheme","light").toString() == "dark"){
-        page->setBackgroundColor(QColor("#F0F0F0")); //whatsapp bg color
+        page->setBackgroundColor(QColor("#131C21")); //whatsapp bg color
     }
     webEngine->setPage(page);
     //page should be set parent of profile to prevent

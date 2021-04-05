@@ -38,6 +38,7 @@ SOURCES += \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
         elidedlabel.cpp \
+        lock.cpp \
         main.cpp \
         mainwindow.cpp \
         settingswidget.cpp \
@@ -53,6 +54,7 @@ HEADERS += \
     downloadmanagerwidget.h \
     downloadwidget.h \
     elidedlabel.h \
+    lock.h \
     mainwindow.h \
     notificationpopup.h \
     requestinterceptor.h \
@@ -84,6 +86,7 @@ FORMS += \
     certificateerrordialog.ui \
     downloadmanagerwidget.ui \
     downloadwidget.ui \
+    lock.ui \
     passworddialog.ui \
     settingswidget.ui
 

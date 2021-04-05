@@ -26,6 +26,7 @@
 #include "requestinterceptor.h"
 #include "settingswidget.h"
 #include "webenginepage.h"
+#include "lock.h"
 
 #include "downloadmanagerwidget.h"
 
@@ -75,6 +76,8 @@ private:
     DownloadManagerWidget m_downloadManagerWidget;
     QScopedPointer<QWebEngineProfile> m_otrProfile;
 
+    Lock *lockWidget = nullptr;
+
 
 private slots:
 
@@ -103,6 +106,7 @@ private slots:
     void init_settingWidget();
     void init_globalWebProfile();
     void check_window_state();
+    void init_lock();
 };
 
 #endif // MAINWINDOW_H

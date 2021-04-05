@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>539</width>
-    <height>447</height>
+    <width>553</width>
+    <height>478</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -104,32 +104,39 @@ background:transparent;
          <string>General settings</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <item row="3" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout">
-           <item>
-            <widget class="QLabel" name="label">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="notificationCheckBox">
              <property name="text">
-              <string>Default close button action</string>
+              <string>Disable Notifications PopUp</string>
              </property>
             </widget>
            </item>
-           <item>
-            <widget class="QComboBox" name="closeButtonActionComboBox">
-             <item>
-              <property name="text">
-               <string>Minimize to tray</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Quit Application</string>
-              </property>
-             </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="muteAudioCheckBox">
+             <property name="text">
+              <string>Mute Audio</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
+             <property name="text">
+              <string>Disable Auto Playback of Media</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="disableVideosCheckBox">
+             <property name="text">
+              <string>Disable loading videos</string>
+             </property>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="5" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QLabel" name="label_2">
@@ -154,7 +161,7 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="5" column="0">
+         <item row="6" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QLabel" name="label_4">
@@ -190,33 +197,50 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="notificationCheckBox">
+         <item row="3" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label">
              <property name="text">
-              <string>Disable Notifications PopUp</string>
+              <string>Default close button action</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="muteAudioCheckBox">
+           <item>
+            <widget class="QComboBox" name="closeButtonActionComboBox">
+             <item>
+              <property name="text">
+               <string>Minimize to tray</string>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Quit Application</string>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="applock_checkbox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable application lock screen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
              <property name="text">
-              <string>Mute Audio</string>
+              <string>Enable App Lock on Start</string>
              </property>
             </widget>
            </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
+           <item>
+            <widget class="QLabel" name="current_password">
              <property name="text">
-              <string>Disable Auto Playback of Media</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="disableVideosCheckBox">
-             <property name="text">
-              <string>Disable loading videos</string>
+              <string>Current Password:</string>
              </property>
             </widget>
            </item>
