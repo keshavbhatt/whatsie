@@ -18,6 +18,8 @@ TEMPLATE = app
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
 
+LIBS += -L/usr/X11/lib -lX11
+
 # No debug output in release mode
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
