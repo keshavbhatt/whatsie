@@ -6,7 +6,9 @@
 #include <QSettings>
 #include <QDebug>
 
-#include <mainwindow.h>
+#include "mainwindow.h"
+
+#include "rungaurd.h"
 #include "common.h"
 
 
@@ -30,6 +32,17 @@ int main(int argc, char *argv[])
     QApplication::setApplicationName("WhatSie");
     QApplication::setOrganizationName("org.keshavnrj.ubuntu");
     QApplication::setApplicationVersion(VERSIONSTR);
+
+    QString appname = QApplication::applicationName();
+
+    //allow multiple instances in debug builds
+    #ifndef QT_DEBUG
+        RunGuard guard("org.keshavnrj.ubuntu."+appname);
+        if ( !guard.tryToRun() ){
+            QMessageBox::critical(0, appname,"An instance of "+appname+" is already running.");
+            return 0;
+        }
+    #endif
 
     //QtWebEngine::initialize();
 
