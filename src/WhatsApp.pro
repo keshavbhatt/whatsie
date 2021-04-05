@@ -4,21 +4,26 @@
 #
 #-------------------------------------------------
 
-QT += core widgets webengine webenginewidgets
+QT += core gui webengine webenginewidgets webchannel xml
+
+CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 
 TARGET = whatsie
 TEMPLATE = app
+LIBS += -L/usr/X11/lib -lX11
+
+win32{
+    LIBS += User32.Lib
+}
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
 # deprecated API to know how to port your code away from it.
 DEFINES += QT_DEPRECATED_WARNINGS
-
-LIBS += -L/usr/X11/lib -lX11
 
 # No debug output in release mode
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
@@ -28,7 +33,7 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
-CONFIG += c++11
+
 
 # Set program version
 VERSION = 1.0
@@ -74,10 +79,10 @@ DATADIR = $$PREFIX/share
 
 target.path = $$BINDIR
 
-icon.files = icons/linguist.png
+icon.files = icons/whatsie.png
 icon.path = $$DATADIR/icons/hicolor/512x512/apps/
 
-desktop.files = linguist.desktop
+desktop.files = whatsie.desktop
 desktop.path = $$DATADIR/applications/
 
 INSTALLS += target icon desktop
