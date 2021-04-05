@@ -61,10 +61,13 @@ void Lock::applyThemeQuirks(){
     ui->label_4->setStyleSheet("color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
     ui->label_3->setStyleSheet("color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
 
-    ui->login->setStyleSheet("QWidget#login{background-color:palette(window)};");
-    ui->signup->setStyleSheet("QWidget#signup{background-color:palette(window)};");
+    ui->login->setStyleSheet("QWidget#login{background-color:palette(window);background-image:url(:/icons/wa_bg.png)};");
+    ui->signup->setStyleSheet("QWidget#signup{background-color:palette(window);background-image:url(:/icons/wa_bg.png)};");
+
     ui->widget_2->setStyleSheet("QWidget#widget_2{\nborder-radius: 5px;\nbackground-image:url(:/icons/texture.png);\nbackground-color:palette(shadow);\n}");
     ui->widget->setStyleSheet("QWidget#widget{\nborder-radius: 5px;\nbackground-image:url(:/icons/texture.png);\nbackground-color:palette(shadow);\n}");
+
+    ui->centerWidget->setStyleSheet("QWidget#centerWidget{background-image:url(:/icons/wa_bg.png)}");
     if(settings.value("windowTheme","light").toString() == "dark")
     {
 
