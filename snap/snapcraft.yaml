@@ -43,7 +43,6 @@ apps:
         - network-bind
         - wayland
 plugs:
-  gsettings:
   gtk-3-themes:
     interface: content
     target: $SNAP/data-dir/themes
@@ -70,10 +69,3 @@ parts:
             sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/whatsie.desktop
             mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
             cp -rf ${SNAPCRAFT_PART_SRC}/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
-   cleanup:
-       after: [snap-launcher]
-       plugin: nil
-       override-prime: |
-          # Remove unneeded stage files to save space
-          cd usr/share
-          rm -rf apport bash-completion bug doc doc-base icons lintian man pam-configs pkgconfig themes upstart zsh
