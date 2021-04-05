@@ -102,6 +102,7 @@ private slots:
     void createWebPage(bool offTheRecord =false);
     void init_settingWidget();
     void init_globalWebProfile();
+    void check_window_state();
 };
 
 #endif // MAINWINDOW_H

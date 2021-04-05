@@ -58,7 +58,9 @@ void MainWindow::updateWindowTheme()
         palette.setColor(QPalette::Window,QColor("#131C21")); //whatsapp dark color
         palette.setColor(QPalette::WindowText,Qt::white);
         palette.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
-        palette.setColor(QPalette::Base,QColor(42,42,42));
+        //palette.setColor(QPalette::Base,QColor(42,42,42));
+        palette.setColor(QPalette::Base,QColor(84,84,84));
+
         palette.setColor(QPalette::AlternateBase,QColor(66,66,66));
         palette.setColor(QPalette::ToolTipBase,Qt::white);
         palette.setColor(QPalette::ToolTipText,QColor(53,53,53));
@@ -245,7 +247,7 @@ void MainWindow::createActions()
     addAction(minimizeAction);
 
     restoreAction = new QAction(tr("&Restore"), this);
-    connect(restoreAction, &QAction::triggered, this, &QWidget::showNormal);
+    connect(restoreAction, &QAction::triggered, this, &QWidget::show);
     addAction(restoreAction);
 
     reloadAction = new QAction(tr("Re&load"), this);
@@ -277,6 +279,7 @@ void MainWindow::createStatusBar()
 void MainWindow::createTrayIcon()
 {
     trayIconMenu = new QMenu(this);
+    trayIconMenu->setObjectName("trayIconMenu");
     trayIconMenu->addAction(minimizeAction);
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addSeparator();
@@ -288,6 +291,7 @@ void MainWindow::createTrayIcon()
 
     trayIcon = new QSystemTrayIcon(trayIconRead, this);
     trayIcon->setContextMenu(trayIconMenu);
+    connect(trayIconMenu,SIGNAL(aboutToShow()),this,SLOT(check_window_state()));
 
     trayIcon->show();
 
@@ -295,6 +299,21 @@ void MainWindow::createTrayIcon()
             this, &MainWindow::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated,
             this, &MainWindow::iconActivated);
+}
+
+//check window state and set tray menus
+void MainWindow::check_window_state()
+{
+    QObject *tray_icon_menu = this->findChild<QObject*>("trayIconMenu");
+    if(tray_icon_menu != nullptr){
+        if(this->isVisible()){
+            ((QMenu*)(tray_icon_menu))->actions().at(0)->setDisabled(false);
+            ((QMenu*)(tray_icon_menu))->actions().at(1)->setDisabled(true);
+        }else{
+            ((QMenu*)(tray_icon_menu))->actions().at(0)->setDisabled(true);
+            ((QMenu*)(tray_icon_menu))->actions().at(1)->setDisabled(false);
+        }
+    }
 }
 
 void MainWindow::init_globalWebProfile()
