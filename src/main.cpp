@@ -9,15 +9,14 @@
 #include <mainwindow.h>
 #include "common.h"
 
-extern QString defaultUserAgentStr;
 
 int main(int argc, char *argv[])
 {
 
-    //argv[argc++] = "--single-process";
 
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
+    //argv[argc++] = "--single-process";
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
@@ -32,7 +31,7 @@ int main(int argc, char *argv[])
     QApplication::setOrganizationName("org.keshavnrj.ubuntu");
     QApplication::setApplicationVersion(VERSIONSTR);
 
-    QtWebEngine::initialize();
+    //QtWebEngine::initialize();
 
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
