@@ -6,6 +6,9 @@
 #include <Windows.h>
 #else
 #include <X11/XKBlib.h>  // sudo apt install libx11-dev
+
+#include <QGraphicsOpacityEffect>
+#include <QPropertyAnimation>
 #endif
 
 Lock::Lock(QWidget *parent) :
@@ -16,6 +19,17 @@ Lock::Lock(QWidget *parent) :
     ui->unlock->setEnabled(false);
     ui->setPass->setEnabled(false);
     ui->wrong->hide();
+
+    ui->centerWidget->hide();
+    QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
+    ui->centerWidget->setGraphicsEffect(eff);
+    QPropertyAnimation *a = new QPropertyAnimation(eff,"opacity");
+    a->setDuration(400);
+    a->setStartValue(0);
+    a->setEndValue(1);
+    a->setEasingCurve(QEasingCurve::InCurve);
+    a->start(QPropertyAnimation::DeleteWhenStopped);
+    ui->centerWidget->show();
 
     if(settings.value("asdfg").isValid() == false)
     {
@@ -38,6 +52,7 @@ Lock::Lock(QWidget *parent) :
     ui->caps2->setStyleSheet(capsStyle);
     ui->signup_warning->setStyleSheet(capsStyle);
     ui->wrong->setStyleSheet(capsStyle);
+
 }
 
 void Lock::applyThemeQuirks(){
