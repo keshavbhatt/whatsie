@@ -29,6 +29,7 @@
 #include "lock.h"
 
 #include "downloadmanagerwidget.h"
+#include "about.h"
 
 
 class MainWindow : public QMainWindow
@@ -39,9 +40,11 @@ public:
 public slots:
     void updateWindowTheme();
     void updatePageTheme();
-protected:
-    void closeEvent(QCloseEvent *event) override;
 
+
+protected slots:
+    void closeEvent(QCloseEvent *event) override;
+    void resizeEvent(QResizeEvent *event);
 private:
     QPalette lightPalette;
     void createActions();
@@ -61,6 +64,7 @@ private:
     QAction *aboutAction;
     QAction *settingsAction;
     QAction *quitAction;
+    QAction *lockAction;
 
     QMenu *trayIconMenu;
     QSystemTrayIcon *trayIcon;
@@ -81,7 +85,6 @@ private:
 
 private slots:
 
-    void readSettings();
     void handleWebViewTitleChanged(QString title);
     void handleLoadStarted();
     void handleLoadProgress(int progress);
@@ -107,6 +110,7 @@ private slots:
     void init_globalWebProfile();
     void check_window_state();
     void init_lock();
+    void lockApp();
 };
 
 #endif // MAINWINDOW_H

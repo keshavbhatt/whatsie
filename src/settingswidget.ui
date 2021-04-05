@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>553</width>
-    <height>478</height>
+    <width>554</width>
+    <height>565</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -83,7 +83,7 @@ background:transparent;
      </layout>
     </widget>
    </item>
-   <item>
+   <item alignment="Qt::AlignTop">
     <widget class="QWidget" name="verticalWidget" native="true">
      <layout class="QVBoxLayout" name="verticalLayout_2">
       <property name="leftMargin">
@@ -98,7 +98,7 @@ background:transparent;
       <property name="bottomMargin">
        <number>9</number>
       </property>
-      <item>
+      <item alignment="Qt::AlignTop">
        <widget class="QGroupBox" name="groupBox_8">
         <property name="title">
          <string>General settings</string>
@@ -249,7 +249,7 @@ background:transparent;
         </layout>
        </widget>
       </item>
-      <item>
+      <item alignment="Qt::AlignTop">
        <widget class="QGroupBox" name="groupBox_7">
         <property name="title">
          <string>Application Storage and Other Settings</string>
@@ -368,6 +368,19 @@ background:transparent;
       </item>
      </layout>
     </widget>
+   </item>
+   <item>
+    <spacer name="verticalSpacer">
+     <property name="orientation">
+      <enum>Qt::Vertical</enum>
+     </property>
+     <property name="sizeHint" stdset="0">
+      <size>
+       <width>20</width>
+       <height>40</height>
+      </size>
+     </property>
+    </spacer>
    </item>
   </layout>
  </widget>

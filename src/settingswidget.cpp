@@ -23,6 +23,9 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->themeComboBox->setCurrentText(utils::toCamelCase(settings.value("windowTheme","light").toString()));
     ui->userAgentLineEdit->setText(settings.value("useragent",defaultUserAgentStr).toString());
 
+    this->setCurrentPasswordText("Current Password: <i>"
+            +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
+
     applyThemeQuirks();
 
     ui->setUserAgent->setEnabled(false);
@@ -186,4 +189,26 @@ void SettingsWidget::on_disableVideosCheckBox_toggled(bool checked)
 void SettingsWidget::on_closeButtonActionComboBox_currentIndexChanged(int index)
 {
     settings.setValue("closeButtonActionCombo",index);
+}
+
+void SettingsWidget::appLockSetChecked(bool checked)
+{
+    ui->applock_checkbox->setChecked(checked);
+}
+
+void SettingsWidget::setCurrentPasswordText(QString str)
+{
+    ui->current_password->setText(str);
+}
+
+void SettingsWidget::on_applock_checkbox_toggled(bool checked)
+{
+    if(settings.value("asdfg").isValid()){
+        settings.setValue("lockscreen",checked);
+    }else{
+        settings.setValue("lockscreen",false);
+    }
+    if(checked){
+        emit init_lock();
+    }
 }

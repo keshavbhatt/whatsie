@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QRadioButton>
 
 extern QString defaultUserAgentStr;
 
@@ -9,16 +10,38 @@ MainWindow::MainWindow(QWidget *parent)
       trayIconRead(":/icons/app/whatsapp.svg"),
       trayIconUnread(":/icons/app/whatsapp-message.svg")
 {
+    qApp->setQuitOnLastWindowClosed(false);
+
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
     setMinimumWidth(800);
     setMinimumHeight(600);
-    readSettings();
+
+
+    restoreGeometry(settings.value("geometry").toByteArray());
+    restoreState(settings.value("windowState").toByteArray());
 
     createActions();
     createStatusBar();
     createTrayIcon();
     createWebEngine();
+
+
+    if(settings.value("lockscreen",false).toBool())
+    {
+        init_lock();
+    }
+    QTimer *timer = new QTimer(this);
+    timer->setInterval(1000);
+    connect(timer,&QTimer::timeout,[=](){
+        if(settings.value("asdfg").isValid()){
+            if(lockWidget && lockWidget->isLocked==false){
+                timer->stop();
+                //init_accountWidget();
+            }
+        }
+    });
+    timer->start();
 
     init_settingWidget();
 
@@ -27,8 +50,6 @@ MainWindow::MainWindow(QWidget *parent)
 
     // quit application if the download manager window is the only remaining window
     m_downloadManagerWidget.setAttribute(Qt::WA_QuitOnClose, false);
-
-
 }
 
 void MainWindow::updatePageTheme()
@@ -48,11 +69,18 @@ void MainWindow::updatePageTheme()
     }
 }
 
+void MainWindow::resizeEvent(QResizeEvent *event)
+{
+    if(lockWidget != nullptr){
+        lockWidget->resize(event->size());
+    }
+}
+
 void MainWindow::updateWindowTheme()
 {
     if(settings.value("windowTheme","light").toString() == "dark")
     {
-        //TODO make dark palette match whatsapp dark theme
+
         qApp->setStyle(QStyleFactory::create("fusion"));
         QPalette palette;
         palette.setColor(QPalette::Window,QColor("#131C21")); //whatsapp dark color
@@ -84,6 +112,13 @@ void MainWindow::updateWindowTheme()
         qApp->setPalette(lightPalette);
         this->update();
     }
+
+    if(lockWidget!=nullptr){
+        lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
+                                  "QWidget#signup{background-color:palette(window)};"
+                                  );
+        lockWidget->applyThemeQuirks();
+    }
 }
 
 void MainWindow::handleCookieAdded(const QNetworkCookie &cookie)
@@ -91,11 +126,6 @@ void MainWindow::handleCookieAdded(const QNetworkCookie &cookie)
   qDebug() << cookie.toRawForm() << "\n\n\n";
 }
 
-void MainWindow::readSettings()
-{
-    restoreGeometry(settings.value("geometry").toByteArray());
-    restoreState(settings.value("windowState").toByteArray());
-}
 
 void MainWindow::init_settingWidget()
 {
@@ -106,6 +136,7 @@ void MainWindow::init_settingWidget()
         settingsWidget->setWindowTitle(QApplication::applicationName()+" | Settings");
         settingsWidget->setWindowFlags(Qt::Dialog);
 
+        connect(settingsWidget,SIGNAL(init_lock()),this,SLOT(init_lock()));
         connect(settingsWidget,SIGNAL(updateWindowTheme()),this,SLOT(updateWindowTheme()));
         connect(settingsWidget,SIGNAL(updatePageTheme()),this,SLOT(updatePageTheme()));
         connect(settingsWidget,&SettingsWidget::muteToggled,[=](const bool checked)
@@ -131,11 +162,49 @@ void MainWindow::init_settingWidget()
                         QWebEngineSettings::PlaybackRequiresUserGesture,
                                    checked);
         });
+
+        settingsWidget->appLockSetChecked(settings.value("lockscreen",false).toBool());
+        settingsWidget->resize(settingsWidget->sizeHint().width(),settingsWidget->minimumSizeHint().height());
+    }
+}
+
+void MainWindow::lockApp()
+{
+    if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==false){
+        QMessageBox::critical(this,QApplication::applicationName()+"| Error",
+                              "Unable to lock App, Enable AppLock in settings First.");
+        this->show();
+        return;
+    }
+
+    if(settings.value("asdfg").isValid()){
+        init_lock();
+    }else{
+        if(settings.value("asdfg").isValid() ==false){
+            QMessageBox msgBox;
+              msgBox.setText("App lock is not configured.");
+              msgBox.setIconPixmap(QPixmap(":/icons/information-line.png").scaled(42,42,Qt::KeepAspectRatio,Qt::SmoothTransformation));
+              msgBox.setInformativeText("Do you want to setup App lock now ?");
+              msgBox.setStandardButtons(QMessageBox::Cancel );
+              QPushButton *setAppLock = new QPushButton("Yes",nullptr);
+              msgBox.addButton(setAppLock,QMessageBox::NoRole);
+              connect(setAppLock,&QPushButton::clicked,[=](){
+                    init_lock();
+              });
+              msgBox.exec();
+        }
     }
 }
 
 void MainWindow::showSettings()
 {
+    if(lockWidget && lockWidget->isLocked){
+        QMessageBox::critical(this,QApplication::applicationName()+"| Error",
+                              "UnLock Application to access Settings.");
+        this->show();
+        return;
+    }
+
     if(webEngine == nullptr){
         QMessageBox::critical(this,QApplication::applicationName()+"| Error",
                               "Unable to initialize settings module.\nIs webengine initialized?");
@@ -166,44 +235,12 @@ void MainWindow::askToReloadPage()
 
 void MainWindow::showAbout()
 {
-    QDialog *aboutDialog = new QDialog(this,Qt::Dialog);
-    aboutDialog->setWindowModality(Qt::WindowModal);
-    QVBoxLayout *layout = new QVBoxLayout;
-    QLabel *message = new QLabel(aboutDialog);
-    layout->addWidget(message);
-    connect(message,&QLabel::linkActivated,[=](const QString linkStr){
-        if(linkStr.contains("about_qt")){
-            qApp->aboutQt();
-        }else{
-            QDesktopServices::openUrl(QUrl(linkStr));
-        }
-    });
-    aboutDialog->setLayout(layout);
-    aboutDialog->setAttribute(Qt::WA_DeleteOnClose,true);
-    aboutDialog->show();
-
-    QString mes =
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'><img src=':/icons/app/icon-64.png' /></p>"
-                 "<p align='center' style='-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'><br /></p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'>Designed and Developed</p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'>by <span style=' font-weight:600;'>Keshav Bhatt</span> &lt;keshavnrj@gmail.com&gt;</p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'>Website: https://ktechpit.com</p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'>Runtime: <a href='http://about_qt'>Qt Toolkit</a></p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'>Version: "+QApplication::applicationVersion()+"</p>"
-                 "<p align='center' style='-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'><br /></p>"
-                 "<p align='center' style=' margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'><a href='https://snapcraft.io/search?q=keshavnrj'>More Apps</p>"
-                 "<p align='center' style='-qt-paragraph-type:empty; margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;'><br /></p>";
-
-    QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
-    message->setGraphicsEffect(eff);
-    QPropertyAnimation *a = new QPropertyAnimation(eff,"opacity");
-    a->setDuration(1000);
-    a->setStartValue(0);
-    a->setEndValue(1);
-    a->setEasingCurve(QEasingCurve::InCurve);
-    a->start(QPropertyAnimation::DeleteWhenStopped);
-    message->setText(mes);
-    message->show();
+    About *about = new About(this);
+    about->setWindowFlag(Qt::Dialog);
+    about->adjustSize();
+    about->setFixedSize(about->sizeHint());
+    about->setAttribute(Qt::WA_DeleteOnClose);
+    about->show();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)
@@ -255,6 +292,11 @@ void MainWindow::createActions()
     connect(reloadAction, &QAction::triggered, this, &MainWindow::doReload);
     addAction(reloadAction);
 
+    lockAction = new QAction(tr("Lock"), this);
+    lockAction->setShortcut(QKeySequence(Qt::Key_Control,Qt::Key_L));
+    connect(lockAction, &QAction::triggered, this, &MainWindow::lockApp);
+    addAction(lockAction);
+
     settingsAction = new QAction(tr("Settings"), this);
     connect(settingsAction, &QAction::triggered, this, &MainWindow::showSettings);
 
@@ -284,6 +326,7 @@ void MainWindow::createTrayIcon()
     trayIconMenu->addAction(restoreAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(reloadAction);
+    trayIconMenu->addAction(lockAction);
     trayIconMenu->addAction(settingsAction);
     trayIconMenu->addAction(aboutAction);
     trayIconMenu->addSeparator();
@@ -304,37 +347,42 @@ void MainWindow::createTrayIcon()
 
 void MainWindow::init_lock()
 {
-//    if(lockWidget==nullptr){
-//        lockWidget = new Lock(this);
-//        lockWidget->setObjectName("lockWidget");
-//    }
-//        lockWidget->setWindowFlags(Qt::Widget);
-//        lockWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
-//        lockWidget->setGeometry(this->rect());
+    if(lockWidget==nullptr){
+        lockWidget = new Lock(this);
+        lockWidget->setObjectName("lockWidget");
+    }
+        lockWidget->setWindowFlags(Qt::Widget);
+        lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
+                                  "QWidget#signup{background-color:palette(window)}");
+        lockWidget->setSizePolicy(QSizePolicy::Expanding,QSizePolicy::Expanding);
+        lockWidget->setGeometry(this->rect());
 
-//        connect(lockWidget,&Lock::passwordNotSet,[=](){
-//            settings.setValue("lockscreen",false);
-//            ui->applock_checkbox->setChecked(false);
-//        });
+        connect(lockWidget,&Lock::passwordNotSet,[=]()
+        {
+            settings.setValue("lockscreen",false);
+            settingsWidget->appLockSetChecked(false);
+        });
 
-//        connect(lockWidget,&Lock::unLocked,[=]()
-//        {
-//            //unlock event
-//        });
+        connect(lockWidget,&Lock::unLocked,[=]()
+        {
+            //unlock event
+        });
 
-//        connect(lockWidget,&Lock::passwordSet,[=](){
-//            //enable disable lock screen
-//            if(settings.value("asdfg").isValid()){
-//                ui->current_password->setText("Current Password: <i>"+QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
-//            }else{
-//                ui->current_password->setText("Current Password: <i>Require setup</i>");
-//            }
-//            ui->applock_checkbox->setChecked(settings.value("lockscreen",false).toBool());
-//        });
-//        lockWidget->show();
-//        if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==true){
-//            lockWidget->lock_app();
-//        }
+        connect(lockWidget,&Lock::passwordSet,[=](){
+            //enable disable lock screen
+            if(settings.value("asdfg").isValid()){
+                settingsWidget->setCurrentPasswordText("Current Password: <i>"
+                        +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
+            }else{
+               settingsWidget->setCurrentPasswordText("Current Password: <i>Require setup</i>");
+            }
+            settingsWidget->appLockSetChecked(settings.value("lockscreen",false).toBool());
+        });
+        lockWidget->applyThemeQuirks();
+        lockWidget->show();
+        if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==true){
+            lockWidget->lock_app();
+        }
 }
 
 //check window state and set tray menus
@@ -348,6 +396,11 @@ void MainWindow::check_window_state()
         }else{
             ((QMenu*)(tray_icon_menu))->actions().at(0)->setDisabled(true);
             ((QMenu*)(tray_icon_menu))->actions().at(1)->setDisabled(false);
+        }
+        if(lockWidget && lockWidget->isLocked){
+            ((QMenu*)(tray_icon_menu))->actions().at(4)->setDisabled(true);
+        }else{
+            ((QMenu*)(tray_icon_menu))->actions().at(4)->setDisabled(false);
         }
     }
 }
@@ -464,12 +517,13 @@ void MainWindow::createWebPage(bool offTheRecord)
 
     QWebEnginePage *page = new WebEnginePage(profile,webEngine);
     if(settings.value("windowTheme","light").toString() == "dark"){
-        page->setBackgroundColor(QColor("#131C21")); //whatsapp bg color
+        page->setBackgroundColor(QColor("#131C21")); //whatsapp dark bg color
     }
     webEngine->setPage(page);
     //page should be set parent of profile to prevent
     //Release of profile requested but WebEnginePage still not deleted. Expect troubles !
     profile->setParent(page);
+    profile->setSpellCheckEnabled(true);
     //RequestInterceptor *interceptor = new RequestInterceptor(profile);
     //profile->setUrlRequestInterceptor(interceptor);
     page->setUrl(QUrl("https://web.whatsapp.com/"));
@@ -518,6 +572,7 @@ void MainWindow::handleLoadStarted()
 
 void MainWindow::handleLoadFinished(bool loaded)
 {
+    statusBar->hide();
     if(loaded){
         updatePageTheme();
     }
@@ -525,13 +580,10 @@ void MainWindow::handleLoadFinished(bool loaded)
 
 void MainWindow::handleLoadProgress(int progress)
 {
-    if (progress >= 100)
+    statusBar->showMessage("Loading "+QString::number(progress)+"%");
+    if (progress >= 50)
     {
         statusBar->hide();
-    }
-    else
-    {
-        statusBar->showMessage("Loading "+QString::number(progress)+"%");
     }
 }
 
