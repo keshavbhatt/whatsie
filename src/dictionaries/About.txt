@@ -1,0 +1,30 @@
+All dictionaries in this directory were downloaded and extracted from the official 
+libreooffice-dictionaries-5.0.1.2.tar.xz archive available from the website:  
+    https://www.libreoffice.org/download/libreoffice-fresh/
+Downloaded: September 16, 2015
+
+Author and License are summarized below.  For License Details see each dictionaries specific README file:
+
+de_DE-frami
+ - Authors: Bjoern Jacke <bjoern@j3e.de> and Franz Michael Baumann <frami.baumann@web.de>
+ - License: GPL-v3 LGPL-v3+
+
+en_GB
+ - Authors: Kevin Atkinson, David Bartlett, Brian Kelk, Andrew Brown
+ - License: LGPL
+
+en_US
+ - Authors: Kevin Atkinson, Alan Beale, Laslo Nemeth, SCOWL
+ - License: LGPL and BSD-style license with attribute clause.  Please see README_en_US.txt for complete details
+
+es_ANY
+ - A complete list of collaborators and maintainer is provided in the README_es_ANY.txt file
+ - License: GPL, Triple License with MPL
+
+fr-moderne
+ - Authors: http://www.dicollecte.org/, See the Principla Contributors in README_fr.txt
+ - License: MPL-v2.0 GPL-v2 LGPL-v2.1
+
+hyph_fr
+y - http://www.dicollecte.org/
+ - License GNU LGPL
