@@ -1,6 +1,10 @@
 #include "utils.h"
+#include <QApplication>
 #include <QDateTime>
+#include <QMessageBox>
+#include <QProcessEnvironment>
 #include <QRegularExpression>
+#include <time.h>
 
 utils::utils(QObject *parent) : QObject(parent)
 {
@@ -146,13 +150,60 @@ QString utils::returnPath(QString pathname)
     return _data_path+"/"+pathname+"/";
 }
 
+QString utils::EncodeXML(const QString &encodeMe){
+
+    QString temp;
+    int length = encodeMe.size();
+    for (int index = 0; index < length; index++)
+    {
+        QChar character(encodeMe.at(index));
+
+        switch (character.unicode())
+        {
+        case '&':
+            temp += "&amp;"; break;
+
+        case '\'':
+            temp += "&apos;"; break;
+
+        case '"':
+            temp += "&quot;"; break;
+
+        case '<':
+            temp += "&lt;"; break;
+
+        case '>':
+            temp += "&gt;"; break;
+
+        default:
+            temp += character;
+            break;
+        }
+    }
+
+    return temp;
+}
+
+QString utils::DecodeXML(const QString &decodeMe) {
+
+    QString temp(decodeMe);
+
+    temp.replace("&amp;", "&");
+    temp.replace("&apos;", "'");
+    temp.replace("&quot;", "\"");
+    temp.replace("&lt;", "<");
+    temp.replace("&gt;", ">");
+
+    return temp;
+}
+
 
 QString utils::htmlToPlainText(QString str){
     QString out;
-        QTextDocument text;
-        text.setHtml(str);
-        out = text.toPlainText();
-        text.deleteLater();
+    QTextDocument text;
+    text.setHtml(str);
+    out = text.toPlainText();
+    text.deleteLater();
     return out .replace("\\\"","'")
             .replace("&amp;","&")
             .replace("&gt;",">")
@@ -160,3 +211,65 @@ QString utils::htmlToPlainText(QString str){
             .replace("&#39;","'");
 }
 
+
+QString utils::appDebugInfo()
+{
+
+    QStringList debugInfo;
+    debugInfo     << "<h3>"+QApplication::applicationName()+"</h3>"
+                  << "<ul>"
+                  << "<li><b>" + QObject::tr("Version") + ":</b>             " + QString(VERSIONSTR) + "</li>"
+                  << "<li><b>" + QObject::tr("Build Date") + ":</b>          " + QString::fromLatin1(__DATE__) + "</li>"
+                  << "<li><b>" + QObject::tr("Build Time") + ":</b>          " + QString::fromLatin1(__TIME__) + "</li>"
+                  << "<li><b>" + QObject::tr("Qt Runtime Version")+ ":</b>   " + QString(qVersion()) + "</li>"
+                  << "<li><b>" + QObject::tr("Qt Compiled Version") + ":</b> " + QString(QT_VERSION_STR) + "</li>"
+                  << "<li><b>" + QObject::tr("System") + ":</b>              " + QSysInfo::prettyProductName() + "</li>"
+                  << "<li><b>" + QObject::tr("Architecture") + ":</b>        " + QSysInfo::currentCpuArchitecture() + "</li>";
+    debugInfo << "</ul>";
+    return debugInfo.join("\n");
+
+}
+
+void utils::DisplayExceptionErrorDialog(const QString &error_info)
+{
+    QMessageBox message_box(QApplication::activeWindow());
+    message_box.setAttribute(Qt::WA_DeleteOnClose,true);
+    message_box.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
+    message_box.setModal(true);
+    message_box.setIcon(QMessageBox::Critical);
+    message_box.setWindowTitle(QApplication::applicationName()+QObject::tr("Exception"));
+    //spaces are added to the end because otherwise the dialog is too small
+    message_box.setText(QApplication::applicationName()+QObject::tr(" has encountered a problem."));
+    message_box.setInformativeText(QApplication::applicationName()+QObject::tr(" may need to Restart. Please report the error to developer."));
+    message_box.setStandardButtons(QMessageBox::Close);
+    QStringList detailed_text;
+    detailed_text << "Error info: " + error_info
+                  << "\nApp version: " + QString(VERSIONSTR)
+                  << "\nQt Runtime Version: " + QString(qVersion())
+                  << "\nQt Compiled Version: " + QString(QT_VERSION_STR)
+                  << "\nSystem: " + QSysInfo::prettyProductName()
+                  << "\nArchitecture: " + QSysInfo::currentCpuArchitecture();
+    message_box.setDetailedText(detailed_text.join("\n"));
+    message_box.exec();
+}
+
+// Returns the same number, but rounded to one decimal place
+float utils::RoundToOneDecimal(float number)
+{
+    return QString::number(number, 'f', 1).toFloat();
+}
+
+// Returns a value for the environment variable name passed;
+// if the env var isn't set, it returns an empty string
+QString utils::GetEnvironmentVar(const QString &variable_name)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
+    // The only time this might fall down is on Linux when an
+    // environment variable holds bytedata. Don't use this
+    // utility function for retrieval if that's the case.
+    return qEnvironmentVariable(variable_name.toUtf8().constData(), "").trimmed();
+#else
+    // This will typically only be used on older Qts on Linux
+    return QProcessEnvironment::systemEnvironment().value(variable_name, "").trimmed();
+#endif
+}
