@@ -14,8 +14,6 @@
 
 int main(int argc, char *argv[])
 {
-
-
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
     //argv[argc++] = "--single-process";
@@ -44,7 +42,6 @@ int main(int argc, char *argv[])
         }
     #endif
 
-    //QtWebEngine::initialize();
 
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
