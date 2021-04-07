@@ -3,13 +3,20 @@
 #include <QDesktopServices>
 #include <QGraphicsOpacityEffect>
 #include <QPropertyAnimation>
+#include <QTimer>
 #include <QUrl>
+#include <utils.h>
 
 About::About(QWidget *parent) :
     QWidget(parent),
     ui(new Ui::About)
 {
     ui->setupUi(this);
+
+    ui->debugInfoText->setHtml(utils::appDebugInfo());
+    ui->debugInfoText->hide();
+    ui->debugInfoButton->setText(QObject::tr("Show Debug Info"));
+
 
     ui->version->setText("Version: "+QApplication::applicationVersion());
 
@@ -45,4 +52,21 @@ About::About(QWidget *parent) :
 About::~About()
 {
     delete ui;
+}
+
+void About::on_debugInfoButton_clicked()
+{
+    if(ui->debugInfoText->isVisible()){
+        ui->debugInfoText->hide();
+        ui->debugInfoButton->setText(QObject::tr("Show Debug Info"));
+        //update geometry after above loop is finished
+        QTimer::singleShot(300,this,[=]{
+            this->resize(this->width(),this->minimumHeight());
+        });
+    }else{
+        ui->debugInfoText->show();
+        ui->debugInfoButton->setText(QObject::tr("Hide Debug Info"));
+        this->adjustSize();
+    }
+
 }
