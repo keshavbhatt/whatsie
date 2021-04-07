@@ -238,8 +238,8 @@ void MainWindow::showAbout()
 {
     About *about = new About(this);
     about->setWindowFlag(Qt::Dialog);
+    about->setMinimumSize(about->sizeHint());
     about->adjustSize();
-    about->setFixedSize(about->sizeHint());
     about->setAttribute(Qt::WA_DeleteOnClose);
     about->show();
 }
@@ -412,6 +412,7 @@ void MainWindow::init_globalWebProfile()
 
     QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
     profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
+    profile->setSpellCheckEnabled(true);
 
     auto* webSettings = profile->settings();
     webSettings->setAttribute(QWebEngineSettings::AutoLoadImages, true);
@@ -426,6 +427,7 @@ void MainWindow::init_globalWebProfile()
     webSettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled ,true);
     webSettings->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain, false);
     webSettings->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+
     //webSettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
 
     //    QObject::connect(
@@ -500,7 +502,7 @@ void MainWindow::createWebPage(bool offTheRecord)
       }
 
     auto profile = offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
-
+    profile->setSpellCheckEnabled(true);
     profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
 
         auto popup = new NotificationPopup(webEngine);
@@ -528,7 +530,6 @@ void MainWindow::createWebPage(bool offTheRecord)
     //Release of profile requested but WebEnginePage still not deleted. Expect troubles !
     profile->setParent(page);
 
-    profile->setSpellCheckEnabled(true);
 //    RequestInterceptor *interceptor = new RequestInterceptor(profile);
 //    profile->setUrlRequestInterceptor(interceptor);
     qsrand(time(NULL));
@@ -595,7 +596,7 @@ void MainWindow::checkLoadedCorrectly()
             "document.getElementsByClassName('landing-title')[0].innerText",
             [this](const QVariant &result){
                 qWarning()<<"Loaded correctly value:"<<result.toString();
-                if(result.toString().contains("Google Chrome",Qt::CaseInsensitive)){
+                if(result.toString().contains("WhatsApp works with",Qt::CaseInsensitive)){
                     //contains ug message apply quirk
                     if(correctlyLoaderRetries > -1){
                         qWarning()<<"doReload()"<<correctlyLoaderRetries;
@@ -604,16 +605,26 @@ void MainWindow::checkLoadedCorrectly()
                     }else{
                         utils::delete_cache(webEngine->page()->profile()->cachePath());
                         utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
-                        QMessageBox::information(this,QApplication::applicationName()+"| Page load error",
-                                              "Application restart required.\nPlease restart application.");
+                        settings.setValue("useragent",defaultUserAgentStr);
+                        utils * util = new utils(this);
+                        util->DisplayExceptionErrorDialog("checkLoadedCorrectly() reload retries 0, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
+
                         quitAction->trigger();
                     }
-                    //webEngine->page()->runJavaScript("this.window.location.replace('https://web.whatsapp.com?v=' + Math.floor((Math.random() * 1000) + 1).toString(), {});");
+                }else if(webEngine->title().contains("Error",Qt::CaseInsensitive)){
+                    utils::delete_cache(webEngine->page()->profile()->cachePath());
+                    utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
+                    settings.setValue("useragent",defaultUserAgentStr);
+                    utils * util = new utils(this);
+                    util->DisplayExceptionErrorDialog("handleWebViewTitleChanged(title) title: Error, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
+
+                    quitAction->trigger();
                 }
             }
         );
     }
 }
+
 
 void MainWindow::handleLoadProgress(int progress)
 {
