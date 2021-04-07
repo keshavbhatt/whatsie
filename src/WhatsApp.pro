@@ -41,6 +41,7 @@ DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 SOURCES += \
         about.cpp \
+        dictionaries.cpp \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
         elidedlabel.cpp \
@@ -59,6 +60,7 @@ RESOURCES += \
 HEADERS += \
     about.h \
     common.h \
+    dictionaries.h \
     downloadmanagerwidget.h \
     downloadwidget.h \
     elidedlabel.h \
