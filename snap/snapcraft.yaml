@@ -2,7 +2,7 @@ name: whatsie
 version: git
 summary: Qt Based WhatsApp Client
 description: |
-  Fast Light weight WhatsApp Client based  on Qt's WebEngine, With lots of settings and packed goodies. 
+  Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies. 
 grade: stable
 confinement: strict
 icon: snap/gui/icon.png
@@ -19,7 +19,6 @@ apps:
        DISABLE_WAYLAND: 1
     desktop: usr/share/applications/whatsie.desktop
     plugs:
-        - avahi-observe
         - browser-support
         - camera
         - desktop
@@ -31,17 +30,18 @@ apps:
         - audio-record
         - removable-media
         - screen-inhibit-control
-        - u2f-devices
         - unity7
-        - upower-observe
         - x11
-        - hostname-control
-        - mount-observe
         - network
-        - network-control
-        - network-observe
-        - network-bind
         - wayland
+        #- upower-observe
+        #- avahi-observe
+        #- u2f-devices
+        #- hostname-control
+        #- mount-observe
+        #- network-control
+        #- network-observe
+        #- network-bind
 plugs:
   gsettings:
   gtk-3-themes:
