@@ -10,6 +10,13 @@ CONFIG += c++11
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
+!qtConfig(webengine-spellchecker) {
+    error("Qt WebEngine compiled without spellchecker support, this example will not work.")
+}
+
+qtConfig(webengine-native-spellchecker) {
+    error("Spellcheck example can not be built when using native OS dictionaries.")
+}
 
 TARGET = whatsie
 TEMPLATE = app
@@ -52,6 +59,7 @@ SOURCES += \
         settingswidget.cpp \
         utils.cpp \
         webenginepage.cpp \
+        webview.cpp \
         widgets/scrolltext/scrolltext.cpp
 
 RESOURCES += \
@@ -72,7 +80,49 @@ HEADERS += \
     settingswidget.h \
     utils.h \
     webenginepage.h \
+    webview.h \
     widgets/scrolltext/scrolltext.h
+
+
+FORMS += \
+    about.ui \
+    certificateerrordialog.ui \
+    downloadmanagerwidget.ui \
+    downloadwidget.ui \
+    lock.ui \
+    passworddialog.ui \
+    settingswidget.ui
+
+DISTFILES += \
+    dict/de/de-DE.aff \
+    dict/de/de-DE.dic \
+    dict/en/en-US.aff \
+    dict/en/en-US.dic \
+    dict/es/es.aff \
+    dict/es/es.dic \
+    dict/fr/fr.aff \
+    dict/fr/fr.dic \
+    dict/gb/en-GB.aff \
+    dict/gb/en-GB.dic
+
+qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
+
+debug_and_release {
+    CONFIG(debug, debug|release): DICTIONARIES_DIR = debug/qtwebengine_dictionaries
+    else: DICTIONARIES_DIR = release/qtwebengine_dictionaries
+} else {
+    DICTIONARIES_DIR = qtwebengine_dictionaries
+}
+
+dict.files = $$files($$PWD/dictionaries/*.dic, true)
+
+dictoolbuild.input = dict.files
+dictoolbuild.output = $${DICTIONARIES_DIR}/${QMAKE_FILE_BASE}.bdic
+dictoolbuild.depends = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.aff
+dictoolbuild.commands = $${CONVERT_TOOL} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+dictoolbuild.name = Build ${QMAKE_FILE_IN_BASE}
+dictoolbuild.CONFIG = no_link target_predeps
+QMAKE_EXTRA_COMPILERS += dictoolbuild
 
 
 # Default rules for deployment.
@@ -92,13 +142,4 @@ desktop.files = whatsie.desktop
 desktop.path = $$DATADIR/applications/
 
 INSTALLS += target icon desktop
-
-FORMS += \
-    about.ui \
-    certificateerrordialog.ui \
-    downloadmanagerwidget.ui \
-    downloadwidget.ui \
-    lock.ui \
-    passworddialog.ui \
-    settingswidget.ui
 
