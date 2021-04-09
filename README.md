@@ -11,7 +11,22 @@ on Linux. Not affiliated with WhatsApp or Facebook.
 - BuiltIn download manager
 - Mute Audio, Disable Notifications
 - App Lock feature
-- Other settings that lets you control every aspect of WebApp.
+- Built in Spell Checker (with support for 31 Major languages)
+- Other settings that let you control every aspect of WebApp.
+
+## Install:
+
+ `snap install whatsie`
+ 
+ [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/whatsie)
+
+## Snap permissions:
+
+To enable audio recording and camera in application connect to the respective slot using store permission option or via command line using the following commands:
+- for microphone permission
+ `snap connect whatsie:audio-record`
+- for camera permission
+ `snap connect whatsie:camera`
 
 
 ## Screenshot
