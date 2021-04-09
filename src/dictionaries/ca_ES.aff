@@ -1,0 +1,802 @@
+# Un fitxer d'afixos per al català
+# Creat per Joan Moratinos, 2002 (jmo@softcatala.org)
+
+# Generat a partir de C:/Documents/Programes/prepMySpell/jmo_regles.txt
+
+# Regles
+#     A  Primera conjugació regular
+#     B  Quatre formes amb canvi t > d, u > v, c > g, s > ss
+#     C  Pronoms personals enclítics darrere consonant
+#     D  Pronoms personals enclítics darrere vocal
+#     E  Plurals afegint una s (eventualment amb canvis)
+#     F  Quatre formes afegint a/s/es (sense o)
+#     G  Plurals afegint ns
+#     H  Quatre formes afegint ns
+#     I  Plurals afegint o
+#     J  Quatre formes afegint a/os/es
+#     K  Quatre formes amb canvi d'accent (accent greu)
+#     L  Quatre formes amb canvi d'accent (accent agut)
+#     M  Verbs en -ir, formes comunes als grups III, IV i V
+#     N  Verbs en -ir, formes incoatives
+#     O  Imperfet d'indicatiu de la segona conjugació
+#     P  Formes de la segona conjugació semblants a SIM1 sense -c/-gu (perdés)
+#     Q  Formes de la segona conjugació semblants a SIM1 amb -c/-gu (conegués)
+#     R  Formes de la segona conjugació semblants al gerundi
+#     S  Formes de la segona conjugació semblants a "plaus", "absols", etc.
+#     T  Futurs i condicionals a partir de FUT1
+#     U  Formes pures dels verbs en -ir, a partir d'IPR3 (p.e. sent)
+#     V  Article prefixat no combinable
+#     Y  Preposició "de" apostrofada
+#     Z  Pronoms personals prefixats
+
+# Inclou els següents grups
+#     ---: Sense condicions
+#     001: Indicatiu present en -am i -au (cantam, cantau)
+#     002: Subjuntiu imperfet en -às,-assis, etc. (cantàs, cantassis)
+#     005: Incoatius en -esc (patesc)
+#     101: Accepta "complit", etc.
+#     102: Accepta "duim", "feim", etc.
+# grups: --- 001 002 !003 !004 005 !006 !007 !008 !009 !010 101 102 !999
+
+SET ISO8859-1
+
+TRY easirtocnlumdpgvfbqjwxyzhàèéíïòóúü·-
+
+# substitucions preferides
+FIRST a/à e/é/è é/è/e è/é/e i/í/ï í/i/ï o/ó/ò ó/ò/o ò/ó/o u/ú/ü ú/u/ü ü/u/ú
+FIRST l/l·l l·l/l
+
+# Pronoms personals enclítics darrere consonant
+SFX C Y 81
+SFX C   0      -me         .                # posar-me
+SFX C   0      -nos        .                # posar-nos
+SFX C   0      -te         .                # posar-te
+SFX C   0      -vos        .                # posar-vos
+SFX C   0      -se         .                # posar-se
+SFX C   0      -lo         .                # posar-lo
+SFX C   0      -la         .                # posar-la
+SFX C   0      -li         .                # posar-li
+SFX C   0      -los        .                # posar-los
+SFX C   0      -les        .                # posar-les
+SFX C   0      -ho         .                # posar-ho
+SFX C   0      -hi         .                # posar-hi
+SFX C   0      -ne         .                # posar-ne
+SFX C   0      -se't       .                # posar-se't
+SFX C   0      -se-us      .                # posar-se-us
+SFX C   0      -se'm       .                # posar-se'm
+SFX C   0      -te'm       .                # posar-te'm
+SFX C   0      -vos-em     .                # posar-vos-em
+SFX C   0      -se'ns      .                # posar-se'ns
+SFX C   0      -te'ns      .                # posar-te'ns
+SFX C   0      -vos-ens    .                # posar-vos-ens
+SFX C   0      -se'l       .                # posar-se'l
+SFX C   0      -te'l       .                # posar-te'l
+SFX C   0      -vos-el     .                # posar-vos-el
+SFX C   0      -me'l       .                # posar-me'l
+SFX C   0      -nos-el     .                # posar-nos-el
+SFX C   0      -los-el     .                # posar-los-el
+SFX C   0      -l'hi       .                # posar-l'hi
+SFX C   0      -se'ls      .                # posar-se'ls
+SFX C   0      -te'ls      .                # posar-te'ls
+SFX C   0      -vos-els    .                # posar-vos-els
+SFX C   0      -me'ls      .                # posar-me'ls
+SFX C   0      -nos-els    .                # posar-nos-els
+SFX C   0      -los-els    .                # posar-los-els
+SFX C   0      -los-hi     .                # posar-los-hi
+SFX C   0      -se-la      .                # posar-se-la
+SFX C   0      -te-la      .                # posar-te-la
+SFX C   0      -vos-la     .                # posar-vos-la
+SFX C   0      -me-la      .                # posar-me-la
+SFX C   0      -nos-la     .                # posar-nos-la
+SFX C   0      -los-la     .                # posar-los-la
+SFX C   0      -la-hi      .                # posar-la-hi
+SFX C   0      -se-les     .                # posar-se-les
+SFX C   0      -te-les     .                # posar-te-les
+SFX C   0      -vos-les    .                # posar-vos-les
+SFX C   0      -me-les     .                # posar-me-les
+SFX C   0      -nos-les    .                # posar-nos-les
+SFX C   0      -los-les    .                # posar-los-les
+SFX C   0      -les-hi     .                # posar-les-hi
+SFX C   0      -se-li      .                # posar-se-li
+SFX C   0      -te-li      .                # posar-te-li
+SFX C   0      -vos-li     .                # posar-vos-li
+SFX C   0      -me-li      .                # posar-me-li
+SFX C   0      -nos-li     .                # posar-nos-li
+SFX C   0      -s'ho       .                # posar-s'ho
+SFX C   0      -t'ho       .                # posar-t'ho
+SFX C   0      -vos-ho     .                # posar-vos-ho
+SFX C   0      -m'ho       .                # posar-m'ho
+SFX C   0      -nos-ho     .                # posar-nos-ho
+SFX C   0      -los-ho     .                # posar-los-ho
+SFX C   0      -li-ho      .                # posar-li-ho
+SFX C   0      -se'n       .                # posar-se'n
+SFX C   0      -te'n       .                # posar-te'n
+SFX C   0      -vos-en     .                # posar-vos-en
+SFX C   0      -me'n       .                # posar-me'n
+SFX C   0      -nos-en     .                # posar-nos-en
+SFX C   0      -l'en       .                # posar-l'en
+SFX C   0      -los-en     .                # posar-los-en
+SFX C   0      -la'n       .                # posar-la'n
+SFX C   0      -les-en     .                # posar-les-en
+SFX C   0      -li'n       .                # posar-li'n
+SFX C   0      -s'hi       .                # posar-s'hi
+SFX C   0      -t'hi       .                # posar-t'hi
+SFX C   0      -vos-hi     .                # posar-vos-hi
+SFX C   0      -m'hi       .                # posar-m'hi
+SFX C   0      -nos-hi     .                # posar-nos-hi
+SFX C   0      -l'hi       .                # posar-l'hi
+SFX C   0      -los-hi     .                # posar-los-hi
+SFX C   0      -la-hi      .                # posar-la-hi
+SFX C   0      -les-hi     .                # posar-les-hi
+SFX C   0      -n'hi       .                # posar-n'hi
+
+# Pronoms personals enclítics darrere vocal
+SFX D Y 81
+SFX D   0      'm          .                # posa'm
+SFX D   0      'ns         .                # posa'ns
+SFX D   0      't          .                # posa't
+SFX D   0      -us         .                # posa-us
+SFX D   0      's          .                # posa's
+SFX D   0      'l          .                # posa'l
+SFX D   0      -la         .                # posa-la
+SFX D   0      -li         .                # posa-li
+SFX D   0      'ls         .                # posa'ls
+SFX D   0      -les        .                # posa-les
+SFX D   0      -ho         .                # posa-ho
+SFX D   0      -hi         .                # posa-hi
+SFX D   0      'n          .                # posa'n
+SFX D   0      -se't       .                # posa-se't
+SFX D   0      -se-us      .                # posa-se-us
+SFX D   0      -se'm       .                # posa-se'm
+SFX D   0      -te'm       .                # posa-te'm
+SFX D   0      -us-em      .                # posa-us-em
+SFX D   0      -se'ns      .                # posa-se'ns
+SFX D   0      -te'ns      .                # posa-te'ns
+SFX D   0      -us-ens     .                # posa-us-ens
+SFX D   0      -se'l       .                # posa-se'l
+SFX D   0      -te'l       .                # posa-te'l
+SFX D   0      -us-el      .                # posa-us-el
+SFX D   0      -me'l       .                # posa-me'l
+SFX D   0      'ns-el      .                # posa'ns-el
+SFX D   0      'ls-el      .                # posa'ls-el
+SFX D   0      -l'hi       .                # posa-l'hi
+SFX D   0      -se'ls      .                # posa-se'ls
+SFX D   0      -te'ls      .                # posa-te'ls
+SFX D   0      -us-els     .                # posa-us-els
+SFX D   0      -me'ls      .                # posa-me'ls
+SFX D   0      'ns-els     .                # posa'ns-els
+SFX D   0      'ls-els     .                # posa'ls-els
+SFX D   0      'ls-hi      .                # posa'ls-hi
+SFX D   0      -se-la      .                # posa-se-la
+SFX D   0      -te-la      .                # posa-te-la
+SFX D   0      -us-la      .                # posa-us-la
+SFX D   0      -me-la      .                # posa-me-la
+SFX D   0      'ns-la      .                # posa'ns-la
+SFX D   0      'ls-la      .                # posa'ls-la
+SFX D   0      -la-hi      .                # posa-la-hi
+SFX D   0      -se-les     .                # posa-se-les
+SFX D   0      -te-les     .                # posa-te-les
+SFX D   0      -us-les     .                # posa-us-les
+SFX D   0      -me-les     .                # posa-me-les
+SFX D   0      'ns-les     .                # posa'ns-les
+SFX D   0      'ls-les     .                # posa'ls-les
+SFX D   0      -les-hi     .                # posa-les-hi
+SFX D   0      -se-li      .                # posa-se-li
+SFX D   0      -te-li      .                # posa-te-li
+SFX D   0      -us-li      .                # posa-us-li
+SFX D   0      -me-li      .                # posa-me-li
+SFX D   0      'ns-li      .                # posa'ns-li
+SFX D   0      -s'ho       .                # posa-s'ho
+SFX D   0      -t'ho       .                # posa-t'ho
+SFX D   0      -us-ho      .                # posa-us-ho
+SFX D   0      -m'ho       .                # posa-m'ho
+SFX D   0      'ns-ho      .                # posa'ns-ho
+SFX D   0      'ls-ho      .                # posa'ls-ho
+SFX D   0      -li-ho      .                # posa-li-ho
+SFX D   0      -se'n       .                # posa-se'n
+SFX D   0      -te'n       .                # posa-te'n
+SFX D   0      -us-en      .                # posa-us-en
+SFX D   0      -me'n       .                # posa-me'n
+SFX D   0      'ns-en      .                # posa'ns-en
+SFX D   0      -l'en       .                # posa-l'en
+SFX D   0      'ls-en      .                # posa'ls-en
+SFX D   0      -la'n       .                # posa-la'n
+SFX D   0      -les-en     .                # posa-les-en
+SFX D   0      -li'n       .                # posa-li'n
+SFX D   0      -s'hi       .                # posa-s'hi
+SFX D   0      -t'hi       .                # posa-t'hi
+SFX D   0      -us-hi      .                # posa-us-hi
+SFX D   0      -m'hi       .                # posa-m'hi
+SFX D   0      'ns-hi      .                # posa'ns-hi
+SFX D   0      -l'hi       .                # posa-l'hi
+SFX D   0      'ls-hi      .                # posa'ls-hi
+SFX D   0      -la-hi      .                # posa-la-hi
+SFX D   0      -les-hi     .                # posa-les-hi
+SFX D   0      -n'hi       .                # posa-n'hi
+
+# Plurals afegint una s (eventualment amb canvis)
+SFX E Y 8
+SFX E   0      s           [^as]            # homes 3.
+SFX E   a      es          [^cçgju]a        # dones
+SFX E   a      es          [^gq]ua          # grues
+SFX E   ua     ües         [gq]ua           # aigües, siliqües
+SFX E   ca     ques        ca               # vaques
+SFX E   ça     ces         ça               # terces
+SFX E   ga     gues        ga               # bagues
+SFX E   ja     ges         ja               # pluges
+
+# Plurals afegint o
+SFX I Y 9
+SFX I   0      os          [^s]             # guixos  3.
+SFX I   0      os          [aeiou]s         # gasos
+SFX I   às     asos        às               # biogasos
+SFX I   ès     esos        ès               # entesos
+SFX I   és     esos        és               # 
+SFX I   ís     isos        ís               # avisos
+SFX I   òs     osos        òs               # 
+SFX I   ós     osos        ós               # 
+SFX I   ús     usos        ús               # 
+
+# Plurals afegint ns
+SFX G Y 12
+SFX G   0      ns          a                # pans          3.
+SFX G   0      ns          e                # blens
+SFX G   0      ns          i                # brins
+SFX G   0      ns          o                # trons
+SFX G   0      ns          u                # bruns
+SFX G   à      ans         à                # germans
+SFX G   è      ens         è                # amens
+SFX G   é      ens         é                # 
+SFX G   í      ins         í                # camins
+SFX G   ò      ons         ò                # ultrasons
+SFX G   ó      ons         ó                # avions
+SFX G   ú      uns         ú                # tribuns
+
+# Quatre formes afegint a/s/es (sense o)
+SFX F Y 11
+SFX F   0      a           [^eosxç]         # verda  2.
+SFX F   e      a           e                # altra
+SFX F   o      a           o                # fonda
+SFX F   0      s           [^asçx]          # verds  3.
+SFX F   a      es          a                # poeta
+SFX F   0      es          [^aocçgsx]       # verdes 4.
+SFX F   a      es          a                # poeta
+SFX F   o      es          o                # fondes
+SFX F   c      ques        c                # poques
+SFX F   ç      ces         ç                # felices
+SFX F   g      gues        g                # antropòfag
+
+# Quatre formes amb canvi t > d, u > v, c > g, s > ss
+SFX B Y 12
+SFX B   t      da          t                # abalida - canvi t > d   2.
+SFX B   u      va          u                # nova    - canvi u > v
+SFX B   c      ga          c                # antiga  - canvi c > g
+SFX B   0      sa          s                # grossa  - canvi s > ss
+SFX B   0      s           t                # abalits                 3.
+SFX B   0      s           u                # nous
+SFX B   0      cs          c                # antics
+SFX B   0      sos         s                # grossos
+SFX B   t      des         t                # abalides                4.
+SFX B   u      ves         u                # noves
+SFX B   c      gues        c                # antigues
+SFX B   0      ses         s                # grosses
+
+# Quatre formes afegint ns
+SFX H Y 24
+SFX H   0      na          [aeiou]          # plana, plena, fina, bona, bruna   2.
+SFX H   à      ana         à                # forana
+SFX H   è      ena         è                # amena
+SFX H   é      ena         é                # 
+SFX H   í      ina         í                # albina
+SFX H   ò      ona         ò                # 
+SFX H   ó      ona         ó                # rodona
+SFX H   ú      una         ú                # dejuna
+SFX H   0      ns          [aeiou]          # plans, plens, fins, bons, bruns   3.
+SFX H   à      ans         à                # forans
+SFX H   è      ens         è                # amens
+SFX H   é      ens         é                # 
+SFX H   í      ins         í                # albins
+SFX H   ò      ons         ò                # 
+SFX H   ó      ons         ó                # rodons
+SFX H   ú      uns         ú                # dejuns
+SFX H   0      nes         [aeiou]          # planes, plenes, fines, bones, brunes 4.
+SFX H   à      anes        à                # foranes
+SFX H   è      enes        è                # amenes
+SFX H   é      enes        é                # 
+SFX H   í      ines        í                # albines
+SFX H   ò      ones        ò                # 
+SFX H   ó      ones        ó                # rodones
+SFX H   ú      unes        ú                # dejunes
+
+# Quatre formes afegint a/os/es
+SFX J Y 28
+SFX J   0      a           [^s]             #          2.
+SFX J   0      a           [^àèéíòóú]s      # agradosa
+SFX J   às     asa         às               # 
+SFX J   ès     esa         ès               # 
+SFX J   és     esa         és               # 
+SFX J   ís     isa         ís               # 
+SFX J   òs     osa         òs               # 
+SFX J   ós     osa         ós               # 
+SFX J   ús     usa         ús               # 
+SFX J   0      os          [^s]             #          3.
+SFX J   0      os          [^àèéíòóú]s      # agradosos
+SFX J   às     asos        às               # 
+SFX J   ès     esos        ès               # 
+SFX J   és     esos        és               # 
+SFX J   ís     isos        ís               # 
+SFX J   òs     osos        òs               # 
+SFX J   ós     osos        ós               # 
+SFX J   ús     usos        ús               # 
+SFX J   0      es          [^sç]            #          4.
+SFX J   ç      ces         ç                # terces
+SFX J   0      es          [^àèéíòóú]s      # agradoses
+SFX J   às     ases        às               # 
+SFX J   ès     eses        ès               # 
+SFX J   és     eses        és               # 
+SFX J   ís     ises        ís               # 
+SFX J   òs     oses        òs               # 
+SFX J   ós     oses        ós               # 
+SFX J   ús     uses        ús               # 
+
+# Quatre formes amb canvi d'accent (accent greu)
+SFX K Y 16
+SFX K   ari    ària        ari              # partidària  2.
+SFX K   aci    àcia        aci              # acantàcia
+SFX K   adi    àdia        adi              # accàdia
+SFX K   ori    òria        ori              # abjuratòria
+SFX K   emi    èmia        emi              # abstèmia
+SFX K   oli    òlia        oli              # caducifòlia
+SFX K   ogen   ògena       ogen             # exògena
+SFX K   0      s           [aeiou]          # partidaris  3.
+SFX K   ogen   ògens       ogen             # exògens
+SFX K   ari    àries       ari              # partidàries 4.
+SFX K   adi    àdies       adi              # accàdies
+SFX K   aci    àcies       aci              # acantàcies
+SFX K   ori    òries       ori              # abjuratòries
+SFX K   emi    èmies       emi              # abstèmies
+SFX K   oli    òlies       oli              # caducifòlies
+SFX K   ogen   ògenes      ogen             # exògenes
+
+# Quatre formes amb canvi d'accent (accent agut)
+SFX L Y 5
+SFX L   ini    ínia        ini              # abissínia 2.
+SFX L   igi    ígia        igi              # frígia
+SFX L   0      s           .                # abissinis 3.
+SFX L   ini    ínies       ini              # abissinis 4.
+SFX L   igi    ígies       igi              # frígies
+
+# Primera conjugació regular
+SFX A Y 194
+SFX A   ava    o           ava              # 1. canto - indicatiu present <IPR>
+SFX A   ava    es          [^cçgju]ava      # 2. cantes
+SFX A   ava    es          [^gq]uava        #    sues
+SFX A   guava  gües        guava            #    enaigües
+SFX A   quava  qües        quava            #    adeqües
+SFX A   cava   ques        cava             #    cerques
+SFX A   çava   ces         çava             #    caces
+SFX A   gava   gues        gava             #    porgues 
+SFX A   java   ges         java             #    venges
+SFX A   ava    a           ava              # 3. canta
+SFX A   ava    em          [^cçgju]ava      # 4. cantem
+SFX A   ava    em          [^gq]uava        #    suem
+SFX A   guava  güem        guava            #    enaigüem
+SFX A   quava  qüem        quava            #    adeqüem
+SFX A   cava   quem        cava             #    cerquem
+SFX A   çava   cem         çava             #    cacem
+SFX A   gava   guem        gava             #    porguem 
+SFX A   java   gem         java             #    vengem
+SFX A   ava    am          ava              #    cantam
+SFX A   ava    eu          [^cçgju]ava      # 5. canteu
+SFX A   ava    eu          [^gq]uava        #    sueu
+SFX A   guava  güeu        guava            #    enaigüeu
+SFX A   quava  qüeu        quava            #    adeqüeu
+SFX A   cava   queu        cava             #    cerqueu
+SFX A   çava   ceu         çava             #    caceu
+SFX A   gava   gueu        gava             #    porgueu 
+SFX A   java   geu         java             #    vengeu
+SFX A   ava    au          ava              #    cantau
+SFX A   ava    en          [^cçgju]ava      # 6. canten
+SFX A   ava    en          [^gq]uava        #    suen
+SFX A   guava  güen        guava            #    enaigüen
+SFX A   quava  qüen        quava            #    adeqüen
+SFX A   cava   quen        cava             #    cerquen
+SFX A   çava   cen         çava             #    cacen
+SFX A   gava   guen        gava             #    porguen 
+SFX A   java   gen         java             #    vengen
+SFX A   ava    ava         ava              # 1. cantava - indicatiu imperfet <IIM>
+SFX A   ava    aves        ava              # 2. cantaves
+SFX A   ava    ava         ava              # 3. cantava
+SFX A   ava    àvem        ava              # 4. cantàvem
+SFX A   ava    àveu        ava              # 5. cantàveu
+SFX A   ava    aven        ava              # 6. cantaven
+SFX A   ava    í           [^cçgj]ava       # 1. cantí - indicatiu perfet <IPE>
+SFX A   cava   quí         cava             #    cerquí
+SFX A   çava   cí          çava             #    cací
+SFX A   gava   guí         gava             #    porguí
+SFX A   java   gí          java             #    vengí
+SFX A   ava    ares        ava              # 2. cantares
+SFX A   ava    à           ava              # 3. cantà
+SFX A   ava    àrem        ava              # 4. cantàrem
+SFX A   ava    àreu        ava              # 5. cantàreu
+SFX A   ava    aren        ava              # 6. cantaren
+SFX A   ava    aré         ava              # 1. cantaré - futur <FUT>
+SFX A   ava    aràs        ava              # 2. cantaràs
+SFX A   ava    arà         ava              # 3. cantarà
+SFX A   ava    arem        ava              # 4. cantarem
+SFX A   ava    areu        ava              # 5. cantareu
+SFX A   ava    aran        ava              # 6. cantaran
+SFX A   ava    aria        ava              # 1. cantaria - condicional <CON>
+SFX A   ava    aries       ava              # 2. cantaries
+SFX A   ava    aria        ava              # 3. cantaria
+SFX A   ava    aríem       ava              # 4. cantaríem
+SFX A   ava    aríeu       ava              # 5. cantaríeu
+SFX A   ava    arien       ava              # 6. cantarien
+SFX A   ava    i           [^cçgjeiou]ava   # 1. canti - subjuntiu present <SPR>
+SFX A   ava    ï           [^aeiou][eio]ava #    suï
+SFX A   iava   ï           [aeiou]iava      #    desmaï
+SFX A   guava  güi         guava            #    enaigüi
+SFX A   quava  qüi         quava            #    adeqüi
+SFX A   uava   uï          [^gq]uava        #    evacuï
+SFX A   cava   qui         cava             #    cerqui
+SFX A   çava   ci          çava             #    caci
+SFX A   gava   gui         gava             #    porgui
+SFX A   java   gi          java             #    vengi
+SFX A   ava    is          [^cçgjeiou]ava   # 2. cantis
+SFX A   ava    ïs          [^aeiou][eio]ava #    suïs
+SFX A   iava   ïs          [aeiou]iava      #    desmaïs
+SFX A   guava  güis        guava            #    enaigüis
+SFX A   quava  qüis        quava            #    adeqüis
+SFX A   uava   uïs         [^gq]uava        #    evacuïs
+SFX A   cava   quis        cava             #    cerquis
+SFX A   çava   cis         çava             #    cacis
+SFX A   gava   guis        gava             #    porguis
+SFX A   java   gis         java             #    vengis
+SFX A   ava    i           [^cçgjeiou]ava   # 3. canti
+SFX A   ava    ï           [^aeiou][eio]ava #    suï
+SFX A   iava   ï           [aeiou]iava      #    desmaï
+SFX A   guava  güi         guava            #    enaigüi
+SFX A   quava  qüi         quava            #    adeqüi
+SFX A   uava   uï          [^gq]uava        #    evacuï
+SFX A   cava   qui         cava             #    cerqui
+SFX A   çava   ci          çava             #    caci
+SFX A   gava   gui         gava             #    porgui
+SFX A   java   gi          java             #    vengi
+SFX A   ava    em          [^cçgju]ava      # 4. cantem
+SFX A   ava    em          [^gq]uava        #    suem
+SFX A   guava  güem        guava            #    enaigüem
+SFX A   quava  qüem        quava            #    adeqüem
+SFX A   cava   quem        cava             #    cerquem
+SFX A   çava   cem         çava             #    cacem
+SFX A   gava   guem        gava             #    porguem
+SFX A   java   gem         java             #    vengem
+SFX A   ava    eu          [^cçgju]ava      # 5. canteu
+SFX A   ava    eu          [^gq]uava        #    sueu
+SFX A   guava  güeu        guava            #    enaigüeu
+SFX A   quava  qüeu        quava            #    adeqüeu
+SFX A   cava   queu        cava             #    cerqueu
+SFX A   çava   ceu         çava             #    caceu
+SFX A   gava   gueu        gava             #    porgueu
+SFX A   java   geu         java             #    vengeu
+SFX A   ava    in          [^cçgjeiou]ava   # 6. cantin
+SFX A   ava    ïn          [^aeiou][eio]ava #    suïn
+SFX A   iava   ïn          [aeiou]iava      #    desmaïn
+SFX A   guava  güin        guava            #    enaigüin
+SFX A   quava  qüin        quava            #    adeqüin
+SFX A   uava   uïn         [^gq]uava        #    evacuïn
+SFX A   cava   quin        cava             #    cerquin
+SFX A   çava   cin         çava             #    cacin
+SFX A   gava   guin        gava             #    porguin
+SFX A   java   gin         java             #    vengin
+SFX A   ava    és          [^cçgj]ava       # 1. cantés - subjuntiu imperfet <SIM>
+SFX A   cava   qués        cava             #    cerqués
+SFX A   çava   cés         çava             #    cacés
+SFX A   gava   gués        gava             #    porgués
+SFX A   java   gés         java             #    vengés
+SFX A   ava    às          ava              #    cantàs
+SFX A   ava    essis       [^cçgj]ava       # 2. cantessis
+SFX A   cava   quessis     cava             #    cerquessis
+SFX A   çava   cessis      çava             #    cacessis
+SFX A   gava   guessis     gava             #    porguessis
+SFX A   java   gessis      java             #    vengessis
+SFX A   ava    assis       ava              #    cantassis
+SFX A   ava    és          [^cçgj]ava       # 3. cantés
+SFX A   cava   qués        cava             #    cerqués
+SFX A   çava   cés         çava             #    cacés
+SFX A   gava   gués        gava             #    porgués
+SFX A   java   gés         java             #    vengés
+SFX A   ava    às          ava              #    cantàs
+SFX A   ava    éssim       [^cçgj]ava       # 4. cantéssim
+SFX A   cava   quéssim     cava             #    cerquéssim
+SFX A   çava   céssim      çava             #    cacéssim
+SFX A   gava   guéssim     gava             #    porguéssim
+SFX A   java   géssim      java             #    vengéssim
+SFX A   ava    àssim       ava              #    cantàssim
+SFX A   ava    éssiu       [^cçgj]ava       # 5. cantéssiu
+SFX A   cava   quéssiu     cava             #    cerquéssiu
+SFX A   çava   céssiu      çava             #    cacéssiu
+SFX A   gava   guéssiu     gava             #    porguéssiu
+SFX A   java   géssiu      java             #    vengéssiu
+SFX A   ava    àssiu       ava              #    cantàssiu
+SFX A   ava    essin       [^cçgj]ava       # 6. cantessin
+SFX A   cava   quessin     cava             #    cerquessin
+SFX A   çava   cessin      çava             #    cacessin
+SFX A   gava   guessin     gava             #    porguessin
+SFX A   java   gessin      java             #    vengessin
+SFX A   ava    assin       ava              #    cantassin
+SFX A   ava    a           ava              # 2. canta - imperatiu <IMP>
+SFX A   ava    i           [^cçgjeiou]ava   # 3. canti
+SFX A   ava    ï           [^aeiou][eio]ava #    suï
+SFX A   iava   ï           [aeiou]iava      #    desmaï
+SFX A   guava  güi         guava            #    enaigüi
+SFX A   quava  qüi         quava            #    adeqüi
+SFX A   uava   uï          [^gq]uava        #    evacuï
+SFX A   cava   qui         cava             #    cerqui
+SFX A   çava   ci          çava             #    caci
+SFX A   gava   gui         gava             #    porgui
+SFX A   java   gi          java             #    vengi
+SFX A   ava    em          [^cçgju]ava      # 4. cantem
+SFX A   ava    em          [^gq]uava        #    suem
+SFX A   guava  güem        guava            #    enaigüem
+SFX A   quava  qüem        quava            #    adeqüem
+SFX A   cava   quem        cava             #    cerquem
+SFX A   çava   cem         çava             #    cacem
+SFX A   gava   guem        gava             #    porguem
+SFX A   java   gem         java             #    vengem
+SFX A   ava    eu          [^cçgju]ava      # 5. canteu
+SFX A   ava    eu          [^gq]uava        #    sueu
+SFX A   guava  güeu        guava            #    enaigüeu
+SFX A   quava  qüeu        quava            #    adeqüeu
+SFX A   cava   queu        cava             #    cerqueu
+SFX A   çava   ceu         çava             #    caceu
+SFX A   gava   gueu        gava             #    porgueu
+SFX A   java   geu         java             #    vengeu
+SFX A   ava    au          ava              #    cantau
+SFX A   ava    in          [^cçgjeiou]ava   # 6. cantin
+SFX A   ava    ïn          [^aeiou][eio]ava #    suïn
+SFX A   iava   ïn          [aeiou]iava      #    desmaïn
+SFX A   guava  güin        guava            #    enaigüin
+SFX A   quava  qüin        quava            #    adeqüin
+SFX A   uava   uïn         [^gq]uava        #    evacuïn
+SFX A   cava   quin        cava             #    cerquin
+SFX A   çava   cin         çava             #    cacin
+SFX A   gava   guin        gava             #    porguin
+SFX A   java   gin         java             #    vengin
+
+# Verbs en -ir, formes comunes als grups III, IV i V
+SFX M Y 78
+SFX M   iré    im          [^aeiou]iré      # 4. patim       <IPR>
+SFX M   iré    im          [gq]uiré         #    seguim
+SFX M   iré    ïm          [^gq]uiré        #    induïm
+SFX M   iré    ïm          [aeio]iré        #    traïm
+SFX M   iré    iu          [^aeiou]iré      # 5. patiu
+SFX M   iré    iu          [gq]uiré         #    seguiu
+SFX M   iré    ïu          [^gq]uiré        #    induïu
+SFX M   iré    ïu          [aeio]iré        #    traïu
+SFX M   iré    ia          [^aeiou]iré      # 1. patia       <IIM>
+SFX M   iré    ia          [gq]uiré         #    seguia
+SFX M   iré    ïa          [^gq]uiré        #    induïa
+SFX M   iré    ïa          [aeio]iré        #    traïa
+SFX M   iré    ies         [^aeiou]iré      # 2. paties
+SFX M   iré    ies         [gq]uiré         #    seguies
+SFX M   iré    ïes         [^gq]uiré        #    induïes
+SFX M   iré    ïes         [aeio]iré        #    traïes
+SFX M   iré    ia          [^aeiou]iré      # 3. patia
+SFX M   iré    ia          [gq]uiré         #    seguia
+SFX M   iré    ïa          [^gq]uiré        #    induïa
+SFX M   iré    ïa          [aeio]iré        #    traïa
+SFX M   iré    íem         iré              # 4. patíem, traíem
+SFX M   iré    íeu         iré              # 5. patíeu, traíeu
+SFX M   iré    ien         [^aeiou]iré      # 6. patien
+SFX M   iré    ien         [gq]uiré         #    seguien
+SFX M   iré    ïen         [^gq]uiré        #    induïen
+SFX M   iré    ïen         [aeio]iré        #    traïen
+SFX M   iré    í           iré              # 1. patí        <IPE>
+SFX M   iré    ires        [^aeiou]iré      # 2. patires
+SFX M   iré    ires        [gq]uiré         #    seguires
+SFX M   iré    ïres        [^gq]uiré        #    induïres
+SFX M   iré    ïres        [aeio]iré        #    traïres
+SFX M   iré    í           iré              # 3. patí
+SFX M   iré    írem        iré              # 4. patírem, traírem
+SFX M   iré    íreu        iré              # 5. patíreu, traíreu
+SFX M   iré    iren        [^aeiou]iré      # 6. patiren
+SFX M   iré    iren        [gq]uiré         #    seguiren
+SFX M   iré    ïren        [^gq]uiré        #    induïren
+SFX M   iré    ïren        [aeio]iré        #    traïren
+SFX M   iré    iré         iré              # 1. patiré, trairé <FUT>
+SFX M   iré    iràs        iré              # 2. patiràs, trairàs
+SFX M   iré    irà         iré              # 3. patirà, trairà
+SFX M   iré    irem        iré              # 4. patirem, trairem
+SFX M   iré    ireu        iré              # 5. patireu, traireu
+SFX M   iré    iran        iré              # 6. patiran, trairan
+SFX M   iré    iria        iré              # 1. patiria, trairia <CON>
+SFX M   iré    iries       iré              # 2. patiries, trairies
+SFX M   iré    iria        iré              # 3. patiria, trairia
+SFX M   iré    iríem       iré              # 4. patiríem, trairíem
+SFX M   iré    iríeu       iré              # 5. patiríeu, trairíeu
+SFX M   iré    irien       iré              # 6. patirien, trairien
+SFX M   iré    im          [^aeiou]iré      # 4. patim       <SPR>
+SFX M   iré    im          [gq]uiré         #    seguim
+SFX M   iré    ïm          [^gq]uiré        #    induïm
+SFX M   iré    ïm          [aeio]iré        #    traïm
+SFX M   iré    iu          [^aeiou]iré      # 5. patiu
+SFX M   iré    iu          [gq]uiré         #    seguiu
+SFX M   iré    ïu          [^gq]uiré        #    induïu
+SFX M   iré    ïu          [aeio]iré        #    traïu
+SFX M   iré    ís          iré              # 1. patís       <SIM>
+SFX M   iré    issis       [^aeiou]iré      # 2. patissis
+SFX M   iré    issis       [gq]uiré         #    seguissis
+SFX M   iré    ïssis       [^gq]uiré        #    induïssis
+SFX M   iré    ïssis       [aeio]iré        #    traïssis
+SFX M   iré    ís          iré              # 3. patís
+SFX M   iré    íssim       iré              # 4. patíssim
+SFX M   iré    íssiu       iré              # 5. patíssiu
+SFX M   iré    issin       [^aeiou]iré      # 6. patissin
+SFX M   iré    issin       [gq]uiré         #    seguissin
+SFX M   iré    ïssin       [^gq]uiré        #    induïssin
+SFX M   iré    ïssin       [aeio]iré        #    traïssin
+SFX M   iré    im          [^aeiou]iré      # 4. patim       <IMP>
+SFX M   iré    im          [gq]uiré         #    seguim
+SFX M   iré    ïm          [^gq]uiré        #    induïm
+SFX M   iré    ïm          [aeio]iré        #    traïm
+SFX M   iré    iu          [^aeiou]iré      # 5. patiu
+SFX M   iré    iu          [gq]uiré         #    seguiu
+SFX M   iré    ïu          [^gq]uiré        #    induïu
+SFX M   iré    ïu          [aeio]iré        #    traïu
+
+# Verbs en -ir, formes incoatives
+SFX N Y 18
+SFX N   iré    eixo        iré              # 1. pateixo <IPR>
+SFX N   iré    esc         iré              #    patesc
+SFX N   iré    eixes       iré              # 2. pateixes
+SFX N   iré    eix         iré              # 3. pateix
+SFX N   iré    eixen       iré              # 6. pateixen  
+SFX N   iré    eixi        iré              # 1. pateixi <SPR>
+SFX N   iré    esqui       iré              #    patesqui
+SFX N   iré    eixis       iré              # 2. pateixis
+SFX N   iré    esquis      iré              #    patesquis
+SFX N   iré    eixi        iré              # 3. pateixi
+SFX N   iré    esqui       iré              #    patesqui
+SFX N   iré    eixin       iré              # 6. pateixin  
+SFX N   iré    esquin      iré              #    patesquin 
+SFX N   iré    eix         iré              # 2. pateix  <IMP>
+SFX N   iré    eixi        iré              # 3. pateixi
+SFX N   iré    esqui       iré              #    patesqui
+SFX N   iré    eixin       iré              # 6. pateixin  
+SFX N   iré    esquin      iré              #    patesquin 
+
+# Imperfet d'indicatiu de la segona conjugació
+SFX O Y 11
+SFX O   a      es          a                # 2. perdies, cloïes    <IIM>
+SFX O   a      a           a                # 3. perdia, cloïa
+SFX O   ia     íem         [^eu]ia          # 4. perdíem
+SFX O   ïa     íem         ïa               #    cloíem
+SFX O   eia    èiem        eia              #    dèiem (*** sempre è? ***)
+SFX O   uia    úiem        uia              #    dúiem
+SFX O   ia     íeu         [^eu]ia          # 5. perdíeu
+SFX O   ïa     íeu         ïa               #    cloíeu
+SFX O   eia    èieu        eia              #    dèieu (*** sempre è? ***)
+SFX O   uia    úieu        uia              #    dúieu
+SFX O   a      en          a                # 6. perdien, cloïen
+
+# Formes de la segona conjugació semblants a SIM1 sense -c/-gu (perdés)
+SFX P Y 24
+SFX P   és     o           [^c]és           # 1. perdo, temo        <IPR>
+SFX P   cés    ço          cés              #    torço
+SFX P   és     í           .                # 1. perdí, temí        <IPE>
+SFX P   és     eres        .                # 2. perderes, temeres
+SFX P   és     é           .                # 3. perdé, temé
+SFX P   és     érem        .                # 4. perdérem, temérem
+SFX P   és     éreu        .                # 5. perdéreu, teméreu
+SFX P   és     eren        .                # 6. perderen, temeren
+SFX P   és     i           .                # 1. perdi, temi        <SPR>
+SFX P   és     is          .                # 2. perdis, temis
+SFX P   és     i           .                # 3. perdi, temi
+SFX P   és     em          .                # 4. perdem, temem
+SFX P   és     eu          .                # 5. perdeu, temeu
+SFX P   és     in          .                # 6. perdin, temin
+SFX P   és     és          .                # 1. perdés, temés      <SIM>
+SFX P   és     essis       .                # 2. perdessis, temessis
+SFX P   és     és          .                # 3. perdés, temés
+SFX P   és     éssim       .                # 4. perdéssim, teméssim
+SFX P   és     éssiu       .                # 5. perdéssiu, teméssiu
+SFX P   és     essin       .                # 6. perdessin, temessin
+SFX P   és     i           .                # 3. perdi, temi        <IMP>
+SFX P   és     em          .                # 4. perdem, temem
+SFX P   és     eu          .                # 5. perdeu, temeu
+SFX P   és     in          .                # 6. perdin, temin
+
+# Formes de la segona conjugació semblants a SIM1 amb -c/-gu (conegués)
+SFX Q Y 23
+SFX Q   gués   c           .                # 1. conec              <IPR>
+SFX Q   qués   c           .                #    visc
+SFX Q   és     í           .                # 1. coneguí            <IPE>
+SFX Q   és     eres        .                # 2. conegueres
+SFX Q   és     é           .                # 3. conegué
+SFX Q   és     érem        .                # 4. coneguérem
+SFX Q   és     éreu        .                # 5. coneguéreu
+SFX Q   és     eren        .                # 6. conegueren
+SFX Q   és     i           .                # 1. conegui            <SPR>
+SFX Q   és     is          .                # 2. coneguis
+SFX Q   és     i           .                # 3. conegui
+SFX Q   és     em          .                # 4. coneguem
+SFX Q   és     eu          .                # 5. conegueu
+SFX Q   és     in          .                # 6. coneguin
+SFX Q   és     és          .                # 1. conegués           <SIM> 
+SFX Q   és     essis       .                # 2. coneguessis             
+SFX Q   és     és          .                # 3. conegués
+SFX Q   és     éssim       .                # 4. coneguéssim
+SFX Q   és     éssiu       .                # 5. coneguéssiu
+SFX Q   és     essin       .                # 6. coneguessin
+SFX Q   és     i           .                # 3. conegui            <IMP>
+SFX Q   és     em          .                # 4. coneguem
+SFX Q   és     in          .                # 6. coneguin
+
+# Formes de la segona conjugació semblants al gerundi
+SFX R Y 6
+SFX R   ent    em          ent              # 4. perdem, temem      <IPR>
+SFX R   int    im          int              #    vivim
+SFX R   ent    eu          ent              # 5. perdeu, temeu
+SFX R   int    iu          int              #    viviu
+SFX R   ent    eu          ent              # 5. perdeu, temeu      <IMP>
+SFX R   int    iu          int              #    viviu
+
+# Formes de la segona conjugació semblants a "plaus", "absols", etc.
+SFX S Y 11
+SFX S   0      s           [^nçx]           # 2. plaus, absols      <IPR>
+SFX S   ç      ces         ç                #    torces
+SFX S   0      es          x                #    torces
+SFX S   0      s           [^èé]n           #    prens
+SFX S   èn     ens         èn               #    aprens
+SFX S   én     ens         én               #    entens
+SFX S   0      en          [^nç]            # 6. plauen, absolen    <IPR>
+SFX S   ç      cen         ç                #    torcen
+SFX S   0      en          [^èé]n           #    prenen
+SFX S   èn     enen        èn               #    aprenen
+SFX S   én     enen        én               #    entenen
+
+# Futurs i condicionals a partir de FUT1
+SFX T Y 11
+SFX T   é      às          .                # 2. perdràs, temeràs <FUT>
+SFX T   é      à           .                # 3. perdrà, temerà
+SFX T   é      em          .                # 4. perdrem, temerem
+SFX T   é      eu          .                # 5. perdreu, temereu
+SFX T   é      an          .                # 6. perdran, temeran
+SFX T   é      ia          .                # 1. perdria, temeria <CON>
+SFX T   é      ies         .                # 2. perdries, temeries
+SFX T   é      ia          .                # 3. perdria, temeria
+SFX T   é      íem         .                # 4. perdríem, temeríem
+SFX T   é      íeu         .                # 5. perdríeu, temeríeu
+SFX T   é      ien         .                # 6. perdrien, temerien
+
+# Formes pures dels verbs en -ir, a partir d'IPR3 (p.e. sent)
+SFX U Y 10
+SFX U   0      o           .                # 1. sento <IPR>
+SFX U   0      s           [^sx]            # 2. sents
+SFX U   0      es          [sx]             #    cuses, cruixes
+SFX U   0      en          .                # 6. senten
+SFX U   0      i           .                # 1. senti <SPR>
+SFX U   0      is          .                # 2. sentis
+SFX U   0      i           .                # 3. senti
+SFX U   0      in          .                # 6. sentin
+SFX U   0      i           .                # 3. senti  <IMP>
+SFX U   0      in          .                # 6. sentin
+
+# Article prefixat no combinable
+PFX V N 1
+PFX V   0      l'          .                # l'home
+
+# Preposició "de" apostrofada
+PFX Y Y 1
+PFX Y   0      d'          .                # d'algú
+
+# Pronoms personals prefixats
+PFX Z Y 5
+PFX Z   0      m'          .                # m'abillo
+PFX Z   0      t'          .                # t'abillo
+PFX Z   0      s'          .                # s'abilla
+PFX Z   0      l'          .                # l'abillo
+PFX Z   0      n'          .                # n'abillo
+
+NOSUGGEST !
+

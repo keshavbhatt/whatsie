@@ -1,0 +1,53 @@
+SET ISO8859-2
+TRY ieatrnocluãsmpdþgbvfîºhkâywIEATRNOCLUÃSMPDÞGBVFÎªHKÂYW
+
+PFX E Y 1
+PFX E   0          re         .
+
+PFX N Y 1
+PFX N   0          nr         .
+
+SFX L Y 5
+SFX L   0          ul         [^auei]
+SFX L   0          l          u
+SFX L   0          le         [^cg]i
+SFX L   0          i          [cg]i
+SFX L   0          le         e
+
+SFX U Y 2
+SFX U   0          a          re
+SFX U   0          i          [^i]ii
+
+SFX P Y 2
+SFX P   a          i          a
+SFX P   l          i          l	
+
+SFX W Y 1
+SFX W   0          e          .
+
+SFX M Y 1
+SFX M   0          uri        .
+
+SFX Z Y 3
+SFX Z   0          i          [^ea]
+SFX Z   e          i          e
+SFX Z   a          e          a
+
+SFX I Y 4
+SFX I   0          lui        u
+SFX I   0          ului       [^ua]
+SFX I   a          ii         [gc]a
+SFX I   a          ei         [^cg]a
+
+SFX G Y 2
+SFX G   0          lor        i
+SFX G   0          ilor       [^i]
+
+SFX R Y 1
+SFX R   0          re         [iae]
+
+SFX T Y 1
+SFX T   0          t          a
+
+SFX A Y 1
+SFX A   0          a          .

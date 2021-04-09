@@ -1,0 +1,618 @@
+SET ISO8859-1
+TRY esianrtolcvjugmphbyqfkwæøåxz
+
+COMPOUNDFLAG m
+COMPOUNDMIN 3
+
+# Foranstilling af u-
+PFX z Y 1  
+PFX z   0     u            .                                     # fiks -> ufiks 
+
+# Foranstilling af for-
+PFX y Y 1  
+PFX y   0     for          .                                     # bytte -> forbytte 
+
+# Foranstilling af ud-
+PFX x Y 1  
+PFX x   0     ud           .                                     # råb -> udråb 
+
+# Foranstilling af af-
+PFX w Y 1  
+PFX w   0     af           .                                     # høre -> afhøre 
+
+# Foranstilling af ind-
+PFX v Y 1  
+PFX v   0     ind          .                                     # betale -> indbetale 
+
+# Foranstilling af op-
+PFX u Y 1  
+PFX u   0     op           .                                     # tog -> optog
+
+# Foranstilling af be-
+PFX t Y 1  
+PFX t   0     be           .                                     # bygge -> bebygge
+
+# Foranstilling af gen-
+PFX s Y 1  
+PFX s   0     gen          .                                     # finde -> genfinde
+
+# Foranstilling af an-
+PFX r Y 1  
+PFX r   0     an           .                                     # holde -> anholde
+ 
+ 
+# Regler der primært er rettet mod navneord:
+
+# Tilføjelse af et -s til ord der ikke ender på -[szx], ofte brugt til:
+# - ejefald
+SFX A Y 3 
+SFX A   0       s          [^szx]                               
+SFX A   0       '          [szx]                                 
+SFX A   0       's         [szx]       
+   
+# Tilføjelse af -et og -ets, ofte brugt til:
+# - bestemt form af navneord i intetkøn 
+SFX B Y 2
+SFX B   0       et         .                                     # Eksempel: hus -> huset(s)
+SFX B   0       ets        .                                      
+
+# Tilføjelse af et -t, brugt til:
+# - bestemt form af navneord i intetkøn der ender på -e
+# - tillægsord i intetkøn / biord dannet af tillægsord
+# Eksempel: lang -> langt
+# - datids tillægsform af udsagnsord
+# Eksempel: adle -> adlet
+SFX C Y 1
+SFX C   0       t          .                                      
+
+# Tilføjelse af -ts, brugt til:
+# - ejefald af bestemt form af navneord i intetkøn der ender på -e
+SFX D Y 1 
+SFX D   0       ts         e                                     # æble -> æblets
+ 
+# Konsonantfordobling og tilføjelse af -et og -ets, brugt til:
+# - bestemt form af navneord i intetkøn: 
+SFX E Y 22  
+SFX E   0       det        d                                     # fed > feddet 
+SFX E   0       dets       d                                     # fed > feddets 
+SFX E   0       fet        f                                     
+SFX E   0       fets       f                                     
+SFX E   0       get        g                                     
+SFX E   0       gets       g                                     
+SFX E   0       ket        k                                     
+SFX E   0       kets       k                                     
+SFX E   0       let        l                                     
+SFX E   0       lets       l                                     
+SFX E   0       met        m                                     
+SFX E   0       mets       m                                     
+SFX E   0       net        n                                     
+SFX E   0       nets       n                                     
+SFX E   0       pet        p                                     
+SFX E   0       pets       p                                     
+SFX E   0       ret        r                                     
+SFX E   0       rets       r                                     
+SFX E   0       set        s                                     
+SFX E   0       sets       s                                     
+SFX E   0       tet        t                                     
+SFX E   0       tets       t                                     
+
+# Tilføjelse af -en og -ens, ofte brugt til:
+# - bestemt form af navneord i fælleskøn 
+SFX F Y 2   
+SFX F   0       en         .                                     # abrikos -> abrikosen & abrikosens
+SFX F   0       ens        .                                    
+
+# - bestemt form af navneord i fælleskøn der ender på -e
+# Konsonantfordobling og tilføjelse af -en og -ens, brugt til
+# - bestemt form af navneord i fælleskøn
+SFX G Y 22  
+SFX G   0       n          [^bdflkmnpst]                         # aborre > aborren
+SFX G   0       ns         [^bdflkmnpst]                         # aborre > aborrens
+SFX G   0       ben        b                                     # lab > labben 
+SFX G   0       bens       b
+SFX G   0       den        d
+SFX G   0       dens       d
+SFX G   0       fen        f
+SFX G   0       fens       f
+SFX G   0       len        l
+SFX G   0       lens       l
+SFX G   0       ken        k
+SFX G   0       kens       k
+SFX G   0       men        m
+SFX G   0       mens       m
+SFX G   0       nen        n
+SFX G   0       nens       n
+SFX G   0       pen        p
+SFX G   0       pens       p
+SFX G   0       sen        s
+SFX G   0       sens       s
+SFX G   0       ten        t
+SFX G   0       tens       t
+
+# Tilføjelse af -er, -erne, -ernes og -ers, ofte brugt til:
+# - flertal af navneord
+SFX H Y 4                              
+SFX H   0       er         .                                     #vagt -> vagter & vagterne
+SFX H   0       erne       .                                     #vagt -> vagternes & vagters                             
+SFX H   0       ernes      .                              
+SFX H   0       ers        .    
+
+# Fjernelse af -um og tilføjelse af -er, -erne, -ernes, -ers, brugt til:
+# - bestemt form og flertal af navneord på -um 
+SFX I Y 6        
+SFX I   um      er         um                                    # gymnasium -> gymnasier
+SFX I   um      erne       um      
+SFX I   um      ernes      um      
+SFX I   um      ers        um      
+SFX I   um      et         um                                    # gymnasium -> gymnasiet 
+SFX I   um      ets        um  
+
+# Tilføjelse af -ne og -nes, brugt til
+# - flertal af navneord på -e, -er og -re
+SFX J Y 2                                                       
+SFX J   0       ne         .                                     # dansker -> danskerne(s)
+SFX J   0       nes        .  
+
+# Tilføjelse af -ene og -enes, brugt til
+# - flertal af navneord 
+SFX K Y 2 
+SFX K   0       ene        .                                     # fad -> fadene(s) 
+SFX K   0       enes       . 
+
+# Konsonantfordobling og tilføjelse af -ene og -enes, brugt til
+# - flertal af navneord 
+SFX L Y 20 
+SFX L   0       bene       b                                     # rum -> rummene(s) 
+SFX L   0       benes      b     
+SFX L   0       dene       d     
+SFX L   0       denes      d     
+SFX L   0       gene       g     
+SFX L   0       genes      g     
+SFX L   0       kene       k     
+SFX L   0       kenes      k     
+SFX L   0       lene       l     
+SFX L   0       lenes      l     
+SFX L   0       mene       m     
+SFX L   0       menes      m     
+SFX L   0       nene       n     
+SFX L   0       nenes      n     
+SFX L   0       pene       p     
+SFX L   0       penes      p     
+SFX L   0       sene       s     
+SFX L   0       senes      s     
+SFX L   0       tene       t     
+SFX L   0       tenes      t     
+
+# Konsonantfordobling og tilføjelse af -er, -erne, -ernes og -ers, brugt til:
+# - flertal af navneord
+SFX M Y 46 
+SFX M   0       ber        b 
+SFX M   0       berne      b     
+SFX M   0       bernes     b     
+SFX M   0       bers       b     
+SFX M   0       der        d                                     # jordnød -> jordnødder(ne)(s) 
+SFX M   0       derne      d     
+SFX M   0       dernes     d     
+SFX M   0       ders       d     
+SFX M   0       r          e 
+SFX M   0       rne        e     
+SFX M   0       rnes       e     
+SFX M   0       rs         e     
+SFX M   0       fer        f 
+SFX M   0       ferne      f     
+SFX M   0       fernes     f     
+SFX M   0       fers       f     
+SFX M   0       ler        l 
+SFX M   0       lerne      l     
+SFX M   0       lernes     l     
+SFX M   0       lers       l     
+SFX M   0       ker        k 
+SFX M   0       kerne      k     
+SFX M   0       kernes     k     
+SFX M   0       kers       k     
+SFX M   0       mer        m 
+SFX M   0       merne      m     
+SFX M   0       mernes     m     
+SFX M   0       mers       m     
+SFX M   0       ner        n 
+SFX M   0       nerne      n     
+SFX M   0       nernes     n     
+SFX M   0       ners       n     
+SFX M   0       per        p 
+SFX M   0       perne      p     
+SFX M   0       pernes     p     
+SFX M   0       pers       p     
+SFX M   0       rene       r 
+SFX M   0       renes      r     
+SFX M   0       ser        s 
+SFX M   0       serne      s     
+SFX M   0       sernes     s     
+SFX M   0       sers       s     
+SFX M   0       ter        t
+SFX M   0       terne      t     
+SFX M   0       ternes     t    
+SFX M   0       ters       t     
+     
+# Ombytning af -e[lnr] med tilføjelse af -t og -ts, brugt til:
+# - bestemt form af navneord i intetkøn
+SFX N Y 14
+SFX N   el      let        [^dm]el                                   # Kabel > Kablet(s) 
+SFX N   el      lets       [^dm]el
+SFX N   del     let        ddel
+SFX N   del     lets       ddel
+SFX N   mel     let        mmel
+SFX N   mel     lets       mmel
+SFX N   en      net        en
+SFX N   en      nets       en
+SFX N   er      ret        [^fm]er
+SFX N   er      rets       [^fm]er
+SFX N   fer     ret        fer
+SFX N   fer     rets       fer
+SFX N   mer     ret        mer
+SFX N   mer     rets       mer
+
+# Ombytning af -e[lrn] tilføjelse af -n og -ns, brugt til:
+# - bestemt form af navneord i fælleskøn
+SFX O Y 26
+SFX O   el      len        [^dfkm]el                                   # vagtel > vagtlen(s) 
+SFX O   el      lens       [^dfkm]el
+SFX O   el      len        [^d]del
+SFX O   el      lens       [^d]del
+SFX O   del     len        ddel
+SFX O   del     lens       ddel
+SFX O   fel     len        ffel
+SFX O   fel     lens       ffel
+SFX O   el      len        [^k]kel
+SFX O   el      lens       [^k]kel
+SFX O   kel     len        kkel
+SFX O   kel     lens       kkel
+SFX O   el      len        [^m]mel
+SFX O   el      lens       [^m]mel
+SFX O   mel     len        mmel
+SFX O   mel     lens       mmel
+SFX O   en      nen        en
+SFX O   en      nens       en
+SFX O   0       rene       [^e]r
+SFX O   0       renes      [^e]r
+SFX O   er      rene       [^fm]er
+SFX O   er      renes      [^fm]er
+SFX O   fer     rene       fer
+SFX O   fer     renes      fer
+SFX O   mer     rene       mer
+SFX O   mer     renes      mer
+
+# Ombytning af -e[ln], og tilføjelse af -er, -erne, -ernes og -ers, brugt til:
+# - flertal af navneord
+SFX P Y 36
+SFX P   el      ler        [^dfkm]el                                   # cykel > cykler(ne)(s) 
+SFX P   el      lerne      [^dfkm]el
+SFX P   el      lernes     [^dfkm]el
+SFX P   el      lers       [^dfkm]el
+SFX P   del     ler        ddel
+SFX P   del     lerne      ddel
+SFX P   del     lernes     ddel
+SFX P   del     lers       ddel
+SFX P   el      ler        [^d]del
+SFX P   el      lerne      [^d]del
+SFX P   el      lernes     [^d]del
+SFX P   el      lers       [^d]del
+SFX P   fel     ler        ffel
+SFX P   fel     lerne      ffel
+SFX P   fel     lernes     ffel
+SFX P   fel     lers       ffel
+SFX P   kel     ler        kkel
+SFX P   kel     lerne      kkel
+SFX P   kel     lernes     kkel
+SFX P   kel     lers       kkel
+SFX P   el      ler        [^k]kel
+SFX P   el      lerne      [^k]kel
+SFX P   el      lernes     [^k]kel
+SFX P   el      lers       [^k]kel
+SFX P   mel     ler        mmel
+SFX P   mel     lerne      mmel
+SFX P   mel     lernes     mmel
+SFX P   mel     lers       mmel
+SFX P   el      ler        [^m]mel
+SFX P   el      lerne      [^m]mel
+SFX P   el      lernes     [^m]mel
+SFX P   el      lers       [^m]mel
+SFX P   en      ner        en
+SFX P   en      nerne      en
+SFX P   en      nernes     en
+SFX P   en      ners       en
+
+# Tilføjelse af -e og -es til ord der ikke ender på -e, brugt til:
+# - flertal af navneord og tillægsord
+SFX Q Y 2
+SFX Q   0       e         [^e]                                    # falk > falke(s) 
+SFX Q   0       es        [^e] 
+
+# Konsonantfordobling og tilføjelse af -e og -es,
+# Ombytning af -e[nr] med tilføjelse af -e og -es, brugt til:
+# - Flertal af navneord og tillægsord
+SFX R Y 18
+SFX R   0       ke        k                                       # unik > unikke(s) 
+SFX R   0       kes       k
+SFX R   0       le        l 
+SFX R   0       les       l
+SFX R   0       me        m 
+SFX R   0       mes       m
+SFX R   0       ne        n 
+SFX R   0       nes       n
+SFX R   0       te        t 
+SFX R   0       tes       t
+SFX R   en      ne        en
+SFX R   en      nes       en 
+SFX R   er      re        [^fm]er                                 # parkometer > parkometre(s)
+SFX R   er      res       [^fm]er
+SFX R   fer     re        ffer
+SFX R   fer     res       ffer
+SFX R   mer     re        mmer
+SFX R   mer     res       mmer
+
+# Tilføjelse af -'s, brugt til
+# - Ejefald af forkortelser skrevet uden forkortelsespunktum
+SFX S Y 1
+SFX S   0       's        .                                     # lp > lp's 
+ 
+SFX T Y 2
+SFX T   0       'et       .                                     # tv > tv'et(s) 
+SFX T   0       'ets      .
+
+# Tilføjelse af -'en og -'ens, brugt til
+# - Bestemt form af forkortelser skrevet uden forkortelsespunktum
+SFX U Y 2
+SFX U   0       'en       .                                     # bh > bh'en(s) 
+SFX U   0       'ens      .
+
+# Tilføjelse af -'er, -'erne, -'ernes og -'ers, brugt til
+# - Flertal af forkortelser skrevet uden forkortelsespunktum
+SFX V Y 4
+SFX V   0       'er       .                                     # cd > cd'erne(s) 
+SFX V   0       'erne     .
+SFX V   0       'ernes    .                                     
+SFX V   0       'ers      .
+
+###############################################
+# Regler der primært er rettet mod udsagnsord:
+
+# Tilføjelse af -r, brugt til:
+# (- flertal af navneord (dækket af /M))
+# - nutidsformer af udsagnsord
+SFX W Y 1
+SFX W   0       r         .                                     # spise > spiser
+
+# Tilføjelse af -de og -des, brugt til:
+# - datidsformer af udsagnsord
+SFX X Y 2
+SFX X   0       de         .                                     # spise > spiser
+SFX X   0       des        .
+
+# Fjernelse af -e, tilføjelse af -ning*, brugt til
+# - Navneord afledt af udsagnsord på -e ved tilføjelse af -ning
+SFX Y Y 8
+SFX Y   e       ning       e                                     # afblæse > afblæsning(s)
+SFX Y   e       nings      e
+SFX Y   e       ningen     e
+SFX Y   e       ningens    e
+SFX Y   e       ninger     e
+SFX Y   e       ningerne   e
+SFX Y   e       ningernes  e
+SFX Y   e       ningers    e
+
+
+# Som /Y, men med konsonantreduktion
+# Eksempler: afslutte -> afslutning, bygge -> bygning
+# Særregel for det tilfældes skyld at n'et er der i forvejen
+# Eksempel: regne -> regning
+SFX Z Y 64
+SFX Z   ge      ning       gge
+SFX Z   ge      nings      gge
+SFX Z   ge      ningen     gge
+SFX Z   ge      ningens    gge
+SFX Z   ge      ninger     gge
+SFX Z   ge      ningerne   gge
+SFX Z   ge      ningernes  gge
+SFX Z   ge      ningers    gge
+SFX Z   ke      ning       kke
+SFX Z   ke      nings      kke
+SFX Z   ke      ningen     kke
+SFX Z   ke      ningens    kke
+SFX Z   ke      ninger     kke
+SFX Z   ke      ningerne   kke
+SFX Z   ke      ningernes  kke
+SFX Z   ke      ningers    kke
+SFX Z   me      ning       mme
+SFX Z   me      nings      mme
+SFX Z   me      ningen     mme
+SFX Z   me      ningens    mme
+SFX Z   me      ninger     mme
+SFX Z   me      ningerne   mme
+SFX Z   me      ningernes  mme
+SFX Z   me      ningers    mme
+SFX Z   ne      ning       nne
+SFX Z   ne      nings      nne
+SFX Z   ne      ningen     nne
+SFX Z   ne      ningens    nne
+SFX Z   ne      ninger     nne
+SFX Z   ne      ningerne   nne
+SFX Z   ne      ningernes  nne
+SFX Z   ne      ningers    nne
+SFX Z   pe      ning       ppe
+SFX Z   pe      nings      ppe
+SFX Z   pe      ningen     ppe
+SFX Z   pe      ningens    ppe
+SFX Z   pe      ninger     ppe
+SFX Z   pe      ningerne   ppe
+SFX Z   pe      ningernes  ppe
+SFX Z   pe      ningers    ppe
+SFX Z   se      ning       sse
+SFX Z   se      nings      sse
+SFX Z   se      ningen     sse
+SFX Z   se      ningens    sse
+SFX Z   se      ninger     sse
+SFX Z   se      ningerne   sse
+SFX Z   se      ningernes  sse
+SFX Z   se      ningers    sse
+SFX Z   te      ning       tte
+SFX Z   te      nings      tte
+SFX Z   te      ningen     tte
+SFX Z   te      ningens    tte
+SFX Z   te      ninger     tte
+SFX Z   te      ningerne   tte
+SFX Z   te      ningernes  tte
+SFX Z   te      ningers    tte
+SFX Z   e       ing        [^n]ne                                 # Er det nødvendigt at tjekke 
+SFX Z   e       ings       [^n]ne                                 # på dobbeltkonsonant
+SFX Z   e       ingen      [^n]ne
+SFX Z   e       ingens     [^n]ne
+SFX Z   e       inger      [^n]ne
+SFX Z   e       ingerne    [^n]ne
+SFX Z   e       ingernes   [^n]ne
+SFX Z   e       ingers     [^n]ne
+# Tilføjelse af -(e)lse, brugt til:
+# (-e- kun på ord på -i, -o, -u, -y og -å) 
+# - Navneord afledt af udsagnsord
+SFX a Y 16
+SFX a   0       lse        e                                     # adskille > adskillelse
+SFX a   0       lsen       e
+SFX a   0       lsens      e
+SFX a   0       lses       e
+SFX a   0       lser       e
+SFX a   0       lserne     e
+SFX a   0       lsernes    e
+SFX a   0       lsers      e
+SFX a   0       else       [iouyå]                                # afstå > afståelse
+SFX a   0       elsen      [iouyå]
+SFX a   0       elsens     [iouyå]
+SFX a   0       elses      [iouyå]
+SFX a   0       elser      [iouyå]
+SFX a   0       elserne    [iouyå]
+SFX a   0       elsernes   [iouyå]
+SFX a   0       elsers     [iouyå]
+
+# Fjernelse af -[bdfgklmnprst]e, brugt til:
+# - bydemåde
+# Eksempel: gemme -> gem
+# - ofte brugt ugrammatisk
+# Eksempel: abe -> a
+SFX b Y 12
+SFX b   be      0          be
+SFX b   de      0          de
+SFX b   fe      0          fe
+SFX b   ge      0          ge
+SFX b   ke      0          ke
+SFX b   le      0          le
+SFX b   me      0          me
+SFX b   ne      0          ne
+SFX b   pe      0          pe
+SFX b   re      0          re
+SFX b   se      0          se
+SFX b   te      0          te
+
+# Fjernelse af -e, brugt til:
+# - bydemåde af udsagnsord
+# Eksempel: løbe -> løb
+SFX c Y 1
+SFX c   e       0          e
+
+
+# Eksempel: acceptere -> acceptér
+SFX d Y 1
+SFX d   ere     ér         ere
+
+# Erstatning af -e med -t, brugt til:
+# - datids tillægsform
+# Eksempel: fylde -> fyldt
+SFX e Y 1
+SFX e   e       t          e
+
+# Tilføjelse af -nde og -ndes til ord på -e, brugt til:
+# - nutids tillægsform
+# Eksempel: dirigere -> dirigerende & dirigerendes
+SFX f Y 2
+SFX f   0       nde        e
+SFX f   0       ndes       e
+
+# Fjernelse af -s fra ord på -des,
+# Erstatning af -des med -t, brugt til:
+# - invers passiv (?)
+# Eksempel: anedes -> anede & anet
+SFX g Y 2
+SFX g   s       0          des
+SFX g   des     t          des
+
+# Udskiftning af -e med -te og -tes, brugt til:
+# - Datidsformer af udsagnsord
+# Eksempel: stege -> stegte & stegtes
+SFX h Y 2
+SFX h   e       te         e
+SFX h   e       tes        e
+
+# Regel for konsonanthalvering og udskiftning af -e med -te og -tes
+# - eksempler: bestemme-me+te
+
+
+###############################################
+# Regler der primært er rettet mod tillægsord:
+
+# Tilføjelse af -ere og -eres, brugt til:
+# - komparativformer af tillægsord
+# Eksempel: blid -> blidere & blideres 
+# Tilføjelse af -est, -este og -estes, brugt til:
+# - superlativformer af tillægsord
+# Eksempel: blid -> blidest & blideste & blidestes
+SFX i Y 5
+SFX i   0       ere        [^e]
+SFX i   0       eres       [^e]
+SFX i   0       est        [^e]
+SFX i   0       este       [^e]
+SFX i   0       estes      [^e]
+
+# Tilføjelse af -ere, eres, -st, -ste og -stes til ord der ikke ender på [ls],
+# brugt til: 
+# - komparativ og superlativ af tillægsord
+# Eksempel: begærlig -> begærligere(s) & begærligst(e(s))
+# Ombytning af -el og tilføjelse af -ere,-eres,-est,-este,-estes, brugt til:
+# - komparativ og superlativ af tillægsord
+# Eksempel: enkel -> enklere(s) & enklest(e(s))
+SFX j Y 10
+SFX j   0       ere        [^ls]
+SFX j   0       eres       [^ls]
+SFX j   0       st         [^ls]
+SFX j   0       ste        [^ls]
+SFX j   0       stes       [^ls]
+SFX j   el      lere       el
+SFX j   el      leres      el
+SFX j   el      lest       el
+SFX j   el      leste      el
+SFX j   el      lestes     el
+
+# Tilføjelse af -eren og -erens, brugt til:
+# - navneord afledt af udsagnord i bydeform (?)
+# Eksempel: affugt -> affugteren & affugterens
+# Ombytning af afsluttende -el, evt. fjernelse af foranstående m, brugt til
+# - flertal af tillægsord
+# Eksempel: dunkel -> dunkle & dunkles
+# Eksempel: gammel -> gamle & gamles
+SFX k Y 6
+SFX k   0       eren       [^l]
+SFX k   0       erens      [^l]
+SFX k   el      le         [^m]el
+SFX k   el      les        [^m]el
+SFX k   mel     le         mmel
+SFX k   mel     les        mmel
+
+
+
+
+
+
+
+
+
+
+
+
+
+

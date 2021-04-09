@@ -1,0 +1,333 @@
+SET ISO8859-1
+TRY esianrtolcdugmphbyfvkwjkqxz-ëéèêïîäàâöüû'ESIANRTOLCDUGMPHBYFVKWJKQXZ
+
+NOSPLITSUGS
+
+PFX A Y 1
+PFX A 0 aan .
+
+PFX B Y 1
+PFX B 0 be .
+
+PFX C Y 1
+PFX C 0 in .
+
+PFX F Y 1
+PFX F 0 af .
+
+PFX G Y 1
+PFX G 0 ge .
+
+PFX K Y 1
+PFX K 0 op .
+
+PFX O Y 1
+PFX O 0 on .
+
+PFX U Y 1
+PFX U 0 uit .
+
+PFX V Y 1
+PFX V 0 ver .
+
+SFX J N 18
+SFX J 0 tje [aeiou][aeiou] 
+SFX J 0 tjes [aeiou][aeiou] 
+SFX J 0 atje [^aeiou]a 
+SFX J 0 atjes [^aeiou]a 
+SFX J 0 etje [^aeiou]i 
+SFX J 0 etjes [^aeiou]i 
+SFX J 0 'tje [^aeiou]y
+SFX J 0 'tjes [^aeiou]y 
+SFX J 0 otje [^aeiou]o
+SFX J 0 otjes [^aeiou]o 
+SFX J 0 utje [^aeiou]u
+SFX J 0 utjes [^aeiou]u 
+SFX J 0 tje [aeiou][lnrw] 
+SFX J 0 tjes [aeiou][lnrw] 
+SFX J 0 pje [aeiou][m] 
+SFX J 0 pjes [aeiou][m] 
+SFX J 0 je [aeiou][bcdfgkpt] 
+SFX J 0 jes [aeiou][bcdfgkpt] 
+
+SFX N N 2
+SFX N 0 en [^e]
+SFX N 0 n e
+
+SFX M N 13
+SFX M 0 ben b
+SFX M 0 den d
+SFX M 0 fen f
+SFX M 0 gen g
+SFX M 0 ken k
+SFX M 0 len l
+SFX M 0 men m
+SFX M 0 nen n
+SFX M 0 pen p
+SFX M 0 ren r
+SFX M 0 sen s
+SFX M 0 ten t
+SFX M z zen z
+
+SFX Z N 20
+SFX Z af ven aaf
+SFX Z as zen aas
+SFX Z ef ven eef
+SFX Z es zen ees
+SFX Z s zen eis
+SFX Z s zen eus
+SFX Z f ven ief
+SFX Z s zen ies
+SFX Z f ven ijf
+SFX Z s zen ijs
+SFX Z f ven oef
+SFX Z s zen oes
+SFX Z of ven oof
+SFX Z os zen oos
+SFX Z f ven uif
+SFX Z s zen uis
+SFX Z us zen uus
+SFX Z f ven [^aeijou]f
+SFX Z s zen [^aeijou]s
+SFX Z id den heid
+
+SFX P N 34
+SFX P ad den aad
+SFX P af fen aaf
+SFX P ag gen aag
+SFX P ak ken aak
+SFX P al len aal
+SFX P am men aam
+SFX P an nen aan
+SFX P ap pen aap
+SFX P ar ren aar
+SFX P as sen aas
+SFX P at ten aat
+SFX P ed den eed
+SFX P eg gen eeg
+SFX P ek ken eek
+SFX P el len eel
+SFX P em men eem
+SFX P en nen een
+SFX P ep pen eep
+SFX P er ren eer
+SFX P es sen ees
+SFX P et ten eet
+SFX P od den ood
+SFX P of fen oof
+SFX P og gen oog
+SFX P ok ken ook
+SFX P ol len ool
+SFX P om men oom
+SFX P on nen oon
+SFX P op pen oop
+SFX P or ren oor
+SFX P ot ten oot
+SFX P ul len uul
+SFX P un nen uun
+SFX P ur ren uur
+
+SFX S N 1
+SFX S 0 s [^s]
+
+SFX X N 1
+SFX X 0 's [^s]
+
+SFX E N 1
+SFX E 0 e [^e]
+
+SFX R N 4
+SFX R 0 r e
+SFX R 0 er [^e]
+SFX R 0 re e
+SFX R 0 ere [^e]
+
+SFX T N 2
+SFX T 0 st .
+SFX T 0 ste .
+
+SFX D N 2
+SFX D 0 d [^d]
+SFX D 0 de [^d]
+
+SFX W N 7
+SFX W 0 t [^t]
+SFX W 0 te [kfstp]
+SFX W 0 ten [kfstp]
+SFX W 0 te ch
+SFX W 0 ten ch
+SFX W 0 de [^kfstp]
+SFX W 0 den [^kfstp]
+
+SFX H N 1
+SFX H 0 heid .
+
+SFX I N 1
+SFX I 0 ing .
+
+REP 165
+REP g ch
+REP ch g
+REP cht gd
+REP gg ch
+REP ei ij
+REP ij ei
+REP y ij
+REP u ij
+REP e ij
+REP ie y
+REP ie y'
+REP ï ii
+REP ee é
+REP é ee
+REP ee ë
+REP ae ë
+REP je ë
+REP eë e-e
+REP o eau
+REP o's eaus
+REP oo eau
+REP ok eauc
+REP joe u
+REP ui eu
+REP iu uï
+REP ies isch
+REP s sch
+REP ss zz
+REP c ss
+REP z ss
+REP x ks
+REP ks x
+REP kt x
+REP ks ct
+REP ks cz
+REP x cz
+REP ed t
+REP k qu
+REP kw qu
+REP kw cqu
+REP qu k
+REP qu kw
+REP kwie cui
+REP kwie cuit
+REP que k
+REP ph f
+REP ff v
+REP ks cc
+REP kk cc
+REP cc kk
+REP k cc
+REP ele elli
+REP ove oof
+REP ool ole
+REP age aag
+REP lli lj
+REP aj aill
+REP lj ill
+REP lis lliss
+REP alie aille
+REP nj gn
+REP oer oure
+REP ouqu oek
+REP oe out
+REP cou koe
+REP ique iek
+REP e ai
+REP eks ax
+REP tens tigens
+REP g gge
+REP de dede
+REP ing iging
+REP rres ress
+REP bbon bonn
+REP scus cuss
+REP rondis rrondiss
+REP abber aberr
+REP ggres gress
+REP acoll accol
+REP plaudis pplaudiss
+REP lluminim lumini
+REP len llenn
+REP ttel tell
+REP acab abrac
+REP ubi ibu
+REP croc krok 
+REP ten than
+REP uuk uc
+REP ings ens
+REP ens ings
+REP eid ijdt
+REP ters teress
+REP iep ype
+REP sen sciën
+REP sens sciënt
+REP kons conc
+REP konsekw consequ
+REP akkom accomm
+REP statie staatsie
+REP glij gelei
+REP noot note
+REP knoot cnote
+REP usqu uusk
+REP kass caiss
+REP akel acle
+REP crash krach
+REP gynek gynaec
+REP gine gynae
+REP music muzik
+REP kiet quitte
+REP ruggegraad ruggengraat
+REP zowiezo sowieso
+REP ceedee cd
+REP ceedees cd's
+REP grafitti graffiti
+REP kangaroe kangoeroe
+REP kassiere caissière
+REP britanië Brittannië
+REP britanie Brittannië
+REP capucino cappuccino
+REP celcius Celsius 
+REP kado cadeau
+REP kado's cadeaus
+REP kadootje cadeautje
+REP comittee comité
+REP committee comité
+REP komitee comité 
+REP komittee comité 
+REP kommitee comité 
+REP kommittee comité
+REP kwis quiz 
+REP kwissen quizzen
+REP loupe loep
+REP copy kopij
+REP pitoresque pittoreske 
+REP reikweite reikwijdte
+REP snietsel schnitzel
+REP snitsel schnitzel
+REP spagetie spaghetti
+REP spagettie spaghetti
+REP lazanja lasagne
+REP attack attaque
+REP uptodate up-to-date
+REP caffeine cafeïne
+REP enigsinds enigszins
+REP klup club
+REP wiskid whizzkid 
+REP kontakt contact 
+REP kontekst context 
+REP korrekt correct 
+REP kritikus criticus
+REP gestressed gestrest
+REP zoëven zo-even
+REP dislek dyslec
+REP dislektie dyslexie
+REP disleksie dyslexie
+REP dyslecten dyslectici
+REP dyslect dyslecticus
+REP dislekties dyslectisch
+REP dyslexties dyslectisch
+REP spel spelling
+REP spelcheck spellingcontrole
+REP spellingcheck spellingcontrole
+REP spellingscheck spellingcontrole
+REP aflassen afgelasten

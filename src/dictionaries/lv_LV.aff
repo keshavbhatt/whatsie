@@ -1,0 +1,1989 @@
+# Latvieğu valodas affix fails lietoğanai ar OpenOffice 1.1.x
+# Latvian affix table for OpenOffice 1.1.x
+#
+# Copyright (C) 2002 Janis Eisaks, jancs@dv.lv
+#
+# Version info: 0.7
+# Izmainîta pieeja darbîbas vârdu locîğanai - no dalîtas pa konjugâcijâm 
+# uz dalîtâm pa laikiem un tipiem (tag, pak, nak, izt formas, ciesh k, divd.)
+#
+# This library is free software; you can redistribute it and/or
+# modify it under the terms of the GNU Lesser General Public
+# License as published by the Free Software Foundation; either
+# version 2.1 of the License, or (at your option) any later version.
+#
+# This library is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
+# Lesser General Public License for more details.
+#
+# You should have received a copy of the GNU Lesser General Public
+# License along with this library; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA 02111-1307 USA
+# 
+# Faila radîğanai izmantotâ literatûra  
+#  1. B.Ceplîte, L.Ceplîtis
+#     Latvieğu valodas praktiskâ gramatika
+#
+# Pateicos Dr. Andrejam Spektoram un LU Mâkslîgâ Intelekta laboratorijai
+# par iespçju izmantot apkopoto vârdu krâjumu; Edvînam Malnaèam, 
+# Egonam Spalânam, Valdemâram Rozenbergam, kâ arî citiem brîvprâtîgajiem 
+# par nesavtîgu atbalstu projekta realizâcijâ
+#
+# Faila formâts: myspell
+#
+# Here's a part of flags used, in case you want to add new ones.
+#
+#        !@#$%^&*()_+-=1234567890ABCDEFGHIJKLMNOPQRSTUVWXYZ 
+# Used:  --------------------------+++-++++++-+++++++++++++
+#                                abcdefghijklmnopqrstuvwxyz
+# Used:                          --++++++------+++++++---++
+#
+# extended keys, starting form ASCII(123)
+#
+# Used    {|}~€ƒ‚„…†‡ˆ‰Š‹
+#         +++++++++++++++++
+#140
+#      Œ‘’“”•–—˜™š›œŸ ¡¢£¤¥¦§¨©ª«¬­®¯°±²³´µ¶·¸¹º»¼½
+#      +     +++++++++++++++++++++++++++++++++++++++++++  (free - 189)
+
+SET ISO8859-13
+TRY ianseâtumpojğrkdîzlçvbgcíûòïèşfìhASMVLDIKERBGJZTNPHUOFCÂÍŞÇÌĞÎÛÈÒÏ
+
+PFX + Y 1
+PFX +  0  ne .
+
+SFX B Y 21
+SFX B   t     ğu     [^sz]t
+SFX B   t     si     [^sz]t
+SFX B   t     s      [^sz]t
+SFX B   t     sim    [^sz]t
+SFX B   t     siet   [^sz]t
+SFX B   t     sit    [^sz]t
+SFX B   t     ğot    [^sz]t     #atst izt.v.nak
+SFX B   st    tîğu   [s]t
+SFX B   st    tîsi   [s]t
+SFX B   st    tîs    [s]t
+SFX B   st    tîsim  [s]t
+SFX B   st    tîsiet [s]t
+SFX B   st    tîsit  [s]t
+SFX B   st    tîğot  [s]t     #atst izt.v.nak
+SFX B   t     îğu     [z]t
+SFX B   t     îsi     [z]t
+SFX B   t     îs      [z]t
+SFX B   t     îsim    [z]t
+SFX B   t     îsiet   [z]t
+SFX B   t     îsit    [z]t
+SFX B   t     îğot    [z]t     #atst izt.v.nak
+
+SFX F Y 7
+SFX F   t     îğu     [s]t
+SFX F   t     îsi     [s]t
+SFX F   t     îs      [s]t
+SFX F   t     îsim    [s]t
+SFX F   t     îsiet   [s]t
+SFX F   t     îsit    [s]t
+SFX F   t     îğot    [s]t     #atst izt.v.nak
+
+SFX E Y 37
+SFX E   st    dîğu     [s]t
+SFX E   st    dîsi     [s]t
+SFX E   st    dîs      [s]t
+SFX E   st    dîsim    [s]t
+SFX E   st    dîsiet   [s]t
+SFX E   st    dîsit    [s]t
+SFX E   st    dîğot    [s]t    #atst izt.v.nak
+SFX E   st    du       [s]t     #pagâtne
+SFX E   st    di       [s]t
+SFX E   st    da       [s]t
+SFX E   st    dâm      [s]t
+SFX E   st    dât      [s]t
+SFX E   st   dis      [s]t
+SFX E   st   duğa     [s]t
+SFX E   st   duğam    [s]t
+SFX E   st   duğu     [s]t
+SFX E   st   duğâ     [s]t
+SFX E   st   dusi     [s]t
+SFX E   st   duğas    [s]t
+SFX E   st   duğai    [s]t
+SFX E   st   duği     [s]t
+SFX E   st   duğiem   [s]t
+SFX E   st   duğus    [s]t
+SFX E   st   duğos    [s]t
+SFX E   st   duğâm    [s]t
+SFX E   st   duğâs    [s]t
+SFX E   st   duğais   [s]t
+SFX E   st   duğajam  [s]t
+SFX E   st   duğo     [s]t
+SFX E   st   duğajâ   [s]t
+SFX E   st   dusî     [s]t
+SFX E   st   duğajai  [s]t
+SFX E   st   duğie    [s]t
+SFX E   st   duğajiem [s]t
+SFX E   st   duğajos  [s]t
+SFX E   st   duğajâm  [s]t
+SFX E   st   duğajâs  [s]t
+
+SFX 4 Y 15
+SFX 4   t     u       [^îû]t
+SFX 4   t     i       [^îû]t
+SFX 4   t     a       [^îû]t
+SFX 4   t     âm      [^îû]t
+SFX 4   t     ât      [^îû]t
+SFX 4   ît    inu     [î]t
+SFX 4   ît    ini     [î]t
+SFX 4   ît    ina     [î]t
+SFX 4   ît    inâm    [î]t
+SFX 4   ît    inât    [î]t
+SFX 4   ût    uvu     [û]t
+SFX 4   ût    uvi     [û]t
+SFX 4   ût    uva     [û]t
+SFX 4   ût    uvâm    [û]t
+SFX 4   ût    uvât    [û]t
+
+SFX 5 Y 65
+SFX 5   gt    dzu     [g]t
+SFX 5   gt    dzi     [g]t
+SFX 5   gt    dza     [g]t
+SFX 5   gt    dzâm    [g]t
+SFX 5   gt    dzât    [g]t
+SFX 5   kt    cu      [k]t
+SFX 5   kt    ci      [k]t
+SFX 5   kt    ca      [k]t
+SFX 5   kt    câm     [k]t
+SFX 5   kt    cât     [k]t
+SFX 5   st    ju      [s]t
+SFX 5   st    ji      [s]t
+SFX 5   st    ja      [s]t
+SFX 5   st    jâm     [s]t
+SFX 5   st    jât     [s]t
+SFX 5   aut   âvu     [a]ut
+SFX 5   aut   âvi     [a]ut
+SFX 5   aut   âva     [a]ut
+SFX 5   aut   âvâm    [a]ut
+SFX 5   aut   âvât    [a]ut
+SFX 5   t     u       [^eiu]lt
+SFX 5   t     i       [^eiu]lt
+SFX 5   t     a       [^eiu]lt
+SFX 5   t     âm      [^eiu]lt
+SFX 5   t     ât      [^eiu]lt
+SFX 5   elt   çlu     [e]lt
+SFX 5   elt   çli     [e]lt
+SFX 5   elt   çla     [e]lt
+SFX 5   elt   çlâm    [e]lt
+SFX 5   elt   çlât    [e]lt
+SFX 5   ilt   îlu     [i]lt
+SFX 5   ilt   îli     [i]lt
+SFX 5   ilt   îla     [i]lt
+SFX 5   ilt   îlâm    [i]lt
+SFX 5   ilt   îlât    [i]lt
+SFX 5   ult   ûlu     [u]lt
+SFX 5   ult   ûli     [u]lt
+SFX 5   ult   ûla     [u]lt
+SFX 5   ult   ûlâm    [u]lt
+SFX 5   ult   ûlât    [u]lt
+SFX 5   t     u       [^aeiu]rt
+SFX 5   t     i       [^aeiu]rt
+SFX 5   t     a       [^aeiu]rt
+SFX 5   t     âm      [^aeiu]rt
+SFX 5   t     ât      [^aeiu]rt
+SFX 5   art   âru     [a]rt
+SFX 5   art   âri     [a]rt
+SFX 5   art   âra     [a]rt
+SFX 5   art   ârâm    [a]rt
+SFX 5   art   ârât    [a]rt
+SFX 5   ert   çru     [e]rt
+SFX 5   ert   çri     [e]rt
+SFX 5   ert   çra     [e]rt
+SFX 5   ert   çrâm    [e]rt
+SFX 5   ert   çrât    [e]rt
+SFX 5   irt   îru     [i]rt
+SFX 5   irt   îri     [i]rt
+SFX 5   irt   îra     [i]rt
+SFX 5   irt   îrâm    [i]rt
+SFX 5   irt   îrât    [i]rt
+SFX 5   urt   ûru     [u]rt
+SFX 5   urt   ûri     [u]rt
+SFX 5   urt   ûra     [u]rt
+SFX 5   urt   ûrâm    [u]rt
+SFX 5   urt   ûrât    [u]rt
+
+SFX 1 Y 5
+SFX 1   t     ju      [âçîoû]t
+SFX 1   t     ji      [âçîoû]t
+SFX 1   t     ja      [âçîoû]t
+SFX 1   t     jâm     [âçîoû]t
+SFX 1   t     jât     [âçîoû]t
+
+SFX H Y 6
+SFX H   t   ju    [âçîoû]t
+SFX H   t   0     [âçîoû]t
+SFX H   t   jam   [âçîoû]t
+SFX H   t   jat   [âçîoû]t
+SFX H   t   jiet  [âçîoû]t
+SFX H   t   jot   [âçîoû]t
+
+SFX G Y 5
+SFX G   t   jas     [âçîoû]t    # IIk refl. tagadne
+SFX G   t   jamies  [âçîoû]t
+SFX G   t   jaties  [âçîoû]t    # beigas tagadnei
+SFX G   t   jieties [âçîoû]t    # IIk refl. pavçle
+SFX G   t   joties  [âçîoû]t    # IIk refl. atst.izt.v.tag.
+
+SFX C Y 20
+SFX C  ât  u       [^j][â]t     #tag, Ip
+SFX C  ât  i       [^j][â]t     #tag, Ip
+SFX C  ât  a       [^j][â]t     #tag, Ip
+SFX C  ât  âm      [^j][â]t     #tag, Ip
+SFX C  ât  ot      [^j][â]t     #atst.izst.v.tag
+SFX C  ât  iet     [^j][â]t     #pavçle
+SFX C  çt  u        [ç]t     #tag, Ip
+SFX C  çt  i        [ç]t     #tag, IIp
+SFX C  çt  0        [ç]t     #tag, IIIp
+SFX C  çt  am       [ç]t     #tag, Ip
+SFX C  çt  at       [ç]t     #tag, IIp
+SFX C  çt  iet      [ç]t     #pavçle
+SFX C  çt  ot       [ç]t     #atst.izst.v.tag
+SFX C  ît  u        [î]t     #tag, Ip
+SFX C  ît  i        [î]t     #tag, IIp
+SFX C  ît  a        [î]t     #tag, IIIp
+SFX C  ît  âm       [î]t     #tag, Ip
+SFX C  ît  ât       [î]t     #tag, IIp
+SFX C  ît  iet      [î]t     #pavçle
+SFX C  ît  ot       [î]t     #atst.izst.v.tag
+
+SFX c Y 25
+SFX c  0   ies    [â]t    #relf.nenoteiksme
+SFX c  ât  os     [â]t    #tag, Ip
+SFX c  ât  ies    [â]t    #tag, IIp
+SFX c  t   mies   [â]t    #tag, Ip
+SFX c  ât  ieties [â]t    #pavçle
+SFX c  ât  oties  [â]t    #atst.izst.v.tag
+SFX c  t   ğoties [â]t    #atst.izst.v.nak
+SFX c  0   ies    [ç]t    #relf.nenoteiksme ----------
+SFX c  çt  os     [ç]t    #tag, Ip 
+SFX c  çt  ies    [ç]t    #tag, IIp
+SFX c  çt  as     [ç]t    #tag, IIIp
+SFX c  çt  amies  [ç]t    #tag, Ip.d.
+SFX c  çt  aties  [ç]t    #tag, IIp.d
+SFX c  çt  ieties [ç]t    #pavçle
+SFX c  çt  oties  [ç]t    #atst.izst.v.tag
+SFX c  t   ğoties [ç]t    #atst.izst.v.nak ------
+SFX c  0   ies    [î]t    #relf.nenoteiksme
+SFX c  ît  os     [î]t    #tag, Ip
+SFX c  ît  ies    [î]t    #tag, Ip
+SFX c  ît  âs     [î]t    #tag, Ip
+SFX c  ît  âmies  [î]t    #tag, Ip
+SFX c  ît  âties  [î]t    #tag, Ip
+SFX c  ît  ieties [î]t    #
+SFX c  ît  oties  [î]t    #atst.izst.v.tag
+SFX c  t   ğoties [î]t    #atst.izst.v.nak
+#SFX c  0   os     [â]t    #cieshamaa k.
+#SFX c  0   os     [ç]t    #cieshamaa k.
+#SFX c  0   os     [î]t    #cieshamaa k.
+
+SFX 6 Y 104
+SFX 6   t     ju      [âçubmp]t
+SFX 6   t     0       [bmp]t
+SFX 6   t     j       [âçubmp]t
+SFX 6   t     jam     [âçubmp]t
+SFX 6   t     jat     [âçubmp]t
+SFX 6   t     jot     [âçubmp]t    #atst.izt.v.tag
+SFX 6   t     jiet    [âçu]t    #pavçle
+SFX 6   t     iet    [bmp]t    #pavçle
+SFX 6   t     j       [âçu]t
+SFX 6   gt    dzu     [g]t
+SFX 6   gt    dz      [g]t
+SFX 6   gt    dzam    [g]t
+SFX 6   gt    dzat    [g]t
+SFX 6   gt    dzot    [g]t    #atst.izt.v.tag
+SFX 6   gt    dziet   [g]t
+SFX 6   kt    cu      [k]t
+SFX 6   kt    c       [k]t
+SFX 6   kt    cam     [k]t
+SFX 6   kt    cat     [k]t
+SFX 6   kt    cot     [k]t    #atst.izt.v.tag
+SFX 6   kt    ciet    [k]t
+SFX 6   ût    uju     [û]t
+SFX 6   ût    uj      [û]t
+SFX 6   ût    ujam    [û]t
+SFX 6   ût    ujat    [û]t
+SFX 6   ût    ujot    [û]t    #atst.izt.v.tag
+SFX 6   ût    ujiet   [û]t
+SFX 6   zt    şu      [z]t
+SFX 6   t     0       [z]t
+SFX 6   zt    ş       [z]t
+SFX 6   zt    şam     [z]t
+SFX 6   zt    şat     [z]t
+SFX 6   zt    şot     [z]t    #atst.izt.v.tag
+SFX 6   t     iet     [lz]t
+SFX 6   lt    ïu      [l]t
+SFX 6   t     0       [l]t
+SFX 6   lt    ï       [l]t
+SFX 6   lt    ïam     [l]t
+SFX 6   lt    ïat     [l]t
+SFX 6   lt    ïot     [l]t    #atst.izt.v.tag
+SFX 6   t     u       [^âç][r]t
+SFX 6   t     0       [^âç][r]t
+SFX 6   t     am      [^âç][r]t
+SFX 6   t     at      [^âç][r]t
+SFX 6   t     iet     [^âç][r]t
+SFX 6   t     ot     [^âç][r]t
+SFX 6   ârt   aru     [â]rt
+SFX 6   ârt   ar      [â]rt  # â ç speciâlie
+SFX 6   ârt   aram    [â]rt
+SFX 6   ârt   arat    [â]rt
+SFX 6   ârt   arot    [â]rt    #atst.izt.v.tag
+SFX 6   ârt   ariet   [â]rt
+SFX 6   çrt   eru     [ç]rt
+SFX 6   çrt   er      [ç]rt  # â ç speciâlie
+SFX 6   çrt   eram    [ç]rt
+SFX 6   çrt   erat    [ç]rt
+SFX 6   çrt   erot    [ç]rt    #atst.izt.v.tag
+SFX 6   çrt   eriet   [ç]rt
+SFX 6  zt   şoğs     [z]t
+SFX 6  zt   şoğa     [z]t
+SFX 6  zt   şoğam    [z]t
+SFX 6  zt   şoğu     [z]t
+SFX 6  zt   şoğâ     [z]t
+SFX 6  zt   şoğas    [z]t
+SFX 6  zt   şoğai    [z]t
+SFX 6  zt   şoği     [z]t
+SFX 6  zt   şoğiem   [z]t
+SFX 6  zt   şoğus    [z]t
+SFX 6  zt   şoğos    [z]t
+SFX 6  zt   şoğâm    [z]t
+SFX 6  zt   şoğâs    [z]t
+SFX 6  zt   şoğais   [z]t
+SFX 6  zt   şoğajam  [z]t
+SFX 6  zt   şoğo     [z]t
+SFX 6  zt   şoğajâ   [z]t
+SFX 6  zt   şoğajai  [z]t
+SFX 6  zt   şoğie    [z]t
+SFX 6  zt   şoğajiem [z]t
+SFX 6  zt   şoğajos  [z]t
+SFX 6  zt   şoğajâm  [z]t
+SFX 6  zt   şoğajâs  [z]t
+SFX 6  zt   şams     [z]t
+SFX 6  zt   şama     [z]t
+SFX 6  zt   şamam    [z]t
+SFX 6  zt   şamu     [z]t
+SFX 6  zt   şamâ     [z]t
+SFX 6  zt   şamas    [z]t
+SFX 6  zt   şamai    [z]t
+SFX 6  zt   şami     [z]t
+SFX 6  zt   şamiem   [z]t
+SFX 6  zt   şamus    [z]t
+SFX 6  zt   şamos    [z]t
+SFX 6  zt   şamâm    [z]t
+SFX 6  zt   şamâs    [z]t
+SFX 6  zt   şamais   [z]t
+SFX 6  zt   şamajam  [z]t
+SFX 6  zt   şamo     [z]t
+SFX 6  zt   şamajâ   [z]t
+SFX 6  zt   şamajai  [z]t
+SFX 6  zt   şamie    [z]t
+SFX 6  zt   şamajiem [z]t
+SFX 6  zt   şamajos  [z]t
+SFX 6  zt   şamajâm  [z]t
+SFX 6  zt   şamajâs  [z]t
+
+SFX 2 Y 7
+SFX 2   st     şu     [s]t   # tagadne
+SFX 2   st     d      [s]t
+SFX 2   st     ş      [s]t
+SFX 2   st     şam    [s]t
+SFX 2   st     şat    [s]t
+SFX 2   st     şot    [s]t    #atst.izt.v.tag
+SFX 2   st     diet   [s]t
+
+SFX 3 Y 6
+SFX 3   st     ğu     [s]t
+SFX 3   t      0      [s]t
+SFX 3   st     ğ      [s]t
+SFX 3   st     ğam    [s]t
+SFX 3   st     ğat    [s]t
+SFX 3   st     ğot    [s]t    #atst.izt.v.tag
+
+SFX 7 Y 12
+SFX 7   t   stu   [^sz]t
+SFX 7   t   sti   [^sz]t
+SFX 7   t   st    [^sz]t
+SFX 7   t   stam  [^sz]t
+SFX 7   t   stat  [^sz]t
+SFX 7   t   stot  [^sz]t
+SFX 7   t   stiet [^sz]t
+SFX 7   0   i    [sz]t
+SFX 7   0   am   [sz]t
+SFX 7   0   at   [sz]t
+SFX 7   0   ot   [sz]t
+SFX 7   0   iet  [sz]t
+
+SFX M Y 4
+SFX M   t    dams    t
+SFX M   t    dama    t
+SFX M   t    dami    t
+SFX M   t    damas   t
+
+SFX N Y 4
+SFX N   st   zdams   [s]t
+SFX N   st   zdama   [s]t
+SFX N   st   zdami   [s]t
+SFX N   st   zdamas  [s]t
+
+#modificçts 2006.04.06
+SFX [ Y 5
+SFX [   t    damies    t
+SFX [   t    damâs     t
+SFX [   t    ğanos     [^sz]t
+SFX [   st   ğanos     [s]t
+SFX [   zt   ğanos     [z]t
+
+
+SFX ] Y 2
+SFX ]   st   zdamies [s]t
+SFX ]   st   zdamâs  [s]t
+
+SFX { Y 3
+SFX { t  juğies    t
+SFX { t  jusies    t
+SFX { t  joğies    t
+#SFX { t  jies      t
+
+#2006-08-06 - pievienots sfx -oğies (III konj, piem.)
+SFX } Y 3
+SFX } t  uğies    t
+SFX } t  usies    t
+SFX } t  oğies    t
+#SFX } t  ies      t
+
+SFX Z Y 23
+SFX Z   t   stams     t
+SFX Z   t   stama     t
+SFX Z   t   stamam    t
+SFX Z   t   stamu     t
+SFX Z   t   stamâ     t
+SFX Z   t   stamas    t
+SFX Z   t   stamai    t
+SFX Z   t   stami     t
+SFX Z   t   stamiem   t
+SFX Z   t   stamus    t
+SFX Z   t   stamos    t
+SFX Z   t   stamâm    t
+SFX Z   t   stamâs    t
+SFX Z   t   stamais   t
+SFX Z   t   stamajam  t
+SFX Z   t   stamo     t
+SFX Z   t   stamajâ   t
+SFX Z   t   stamajai  t
+SFX Z   t   stamie    t
+SFX Z   t   stamajiem t
+SFX Z   t   stamajos  t
+SFX Z   t   stamajâm  t
+SFX Z   t   stamajâs  t
+
+SFX )   Y 23
+SFX )   t   jams     t
+SFX )   t   jama     t
+SFX )   t   jamam    t
+SFX )   t   jamu     t
+SFX )   t   jamâ     t
+SFX )   t   jamas    t
+SFX )   t   jamai    t
+SFX )   t   jami     t
+SFX )   t   jamiem   t
+SFX )   t   jamus    t
+SFX )   t   jamos    t
+SFX )   t   jamâm    t
+SFX )   t   jamâs    t
+SFX )   t   jamais   t
+SFX )   t   jamajam  t
+SFX )   t   jamo     t
+SFX )   t   jamajâ   t
+SFX )   t   jamajai  t
+SFX )   t   jamie    t
+SFX )   t   jamajiem t
+SFX )   t   jamajos  t
+SFX )   t   jamajâm  t
+SFX )   t   jamajâs  t
+
+#iebâzti III konjugâcijas am (tipa [^âçî]t
+SFX ( Y 184
+SFX (   t   ams      [^âçî]t
+SFX (   t   ama      [^âçî]t
+SFX (   t   amâ      [^âçî]t
+SFX (   t   amai     [^âçî]t
+SFX (   t   amais    [^âçî]t
+SFX (   t   amajâ    [^âçî]t
+SFX (   t   amajai   [^âçî]t
+SFX (   t   amajam   [^âçî]t
+SFX (   t   amajâm   [^âçî]t
+SFX (   t   amajâs   [^âçî]t
+SFX (   t   amajiem  [^âçî]t
+SFX (   t   amajos   [^âçî]t
+SFX (   t   amam     [^âçî]t
+SFX (   t   amâm     [^âçî]t
+SFX (   t   amas     [^âçî]t
+SFX (   t   amâs     [^âçî]t
+SFX (   t   ami      [^âçî]t
+SFX (   t   amie     [^âçî]t
+SFX (   t   amiem    [^âçî]t
+SFX (   t   amo      [^âçî]t
+SFX (   t   amos     [^âçî]t
+SFX (   t   amu      [^âçî]t
+SFX (   t   amus     [^âçî]t
+SFX (   ît   âms     [^cz][î]t
+SFX (   ît   âma     [^cz][î]t
+SFX (   ît   âmam    [^cz][î]t
+SFX (   ît   âmu     [^cz][î]t
+SFX (   ît   âmâ     [^cz][î]t
+SFX (   ît   âmas    [^cz][î]t
+SFX (   ît   âmai    [^cz][î]t
+SFX (   ît   âmi     [^cz][î]t
+SFX (   ît   âmiem   [^cz][î]t
+SFX (   ît   âmus    [^cz][î]t
+SFX (   ît   âmos    [^cz][î]t
+SFX (   ît   âmâm    [^cz][î]t
+SFX (   ît   âmâs    [^cz][î]t
+SFX (   ît   âmais   [^cz][î]t
+SFX (   ît   âmajam  [^cz][î]t
+SFX (   ît   âmo     [^cz][î]t
+SFX (   ît   âmajâ   [^cz][î]t
+SFX (   ît   âmajai  [^cz][î]t
+SFX (   ît   âmie    [^cz][î]t
+SFX (   ît   âmajiem [^cz][î]t
+SFX (   ît   âmajos  [^cz][î]t
+SFX (   ît   âmajâm  [^cz][î]t
+SFX (   ît   âmajâs  [^cz][î]t
+SFX (   cît  kâms     [c][î]t
+SFX (   cît  kâma     [c][î]t
+SFX (   cît  kâmam    [c][î]t
+SFX (   cît  kâmu     [c][î]t
+SFX (   cît  kâmâ     [c][î]t
+SFX (   cît  kâmas    [c][î]t
+SFX (   cît  kâmai    [c][î]t
+SFX (   cît  kâmi     [c][î]t
+SFX (   cît  kâmiem   [c][î]t
+SFX (   cît  kâmus    [c][î]t
+SFX (   cît  kâmos    [c][î]t
+SFX (   cît  kâmâm    [c][î]t
+SFX (   cît  kâmâs    [c][î]t
+SFX (   cît  kâmais   [c][î]t
+SFX (   cît  kâmajam  [c][î]t
+SFX (   cît  kâmo     [c][î]t
+SFX (   cît  kâmajâ   [c][î]t
+SFX (   cît  kâmajai  [c][î]t
+SFX (   cît  kâmie    [c][î]t
+SFX (   cît  kâmajiem [c][î]t
+SFX (   cît  kâmajos  [c][î]t
+SFX (   cît  kâmajâm  [c][î]t
+SFX (   cît  kâmajâs  [c][î]t
+SFX (   ît   âms     [^d]zît
+SFX (   ît   âma     [^d]zît
+SFX (   ît   âmam    [^d]zît
+SFX (   ît   âmu     [^d]zît
+SFX (   ît   âmâ     [^d]zît
+SFX (   ît   âmas    [^d]zît
+SFX (   ît   âmai    [^d]zît
+SFX (   ît   âmi     [^d]zît
+SFX (   ît   âmiem   [^d]zît
+SFX (   ît   âmus    [^d]zît
+SFX (   ît   âmos    [^d]zît
+SFX (   ît   âmâm    [^d]zît
+SFX (   ît   âmâs    [^d]zît
+SFX (   ît   âmais   [^d]zît
+SFX (   ît   âmajam  [^d]zît
+SFX (   ît   âmo     [^d]zît
+SFX (   ît   âmajâ   [^d]zît
+SFX (   ît   âmajai  [^d]zît
+SFX (   ît   âmie    [^d]zît
+SFX (   ît   âmajiem [^d]zît
+SFX (   ît   âmajos  [^d]zît
+SFX (   ît   âmajâm  [^d]zît
+SFX (   ît   âmajâs  [^d]zît
+SFX (   dzît  gâms     [d]zît
+SFX (   dzît  gâma     [d]zît
+SFX (   dzît  gâmam    [d]zît
+SFX (   dzît  gâmu     [d]zît
+SFX (   dzît  gâmâ     [d]zît
+SFX (   dzît  gâmas    [d]zît
+SFX (   dzît  gâmai    [d]zît
+SFX (   dzît  gâmi     [d]zît
+SFX (   dzît  gâmiem   [d]zît
+SFX (   dzît  gâmus    [d]zît
+SFX (   dzît  gâmos    [d]zît
+SFX (   dzît  gâmâm    [d]zît
+SFX (   dzît  gâmâs    [d]zît
+SFX (   dzît  gâmais   [d]zît
+SFX (   dzît  gâmajam  [d]zît
+SFX (   dzît  gâmo     [d]zît
+SFX (   dzît  gâmajâ   [d]zît
+SFX (   dzît  gâmajai  [d]zît
+SFX (   dzît  gâmie    [d]zît
+SFX (   dzît  gâmajiem [d]zît
+SFX (   dzît  gâmajos  [d]zît
+SFX (   dzît  gâmajâm  [d]zît
+SFX (   dzît  gâmajâs  [d]zît
+SFX (   çt   ams      [^t][ç]t
+SFX (   çt   ama      [^t][ç]t
+SFX (   çt   amâ      [^t][ç]t
+SFX (   çt   amai     [^t][ç]t
+SFX (   çt   amais    [^t][ç]t
+SFX (   çt   amajâ    [^t][ç]t
+SFX (   çt   amajai   [^t][ç]t
+SFX (   çt   amajam   [^t][ç]t
+SFX (   çt   amajâm   [^t][ç]t
+SFX (   çt   amajâs   [^t][ç]t
+SFX (   çt   amajiem  [^t][ç]t
+SFX (   çt   amajos   [^t][ç]t
+SFX (   çt   amam     [^t][ç]t
+SFX (   çt   amâm     [^t][ç]t
+SFX (   çt   amas     [^t][ç]t
+SFX (   çt   amâs     [^t][ç]t
+SFX (   çt   ami      [^t][ç]t
+SFX (   çt   amie     [^t][ç]t
+SFX (   çt   amiem    [^t][ç]t
+SFX (   çt   amo      [^t][ç]t
+SFX (   çt   amos     [^t][ç]t
+SFX (   çt   amu      [^t][ç]t
+SFX (   çt   amus     [^t][ç]t
+SFX (   tçt   tams    [t][ç]t
+SFX (   tçt   tama      [t][ç]t
+SFX (   tçt   tamâ      [t][ç]t
+SFX (   tçt   tamai     [t][ç]t
+SFX (   tçt   tamais    [t][ç]t
+SFX (   tçt   tamajâ    [t][ç]t
+SFX (   tçt   tamajai   [t][ç]t
+SFX (   tçt   tamajam   [t][ç]t
+SFX (   tçt   tamajâm   [t][ç]t
+SFX (   tçt   tamajâs   [t][ç]t
+SFX (   tçt   tamajiem  [t][ç]t
+SFX (   tçt   tamajos   [t][ç]t
+SFX (   tçt   tamam     [t][ç]t
+SFX (   tçt   tamâm     [t][ç]t
+SFX (   tçt   tamas     [t][ç]t
+SFX (   tçt   tamâs     [t][ç]t
+SFX (   tçt   tami      [t][ç]t
+SFX (   tçt   tamie     [t][ç]t
+SFX (   tçt   tamiem    [t][ç]t
+SFX (   tçt   tamo      [t][ç]t
+SFX (   tçt   tamos     [t][ç]t
+SFX (   tçt   tamu      [t][ç]t
+SFX (   tçt   tamus     [t][ç]t
+SFX (   t   ms      [â]t
+SFX (   t   ma      [â]t
+SFX (   t   mam     [â]t
+SFX (   t   mu      [â]t
+SFX (   t   mâ      [â]t
+SFX (   t   mas     [â]t
+SFX (   t   mai     [â]t
+SFX (   t   mi      [â]t
+SFX (   t   miem    [â]t
+SFX (   t   mus     [â]t
+SFX (   t   mos     [â]t
+SFX (   t   mâm     [â]t
+SFX (   t   mâs     [â]t
+SFX (   t   mais    [â]t
+SFX (   t   majam   [â]t
+SFX (   t   mo      [â]t
+SFX (   t   majâ    [â]t
+SFX (   t   majai   [â]t
+SFX (   t   mie     [â]t
+SFX (   t   majiem  [â]t
+SFX (   t   majos   [â]t
+SFX (   t   majâm   [â]t
+SFX (   t   majâs   [â]t
+
+
+SFX ^ Y 23
+SFX ^   t   stoğs     t
+SFX ^   t   stoğa     t
+SFX ^   t   stoğam    t
+SFX ^   t   stoğu     t
+SFX ^   t   stoğâ     t
+SFX ^   t   stoğas    t
+SFX ^   t   stoğai    t
+SFX ^   t   stoği     t
+SFX ^   t   stoğiem   t
+SFX ^   t   stoğus    t
+SFX ^   t   stoğos    t
+SFX ^   t   stoğâm    t
+SFX ^   t   stoğâs    t
+SFX ^   t   stoğais   t
+SFX ^   t   stoğajam  t
+SFX ^   t   stoğo     t
+SFX ^   t   stoğajâ   t
+SFX ^   t   stoğajai  t
+SFX ^   t   stoğie    t
+SFX ^   t   stoğajiem t
+SFX ^   t   stoğajos  t
+SFX ^   t   stoğajâm  t
+SFX ^   t   stoğajâs  t
+
+SFX $ Y 23
+SFX $   t   joğs     t
+SFX $   t   joğa     t
+SFX $   t   joğam    t
+SFX $   t   joğu     t
+SFX $   t   joğâ     t
+SFX $   t   joğas    t
+SFX $   t   joğai    t
+SFX $   t   joği     t
+SFX $   t   joğiem   t
+SFX $   t   joğus    t
+SFX $   t   joğos    t
+SFX $   t   joğâm    t
+SFX $   t   joğâs    t
+SFX $   t   joğais   t
+SFX $   t   joğajam  t
+SFX $   t   joğo     t
+SFX $   t   joğajâ   t
+SFX $   t   joğajai  t
+SFX $   t   joğie    t
+SFX $   t   joğajiem t
+SFX $   t   joğajos  t
+SFX $   t   joğajâm  t
+SFX $   t   joğajâs  t
+
+SFX h Y 161
+SFX h   t   oğa      [^âçî]t
+SFX h   t   oğâ      [^âçî]t
+SFX h   t   oğai     [^âçî]t
+SFX h   t   oğais    [^âçî]t
+SFX h   t   oğajâ    [^âçî]t
+SFX h   t   oğajai   [^âçî]t
+SFX h   t   oğajam   [^âçî]t
+SFX h   t   oğajâm   [^âçî]t
+SFX h   t   oğajâs   [^âçî]t
+SFX h   t   oğajiem  [^âçî]t
+SFX h   t   oğajos   [^âçî]t
+SFX h   t   oğam     [^âçî]t
+SFX h   t   oğâm     [^âçî]t
+SFX h   t   oğas     [^âçî]t
+SFX h   t   oğâs     [^âçî]t
+SFX h   t   oği      [^âçî]t
+SFX h   t   oğie     [^âçî]t
+SFX h   t   oğiem    [^âçî]t
+SFX h   t   oğo      [^âçî]t
+SFX h   t   oğos     [^âçî]t
+SFX h   t   oğs      [^âçî]t
+SFX h   t   oğu      [^âçî]t
+SFX h   t   oğus     [^âçî]t
+SFX h   çt   oğa      [ç]t
+SFX h   çt   oğâ      [ç]t
+SFX h   çt   oğai     [ç]t
+SFX h   çt   oğais    [ç]t
+SFX h   çt   oğajâ    [ç]t
+SFX h   çt   oğajai   [ç]t
+SFX h   çt   oğajam   [ç]t
+SFX h   çt   oğajâm   [ç]t
+SFX h   çt   oğajâs   [ç]t
+SFX h   çt   oğajiem  [ç]t
+SFX h   çt   oğajos   [ç]t
+SFX h   çt   oğam     [ç]t
+SFX h   çt   oğâm     [ç]t
+SFX h   çt   oğas     [ç]t
+SFX h   çt   oğâs     [ç]t
+SFX h   çt   oği      [ç]t
+SFX h   çt   oğie     [ç]t
+SFX h   çt   oğiem    [ç]t
+SFX h   çt   oğo      [ç]t
+SFX h   çt   oğos     [ç]t
+SFX h   çt   oğs      [ç]t
+SFX h   çt   oğu      [ç]t
+SFX h   çt   oğus     [ç]t
+SFX h   ît   oğa      [^cz][î]t
+SFX h   ît   oğâ      [^cz][î]t
+SFX h   ît   oğai     [^cz][î]t
+SFX h   ît   oğais    [^cz][î]t
+SFX h   ît   oğajâ    [^cz][î]t
+SFX h   ît   oğajai   [^cz][î]t
+SFX h   ît   oğajam   [^cz][î]t
+SFX h   ît   oğajâm   [^cz][î]t
+SFX h   ît   oğajâs   [^cz][î]t
+SFX h   ît   oğajiem  [^cz][î]t
+SFX h   ît   oğajos   [^cz][î]t
+SFX h   ît   oğam     [^cz][î]t
+SFX h   ît   oğâm     [^cz][î]t
+SFX h   ît   oğas     [^cz][î]t
+SFX h   ît   oğâs     [^cz][î]t
+SFX h   ît   oği      [^cz][î]t
+SFX h   ît   oğie     [^cz][î]t
+SFX h   ît   oğiem    [^cz][î]t
+SFX h   ît   oğo      [^cz][î]t
+SFX h   ît   oğos     [^cz][î]t
+SFX h   ît   oğs      [^cz][î]t
+SFX h   ît   oğu      [^cz][î]t
+SFX h   ît   oğus     [^cz][î]t
+SFX h   cît  koğa      [c]ît
+SFX h   cît  koğâ      [c]ît
+SFX h   cît  koğai     [c]ît
+SFX h   cît  koğais    [c]ît
+SFX h   cît  koğajâ    [c]ît
+SFX h   cît  koğajai   [c]ît
+SFX h   cît  koğajam   [c]ît
+SFX h   cît  koğajâm   [c]ît
+SFX h   cît  koğajâs   [c]ît
+SFX h   cît  koğajiem  [c]ît
+SFX h   cît  koğajos   [c]ît
+SFX h   cît  koğam     [c]ît
+SFX h   cît  koğâm     [c]ît
+SFX h   cît  koğas     [c]ît
+SFX h   cît  koğâs     [c]ît
+SFX h   cît  koği      [c]ît
+SFX h   cît  koğie     [c]ît
+SFX h   cît  koğiem    [c]ît
+SFX h   cît  koğo      [c]ît
+SFX h   cît  koğos     [c]ît
+SFX h   cît  koğs      [c]ît
+SFX h   cît  koğu      [c]ît
+SFX h   cît  koğus     [c]ît
+SFX h   ît   oğa      [^d]zît
+SFX h   ît   oğâ      [^d]zît
+SFX h   ît   oğai     [^d]zît
+SFX h   ît   oğais    [^d]zît
+SFX h   ît   oğajâ    [^d]zît
+SFX h   ît   oğajai   [^d]zît
+SFX h   ît   oğajam   [^d]zît
+SFX h   ît   oğajâm   [^d]zît
+SFX h   ît   oğajâs   [^d]zît
+SFX h   ît   oğajiem  [^d]zît
+SFX h   ît   oğajos   [^d]zît
+SFX h   ît   oğam     [^d]zît
+SFX h   ît   oğâm     [^d]zît
+SFX h   ît   oğas     [^d]zît
+SFX h   ît   oğâs     [^d]zît
+SFX h   ît   oği      [^d]zît
+SFX h   ît   oğie     [^d]zît
+SFX h   ît   oğiem    [^d]zît
+SFX h   ît   oğo      [^d]zît
+SFX h   ît   oğos     [^d]zît
+SFX h   ît   oğs      [^d]zît
+SFX h   ît   oğu      [^d]zît
+SFX h   ît   oğus     [^d]zît
+SFX h   dzît  goğa      [d]zît
+SFX h   dzît  goğâ      [d]zît
+SFX h   dzît  goğai     [d]zît
+SFX h   dzît  goğais    [d]zît
+SFX h   dzît  goğajâ    [d]zît
+SFX h   dzît  goğajai   [d]zît
+SFX h   dzît  goğajam   [d]zît
+SFX h   dzît  goğajâm   [d]zît
+SFX h   dzît  goğajâs   [d]zît
+SFX h   dzît  goğajiem  [d]zît
+SFX h   dzît  goğajos   [d]zît
+SFX h   dzît  goğam     [d]zît
+SFX h   dzît  goğâm     [d]zît
+SFX h   dzît  goğas     [d]zît
+SFX h   dzît  goğâs     [d]zît
+SFX h   dzît  goği      [d]zît
+SFX h   dzît  goğie     [d]zît
+SFX h   dzît  goğiem    [d]zît
+SFX h   dzît  goğo      [d]zît
+SFX h   dzît  goğos     [d]zît
+SFX h   dzît  goğs      [d]zît
+SFX h   dzît  goğu      [d]zît
+SFX h   dzît  goğus     [d]zît
+SFX h   ât   oğa      [â]t
+SFX h   ât   oğâ      [â]t
+SFX h   ât   oğai     [â]t
+SFX h   ât   oğais    [â]t
+SFX h   ât   oğajâ    [â]t
+SFX h   ât   oğajai   [â]t
+SFX h   ât   oğajam   [â]t
+SFX h   ât   oğajâm   [â]t
+SFX h   ât   oğajâs   [â]t
+SFX h   ât   oğajiem  [â]t
+SFX h   ât   oğajos   [â]t
+SFX h   ât   oğam     [â]t
+SFX h   ât   oğâm     [â]t
+SFX h   ât   oğas     [â]t
+SFX h   ât   oğâs     [â]t
+SFX h   ât   oği      [â]t
+SFX h   ât   oğie     [â]t
+SFX h   ât   oğiem    [â]t
+SFX h   ât   oğo      [â]t
+SFX h   ât   oğos     [â]t
+SFX h   ât   oğs      [â]t
+SFX h   ât   oğu      [â]t
+SFX h   ât   oğus     [â]t
+
+
+#shitas neder 4 grupai
+# - âç-ae
+SFX % Y 276
+SFX %   0   oğa      [^gkr]t
+SFX %   0   oğâ      [^gkr]t
+SFX %   0   oğai     [^gkr]t
+SFX %   0   oğais    [^gkr]t
+SFX %   0   oğajâ    [^gkr]t
+SFX %   0   oğajai   [^gkr]t
+SFX %   0   oğajam   [^gkr]t
+SFX %   0   oğajâm   [^gkr]t
+SFX %   0   oğajâs   [^gkr]t
+SFX %   0   oğajiem  [^gkr]t
+SFX %   0   oğajos   [^gkr]t
+SFX %   0   oğam     [^gkr]t
+SFX %   0   oğâm     [^gkr]t
+SFX %   0   oğas     [^gkr]t
+SFX %   0   oğâs     [^gkr]t
+SFX %   0   oği      [^gkr]t
+SFX %   0   oğie     [^gkr]t
+SFX %   0   oğiem    [^gkr]t
+SFX %   0   oğo      [^gkr]t
+SFX %   0   oğos     [^gkr]t
+SFX %   0   oğs      [^gkr]t
+SFX %   0   oğu      [^gkr]t
+SFX %   0   oğus     [^gkr]t
+SFX %   0   ams      [^gkr]t
+SFX %   0   ama      [^gkr]t
+SFX %   0   amâ      [^gkr]t
+SFX %   0   amai     [^gkr]t
+SFX %   0   amais    [^gkr]t
+SFX %   0   amajâ    [^gkr]t
+SFX %   0   amajai   [^gkr]t
+SFX %   0   amajam   [^gkr]t
+SFX %   0   amajâm   [^gkr]t
+SFX %   0   amajâs   [^gkr]t
+SFX %   0   amajiem  [^gkr]t
+SFX %   0   amajos   [^gkr]t
+SFX %   0   amam     [^gkr]t
+SFX %   0   amâm     [^gkr]t
+SFX %   0   amas     [^gkr]t
+SFX %   0   amâs     [^gkr]t
+SFX %   0   ami      [^gkr]t
+SFX %   0   amie     [^gkr]t
+SFX %   0   amiem    [^gkr]t
+SFX %   0   amo      [^gkr]t
+SFX %   0   amos     [^gkr]t
+SFX %   0   amu      [^gkr]t
+SFX %   0   amus     [^gkr]t
+SFX %   0   oğa      [^âç][r]t
+SFX %   0   oğâ      [^âç][r]t
+SFX %   0   oğai     [^âç][r]t
+SFX %   0   oğais    [^âç][r]t
+SFX %   0   oğajâ    [^âç][r]t
+SFX %   0   oğajai   [^âç][r]t
+SFX %   0   oğajam   [^âç][r]t
+SFX %   0   oğajâm   [^âç][r]t
+SFX %   0   oğajâs   [^âç][r]t
+SFX %   0   oğajiem  [^âç][r]t
+SFX %   0   oğajos   [^âç][r]t
+SFX %   0   oğam     [^âç][r]t
+SFX %   0   oğâm     [^âç][r]t
+SFX %   0   oğas     [^âç][r]t
+SFX %   0   oğâs     [^âç][r]t
+SFX %   0   oği      [^âç][r]t
+SFX %   0   oğie     [^âç][r]t
+SFX %   0   oğiem    [^âç][r]t
+SFX %   0   oğo      [^âç][r]t
+SFX %   0   oğos     [^âç][r]t
+SFX %   0   oğs      [^âç][r]t
+SFX %   0   oğu      [^âç][r]t
+SFX %   0   oğus     [^âç][r]t
+SFX %   0   ams      [^âç][r]t
+SFX %   0   ama      [^âç][r]t
+SFX %   0   amâ      [^âç][r]t
+SFX %   0   amai     [^âç][r]t
+SFX %   0   amais    [^âç][r]t
+SFX %   0   amajâ    [^âç][r]t
+SFX %   0   amajai   [^âç][r]t
+SFX %   0   amajam   [^âç][r]t
+SFX %   0   amajâm   [^âç][r]t
+SFX %   0   amajâs   [^âç][r]t
+SFX %   0   amajiem  [^âç][r]t
+SFX %   0   amajos   [^âç][r]t
+SFX %   0   amam     [^âç][r]t
+SFX %   0   amâm     [^âç][r]t
+SFX %   0   amas     [^âç][r]t
+SFX %   0   amâs     [^âç][r]t
+SFX %   0   ami      [^âç][r]t
+SFX %   0   amie     [^âç][r]t
+SFX %   0   amiem    [^âç][r]t
+SFX %   0   amo      [^âç][r]t
+SFX %   0   amos     [^âç][r]t
+SFX %   0   amu      [^âç][r]t
+SFX %   0   amus     [^âç][r]t
+SFX %   gt   dzoğa      [g]t
+SFX %   gt   dzoğâ      [g]t
+SFX %   gt   dzoğai     [g]t
+SFX %   gt   dzoğais    [g]t
+SFX %   gt   dzoğajâ    [g]t
+SFX %   gt   dzoğajai   [g]t
+SFX %   gt   dzoğajam   [g]t
+SFX %   gt   dzoğajâm   [g]t
+SFX %   gt   dzoğajâs   [g]t
+SFX %   gt   dzoğajiem  [g]t
+SFX %   gt   dzoğajos   [g]t
+SFX %   gt   dzoğam     [g]t
+SFX %   gt   dzoğâm     [g]t
+SFX %   gt   dzoğas     [g]t
+SFX %   gt   dzoğâs     [g]t
+SFX %   gt   dzoği      [g]t
+SFX %   gt   dzoğie     [g]t
+SFX %   gt   dzoğiem    [g]t
+SFX %   gt   dzoğo      [g]t
+SFX %   gt   dzoğos     [g]t
+SFX %   gt   dzoğs      [g]t
+SFX %   gt   dzoğu      [g]t
+SFX %   gt   dzoğus     [g]t
+SFX %   gt   dzams      [g]t
+SFX %   gt   dzama      [g]t
+SFX %   gt   dzamâ      [g]t
+SFX %   gt   dzamai     [g]t
+SFX %   gt   dzamais    [g]t
+SFX %   gt   dzamajâ    [g]t
+SFX %   gt   dzamajai   [g]t
+SFX %   gt   dzamajam   [g]t
+SFX %   gt   dzamajâm   [g]t
+SFX %   gt   dzamajâs   [g]t
+SFX %   gt   dzamajiem  [g]t
+SFX %   gt   dzamajos   [g]t
+SFX %   gt   dzamam     [g]t
+SFX %   gt   dzamâm     [g]t
+SFX %   gt   dzamas     [g]t
+SFX %   gt   dzamâs     [g]t
+SFX %   gt   dzami      [g]t
+SFX %   gt   dzamie     [g]t
+SFX %   gt   dzamiem    [g]t
+SFX %   gt   dzamo      [g]t
+SFX %   gt   dzamos     [g]t
+SFX %   gt   dzamu      [g]t
+SFX %   gt   dzamus     [g]t
+SFX %   kt   coğa      [k]t
+SFX %   kt   coğâ      [k]t
+SFX %   kt   coğai     [k]t
+SFX %   kt   coğais    [k]t
+SFX %   kt   coğajâ    [k]t
+SFX %   kt   coğajai   [k]t
+SFX %   kt   coğajam   [k]t
+SFX %   kt   coğajâm   [k]t
+SFX %   kt   coğajâs   [k]t
+SFX %   kt   coğajiem  [k]t
+SFX %   kt   coğajos   [k]t
+SFX %   kt   coğam     [k]t
+SFX %   kt   coğâm     [k]t
+SFX %   kt   coğas     [k]t
+SFX %   kt   coğâs     [k]t
+SFX %   kt   coği      [k]t
+SFX %   kt   coğie     [k]t
+SFX %   kt   coğiem    [k]t
+SFX %   kt   coğo      [k]t
+SFX %   kt   coğos     [k]t
+SFX %   kt   coğs      [k]t
+SFX %   kt   coğu      [k]t
+SFX %   kt   coğus     [k]t
+SFX %   kt   cams      [k]t
+SFX %   kt   cama      [k]t
+SFX %   kt   camâ      [k]t
+SFX %   kt   camai     [k]t
+SFX %   kt   camais    [k]t
+SFX %   kt   camajâ    [k]t
+SFX %   kt   camajai   [k]t
+SFX %   kt   camajam   [k]t
+SFX %   kt   camajâm   [k]t
+SFX %   kt   camajâs   [k]t
+SFX %   kt   camajiem  [k]t
+SFX %   kt   camajos   [k]t
+SFX %   kt   camam     [k]t
+SFX %   kt   camâm     [k]t
+SFX %   kt   camas     [k]t
+SFX %   kt   camâs     [k]t
+SFX %   kt   cami      [k]t
+SFX %   kt   camie     [k]t
+SFX %   kt   camiem    [k]t
+SFX %   kt   camo      [k]t
+SFX %   kt   camos     [k]t
+SFX %   kt   camu      [k]t
+SFX %   kt   camus     [k]t
+SFX %   ârt   aroğa      [â]rt
+SFX %   ârt   aroğâ      [â]rt
+SFX %   ârt   aroğai     [â]rt
+SFX %   ârt   aroğais    [â]rt
+SFX %   ârt   aroğajâ    [â]rt
+SFX %   ârt   aroğajai   [â]rt
+SFX %   ârt   aroğajam   [â]rt
+SFX %   ârt   aroğajâm   [â]rt
+SFX %   ârt   aroğajâs   [â]rt
+SFX %   ârt   aroğajiem  [â]rt
+SFX %   ârt   aroğajos   [â]rt
+SFX %   ârt   aroğam     [â]rt
+SFX %   ârt   aroğâm     [â]rt
+SFX %   ârt   aroğas     [â]rt
+SFX %   ârt   aroğâs     [â]rt
+SFX %   ârt   aroği      [â]rt
+SFX %   ârt   aroğie     [â]rt
+SFX %   ârt   aroğiem    [â]rt
+SFX %   ârt   aroğo      [â]rt
+SFX %   ârt   aroğos     [â]rt
+SFX %   ârt   aroğs      [â]rt
+SFX %   ârt   aroğu      [â]rt
+SFX %   ârt   aroğus     [â]rt
+SFX %   ârt   arams      [â]rt
+SFX %   ârt   arama      [â]rt
+SFX %   ârt   aramâ      [â]rt
+SFX %   ârt   aramai     [â]rt
+SFX %   ârt   aramais    [â]rt
+SFX %   ârt   aramajâ    [â]rt
+SFX %   ârt   aramajai   [â]rt
+SFX %   ârt   aramajam   [â]rt
+SFX %   ârt   aramajâm   [â]rt
+SFX %   ârt   aramajâs   [â]rt
+SFX %   ârt   aramajiem  [â]rt
+SFX %   ârt   aramajos   [â]rt
+SFX %   ârt   aramam     [â]rt
+SFX %   ârt   aramâm     [â]rt
+SFX %   ârt   aramas     [â]rt
+SFX %   ârt   aramâs     [â]rt
+SFX %   ârt   arami      [â]rt
+SFX %   ârt   aramie     [â]rt
+SFX %   ârt   aramiem    [â]rt
+SFX %   ârt   aramo      [â]rt
+SFX %   ârt   aramos     [â]rt
+SFX %   ârt   aramu      [â]rt
+SFX %   ârt   aramus     [â]rt
+SFX %   çrt   eroğa      [ç]rt
+SFX %   çrt   eroğâ      [ç]rt
+SFX %   çrt   eroğai     [ç]rt
+SFX %   çrt   eroğais    [ç]rt
+SFX %   çrt   eroğajâ    [ç]rt
+SFX %   çrt   eroğajai   [ç]rt
+SFX %   çrt   eroğajam   [ç]rt
+SFX %   çrt   eroğajâm   [ç]rt
+SFX %   çrt   eroğajâs   [ç]rt
+SFX %   çrt   eroğajiem  [ç]rt
+SFX %   çrt   eroğajos   [ç]rt
+SFX %   çrt   eroğam     [ç]rt
+SFX %   çrt   eroğâm     [ç]rt
+SFX %   çrt   eroğas     [ç]rt
+SFX %   çrt   eroğâs     [ç]rt
+SFX %   çrt   eroği      [ç]rt
+SFX %   çrt   eroğie     [ç]rt
+SFX %   çrt   eroğiem    [ç]rt
+SFX %   çrt   eroğo      [ç]rt
+SFX %   çrt   eroğos     [ç]rt
+SFX %   çrt   eroğs      [ç]rt
+SFX %   çrt   eroğu      [ç]rt
+SFX %   çrt   eroğus     [ç]rt
+SFX %   çrt   erams      [ç]rt
+SFX %   çrt   erama      [ç]rt
+SFX %   çrt   eramâ      [ç]rt
+SFX %   çrt   eramai     [ç]rt
+SFX %   çrt   eramais    [ç]rt
+SFX %   çrt   eramajâ    [ç]rt
+SFX %   çrt   eramajai   [ç]rt
+SFX %   çrt   eramajam   [ç]rt
+SFX %   çrt   eramajâm   [ç]rt
+SFX %   çrt   eramajâs   [ç]rt
+SFX %   çrt   eramajiem  [ç]rt
+SFX %   çrt   eramajos   [ç]rt
+SFX %   çrt   eramam     [ç]rt
+SFX %   çrt   eramâm     [ç]rt
+SFX %   çrt   eramas     [ç]rt
+SFX %   çrt   eramâs     [ç]rt
+SFX %   çrt   erami      [ç]rt
+SFX %   çrt   eramie     [ç]rt
+SFX %   çrt   eramiem    [ç]rt
+SFX %   çrt   eramo      [ç]rt
+SFX %   çrt   eramos     [ç]rt
+SFX %   çrt   eramu      [ç]rt
+SFX %   çrt   eramus     [ç]rt
+
+#
+#Divdabji is/usi // uğais/usî
+#
+SFX e Y 25
+SFX e   t   is      t
+SFX e   t   uğa     t
+SFX e   t   uğam    t
+SFX e   t   uğu     t
+SFX e   t   uğâ     t
+SFX e   t   usi     t
+SFX e   t   uğas    t
+SFX e   t   uğai    t
+SFX e   t   uği     t
+SFX e   t   uğiem   t
+SFX e   t   uğus    t
+SFX e   t   uğos    t
+SFX e   t   uğâm    t
+SFX e   t   uğâs    t
+SFX e   t   uğais   t
+SFX e   t   uğajam  t
+SFX e   t   uğo     t
+SFX e   t   uğajâ   t
+SFX e   t   usî     t
+SFX e   t   uğajai  t
+SFX e   t   uğie    t
+SFX e   t   uğajiem t
+SFX e   t   uğajos  t
+SFX e   t   uğajâm  t
+SFX e   t   uğajâs  t
+
+
+#arî ît - no V grupas
+SFX a Y 177
+SFX a   t   is      [^gîklû]t
+SFX a   t   uğa     [^lûî]t
+SFX a   t   uğam    [^lûî]t
+SFX a   t   uğu     [^lûî]t
+SFX a   t   uğâ     [^lûî]t
+SFX a   t   usi     [^lûî]t
+SFX a   t   uğas    [^lûî]t
+SFX a   t   uğai    [^lûî]t
+SFX a   t   uği     [^lûî]t
+SFX a   t   uğiem   [^lûî]t
+SFX a   t   uğus    [^lûî]t
+SFX a   t   uğos    [^lûî]t
+SFX a   t   uğâm    [^lûî]t
+SFX a   t   uğâs    [^lûî]t
+SFX a   t   uğais   [^lûî]t
+SFX a   t   uğajam  [^lûî]t
+SFX a   t   uğo     [^lûî]t
+SFX a   t   uğajâ   [^lûî]t
+SFX a   t   usî     [^lûî]t
+SFX a   t   uğajai  [^lûî]t
+SFX a   t   uğie    [^lûî]t
+SFX a   t   uğajiem [^lûî]t
+SFX a   t   uğajos  [^lûî]t
+SFX a   t   uğajâm  [^lûî]t
+SFX a   t   uğajâs  [^lûî]t
+SFX a   kt  cis     [k]t
+SFX a   gt  dzis    [g]t
+SFX a   ût   uvis      [û]t
+SFX a   ût   uvuğa     [û]t
+SFX a   ût   uvuğam    [û]t
+SFX a   ût   uvuğu     [û]t
+SFX a   ût   uvuğâ     [û]t
+SFX a   ût   uvusi     [û]t
+SFX a   ût   uvuğas    [û]t
+SFX a   ût   uvuğai    [û]t
+SFX a   ût   uvuği     [û]t
+SFX a   ût   uvuğiem   [û]t
+SFX a   ût   uvuğus    [û]t
+SFX a   ût   uvuğos    [û]t
+SFX a   ût   uvuğâm    [û]t
+SFX a   ût   uvuğâs    [û]t
+SFX a   ût   uvuğais   [û]t
+SFX a   ût   uvuğajam  [û]t
+SFX a   ût   uvuğo     [û]t
+SFX a   ût   uvuğajâ   [û]t
+SFX a   ût   uvusî     [û]t
+SFX a   ût   uvuğajai  [û]t
+SFX a   ût   uvuğie    [û]t
+SFX a   ût   uvuğajiem [û]t
+SFX a   ût   uvuğajos  [û]t
+SFX a   ût   uvuğajâm  [û]t
+SFX a   ût   uvuğajâs  [û]t
+SFX a   ît   inis      [î]t
+SFX a   ît   inuğa     [î]t
+SFX a   ît   inuğam    [î]t
+SFX a   ît   inuğu     [î]t
+SFX a   ît   inuğâ     [î]t
+SFX a   ît   inusi     [î]t
+SFX a   ît   inuğas    [î]t
+SFX a   ît   inuğai    [î]t
+SFX a   ît   inuği     [î]t
+SFX a   ît   inuğiem   [î]t
+SFX a   ît   inuğus    [î]t
+SFX a   ît   inuğos    [î]t
+SFX a   ît   inuğâm    [î]t
+SFX a   ît   inuğâs    [î]t
+SFX a   ît   inuğais   [î]t
+SFX a   ît   inuğajam  [î]t
+SFX a   ît   inuğo     [î]t
+SFX a   ît   inuğajâ   [î]t
+SFX a   ît   inusî     [î]t
+SFX a   ît   inuğajai  [î]t
+SFX a   ît   inuğie    [î]t
+SFX a   ît   inuğajiem [î]t
+SFX a   ît   inuğajos  [î]t
+SFX a   ît   inuğajâm  [î]t
+SFX a   ît   inuğajâs  [î]t
+SFX a   t   is      [^eiu]lt
+SFX a   t   uğa     [^eiu]lt
+SFX a   t   uğam    [^eiu]lt
+SFX a   t   uğu     [^eiu]lt
+SFX a   t   uğâ     [^eiu]lt
+SFX a   t   usi     [^eiu]lt
+SFX a   t   uğas    [^eiu]lt
+SFX a   t   uğai    [^eiu]lt
+SFX a   t   uği     [^eiu]lt
+SFX a   t   uğiem   [^eiu]lt
+SFX a   t   uğus    [^eiu]lt
+SFX a   t   uğos    [^eiu]lt
+SFX a   t   uğâm    [^eiu]lt
+SFX a   t   uğâs    [^eiu]lt
+SFX a   t   uğais   [^eiu]lt
+SFX a   t   uğajam  [^eiu]lt
+SFX a   t   uğo     [^eiu]lt
+SFX a   t   uğajâ   [^eiu]lt
+SFX a   t   usî     [^eiu]lt
+SFX a   t   uğajai  [^eiu]lt
+SFX a   t   uğie    [^eiu]lt
+SFX a   t   uğajiem [^eiu]lt
+SFX a   t   uğajos  [^eiu]lt
+SFX a   t   uğajâm  [^eiu]lt
+SFX a   t   uğajâs  [^eiu]lt
+SFX a   elt   çlis      [e]lt
+SFX a   elt   çluğa     [e]lt
+SFX a   elt   çluğam    [e]lt
+SFX a   elt   çluğu     [e]lt
+SFX a   elt   çluğâ     [e]lt
+SFX a   elt   çlusi     [e]lt
+SFX a   elt   çluğas    [e]lt
+SFX a   elt   çluğai    [e]lt
+SFX a   elt   çluği     [e]lt
+SFX a   elt   çluğiem   [e]lt
+SFX a   elt   çluğus    [e]lt
+SFX a   elt   çluğos    [e]lt
+SFX a   elt   çluğâm    [e]lt
+SFX a   elt   çluğâs    [e]lt
+SFX a   elt   çluğais   [e]lt
+SFX a   elt   çluğajam  [e]lt
+SFX a   elt   çluğo     [e]lt
+SFX a   elt   çluğajâ   [e]lt
+SFX a   elt   çlusî     [e]lt
+SFX a   elt   çluğajai  [e]lt
+SFX a   elt   çluğie    [e]lt
+SFX a   elt   çluğajiem [e]lt
+SFX a   elt   çluğajos  [e]lt
+SFX a   elt   çluğajâm  [e]lt
+SFX a   elt   çluğajâs  [e]lt
+SFX a   ilt   îlis      [i]lt
+SFX a   ilt   îluğa     [i]lt
+SFX a   ilt   îluğam    [i]lt
+SFX a   ilt   îluğu     [i]lt
+SFX a   ilt   îluğâ     [i]lt
+SFX a   ilt   îlusi     [i]lt
+SFX a   ilt   îluğas    [i]lt
+SFX a   ilt   îluğai    [i]lt
+SFX a   ilt   îluği     [i]lt
+SFX a   ilt   îluğiem   [i]lt
+SFX a   ilt   îluğus    [i]lt
+SFX a   ilt   îluğos    [i]lt
+SFX a   ilt   îluğâm    [i]lt
+SFX a   ilt   îluğâs    [i]lt
+SFX a   ilt   îluğais   [i]lt
+SFX a   ilt   îluğajam  [i]lt
+SFX a   ilt   îluğo     [i]lt
+SFX a   ilt   îluğajâ   [i]lt
+SFX a   ilt   îlusî     [i]lt
+SFX a   ilt   îluğajai  [i]lt
+SFX a   ilt   îluğie    [i]lt
+SFX a   ilt   îluğajiem [i]lt
+SFX a   ilt   îluğajos  [i]lt
+SFX a   ilt   îluğajâm  [i]lt
+SFX a   ilt   îluğajâs  [i]lt
+SFX a   ult   ûlis      [u]lt
+SFX a   ult   ûluğa     [u]lt
+SFX a   ult   ûluğam    [u]lt
+SFX a   ult   ûluğu     [u]lt
+SFX a   ult   ûluğâ     [u]lt
+SFX a   ult   ûlusi     [u]lt
+SFX a   ult   ûluğas    [u]lt
+SFX a   ult   ûluğai    [u]lt
+SFX a   ult   ûluği     [u]lt
+SFX a   ult   ûluğiem   [u]lt
+SFX a   ult   ûluğus    [u]lt
+SFX a   ult   ûluğos    [u]lt
+SFX a   ult   ûluğâm    [u]lt
+SFX a   ult   ûluğâs    [u]lt
+SFX a   ult   ûluğais   [u]lt
+SFX a   ult   ûluğajam  [u]lt
+SFX a   ult   ûluğo     [u]lt
+SFX a   ult   ûluğajâ   [u]lt
+SFX a   ult   ûlusî     [u]lt
+SFX a   ult   ûluğajai  [u]lt
+SFX a   ult   ûluğie    [u]lt
+SFX a   ult   ûluğajiem [u]lt
+SFX a   ult   ûluğajos  [u]lt
+SFX a   ult   ûluğajâm  [u]lt
+SFX a   ult   ûluğajâs  [u]lt
+
+SFX b  Y 25
+SFX b   t   jis      t
+SFX b   t   juğa     t
+SFX b   t   juğam    t
+SFX b   t   juğu     t
+SFX b   t   juğâ     t
+SFX b   t   jusi     t
+SFX b   t   juğas    t
+SFX b   t   juğai    t
+SFX b   t   juği     t
+SFX b   t   juğiem   t
+SFX b   t   juğus    t
+SFX b   t   juğos    t
+SFX b   t   juğâm    t
+SFX b   t   juğâs    t
+SFX b   t   juğais   t
+SFX b   t   juğajam  t
+SFX b   t   juğo     t
+SFX b   t   juğajâ   t
+SFX b   t   jusî     t
+SFX b   t   juğajai  t
+SFX b   t   juğie    t
+SFX b   t   juğajiem t
+SFX b   t   juğajos  t
+SFX b   t   juğajâm  t
+SFX b   t   juğajâs  t
+
+SFX I Y 23
+SFX I  t    ts      t
+SFX I  t    ta      t
+SFX I  t    tai     t
+SFX I  t    tais    t
+SFX I  t    tajai   t
+SFX I  t    tajam   t
+SFX I  t    tajiem  t
+SFX I  t    tajos   t
+SFX I  t    tajâ    t
+SFX I  t    tajâm   t
+SFX I  t    tajâs   t
+SFX I  t    tam     t
+SFX I  t    tas     t
+SFX I  t    ti      t
+SFX I  t    tie     t
+SFX I  t    tiem    t
+SFX I  t    to      t
+SFX I  t    tos     t
+SFX I  t    tus     t
+SFX I  t    tâ      t
+SFX I  t    tâm     t
+SFX I  t    tâs     t
+SFX I  t    tu      t
+
+SFX 0 Y 1
+SFX 0   0     u     t
+
+SFX J Y 21
+SFX J  t   ğana   [^sz]t
+SFX J  t   ğanas  [^sz]t
+SFX J  t   ğanai  [^sz]t
+SFX J  t   ğanu   [^sz]t
+SFX J  t   ğanâ   [^sz]t
+SFX J  t   ğanâs  [^sz]t
+SFX J  t   ğanâm  [^sz]t
+SFX J  st  ğana   [s]t
+SFX J  st  ğanas  [s]t
+SFX J  st  ğanai  [s]t
+SFX J  st  ğanu   [s]t
+SFX J  st  ğanâ   [s]t
+SFX J  st  ğanâs  [s]t
+SFX J  st  ğanâm  [s]t
+SFX J  zt  ğana   [z]t
+SFX J  zt  ğanas  [z]t
+SFX J  zt  ğanai  [z]t
+SFX J  zt  ğanu   [z]t
+SFX J  zt  ğanâ   [z]t
+SFX J  zt  ğanâs  [z]t
+SFX J  zt  ğanâm  [z]t
+
+
+SFX d Y 16
+SFX d   0   ies      t   # IIk refl
+SFX d   t   ğos      [^sz]t     #Nâkotne refleksîvajiem
+SFX d   t   sies     [^sz]t     #2, 3 p.
+SFX d   t   simies   [^sz]t
+SFX d   t   sieties  [^sz]t
+SFX d   t   sities   [^sz]t
+SFX d   t   îğos     [z]t
+SFX d   t   îsies    [z]t
+SFX d   t   îsimies  [z]t
+SFX d   t   îsieties [z]t
+SFX d   t   îsities  [z]t
+SFX d   st  tîğos     [s]t     #domâjams, ka atbilst Ik st 
+SFX d   st  tîsies    [s]t     #galotòu îpağnieku vçlmçm
+SFX d   st  tîsimies  [s]t
+SFX d   st  tîsieties [s]t
+SFX d   st  tîsities  [s]t     # --- beigas nâkotnei
+
+SFX g Y 7
+SFX g   t   jos     [âçîoû]t    #--- pagâtne -----
+SFX g   t   jies    [âçîoû]t
+SFX g   t   jâs     [âçîoû]t
+SFX g   t   jâmies  [âçîoû]t
+SFX g   t   jâties  [âçîoû]t    #--- beigas pagâtnei
+SFX g   0   os      [âçîoû]t    #cieğamâ kârta
+SFX g   t   ğoties  [âçîoû]t    #atst.izt.v.nak.
+
+# I konj. I grupas tagadne
+SFX 8 Y 11
+SFX 8   t   u       t           # I vsk
+SFX 8   t   i       [^gk]t      # II vsk
+SFX 8   gt  dz      [g]t        # II vsk
+SFX 8   kt  c       [k]t        # II vsk
+SFX 8   t   0       t           # III vsk
+SFX 8   t   am      t           # I dsk
+SFX 8   t   at      t           # II dsk
+SFX 8   t   iet     [^gk]t      # pav.dsk
+SFX 8   gt  dziet   [g]t        # pav. dsk
+SFX 8   kt  ciet    [k]t        # pav.dsk
+SFX 8   t   ot      t           # II dsk
+
+SFX O Y 9
+SFX O   s     a     [s]    #ìenitivs vsk
+SFX O   s     am    [s]    #datîvs vsk
+SFX O   s     u     [s]    #akuzatîvs un instrum.
+SFX O   s     â     [s]    #lokatîvs vsk
+SFX O   s     0     [s]    #vokatîvs vsk
+SFX O   ğ     a     [ğ]    #ìenitivs vsk
+SFX O   ğ     am    [ğ]    #dativs vsk
+SFX O   ğ     u     [ğ]    #akuzativs un instrum.
+SFX O   ğ     â     [ğ]    #lokativs vsk
+
+#lietvârdi I.deklinâcija - galds, vçjğ, dsk.
+SFX i Y 8
+SFX i   s     i     [s]    #nominatÎvs
+SFX i   s     iem   [s]    #datÎvs
+SFX i   s     us    [s]    #akuzatÎvs
+SFX i   s     os    [s]    #lokatÎvs
+SFX i   ğ     i     [ğ]    #nominativs
+SFX i   ğ     iem   [ğ]    #datÎvs
+SFX i   ğ     us    [ğ]    #akuzativs
+SFX i   ğ     os    [ğ]    #lokatÎvs
+
+SFX t Y 24
+SFX t   s     iò    [^gk]s    #vokatîvs
+SFX t   gs    dziò  [g]s      #vokatîvs
+SFX t   ks    ciò   [k]s      #vokatîvs
+SFX t   s     iòğ   [^gk]s    #viensk. nom.
+SFX t   s     iòa   [^gk]s    #ìenitîvs, d. nom.
+SFX t   s     iòam  [^gk]s    #dativs
+SFX t   s     iòu   [^gk]s    #akuzativs, instr, d.ìen.,
+SFX t   s     iòâ   [^gk]s    #lokativs
+SFX t   gs    dziòğ   [g]s    #viensk. nom. - zirgs-zirdziòğ
+SFX t   gs    dziòa   [g]s    #ìenitîvs, d. nom.
+SFX t   gs    dziòam  [g]s    #dativs
+SFX t   gs    dziòu   [g]s    #akuzativs, instr, d.ìen.,
+SFX t   gs    dziòâ   [g]s    #lokativs
+SFX t   ks    ciòğ    [k]s    #viensk. nom. spoks-spociòğ
+SFX t   ks    ciòa    [k]s    #ìenitîvs, d. nom.
+SFX t   ks    ciòam   [k]s    #dativs
+SFX t   ks    ciòu    [k]s    #akuzativs, instr, d.ìen.,
+SFX t   ks    ciòâ    [k]s    #lokativs
+SFX t   ğ     iòğ     [ğ]     #viensk. nom.
+SFX t   ğ     iòa     [ğ]     #ìenitîvs, d. nom.
+SFX t   ğ     iòam    [ğ]     #dativs
+SFX t   ğ     iòu     [ğ]     #akuzativs, instr, d.ìen.,
+SFX t   ğ     iòâ     [ğ]     #lokativs
+SFX t   ğ     iò      [ğ]     #vokatîvs
+
+#lietvârdi I.deklinâcija - galds, vçjğ, pamaz. dsk.
+SFX v Y 16
+SFX v   s     iòi   [^gk]s    #dsk. nom.
+SFX v   s     iòus  [^gk]s    #dsk. akuzativs,.
+SFX v   s     iòiem [^gk]s    #dativs, instr
+SFX v   s     iòos  [^gk]s    #lokativs
+SFX v   gs    dziòi   [g]s    #dsk. nom.
+SFX v   gs    dziòus  [g]s    #dsk. akuzativs,.
+SFX v   gs    dziòiem [g]s    #dativs, instr
+SFX v   gs    dziòos  [g]s    #lokativs
+SFX v   ks    ciòi    [k]s    #dsk. nom.
+SFX v   ks    ciòus   [k]s    #dsk. akuzativs,.
+SFX v   ks    ciòiem  [k]s    #dativs, instr
+SFX v   ks    ciòos   [k]s    #lokativs
+SFX v   ğ     iòi     [ğ]     #dsk. nom.
+SFX v   ğ     iòus    [ğ]     #dsk. akuzativs
+SFX v   ğ     iòiem   [ğ]     #dativs, instr
+SFX v   ğ     iòos    [ğ]     #lokativs
+
+SFX P Y 22
+SFX P   is    a      [^bcdlmnpvtsz]is  #ìenitîvs
+SFX P   is    ja     [bpmv]is
+SFX P   cis   èa     [c]is
+SFX P   dis   şa     [d]is
+SFX P   sis   ğa     [s]is
+SFX P   tis   ğa     [^a][t]is
+SFX P   is    a      [a][t]is      #ìen. tâlskatis piem.
+SFX P   zis   şa     [z]is
+SFX P   nis   òa     [^lsz][n]is
+SFX P   lis   ïa     [^lsz][l]is
+SFX P   lnis  ïòa    [l]nis
+SFX P   snis  ğòa    [s]nis
+SFX P   znis  şòa    [z]nis
+SFX P   llis  ïïa    [l]lis
+SFX P   slis  ğïa    [s]lis
+SFX P   zlis  şïa    [z]lis
+SFX P   s     m      [i]s        #datîvs
+SFX P   s     0      [i]s        #akuzatîvs, instrumentâlis
+SFX P   is    î      [i]s        #lokatîvs
+SFX P   s     im     [lns]s      #dat suns, mçness
+SFX P   s     i      [lns]s      #akk, instr vsk suns
+SFX P   s     î      [lns]s      #lok
+
+#lietvârdi II.deklinâcija dsk.
+SFX j Y 85
+SFX j   is    ji     [bpmv]is   #dsk nominatîvs
+SFX j   is    i      [ìrí]is
+SFX j   tis   ği     [^a][t]is
+SFX j   is    i      [a][t]is     #tâlskatis
+SFX j   cis   èi     [c]is
+SFX j   dis   şi     [d]is
+SFX j   zis   şi     [z]is
+SFX j   sis   ği     [s]is
+SFX j   nis   òi     [^lsz][n]is
+SFX j   lis   ïi     [^lsz][l]is
+SFX j   lnis  ïòi    [l]nis
+SFX j   snis  ğòi    [s]nis
+SFX j   znis  şòi    [z]nis
+SFX j   llis  ïïi    [l]lis
+SFX j   slis  ğïi    [s]lis
+SFX j   zlis  şïi    [z]lis
+SFX j   ns    òi     [n]s         #suòi
+SFX j   is    ju     [bpmv]is   #dsk ìenitîvs
+SFX j   is    u      [ìrí]is
+SFX j   tis   ğu     [^a][t]is
+SFX j   is    u      [a][t]is     #tâlskatis
+SFX j   cis   èu     [c]is
+SFX j   dis   şu     [d]is
+SFX j   zis   şu     [z]is
+SFX j   sis   ğu     [s]is
+SFX j   nis   òu     [^lsz][n]is
+SFX j   lis   ïu     [^lsz][l]is
+SFX j   lnis  ïòu    [l]nis
+SFX j   snis  ğòu    [s]nis
+SFX j   znis  şòu    [z]nis
+SFX j   llis  ïïu    [l]lis
+SFX j   slis  ğïu    [s]lis
+SFX j   zlis  şïu    [z]lis
+SFX j   ns    òu     [n]s          #suòu
+SFX j   is    jiem   [bpmv]is   #dsk datîvs, instrumentâlis
+SFX j   s     em     [ìrí]is
+SFX j   tis   ğiem   [^a][t]is
+SFX j   is    iem    [a][t]is      #tâlskatis
+SFX j   cis   èiem   [c]is
+SFX j   dis   şiem   [d]is
+SFX j   zis   şiem   [z]is
+SFX j   sis   ğiem   [s]is
+SFX j   nis   òiem   [^lsz][n]is
+SFX j   lis   ïiem   [^lsz][l]is
+SFX j   lnis  ïòiem  [l]nis
+SFX j   snis  ğòiem  [s]nis
+SFX j   znis  şòiem  [z]nis
+SFX j   llis  ïïiem  [l]lis
+SFX j   slis  ğïiem  [s]lis
+SFX j   zlis  şïiem  [z]lis
+SFX j   ns    òiem   [n]s         #suòiem
+SFX j   is    jus    [bpmv]is   #dsk akuzatîvs
+SFX j   is    us     [ìrí]is
+SFX j   tis   ğus    [^a][t]is
+SFX j   is    us     [a][t]is     #tâlskatis
+SFX j   cis   èus    [c]is
+SFX j   dis   şus    [d]is
+SFX j   zis   şus    [z]is
+SFX j   sis   ğus    [s]is
+SFX j   nis   òus    [^lsz][n]is
+SFX j   lis   ïus    [^lsz][l]is
+SFX j   lnis  ïòus   [l]nis
+SFX j   snis  ğòus   [s]nis
+SFX j   znis  şòus   [z]nis
+SFX j   llis  ïïus   [l]lis
+SFX j   slis  ğïus   [s]lis
+SFX j   zlis  şïus   [z]lis
+SFX j   ns    òus    [n]s        #suòus
+SFX j   is    jos    [bpmv]is  #dsk lokatîvs
+SFX j   is    os     [ìrí]is
+SFX j   tis   ğos    [^a][t]is
+SFX j   is    os     [a][t]is    #tâlskatis
+SFX j   cis   èos    [c]is
+SFX j   dis   şos    [d]is
+SFX j   zis   şos    [z]is
+SFX j   sis   ğos    [s]is
+SFX j   nis   òos    [^lsz][n]is
+SFX j   lis   ïos    [^lsz][l]is
+SFX j   lnis  ïòos   [l]nis
+SFX j   snis  ğòos   [s]nis
+SFX j   znis  şòos   [z]nis
+SFX j   llis  ïïos   [l]lis
+SFX j   slis  ğïos   [s]lis
+SFX j   zlis  şïos   [z]lis
+SFX j   ns    òos    [n]s       #suòos
+
+SFX u Y 6
+SFX u   is     îtis  [i]s      #viensk. nom.
+SFX u   is     îğa   [i]s      #v. ìenitîvs, d. nom.
+SFX u   is     îtim  [i]s      #v. dativs
+SFX u   is     îti   [i]s      #v. akuzativs, instr,
+SFX u   is     îtî   [i]s      #v. lokativs
+SFX u   is     ît    [i]s      #v. vokativs
+
+SFX w Y 5
+SFX w   is     îği   [i]s      #viensk. nom.
+SFX w   is     îğu   [i]s      #d. ìenitîvs,
+SFX w   is     îğiem [i]s      #d. dativs, d. instr.
+SFX w   is     îğus  [i]s      #d. akuzativs
+SFX w   is     îğos  [i]s      #d. lokatîvs
+
+SFX Q Y 3
+SFX Q   s     m     [u]s
+SFX Q   s     0     [u]s
+SFX Q   us    û     [s]
+
+#lietvârdi III deklinâcija dsk.
+SFX k Y 3
+SFX k   us    i     [s]
+SFX k   us    iem   [s]
+SFX k   us    os    [s]
+
+#lietvârdi IV.deklinâcija - sala
+#nouns, 4th declination, fem.
+SFX R Y 4
+SFX R   0     s     a
+SFX R   0     i     a
+SFX R   a     u     a
+SFX R   a     â     a
+
+#lietvârdi IV.deklinâcija dsk.
+SFX l Y 2
+SFX l   a     âm    a
+SFX l   a     âs    a
+
+SFX r Y 20
+SFX r   a     iòa   [^gk]a
+SFX r   a     iòas  [^gk]a
+SFX r   a     iòai  [^gk]a
+SFX r   a     iòu   [^gk]a
+SFX r   a     iòâ   [^gk]a
+SFX r   ga    dziòa   [g]a
+SFX r   ga    dziòas  [g]a
+SFX r   ga    dziòai  [g]a
+SFX r   ga    dziòu   [g]a
+SFX r   ga    dziòâ   [g]a
+SFX r   ka    ciòa   [^s]ka
+SFX r   ka    ciòas  [^s]ka
+SFX r   ka    ciòai  [^s]ka
+SFX r   ka    ciòu   [^s]ka
+SFX r   ka    ciòâ   [^s]ka
+SFX r   a     iòa     [s]ka
+SFX r   a     iòas    [s]ka
+SFX r   a     iòai    [s]ka
+SFX r   a     iòu     [s]ka
+SFX r   a     iòâ     [s]ka
+
+
+#lietvârdi IV.deklinâcija dsk.
+SFX x Y 8
+SFX x   a     iòâm   [^gk]a
+SFX x   a     iòâs   [^gk]a
+SFX x   ga    dziòâm   [g]a
+SFX x   ga    dziòâs   [g]a
+SFX x   ka    ciòâm   [^s]ka
+SFX x   ka    ciòâs   [^s]ka
+SFX x   a     iòâm    [s]ka
+SFX x   a     iòâs    [s]ka
+
+SFX S Y 4
+SFX S   0     s    e
+SFX S   0     i    [e]
+SFX S   e     i    [e]
+SFX S   e     ç    [e]
+
+#Vd dsk.
+SFX m Y 16
+SFX m   e     u    [^bcdlmnpstvz]e
+SFX m   e     ju   [bmpv]e
+SFX m   ce    èu   [c]e
+SFX m   de    şu   [d]e
+SFX m   le    ïu   [^l]le
+SFX m   lle   ïïu  [l]le
+SFX m   ne    òu   [^sz][n]e
+SFX m   sne   ğòu  [s]ne
+SFX m   zne   şòu  [z]ne
+SFX m   se    ğu   [s]e
+SFX m   te    ğu   [^s]te
+SFX m   te    tu   [^k]ste
+SFX m   ste   ğu   [k]ste
+SFX m   ze    şu   [z]e
+SFX m   e     çm   [e]
+SFX m   e     çs   [e]
+
+#Vd-pamaz. vsk.
+SFX s Y 5
+SFX s   e     îte   [e]
+SFX s   e     îtes  [e]
+SFX s   e     îtei  [e]
+SFX s   e     îti   [e]
+SFX s   e     îtç   [e]
+
+#Vd pamaz. dsk.
+SFX f Y 3
+SFX f   e     îğu   [e]
+SFX f   e     îtçm  [e]
+SFX f   e     îtçs  [e]
+
+#lietvârdi VI.deklinâcija - sirds
+SFX T Y 3
+SFX T   s     ij   [s]
+SFX T   s     i    [s]
+SFX T   s     î    [s]
+
+#lietvârdi VI.deklinâcija dsk.
+SFX n Y 13
+SFX n   s     is   [s]
+SFX n   s     u    [^dlntsvz]s
+SFX n   ds    şu   [d]s
+SFX n   ls    ïu   [l]s
+SFX n   ns    òu   [^s]ns
+SFX n   sns   ğòu  [s]ns
+SFX n   s     ju   [v]s
+SFX n   zs    şu   [z]s
+SFX n   s     îm   [s]
+SFX n   s     îs   [s]
+SFX n   s     u    [s]s
+SFX n   ts    ğu   [^âuûrs]ts
+SFX n   ts    tu   [âuûrs]ts
+
+
+SFX o Y 38
+SFX o  s     a       [s] #
+SFX o  s     â       [s] #  IVd vsk
+SFX o  s     i       [s] #   Id dsk
+SFX o  s     u       [s] #  IVd vsk
+SFX o  s     am      [s] #
+SFX o  s     iem     [s] # Id dsk
+SFX o  s     os      [s] # Id dsk
+SFX o  s     us      [s] # Id dsk
+SFX o  s     o       [s]
+SFX o  s     ai      [s] # IVd vsk
+SFX o  s     as      [s] # IVd vsk
+SFX o  s     âs      [s] # IVd dsk
+SFX o  s     âm      [s] # IVd dsk
+SFX o  s     ie      [s]
+SFX o  s     ais     [s]      #not.
+SFX o  s     ajam    [s]
+SFX o  s     ajâ     [s]
+SFX o  s     ajai    [s]
+SFX o  s     ajiem   [s]
+SFX o  s     ajos    [s]
+SFX o  s     ajâm    [s]
+SFX o  s     ajâs    [s]
+SFX o  ğ     â       [ğ] #   Id dsk IVd vsk
+SFX o  ğ     u       [ğ] #   Id dsk IVd vsk
+SFX o  ğ     o       [ğ]
+SFX o  ğ     ai      [ğ] # IVd dsk
+SFX o  ğ     as      [ğ] # IVd dsk
+SFX o  ğ     âs      [ğ] # IVd dsk
+SFX o  ğ     âm      [ğ] # IVd dsk
+SFX o  ğ     ie      [ğ]
+SFX o  ğ     ais     [ğ]      #not.
+SFX o  ğ     ajam    [ğ]
+SFX o  ğ     ajâ     [ğ]
+SFX o  ğ     ajai    [ğ]
+SFX o  ğ     ajiem   [ğ]
+SFX o  ğ     ajos    [ğ]
+SFX o  ğ     ajâm    [ğ]
+SFX o  ğ     ajâs    [ğ]
+
+SFX Y Y 28
+SFX Y  s     âk      [s]
+SFX Y  s     âks     [s]
+SFX Y  s     âka     [s]
+SFX Y  s     âkas    [s]
+SFX Y  s     âkam    [s]
+SFX Y  s     âkai    [s]
+SFX Y  s     âku     [s]
+SFX Y  s     âkâ     [s]
+SFX Y  s     âki     [s]
+SFX Y  s     âkiem   [s]
+SFX Y  s     âkâm    [s]
+SFX Y  s     âkus    [s]
+SFX Y  s     âkos    [s]
+SFX Y  s     âkâs    [s]
+SFX Y  ğ     âk      [ğ]
+SFX Y  ğ     âks     [ğ]
+SFX Y  ğ     âka     [ğ]
+SFX Y  ğ     âkas    [ğ]
+SFX Y  ğ     âkam    [ğ]
+SFX Y  ğ     âkai    [ğ]
+SFX Y  ğ     âku     [ğ]
+SFX Y  ğ     âkâ     [ğ]
+SFX Y  ğ     âki     [ğ]
+SFX Y  ğ     âkiem   [ğ]
+SFX Y  ğ     âkâm    [ğ]
+SFX Y  ğ     âkus    [ğ]
+SFX Y  ğ     âkos    [ğ]
+SFX Y  ğ     âkâs    [ğ]
+
+SFX a Y 20
+SFX a  s     âkais   [s]
+SFX a  s     âkajam  [s]
+SFX a  s     âkajai  [s]
+SFX a  s     âko     [s]
+SFX a  s     âkajâ   [s]
+SFX a  s     âkie    [s]
+SFX a  s     âkajiem [s]
+SFX a  s     âkajâm  [s]
+SFX a  s     âkajos  [s]
+SFX a  s     âkajâs  [s]
+SFX a  ğ     âkais   [ğ]
+SFX a  ğ     âkajam  [ğ]
+SFX a  ğ     âkajai  [ğ]
+SFX a  ğ     âko     [ğ]
+SFX a  ğ     âkajâ   [ğ]
+SFX a  ğ     âkie    [ğ]
+SFX a  ğ     âkajiem [ğ]
+SFX a  ğ     âkajâm  [ğ]
+SFX a  ğ     âkajos  [ğ]
+SFX a  ğ     âkajâs  [ğ]
+
+SFX y Y 12
+SFX y  ais   â       [a]is
+SFX y  ais   âs      [a]is
+SFX y  is    jam     [a]is
+SFX y  is    jai     [a]is
+SFX y  ais   o       [a]is
+SFX y  is    jâ      [a]is
+SFX y  ais   ie      [a]is
+SFX y  is    jiem    [a]is
+SFX y  is    jâm     [a]is
+SFX y  ais   os      [a]is
+SFX y  is    jos     [a]is
+SFX y  is    jâs     [a]is
+
+SFX q Y 45
+SFX q   i       u     [i]        #skaitïa vardi, kas beidzas ar i
+SFX q   i       as    [i]
+SFX q   i       iem   [i]
+SFX q   i       âm    [i]
+SFX q   i       âs    [i]
+SFX q   i       os    [i]
+SFX q   i       us    [i]
+SFX q   ais     â     [a]is     #ğî daïa apraksta pirmo 10 kârtas sk. vârdu
+SFX q   ais     o     [a]is     #izdarîbas
+SFX q   ais     âs    [a]is
+SFX q   ais     os    [a]is
+SFX q   ais     ie    [a]is
+SFX q   is      jam   [a]is
+SFX q   is      jâ    [a]is
+SFX q   is      jai   [a]is
+SFX q   is      jiem  [a]is
+SFX q   is      jos   [a]is
+SFX q   is      jâm   [a]is
+SFX q   is      jâs   [a]is
+SFX q   0       ais   [t]        #te sâkas vienpadsmit un citi, kas beidzas ar t
+SFX q   0       â     [t]        
+SFX q   0       o     [t]
+SFX q   0       âs    [t]
+SFX q   0       os    [t]
+SFX q   0       ie    [t]
+SFX q   0       ajam  [t]
+SFX q   0       ajâ   [t]
+SFX q   0       ajai  [t]
+SFX q   0       ajiem [t]
+SFX q   0       ajos  [t]
+SFX q   0       ajâm  [t]
+SFX q   0       ajâs  [t]
+SFX q   ğ       ğais  [ğ]        #te sâkas tie, kas beidzas ar ğ
+SFX q   0       â     [ğ]        
+SFX q   0       o     [ğ]
+SFX q   0       âs    [ğ]
+SFX q   0       os    [ğ]
+SFX q   0       ie    [ğ]
+SFX q   0       ajam  [ğ]
+SFX q   0       ajâ   [ğ]
+SFX q   0       ajai  [ğ]
+SFX q   0       ajiem [ğ]
+SFX q   0       ajos  [ğ]
+SFX q   0       ajâm  [ğ]
+SFX q   0       ajâs  [ğ]
+
