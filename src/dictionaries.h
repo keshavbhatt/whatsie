@@ -14,8 +14,8 @@ public:
     Dictionaries(QObject* parent=0);
     virtual ~Dictionaries();
 public slots:
-    QString GetDictionaryPath();
-    QStringList GetDictionaries();
+    static QString GetDictionaryPath();
+    static QStringList GetDictionaries();
 };
 
 #endif // DICTIONARIES_H
