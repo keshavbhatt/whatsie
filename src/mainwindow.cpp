@@ -1,7 +1,8 @@
 #include "mainwindow.h"
 
-#include <QRadioButton>
-#include <QtWebEngine>
+#include <QStyleHints>
+
+
 
 extern QString defaultUserAgentStr;
 
@@ -110,6 +111,8 @@ void MainWindow::updateWindowTheme()
         this->webEngine->setStyleSheet("QWebEngineView{background:#131C21;}"); //whatsapp dark color
     }
     else{
+        this->webEngine->setStyleSheet("QWebEngineView{background:#f8f9fa;}"); //whatsapp light color
+        lightPalette.setColor(QPalette::Window,QColor("#f8f9fa"));
         qApp->setPalette(lightPalette);
         this->update();
     }
@@ -164,7 +167,26 @@ void MainWindow::init_settingWidget()
                                    checked);
         });
 
+        connect(settingsWidget,&SettingsWidget::dictChanged,[=](QString dictName)
+        {
+            if(webEngine && webEngine->page())
+            {
+                webEngine->page()->profile()->setSpellCheckLanguages(QStringList()<<dictName);
+            }
+        });
+
+        connect(settingsWidget,&SettingsWidget::spellCheckChanged,[=](bool checked){
+            if(webEngine && webEngine->page())
+            {
+                webEngine->page()->profile()->setSpellCheckEnabled(checked);
+            }
+        });
+
         settingsWidget->appLockSetChecked(settings.value("lockscreen",false).toBool());
+
+        //spell checker
+        settingsWidget->loadDictionaries(m_dictionaries);
+
         settingsWidget->resize(settingsWidget->sizeHint().width(),settingsWidget->minimumSizeHint().height());
     }
 }
@@ -244,6 +266,7 @@ void MainWindow::showAbout()
     about->show();
 }
 
+
 void MainWindow::closeEvent(QCloseEvent *event)
 {
     settings.setValue("geometry", saveGeometry());
@@ -279,10 +302,19 @@ void MainWindow::notify(QString title,QString message)
 
 void MainWindow::createActions()
 {
+    fullscreenAction = new QAction(tr("Fullscreen"),this);
+    fullscreenAction->setShortcut(Qt::Key_F11);
+    connect(fullscreenAction, &QAction::triggered,[=](){
+        setWindowState(windowState() ^ Qt::WindowFullScreen);
+    });
+    this->addAction(fullscreenAction);
+
 
     minimizeAction = new QAction(tr("Mi&nimize to tray"), this);
+    minimizeAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_H));
     connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
     addAction(minimizeAction);
+    this->addAction(minimizeAction);
 
     restoreAction = new QAction(tr("&Restore"), this);
     connect(restoreAction, &QAction::triggered, this, &QWidget::show);
@@ -293,22 +325,24 @@ void MainWindow::createActions()
     connect(reloadAction, &QAction::triggered, this, &MainWindow::doReload);
     addAction(reloadAction);
 
-    lockAction = new QAction(tr("Lock"), this);
-    lockAction->setShortcut(QKeySequence(Qt::Key_Control,Qt::Key_L));
+    lockAction = new QAction(tr("Loc&k"), this);
+    lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL+Qt::Key_L));
     connect(lockAction, &QAction::triggered, this, &MainWindow::lockApp);
     addAction(lockAction);
+    this->addAction(lockAction);
 
-    settingsAction = new QAction(tr("Settings"), this);
+    settingsAction = new QAction(tr("&Settings"), this);
     connect(settingsAction, &QAction::triggered, this, &MainWindow::showSettings);
 
 
-    aboutAction = new QAction(tr("About"), this);
+    aboutAction = new QAction(tr("&About"), this);
     connect(aboutAction, &QAction::triggered, this, &MainWindow::showAbout);
 
     quitAction = new QAction(tr("&Quit"), this);
     quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     addAction(quitAction);
+    this->addAction(quitAction);
 }
 
 void MainWindow::createStatusBar()
@@ -328,6 +362,7 @@ void MainWindow::createTrayIcon()
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(reloadAction);
     trayIconMenu->addAction(lockAction);
+    trayIconMenu->addSeparator();
     trayIconMenu->addAction(settingsAction);
     trayIconMenu->addAction(aboutAction);
     trayIconMenu->addSeparator();
@@ -343,6 +378,14 @@ void MainWindow::createTrayIcon()
             this, &MainWindow::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated,
             this, &MainWindow::iconActivated);
+
+    //enable show shortcuts in menu
+    if(qApp->styleHints()->showShortcutsInContextMenus())
+    {
+        foreach(QAction *action, trayIconMenu->actions()){
+            action->setShortcutVisibleInContextMenu(true);
+        }
+    }
 }
 
 
@@ -412,7 +455,12 @@ void MainWindow::init_globalWebProfile()
 
     QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
     profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
-    profile->setSpellCheckEnabled(true);
+
+    QStringList dict_names;
+    dict_names.append(settings.value("sc_dict","en-US").toString());
+
+    profile->setSpellCheckEnabled(settings.value("sc_enabled",true).toBool());
+    profile->setSpellCheckLanguages(dict_names);
 
     auto* webSettings = profile->settings();
     webSettings->setAttribute(QWebEngineSettings::AutoLoadImages, true);
@@ -449,13 +497,17 @@ void MainWindow::createWebEngine()
     widgetSize.setHorizontalStretch(1);
     widgetSize.setVerticalStretch(1);
 
-    QWebEngineView *webEngine = new QWebEngineView(this);
+    m_dictionaries = Dictionaries::GetDictionaries();
+
+    WebView *webEngine = new WebView(this,m_dictionaries);
     setCentralWidget(webEngine);
     webEngine->setSizePolicy(widgetSize);
     webEngine->show();
 
     this->webEngine = webEngine;
-
+    webEngine->addAction(minimizeAction);
+    webEngine->addAction(lockAction);
+    webEngine->addAction(quitAction);
 
     connect(webEngine, &QWebEngineView::titleChanged,
             this, &MainWindow::handleWebViewTitleChanged);
@@ -483,8 +535,7 @@ void MainWindow::createWebEngine()
             break;
         }
         QMessageBox::StandardButton btn = QMessageBox::question(window(), status,
-                                                   tr("Render process exited with code: %1\n"
-                                                      "Do you want to reload the page ?").arg(statusCode));
+                                                   tr("Render process exited with code: %1\n"                                            "Do you want to reload the page ?").arg(statusCode));
         if (btn == QMessageBox::Yes)
             QTimer::singleShot(0, [this] { this->webEngine->reload(); });
     });
@@ -497,12 +548,19 @@ void MainWindow::createWebEngine()
 
 void MainWindow::createWebPage(bool offTheRecord)
 {
-    if (offTheRecord && !m_otrProfile) {
+    if (offTheRecord && !m_otrProfile)
+    {
         m_otrProfile.reset(new QWebEngineProfile);
-      }
+    }
 
     auto profile = offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
-    profile->setSpellCheckEnabled(true);
+
+    QStringList dict_names;
+    dict_names.append(settings.value("sc_dict","en-US").toString());
+
+    profile->setSpellCheckEnabled(settings.value("sc_enabled",true).toBool());
+    profile->setSpellCheckLanguages(dict_names);
+
     profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
 
         auto popup = new NotificationPopup(webEngine);
@@ -524,6 +582,8 @@ void MainWindow::createWebPage(bool offTheRecord)
     QWebEnginePage *page = new WebEnginePage(profile,webEngine);
     if(settings.value("windowTheme","light").toString() == "dark"){
         page->setBackgroundColor(QColor("#131C21")); //whatsapp dark bg color
+    }else{
+        page->setBackgroundColor(QColor("#f8f9fa")); //whatsapp light bg color
     }
     webEngine->setPage(page);
     //page should be set parent of profile to prevent
@@ -535,7 +595,7 @@ void MainWindow::createWebPage(bool offTheRecord)
     qsrand(time(NULL));
     auto randomValue = qrand() % 300;
     page->setUrl(QUrl("https://web.whatsapp.com?v="+QString::number(randomValue)));
-
+    //page->setUrl(QUrl("http://ktechpit.com/USS/text.html"));
     connect(profile, &QWebEngineProfile::downloadRequested,
         &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 

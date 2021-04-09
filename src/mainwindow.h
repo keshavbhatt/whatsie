@@ -22,6 +22,9 @@
 #include <QWebEngineView>
 #include <QWebEngineSettings>
 
+#include <QRadioButton>
+#include <QWebEngineContextMenuData>
+
 #include "notificationpopup.h"
 #include "requestinterceptor.h"
 #include "settingswidget.h"
@@ -30,6 +33,8 @@
 
 #include "downloadmanagerwidget.h"
 #include "about.h"
+#include "dictionaries.h"
+#include "webview.h"
 
 
 class MainWindow : public QMainWindow
@@ -65,6 +70,7 @@ private:
     QAction *settingsAction;
     QAction *quitAction;
     QAction *lockAction;
+    QAction *fullscreenAction;
 
     QMenu *trayIconMenu;
     QSystemTrayIcon *trayIcon;
@@ -83,6 +89,8 @@ private:
     Lock *lockWidget = nullptr;
 
     int correctlyLoaderRetries = 4;
+
+    QStringList m_dictionaries;
 
 private slots:
 
