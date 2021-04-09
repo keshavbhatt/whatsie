@@ -123,6 +123,7 @@ private slots:
 
 
     void checkLoadedCorrectly();
+    void loadingQuirk(QString test);
 };
 
 #endif // MAINWINDOW_H

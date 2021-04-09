@@ -85,17 +85,17 @@ void MainWindow::updateWindowTheme()
 
         qApp->setStyle(QStyleFactory::create("fusion"));
         QPalette palette;
-        palette.setColor(QPalette::Window,QColor("#131C21")); //whatsapp dark color
+        palette.setColor(QPalette::Window,QColor("#262D31")); //whatsapp dark color
+        palette.setColor(QPalette::Disabled,QPalette::Window,QColor("#3f4143")); //whatsapp dark color
+
         palette.setColor(QPalette::WindowText,Qt::white);
         palette.setColor(QPalette::Disabled,QPalette::WindowText,QColor(127,127,127));
-        //palette.setColor(QPalette::Base,QColor(42,42,42));
-        palette.setColor(QPalette::Base,QColor(84,84,84));
-
-        palette.setColor(QPalette::AlternateBase,QColor(66,66,66));
+        palette.setColor(QPalette::Base,QColor("#323739"));
+        palette.setColor(QPalette::AlternateBase,QColor("#5f6c73"));
         palette.setColor(QPalette::ToolTipBase,Qt::white);
         palette.setColor(QPalette::ToolTipText,QColor(53,53,53));
         palette.setColor(QPalette::Text,Qt::white);
-        palette.setColor(QPalette::Disabled,QPalette::Text,QColor(127,127,127));
+        palette.setColor(QPalette::Disabled,QPalette::Text,QColor("#646464"));
         palette.setColor(QPalette::Dark,QColor(35,35,35));
         palette.setColor(QPalette::Shadow,QColor(20,20,20));
         palette.setColor(QPalette::Button,QColor(53,53,53));
@@ -652,36 +652,54 @@ void MainWindow::checkLoadedCorrectly()
 {
     if(webEngine && webEngine->page())
     {
-        webEngine->page()->runJavaScript(
-            "document.getElementsByClassName('landing-title')[0].innerText",
-            [this](const QVariant &result){
-                qWarning()<<"Loaded correctly value:"<<result.toString();
-                if(result.toString().contains("WhatsApp works with",Qt::CaseInsensitive)){
-                    //contains ug message apply quirk
-                    if(correctlyLoaderRetries > -1){
-                        qWarning()<<"doReload()"<<correctlyLoaderRetries;
-                        doReload();
-                        correctlyLoaderRetries--;
-                    }else{
-                        utils::delete_cache(webEngine->page()->profile()->cachePath());
-                        utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
-                        settings.setValue("useragent",defaultUserAgentStr);
-                        utils * util = new utils(this);
-                        util->DisplayExceptionErrorDialog("checkLoadedCorrectly() reload retries 0, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
-
-                        quitAction->trigger();
-                    }
-                }else if(webEngine->title().contains("Error",Qt::CaseInsensitive)){
-                    utils::delete_cache(webEngine->page()->profile()->cachePath());
-                    utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
-                    settings.setValue("useragent",defaultUserAgentStr);
-                    utils * util = new utils(this);
-                    util->DisplayExceptionErrorDialog("handleWebViewTitleChanged(title) title: Error, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
-
-                    quitAction->trigger();
-                }
+        //test 1 based on the class name of body of the page
+        webEngine->page()->runJavaScript("document.querySelector('body').className",[this](const QVariant &result)
+        {
+            if(result.toString().contains("page-version",Qt::CaseInsensitive))
+            {
+                qWarning()<<"Test 1 found"<<result.toString();
+                loadingQuirk("test1");
+            }else{
+                qWarning()<<"Test 1 Loaded correctly value:"<<result.toString();
             }
-        );
+        });
+
+//        //test #2 based on the content of landing-title class of page
+//        webEngine->page()->runJavaScript(
+//            "document.getElementsByClassName('landing-title')[0].innerText",
+//            [this](const QVariant &result){
+//                qWarning()<<"Test #1 Loaded correctly value:"<<result.toString();
+//                if(result.toString().contains("WhatsApp works with",Qt::CaseInsensitive)){
+//                    loadingQuirk("test2");
+//                }else if(webEngine->title().contains("Error",Qt::CaseInsensitive)){
+//                    utils::delete_cache(webEngine->page()->profile()->cachePath());
+//                    utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
+//                    settings.setValue("useragent",defaultUserAgentStr);
+//                    utils * util = new utils(this);
+//                    util->DisplayExceptionErrorDialog("handleWebViewTitleChanged(title) title: Error, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
+
+//                    quitAction->trigger();
+//                }
+//            }
+//        );
+    }
+}
+
+void MainWindow::loadingQuirk(QString test)
+{
+    //contains ug message apply quirk
+    if(correctlyLoaderRetries > -1){
+        qWarning()<<test<<"checkLoadedCorrectly()/loadingQuirk()/doReload()"<<correctlyLoaderRetries;
+        doReload();
+        correctlyLoaderRetries--;
+    }else{
+        utils::delete_cache(webEngine->page()->profile()->cachePath());
+        utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
+        settings.setValue("useragent",defaultUserAgentStr);
+        utils * util = new utils(this);
+        util->DisplayExceptionErrorDialog(test+" checkLoadedCorrectly()/loadingQuirk() reload retries 0, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
+
+        quitAction->trigger();
     }
 }
 
