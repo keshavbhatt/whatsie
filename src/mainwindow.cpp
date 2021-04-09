@@ -659,6 +659,15 @@ void MainWindow::checkLoadedCorrectly()
             {
                 qWarning()<<"Test 1 found"<<result.toString();
                 loadingQuirk("test1");
+            }else if(webEngine->title().contains("Error",Qt::CaseInsensitive))
+            {
+                utils::delete_cache(webEngine->page()->profile()->cachePath());
+                utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
+                settings.setValue("useragent",defaultUserAgentStr);
+                utils * util = new utils(this);
+                util->DisplayExceptionErrorDialog("test1 handleWebViewTitleChanged(title) title: Error, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
+
+                quitAction->trigger();
             }else{
                 qWarning()<<"Test 1 Loaded correctly value:"<<result.toString();
             }
