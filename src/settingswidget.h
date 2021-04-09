@@ -22,6 +22,8 @@ signals:
     void autoPlayMediaToggled(const bool checked);
     void userAgentChanged(QString userAgentStr);
     void init_lock();
+    void dictChanged(QString dict);
+    void spellCheckChanged(bool checked);
 public:
     explicit SettingsWidget(QWidget *parent = nullptr,QString engineCachePath = "",
                             QString enginePersistentStoragePath = "");
@@ -32,6 +34,7 @@ public slots:
     void updateDefaultUAButton(const QString engineUA);
     void appLockSetChecked(bool checked);
     void setCurrentPasswordText(QString str);
+    void loadDictionaries(QStringList dictionaries);
 private slots:
     QString cachePath();
     QString persistentStoragePath();
@@ -60,6 +63,12 @@ private slots:
     void on_closeButtonActionComboBox_currentIndexChanged(int index);
 
     void on_applock_checkbox_toggled(bool checked);
+
+    void on_dictComboBox_currentIndexChanged(const QString &arg1);
+
+    void on_enableSpellCheck_toggled(bool checked);
+
+    void on_showShortcutsButton_clicked();
 
 private:
     Ui::SettingsWidget *ui;

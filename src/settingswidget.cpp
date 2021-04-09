@@ -2,6 +2,7 @@
 #include "ui_settingswidget.h"
 
 #include <QMessageBox>
+#include "mainwindow.h"
 
 extern QString defaultUserAgentStr;
 
@@ -22,6 +23,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->autoPlayMediaCheckBox->setChecked(settings.value("autoPlayMedia",false).toBool());
     ui->themeComboBox->setCurrentText(utils::toCamelCase(settings.value("windowTheme","light").toString()));
     ui->userAgentLineEdit->setText(settings.value("useragent",defaultUserAgentStr).toString());
+    ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
 
     this->setCurrentPasswordText("Current Password: <i>"
             +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
@@ -36,10 +38,53 @@ SettingsWidget::~SettingsWidget()
     delete ui;
 }
 
+void SettingsWidget::loadDictionaries(QStringList dictionaries)
+{
+       // set up supported spellcheck dictionaries
+       QStringList ui_dictionary_names;
+       foreach(QString dictionary_name, dictionaries) {
+           ui_dictionary_names.append(dictionary_name);
+       }
+       ui_dictionary_names.sort();
+       //add to ui
+       ui->dictComboBox->blockSignals(true);
+       foreach(QString dict_name, ui_dictionary_names) {
+           ui->dictComboBox->addItem(dict_name);
+       }
+       ui->dictComboBox->blockSignals(false);
+
+       // load settings for spellcheck dictionary
+       QString dictionary_name = settings.value("sc_dict","en-US").toString();
+       int pos = ui->dictComboBox->findText(dictionary_name);
+       if (pos == -1) {
+          pos = ui->dictComboBox->findText("en-US");
+          if (pos == -1) {
+              pos = 0;
+          }
+       }
+       ui->dictComboBox->setCurrentIndex(pos);
+}
+
 void SettingsWidget::refresh()
 {
     ui->cacheSize->setText(utils::refreshCacheSize(cachePath()));
     ui->cookieSize->setText(utils::refreshCacheSize(persistentStoragePath()));
+
+    //update dict settings at runtime
+    // load settings for spellcheck dictionary
+    QString dictionary_name = settings.value("sc_dict","en-US").toString();
+    int pos = ui->dictComboBox->findText(dictionary_name);
+    if (pos == -1) {
+       pos = ui->dictComboBox->findText("en-US");
+       if (pos == -1) {
+           pos = 0;
+       }
+    }
+    ui->dictComboBox->setCurrentIndex(pos);
+
+    //enable disable spell check
+    ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
+
 }
 
 void SettingsWidget::updateDefaultUAButton(const QString engineUA)
@@ -211,4 +256,35 @@ void SettingsWidget::on_applock_checkbox_toggled(bool checked)
     if(checked){
         emit init_lock();
     }
+}
+
+void SettingsWidget::on_dictComboBox_currentIndexChanged(const QString &arg1)
+{
+    settings.setValue("sc_dict",arg1);
+    emit dictChanged(arg1);
+}
+
+void SettingsWidget::on_enableSpellCheck_toggled(bool checked)
+{
+    settings.setValue("sc_enabled",checked);
+    emit spellCheckChanged(checked);
+}
+
+void SettingsWidget::on_showShortcutsButton_clicked()
+{
+    QWidget *sheet = new QWidget(this);
+    sheet->setWindowTitle(QApplication::applicationName()+" | Global shortcuts");
+    sheet->setWindowFlag(Qt::Sheet);
+
+    QVBoxLayout *layout = new QVBoxLayout(sheet);
+    sheet->setLayout(layout);
+    auto *w = qobject_cast<MainWindow*>(parent());
+    if(w != 0){
+        foreach (QAction *action, w->actions()) {
+            QLabel *label = new QLabel(action->text()+" | "+action->shortcut().toString(),sheet);
+            layout->addWidget(label);
+        }
+    }
+    sheet->setAttribute(Qt::WA_DeleteOnClose);
+    sheet->show();
 }

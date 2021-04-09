@@ -104,64 +104,78 @@ background:transparent;
          <string>General settings</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="notificationCheckBox">
-             <property name="text">
-              <string>Disable Notifications PopUp</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="muteAudioCheckBox">
-             <property name="text">
-              <string>Mute Audio</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
-             <property name="text">
-              <string>Disable Auto Playback of Media</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="disableVideosCheckBox">
-             <property name="text">
-              <string>Disable loading videos</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="5" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
+         <item row="1" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
-            <widget class="QLabel" name="label_2">
+            <widget class="QCheckBox" name="enableSpellCheck">
              <property name="text">
-              <string>Theme</string>
+              <string>Enable Spell Checker</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="themeComboBox">
+            <widget class="Line" name="line">
+             <property name="minimumSize">
+              <size>
+               <width>1</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>1</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>SpellChecker Language</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="dictComboBox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="4" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Close button action</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="closeButtonActionComboBox">
              <item>
               <property name="text">
-               <string>Dark</string>
+               <string>Minimize to tray</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Light</string>
+               <string>Quit Application</string>
               </property>
              </item>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QLabel" name="label_4">
@@ -197,32 +211,64 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="3" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout">
+         <item row="6" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="label_2">
              <property name="text">
-              <string>Default close button action</string>
+              <string>Theme</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="closeButtonActionComboBox">
+            <widget class="QComboBox" name="themeComboBox">
              <item>
               <property name="text">
-               <string>Minimize to tray</string>
+               <string>Dark</string>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Quit Application</string>
+               <string>Light</string>
               </property>
              </item>
             </widget>
            </item>
           </layout>
          </item>
-         <item row="4" column="0">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="notificationCheckBox">
+             <property name="text">
+              <string>Disable Notifications PopUp</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="muteAudioCheckBox">
+             <property name="text">
+              <string>Mute Audio from Page</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="1">
+            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
+             <property name="text">
+              <string>Disable Auto Playback of Media</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="QCheckBox" name="disableVideosCheckBox">
+             <property name="text">
+              <string>Disable loading videos</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="3" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_4">
            <property name="topMargin">
             <number>0</number>
@@ -241,6 +287,53 @@ background:transparent;
             <widget class="QLabel" name="current_password">
              <property name="text">
               <string>Current Password:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <widget class="Line" name="line_2">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>1</height>
+            </size>
+           </property>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>1</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Global App shortcuts</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="showShortcutsButton">
+             <property name="text">
+              <string>Show</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/eye-line.png</normaloff>:/icons/eye-line.png</iconset>
              </property>
             </widget>
            </item>
