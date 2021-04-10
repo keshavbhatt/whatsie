@@ -16,8 +16,14 @@ void WebView::contextMenuEvent(QContextMenuEvent *event)
     const QWebEngineContextMenuData &data = page()->contextMenuData();
     Q_ASSERT(data.isValid());
 
-    if (!data.isContentEditable()) {
+    //allow context menu on image
+    if (data.mediaType() == QWebEngineContextMenuData::MediaTypeImage) {
         QWebEngineView::contextMenuEvent(event);
+        return;
+    }
+    // if content is not editable
+    if (!data.isContentEditable()) {
+        event->ignore();
         return;
     }
 
