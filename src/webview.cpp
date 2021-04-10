@@ -4,11 +4,49 @@
 #include <QMenu>
 #include <QWebEngineProfile>
 #include <QWebEngineContextMenuData>
+#include <mainwindow.h>
 
 WebView::WebView(QWidget *parent, QStringList dictionaries)
     : QWebEngineView(parent)
 {
     m_dictionaries = dictionaries;
+
+    QObject *parentMainWindow = this->parent();
+    while (!parentMainWindow -> objectName().contains("MainWindow")){
+        parentMainWindow = parentMainWindow -> parent();
+    }
+    MainWindow *mainWindow = dynamic_cast<MainWindow *>(parentMainWindow);
+
+    connect(this, &WebView::titleChanged,
+            mainWindow, &MainWindow::handleWebViewTitleChanged);
+    connect(this, &WebView::loadStarted,
+            mainWindow, &MainWindow::handleLoadStarted);
+    connect(this, &WebView::loadProgress,
+            mainWindow, &MainWindow::handleLoadProgress);
+    connect(this, &WebView::loadFinished,
+            mainWindow, &MainWindow::handleLoadFinished);
+    connect(this, &WebView::renderProcessTerminated,
+            [this](QWebEnginePage::RenderProcessTerminationStatus termStatus, int statusCode) {
+        QString status;
+        switch (termStatus) {
+        case QWebEnginePage::NormalTerminationStatus:
+            status = tr("Render process normal exit");
+            break;
+        case QWebEnginePage::AbnormalTerminationStatus:
+            status = tr("Render process abnormal exit");
+            break;
+        case QWebEnginePage::CrashedTerminationStatus:
+            status = tr("Render process crashed");
+            break;
+        case QWebEnginePage::KilledTerminationStatus:
+            status = tr("Render process killed");
+            break;
+        }
+        QMessageBox::StandardButton btn = QMessageBox::question(window(), status,
+                                                   tr("Render process exited with code: %1\n"                                            "Do you want to reload the page ?").arg(statusCode));
+        if (btn == QMessageBox::Yes)
+            QTimer::singleShot(0, [this] { this->reload(); });
+    });
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent *event)
