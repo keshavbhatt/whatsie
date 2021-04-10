@@ -13,13 +13,16 @@ MainWindow::MainWindow(QWidget *parent)
       trayIconRead(":/icons/app/whatsapp.svg"),
       trayIconUnread(":/icons/app/whatsapp-message.svg")
 {
+    this->setObjectName("MainWindow");
+
     qApp->setQuitOnLastWindowClosed(false);
+
+    lightPalette = qApp->palette();
 
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
     setMinimumWidth(800);
     setMinimumHeight(600);
-
 
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
@@ -28,7 +31,6 @@ MainWindow::MainWindow(QWidget *parent)
     createStatusBar();
     createTrayIcon();
     createWebEngine();
-
 
     if(settings.value("lockscreen",false).toBool())
     {
@@ -51,7 +53,6 @@ MainWindow::MainWindow(QWidget *parent)
     // quit application if the download manager window is the only remaining window
     m_downloadManagerWidget.setAttribute(Qt::WA_QuitOnClose, false);
 
-    lightPalette = qApp->palette();
     updateWindowTheme();
 }
 
@@ -83,7 +84,6 @@ void MainWindow::updateWindowTheme()
 {
     if(settings.value("windowTheme","light").toString() == "dark")
     {
-
         qApp->setStyle(QStyleFactory::create("fusion"));
         QPalette palette;
         palette.setColor(QPalette::Window,QColor("#262D31")); //whatsapp dark color
@@ -117,11 +117,12 @@ void MainWindow::updateWindowTheme()
         qApp->setPalette(lightPalette);
     }
 
+    setNotificationPresenter(webEngine->page()->profile());
+
     if(lockWidget!=nullptr)
     {
         lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
-                                  "QWidget#signup{background-color:palette(window)};"
-                                  );
+                                  "QWidget#signup{background-color:palette(window)};");
         lockWidget->applyThemeQuirks();
     }
     this->update();
@@ -301,7 +302,6 @@ void MainWindow::notify(QString title,QString message)
     popup->style()->polish(qApp);
     popup->setMinimumWidth(300);
     popup->adjustSize();
-    popup->update();
     popup->present(title,message,QPixmap(":/icons/app/icon-64.png"));
 }
 
@@ -503,47 +503,16 @@ void MainWindow::createWebEngine()
     webEngine->show();
 
     this->webEngine = webEngine;
-    //webEngine->setContextMenuPolicy(Qt::CustomContextMenu);
 
     webEngine->addAction(minimizeAction);
     webEngine->addAction(lockAction);
     webEngine->addAction(quitAction);
 
-    connect(webEngine, &QWebEngineView::titleChanged,
-            this, &MainWindow::handleWebViewTitleChanged);
-    connect(webEngine, &QWebEngineView::loadStarted,
-            this, &MainWindow::handleLoadStarted);
-    connect(webEngine, &QWebEngineView::loadProgress,
-            this, &MainWindow::handleLoadProgress);
-    connect(webEngine, &QWebEngineView::loadFinished,
-            this, &MainWindow::handleLoadFinished);
-    connect(webEngine, &QWebEngineView::renderProcessTerminated,
-            [this](QWebEnginePage::RenderProcessTerminationStatus termStatus, int statusCode) {
-        QString status;
-        switch (termStatus) {
-        case QWebEnginePage::NormalTerminationStatus:
-            status = tr("Render process normal exit");
-            break;
-        case QWebEnginePage::AbnormalTerminationStatus:
-            status = tr("Render process abnormal exit");
-            break;
-        case QWebEnginePage::CrashedTerminationStatus:
-            status = tr("Render process crashed");
-            break;
-        case QWebEnginePage::KilledTerminationStatus:
-            status = tr("Render process killed");
-            break;
-        }
-        QMessageBox::StandardButton btn = QMessageBox::question(window(), status,
-                                                   tr("Render process exited with code: %1\n"                                            "Do you want to reload the page ?").arg(statusCode));
-        if (btn == QMessageBox::Yes)
-            QTimer::singleShot(0, [this] { this->webEngine->reload(); });
-    });
+    createWebPage(false);
 
-    QWebEngineCookieStore *browser_cookie_store = webEngine->page()->profile()->cookieStore();
+    QWebEngineCookieStore *browser_cookie_store = this->webEngine->page()->profile()->cookieStore();
     connect( browser_cookie_store, &QWebEngineCookieStore::cookieAdded, this, &MainWindow::handleCookieAdded );
 
-    createWebPage(false);
 }
 
 void MainWindow::createWebPage(bool offTheRecord)
@@ -552,7 +521,6 @@ void MainWindow::createWebPage(bool offTheRecord)
     {
         m_otrProfile.reset(new QWebEngineProfile);
     }
-
     auto profile = offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
 
     QStringList dict_names;
@@ -560,26 +528,9 @@ void MainWindow::createWebPage(bool offTheRecord)
 
     profile->setSpellCheckEnabled(settings.value("sc_enabled",true).toBool());
     profile->setSpellCheckLanguages(dict_names);
-
     profile->setHttpUserAgent(settings.value("useragent",defaultUserAgentStr).toString());
 
-        auto popup = new NotificationPopup(webEngine);
-        connect(popup,&NotificationPopup::notification_clicked,[=](){
-            if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
-                activateWindow();
-                raise();
-                showNormal();
-            }
-        });
-        profile->setNotificationPresenter([=] (std::unique_ptr<QWebEngineNotification> notification)
-        {
-            if(settings.value("disableNotificationPopups",false).toBool() == true){
-                return;
-            }
-            popup->setMinimumWidth(300);
-            popup->update();
-            popup->present(notification);
-        });
+    setNotificationPresenter(profile);
 
     QWebEnginePage *page = new WebEnginePage(profile,webEngine);
     if(settings.value("windowTheme","light").toString() == "dark"){
@@ -597,12 +548,39 @@ void MainWindow::createWebPage(bool offTheRecord)
     qsrand(time(NULL));
     auto randomValue = qrand() % 300;
     page->setUrl(QUrl("https://web.whatsapp.com?v="+QString::number(randomValue)));
-    //page->setUrl(QUrl("http://ktechpit.com/USS/text.html"));
     connect(profile, &QWebEngineProfile::downloadRequested,
         &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 
     connect(webEngine->page(), SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
                 this, SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
+}
+
+void MainWindow::setNotificationPresenter(QWebEngineProfile* profile)
+{
+    auto *op = webEngine->findChild<NotificationPopup*>("engineNotifier");
+    if( op != nullptr){
+        op->close();
+        op->deleteLater();
+    }
+
+    auto popup = new NotificationPopup(webEngine);
+    popup->setObjectName("engineNotifier");
+    connect(popup,&NotificationPopup::notification_clicked,[=](){
+        if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+            activateWindow();
+            raise();
+            showNormal();
+        }
+    });
+
+    profile->setNotificationPresenter([=] (std::unique_ptr<QWebEngineNotification> notification)
+    {
+        if(settings.value("disableNotificationPopups",false).toBool() == true){
+            return;
+        }
+        popup->setMinimumWidth(300);
+        popup->present(notification);
+    });
 }
 
 void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request)

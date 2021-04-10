@@ -46,6 +46,11 @@ public slots:
     void updateWindowTheme();
     void updatePageTheme();
 
+    void handleWebViewTitleChanged(QString title);
+    void handleLoadStarted();
+    void handleLoadProgress(int progress);
+    void handleLoadFinished(bool loaded);
+    void handleDownloadRequested(QWebEngineDownloadItem *download);
 
 protected slots:
     void closeEvent(QCloseEvent *event) override;
@@ -94,10 +99,6 @@ private:
 
 private slots:
 
-    void handleWebViewTitleChanged(QString title);
-    void handleLoadStarted();
-    void handleLoadProgress(int progress);
-    void handleDownloadRequested(QWebEngineDownloadItem *download);
     void iconActivated(QSystemTrayIcon::ActivationReason reason);
     void messageClicked();
     void doReload();
@@ -105,7 +106,6 @@ private slots:
     void notify(QString title, QString message);
     void showSettings();
     void handleCookieAdded(const QNetworkCookie &cookie);
-    void handleLoadFinished(bool loaded);
 
     QString getPageTheme();
     void toggleMute(const bool checked);
@@ -124,6 +124,7 @@ private slots:
 
     void checkLoadedCorrectly();
     void loadingQuirk(QString test);
+    void setNotificationPresenter(QWebEngineProfile *profile);
 };
 
 #endif // MAINWINDOW_H
