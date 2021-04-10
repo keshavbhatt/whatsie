@@ -68,7 +68,7 @@ public:
 
         this->update();
 
-        QTimer::singleShot(settings.value("notificationTimeOut",5000).toInt(),this,[=](){
+        QTimer::singleShot(settings.value("notificationTimeOut",9000).toInt(),this,[=](){
             onClosed();
         });
 
@@ -100,7 +100,7 @@ public:
         notification->show();
 
         connect(notification.get(), &QWebEngineNotification::closed, this, &NotificationPopup::onClosed);
-        QTimer::singleShot(settings.value("notificationTimeOut",5000).toInt(), notification.get(), [&] () { onClosed(); });
+        QTimer::singleShot(settings.value("notificationTimeOut",9000).toInt(), notification.get(), [&] () { onClosed(); });
 
         this->adjustSize();
         qApp->processEvents();
