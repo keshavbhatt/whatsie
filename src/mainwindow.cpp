@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QRegularExpression>
 #include <QStyleHints>
 
 
@@ -47,11 +48,11 @@ MainWindow::MainWindow(QWidget *parent)
 
     init_settingWidget();
 
-    lightPalette = qApp->palette();
-    updateWindowTheme();
-
     // quit application if the download manager window is the only remaining window
     m_downloadManagerWidget.setAttribute(Qt::WA_QuitOnClose, false);
+
+    lightPalette = qApp->palette();
+    updateWindowTheme();
 }
 
 void MainWindow::updatePageTheme()
@@ -111,18 +112,19 @@ void MainWindow::updateWindowTheme()
         this->webEngine->setStyleSheet("QWebEngineView{background:#131C21;}"); //whatsapp dark color
     }
     else{
-        this->webEngine->setStyleSheet("QWebEngineView{background:#f8f9fa;}"); //whatsapp light color
-        lightPalette.setColor(QPalette::Window,QColor("#f8f9fa"));
+        this->webEngine->setStyleSheet("QWebEngineView{background:#F0F0F0;}"); //whatsapp light color
+        lightPalette.setColor(QPalette::Window,QColor("#F0F0F0"));
         qApp->setPalette(lightPalette);
-        this->update();
     }
 
-    if(lockWidget!=nullptr){
+    if(lockWidget!=nullptr)
+    {
         lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
                                   "QWidget#signup{background-color:palette(window)};"
                                   );
         lockWidget->applyThemeQuirks();
     }
+    this->update();
 }
 
 void MainWindow::handleCookieAdded(const QNetworkCookie &cookie)
@@ -157,8 +159,8 @@ void MainWindow::init_settingWidget()
             }
         });
         connect(settingsWidget,&SettingsWidget::autoPlayMediaToggled,[=](bool checked)
-        {   QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
-
+        {
+            QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
             auto* webSettings = profile->settings();
             webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,checked);
 
@@ -296,7 +298,10 @@ void MainWindow::notify(QString title,QString message)
             showNormal();
         }
     });
+    popup->style()->polish(qApp);
+    popup->setMinimumWidth(300);
     popup->adjustSize();
+    popup->update();
     popup->present(title,message,QPixmap(":/icons/app/icon-64.png"));
 }
 
@@ -475,15 +480,8 @@ void MainWindow::init_globalWebProfile()
     webSettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled ,true);
     webSettings->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain, false);
     webSettings->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
-
-    //webSettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
-
-    //    QObject::connect(
-    //        QWebEngineProfile::defaultProfile(), &QWebEngineProfile::downloadRequested,
-    //        &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
-
-    QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
-                                                        true);
+    webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
+                                                        settings.value("autoPlayMedia",false).toBool());
 
 }
 
@@ -505,6 +503,8 @@ void MainWindow::createWebEngine()
     webEngine->show();
 
     this->webEngine = webEngine;
+    //webEngine->setContextMenuPolicy(Qt::CustomContextMenu);
+
     webEngine->addAction(minimizeAction);
     webEngine->addAction(lockAction);
     webEngine->addAction(quitAction);
@@ -576,6 +576,8 @@ void MainWindow::createWebPage(bool offTheRecord)
             if(settings.value("disableNotificationPopups",false).toBool() == true){
                 return;
             }
+            popup->setMinimumWidth(300);
+            popup->update();
             popup->present(notification);
         });
 
@@ -583,7 +585,7 @@ void MainWindow::createWebPage(bool offTheRecord)
     if(settings.value("windowTheme","light").toString() == "dark"){
         page->setBackgroundColor(QColor("#131C21")); //whatsapp dark bg color
     }else{
-        page->setBackgroundColor(QColor("#f8f9fa")); //whatsapp light bg color
+        page->setBackgroundColor(QColor("#F0F0F0")); //whatsapp light bg color
     }
     webEngine->setPage(page);
     //page should be set parent of profile to prevent
@@ -623,6 +625,17 @@ void MainWindow::handleWebViewTitleChanged(QString title)
 
     if (notificationsTitleRegExp.exactMatch(title))
     {
+        if(notificationsTitleRegExp.isEmpty() == false){
+            QString capturedTitle = notificationsTitleRegExp.capturedTexts().first();
+            QRegExp rgex("\\([^\\d]*(\\d+)[^\\d]*\\)");
+            rgex.setMinimal(true);
+            if(rgex.indexIn(capturedTitle) != -1){
+                qDebug()<<rgex.capturedTexts();
+                QString unreadMessageCount = rgex.capturedTexts().last();
+                QString suffix = unreadMessageCount.toInt() > 1 ? tr("messages"): tr("message");
+                restoreAction->setText(tr("Restore")+" | "+unreadMessageCount+" "+suffix);
+            }
+        }
         trayIcon->setIcon(trayIconUnread);
         setWindowIcon(trayIconUnread);
     }
