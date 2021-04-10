@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>554</width>
-    <height>565</height>
+    <width>527</width>
+    <height>590</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -104,6 +104,53 @@ background:transparent;
          <string>General settings</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
+         <item row="0" column="0">
+          <layout class="QGridLayout" name="gridLayout">
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
+             <property name="text">
+              <string>Disable Auto Playback of Media</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <widget class="QCheckBox" name="muteAudioCheckBox">
+             <property name="text">
+              <string>Mute Audio from Page</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="notificationCheckBox">
+             <property name="text">
+              <string>Disable Notifications PopUp</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="1">
+            <widget class="Line" name="line_3">
+             <property name="minimumSize">
+              <size>
+               <width>1</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>1</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="1" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_5">
            <item>
@@ -175,7 +222,53 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="7" column="0">
+         <item row="3" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_4">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QCheckBox" name="applock_checkbox">
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable application lock screen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Enable App Lock on Start</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="current_password">
+             <property name="text">
+              <string>Current Password:</string>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="5" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Global App shortcuts</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="showShortcutsButton">
+             <property name="text">
+              <string>Show shortcuts</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/eye-line.png</normaloff>:/icons/eye-line.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="8" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
             <widget class="QLabel" name="label_4">
@@ -211,7 +304,7 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="6" column="0">
+         <item row="7" column="0">
           <layout class="QHBoxLayout" name="horizontalLayout_2">
            <item>
             <widget class="QLabel" name="label_2">
@@ -232,62 +325,6 @@ background:transparent;
                <string>Light</string>
               </property>
              </item>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="0" column="0">
-          <layout class="QGridLayout" name="gridLayout">
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="notificationCheckBox">
-             <property name="text">
-              <string>Disable Notifications PopUp</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="muteAudioCheckBox">
-             <property name="text">
-              <string>Mute Audio from Page</string>
-             </property>
-            </widget>
-           </item>
-           <item row="1" column="1">
-            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
-             <property name="text">
-              <string>Disable Auto Playback of Media</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="1">
-            <widget class="QCheckBox" name="disableVideosCheckBox">
-             <property name="text">
-              <string>Disable loading videos</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="3" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_4">
-           <property name="topMargin">
-            <number>0</number>
-           </property>
-           <item>
-            <widget class="QCheckBox" name="applock_checkbox">
-             <property name="toolTip">
-              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable application lock screen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
-             </property>
-             <property name="text">
-              <string>Enable App Lock on Start</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="current_password">
-             <property name="text">
-              <string>Current Password:</string>
-             </property>
             </widget>
            </item>
           </layout>
@@ -317,19 +354,22 @@ background:transparent;
            </property>
           </widget>
          </item>
-         <item row="5" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
+         <item row="6" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
            <item>
-            <widget class="QLabel" name="label_9">
+            <widget class="QLabel" name="label_10">
              <property name="text">
-              <string>Global App shortcuts</string>
+              <string>App permissions</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="showShortcutsButton">
+            <widget class="QPushButton" name="showPermissionsButton">
              <property name="text">
-              <string>Show</string>
+              <string>Show permissions</string>
              </property>
              <property name="icon">
               <iconset resource="icons.qrc">

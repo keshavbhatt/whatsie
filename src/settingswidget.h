@@ -5,6 +5,8 @@
 #include <QSettings>
 #include "utils.h"
 
+#include "permissiondialog.h"
+
 
 
 namespace Ui {
@@ -58,8 +60,6 @@ private slots:
 
     void on_autoPlayMediaCheckBox_toggled(bool checked);
 
-    void on_disableVideosCheckBox_toggled(bool checked);
-
     void on_closeButtonActionComboBox_currentIndexChanged(int index);
 
     void on_applock_checkbox_toggled(bool checked);
@@ -69,6 +69,9 @@ private slots:
     void on_enableSpellCheck_toggled(bool checked);
 
     void on_showShortcutsButton_clicked();
+
+    void on_showPermissionsButton_clicked();
+
 
 private:
     Ui::SettingsWidget *ui;

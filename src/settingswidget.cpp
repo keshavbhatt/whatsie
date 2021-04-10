@@ -12,8 +12,6 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
 {
     ui->setupUi(this);
 
-    ui->disableVideosCheckBox->hide();//impl later
-
     this->engineCachePath             = engineCachePath;
     this->enginePersistentStoragePath = enginePersistentStoragePath;
 
@@ -225,12 +223,6 @@ void SettingsWidget::on_setUserAgent_clicked()
 }
 
 
-
-void SettingsWidget::on_disableVideosCheckBox_toggled(bool checked)
-{
-    settings.setValue("disableVideos",checked);
-}
-
 void SettingsWidget::on_closeButtonActionComboBox_currentIndexChanged(int index)
 {
     settings.setValue("closeButtonActionCombo",index);
@@ -274,7 +266,9 @@ void SettingsWidget::on_showShortcutsButton_clicked()
 {
     QWidget *sheet = new QWidget(this);
     sheet->setWindowTitle(QApplication::applicationName()+" | Global shortcuts");
-    sheet->setWindowFlag(Qt::Sheet);
+
+    sheet->setWindowFlags(Qt::Popup |Qt::FramelessWindowHint);
+    sheet->move(this->geometry().center()-sheet->geometry().center());
 
     QVBoxLayout *layout = new QVBoxLayout(sheet);
     sheet->setLayout(layout);
@@ -288,3 +282,16 @@ void SettingsWidget::on_showShortcutsButton_clicked()
     sheet->setAttribute(Qt::WA_DeleteOnClose);
     sheet->show();
 }
+
+void SettingsWidget::on_showPermissionsButton_clicked()
+{
+    PermissionDialog *permissionDialog = new PermissionDialog(this);
+    permissionDialog->setWindowTitle(QApplication::applicationName()+" | "+tr("Feature permissions"));
+    permissionDialog->setWindowFlag(Qt::Dialog);
+    permissionDialog->move(this->geometry().center()-permissionDialog->geometry().center());
+    permissionDialog->setMinimumSize(485,310);
+    permissionDialog->adjustSize();
+    permissionDialog->show();
+
+}
+
