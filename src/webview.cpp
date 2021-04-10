@@ -73,8 +73,9 @@ void WebView::contextMenuEvent(QContextMenuEvent *event)
     QAction *spellcheckAction = new QAction(tr("Check Spelling"), nullptr);
     spellcheckAction->setCheckable(true);
     spellcheckAction->setChecked(profile->isSpellCheckEnabled());
-    connect(spellcheckAction, &QAction::toggled, this, [profile](bool toogled) {
+    connect(spellcheckAction, &QAction::toggled, this, [profile,this](bool toogled) {
         profile->setSpellCheckEnabled(toogled);
+        settings.setValue("sc_enabled",toogled);
     });
     menu->addAction(spellcheckAction);
 
