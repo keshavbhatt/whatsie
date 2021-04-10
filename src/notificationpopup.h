@@ -16,6 +16,7 @@
 #include <QDesktopWidget>
 #include <QDebug>
 #include "widgets/scrolltext/scrolltext.h"
+#include <QSettings>
 
 #include <memory>
 
@@ -25,6 +26,7 @@ class NotificationPopup : public QWidget
 
     QLabel m_icon, m_title; ScrollText m_message;
     std::unique_ptr<QWebEngineNotification> notification;
+    QSettings settings;
 
 public:
     NotificationPopup(QWidget *parent) : QWidget(parent)
@@ -64,7 +66,9 @@ public:
         int y = 40;
 
 
-        QTimer::singleShot(10000,this,[=](){
+        this->update();
+
+        QTimer::singleShot(settings.value("notificationTimeOut",5000).toInt(),this,[=](){
             onClosed();
         });
 
@@ -96,13 +100,15 @@ public:
         notification->show();
 
         connect(notification.get(), &QWebEngineNotification::closed, this, &NotificationPopup::onClosed);
-        QTimer::singleShot(10000, notification.get(), [&] () { onClosed(); });
+        QTimer::singleShot(settings.value("notificationTimeOut",5000).toInt(), notification.get(), [&] () { onClosed(); });
 
         this->adjustSize();
         qApp->processEvents();
 
         int x = QApplication::desktop()->geometry().width()-(this->width()+10);
         int y = 40;
+
+        this->update();
 
         QPropertyAnimation *a = new QPropertyAnimation(this,"pos");
         a->setDuration(200);
