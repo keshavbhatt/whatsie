@@ -31,6 +31,7 @@ public slots:
     static float RoundToOneDecimal(float number);
     void DisplayExceptionErrorDialog(const QString &error_info);
     static QString appDebugInfo();
+
 private slots:
     //use refreshCacheSize
     static quint64 dir_size(const QString &directory);
