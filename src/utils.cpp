@@ -273,3 +273,6 @@ QString utils::GetEnvironmentVar(const QString &variable_name)
     return QProcessEnvironment::systemEnvironment().value(variable_name, "").trimmed();
 #endif
 }
+
+
+
