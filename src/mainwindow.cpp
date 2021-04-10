@@ -18,6 +18,8 @@ MainWindow::MainWindow(QWidget *parent)
     qApp->setQuitOnLastWindowClosed(false);
 
     lightPalette = qApp->palette();
+    lightPalette.setColor(QPalette::Window,QColor("#F0F0F0"));//whatsapp light palette
+
 
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
@@ -110,11 +112,12 @@ void MainWindow::updateWindowTheme()
         palette.setColor(QPalette::Disabled,QPalette::HighlightedText,QColor(127,127,127));
         qApp->setPalette(palette);
         this->webEngine->setStyleSheet("QWebEngineView{background:#131C21;}"); //whatsapp dark color
+        //this->webEngine->page()->setBackgroundColor(QColor("#131C21;")); //whatsapp dark color
     }
     else{
-        this->webEngine->setStyleSheet("QWebEngineView{background:#F0F0F0;}"); //whatsapp light color
-        lightPalette.setColor(QPalette::Window,QColor("#F0F0F0"));
         qApp->setPalette(lightPalette);
+        this->webEngine->setStyleSheet("QWebEngineView{background:#F0F0F0;}"); //whatsapp light color
+        //this->webEngine->page()->setBackgroundColor(QColor("#F0F0F0;")); //whatsapp light color
     }
 
     setNotificationPresenter(webEngine->page()->profile());
@@ -183,6 +186,10 @@ void MainWindow::init_settingWidget()
             {
                 webEngine->page()->profile()->setSpellCheckEnabled(checked);
             }
+        });
+
+        connect(settingsWidget,&SettingsWidget::notificationPopupTimeOutChanged,[=](){
+           setNotificationPresenter(this->webEngine->page()->profile());
         });
 
         settingsWidget->appLockSetChecked(settings.value("lockscreen",false).toBool());

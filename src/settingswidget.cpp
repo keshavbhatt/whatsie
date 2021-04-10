@@ -22,6 +22,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->themeComboBox->setCurrentText(utils::toCamelCase(settings.value("windowTheme","light").toString()));
     ui->userAgentLineEdit->setText(settings.value("useragent",defaultUserAgentStr).toString());
     ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
+    ui->notificationTimeOutspinBox->setValue(settings.value("notificationTimeOut",9000).toInt()/1000);
 
     this->setCurrentPasswordText("Current Password: <i>"
             +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
@@ -299,3 +300,9 @@ void SettingsWidget::on_showPermissionsButton_clicked()
     permissionDialog->show();
 }
 
+
+void SettingsWidget::on_notificationTimeOutspinBox_valueChanged(int arg1)
+{
+    settings.setValue("notificationTimeOut",arg1*1000);
+    emit notificationPopupTimeOutChanged();
+}

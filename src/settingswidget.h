@@ -26,6 +26,8 @@ signals:
     void init_lock();
     void dictChanged(QString dict);
     void spellCheckChanged(bool checked);
+    void notificationPopupTimeOutChanged();
+
 public:
     explicit SettingsWidget(QWidget *parent = nullptr,QString engineCachePath = "",
                             QString enginePersistentStoragePath = "");
@@ -72,6 +74,8 @@ private slots:
 
     void on_showPermissionsButton_clicked();
 
+
+    void on_notificationTimeOutspinBox_valueChanged(int arg1);
 
 private:
     Ui::SettingsWidget *ui;

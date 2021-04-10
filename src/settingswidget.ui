@@ -106,27 +106,6 @@ background:transparent;
         <layout class="QGridLayout" name="gridLayout_4">
          <item row="0" column="0">
           <layout class="QGridLayout" name="gridLayout">
-           <item row="1" column="0">
-            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
-             <property name="text">
-              <string>Disable Auto Playback of Media</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="2">
-            <widget class="QCheckBox" name="muteAudioCheckBox">
-             <property name="text">
-              <string>Mute Audio from Page</string>
-             </property>
-            </widget>
-           </item>
-           <item row="0" column="0">
-            <widget class="QCheckBox" name="notificationCheckBox">
-             <property name="text">
-              <string>Disable Notifications PopUp</string>
-             </property>
-            </widget>
-           </item>
            <item row="0" column="1">
             <widget class="Line" name="line_3">
              <property name="minimumSize">
@@ -148,6 +127,51 @@ background:transparent;
               <enum>Qt::Vertical</enum>
              </property>
             </widget>
+           </item>
+           <item row="0" column="0">
+            <widget class="QCheckBox" name="notificationCheckBox">
+             <property name="text">
+              <string>Disable Notifications PopUp</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="2">
+            <widget class="QCheckBox" name="autoPlayMediaCheckBox">
+             <property name="text">
+              <string>Disable Auto Playback of Media</string>
+             </property>
+            </widget>
+           </item>
+           <item row="1" column="0">
+            <widget class="QCheckBox" name="muteAudioCheckBox">
+             <property name="text">
+              <string>Mute Audio from Page</string>
+             </property>
+            </widget>
+           </item>
+           <item row="0" column="2">
+            <layout class="QHBoxLayout" name="horizontalLayout_9">
+             <item>
+              <widget class="QLabel" name="label_14">
+               <property name="text">
+                <string>PopUp timeout</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSpinBox" name="notificationTimeOutspinBox">
+               <property name="suffix">
+                <string> Secs</string>
+               </property>
+               <property name="minimum">
+                <number>2</number>
+               </property>
+               <property name="maximum">
+                <number>20</number>
+               </property>
+              </widget>
+             </item>
+            </layout>
            </item>
           </layout>
          </item>
