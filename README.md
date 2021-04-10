@@ -11,8 +11,10 @@ on Linux. Not affiliated with WhatsApp or Facebook.
 - BuiltIn download manager
 - Mute Audio, Disable Notifications
 - App Lock feature
+- App permission manager
 - Built in Spell Checker (with support for 31 Major languages)
 - Other settings that let you control every aspect of WebApp.
+
 
 ## Install:
 
