@@ -55,6 +55,7 @@ SOURCES += \
         lock.cpp \
         main.cpp \
         mainwindow.cpp \
+        permissiondialog.cpp \
         rungaurd.cpp \
         settingswidget.cpp \
         utils.cpp \
@@ -75,6 +76,7 @@ HEADERS += \
     lock.h \
     mainwindow.h \
     notificationpopup.h \
+    permissiondialog.h \
     requestinterceptor.h \
     rungaurd.h \
     settingswidget.h \
@@ -91,6 +93,7 @@ FORMS += \
     downloadwidget.ui \
     lock.ui \
     passworddialog.ui \
+    permissiondialog.ui \
     settingswidget.ui
 
 DISTFILES += \
