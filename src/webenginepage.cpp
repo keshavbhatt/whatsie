@@ -2,17 +2,15 @@
 
 #include <QIcon>
 #include <QStyle>
+#include <QWebEngineSettings>
 
 
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent)
 {
     // Connect signals and slots
-    connect(this, &QWebEnginePage::featurePermissionRequested,
-            this, &WebEnginePage::handleFeaturePermissionRequested);
-    connect(this, &QWebEnginePage::loadFinished,
-            this, &WebEnginePage::handleLoadFinished);
     profile->setHttpUserAgent(profile->httpUserAgent().replace("QtWebEngine/5.13.0",""));
+    connect(this, &QWebEnginePage::loadFinished,this, &WebEnginePage::handleLoadFinished);
     connect(this, &QWebEnginePage::authenticationRequired, this, &WebEnginePage::handleAuthenticationRequired);
     connect(this, &QWebEnginePage::featurePermissionRequested, this, &WebEnginePage::handleFeaturePermissionRequested);
     connect(this, &QWebEnginePage::proxyAuthenticationRequired, this, &WebEnginePage::handleProxyAuthenticationRequired);
@@ -68,37 +66,59 @@ inline QString questionForFeature(QWebEnginePage::Feature feature)
 
 void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin, Feature feature)
 {
+    bool autoPlay = true;
+    if(settings.value("autoPlayMedia").isValid())
+         autoPlay = settings.value("autoPlayMedia",false).toBool();
+    if( autoPlay && (feature == QWebEnginePage::MediaVideoCapture || feature ==  QWebEnginePage::MediaAudioVideoCapture))
+    {
+        QWebEngineProfile *defProfile = QWebEngineProfile::defaultProfile();
+        auto* webSettings = defProfile->settings();
+        webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,false);
+
+        profile()->settings()->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,false);
+    }
+
     QString title = tr("Permission Request");
     QString question = questionForFeature(feature).arg(securityOrigin.host());
-    if (!question.isEmpty() && QMessageBox::question(view()->window(), title, question) == QMessageBox::Yes)
-        setFeaturePermission(securityOrigin, feature, PermissionGrantedByUser);
-    else
-        setFeaturePermission(securityOrigin, feature, PermissionDeniedByUser);
+
+    QString featureStr =  QVariant::fromValue(feature).toString();
+    settings.beginGroup("permissions");
+    if(settings.value(featureStr,false).toBool()){
+        setFeaturePermission(securityOrigin, feature, QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
+    }else{
+        if (!question.isEmpty() && QMessageBox::question(view()->window(), title, question) == QMessageBox::Yes)
+        {
+            setFeaturePermission(securityOrigin, feature, QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
+            settings.setValue(featureStr,true);
+        }else{
+            setFeaturePermission(securityOrigin, feature, QWebEnginePage::PermissionPolicy::PermissionDeniedByUser);
+            settings.setValue(featureStr,false);
+        }
+    }
+    settings.endGroup();
 }
 
 void WebEnginePage::handleLoadFinished(bool ok)
 {
     Q_UNUSED(ok);
-    setFeaturePermission(
-                QUrl("https://web.whatsapp.com/"),
-                QWebEnginePage::Feature::Notifications,
-                QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
-    );
-    setFeaturePermission(
-                QUrl("https://web.whatsapp.com/"),
-                QWebEnginePage::Feature::MediaAudioCapture,
-                QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
-    );
-    setFeaturePermission(
-                QUrl("https://web.whatsapp.com/"),
-                QWebEnginePage::Feature::MediaVideoCapture,
-                QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
-    );
-    setFeaturePermission(
-                QUrl("https://web.whatsapp.com/"),
-                QWebEnginePage::Feature::MediaAudioVideoCapture,
-                QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
-    );
+    //turn on Notification settings by default
+    if(settings.value("permissions/Notifications").isValid()==false)
+    {
+        settings.beginGroup("permissions");
+        settings.setValue("Notifications",true);
+        setFeaturePermission(
+                    QUrl("https://web.whatsapp.com/"),
+                    QWebEnginePage::Feature::Notifications,
+                    QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
+        );
+        settings.endGroup();
+    }   else if (settings.value("permissions/Notifications",true).toBool()) {
+        setFeaturePermission(
+                    QUrl("https://web.whatsapp.com/"),
+                    QWebEnginePage::Feature::Notifications,
+                    QWebEnginePage::PermissionPolicy::PermissionGrantedByUser
+        );
+    }
 }
 
 void WebEnginePage::fullScreenRequestedByPage(QWebEngineFullScreenRequest request)

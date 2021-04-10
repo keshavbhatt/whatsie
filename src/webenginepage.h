@@ -17,6 +17,8 @@
 #include <QWebEngineRegisterProtocolHandlerRequest>
 #include <QWebEngineFullScreenRequest>
 
+#include <QSettings>
+
 #include "ui_certificateerrordialog.h"
 #include "ui_passworddialog.h"
 
@@ -26,6 +28,8 @@ class WebEnginePage : public QWebEnginePage
 public:
     WebEnginePage(QWebEngineProfile *profile, QObject *parent = nullptr);
 
+private:
+    QSettings settings;
 protected:
     bool acceptNavigationRequest(const QUrl &url, QWebEnginePage::NavigationType type, bool isMainFrame) override;
     QWebEnginePage* createWindow(QWebEnginePage::WebWindowType type) override;
