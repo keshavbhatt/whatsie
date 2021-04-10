@@ -275,8 +275,12 @@ void SettingsWidget::on_showShortcutsButton_clicked()
     auto *w = qobject_cast<MainWindow*>(parent());
     if(w != 0){
         foreach (QAction *action, w->actions()) {
-            QLabel *label = new QLabel(action->text()+" | "+action->shortcut().toString(),sheet);
-            layout->addWidget(label);
+            QString shortcutStr = action->shortcut().toString();
+            if(shortcutStr.isEmpty()==false){
+                QLabel *label = new QLabel(action->text().remove("&")+"  |  "+shortcutStr,sheet);
+                label->setAlignment(Qt::AlignHCenter);
+                layout->addWidget(label);
+            }
         }
     }
     sheet->setAttribute(Qt::WA_DeleteOnClose);
@@ -288,10 +292,10 @@ void SettingsWidget::on_showPermissionsButton_clicked()
     PermissionDialog *permissionDialog = new PermissionDialog(this);
     permissionDialog->setWindowTitle(QApplication::applicationName()+" | "+tr("Feature permissions"));
     permissionDialog->setWindowFlag(Qt::Dialog);
+    permissionDialog->setAttribute(Qt::WA_DeleteOnClose,true);
     permissionDialog->move(this->geometry().center()-permissionDialog->geometry().center());
     permissionDialog->setMinimumSize(485,310);
     permissionDialog->adjustSize();
     permissionDialog->show();
-
 }
 
