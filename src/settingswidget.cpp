@@ -23,6 +23,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->userAgentLineEdit->setText(settings.value("useragent",defaultUserAgentStr).toString());
     ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
     ui->notificationTimeOutspinBox->setValue(settings.value("notificationTimeOut",9000).toInt()/1000);
+    ui->notificationCombo->setCurrentIndex(settings.value("notificationCombo",1).toInt());
 
     this->setCurrentPasswordText("Current Password: <i>"
             +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
@@ -305,4 +306,14 @@ void SettingsWidget::on_notificationTimeOutspinBox_valueChanged(int arg1)
 {
     settings.setValue("notificationTimeOut",arg1*1000);
     emit notificationPopupTimeOutChanged();
+}
+
+void SettingsWidget::on_notificationCombo_currentIndexChanged(int index)
+{
+    settings.setValue("notificationCombo",index);
+}
+
+void SettingsWidget::on_tryNotification_clicked()
+{
+    emit notify("Test Notification");
 }

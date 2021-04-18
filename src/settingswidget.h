@@ -27,6 +27,7 @@ signals:
     void dictChanged(QString dict);
     void spellCheckChanged(bool checked);
     void notificationPopupTimeOutChanged();
+    void notify(QString message);
 
 public:
     explicit SettingsWidget(QWidget *parent = nullptr,QString engineCachePath = "",
@@ -76,6 +77,10 @@ private slots:
 
 
     void on_notificationTimeOutspinBox_valueChanged(int arg1);
+
+    void on_notificationCombo_currentIndexChanged(int index);
+
+    void on_tryNotification_clicked();
 
 private:
     Ui::SettingsWidget *ui;

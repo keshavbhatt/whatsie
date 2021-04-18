@@ -2,8 +2,7 @@
 
 #include <QRegularExpression>
 #include <QStyleHints>
-
-
+#include <QWebEngineNotification>
 
 extern QString defaultUserAgentStr;
 
@@ -192,6 +191,11 @@ void MainWindow::init_settingWidget()
            setNotificationPresenter(this->webEngine->page()->profile());
         });
 
+        connect(settingsWidget,&SettingsWidget::notify,[=](QString message)
+        {
+           notify("",message);
+        });
+
         settingsWidget->appLockSetChecked(settings.value("lockscreen",false).toBool());
 
         //spell checker
@@ -203,6 +207,9 @@ void MainWindow::init_settingWidget()
 
 void MainWindow::lockApp()
 {
+    if(lockWidget->isLocked)
+        return;
+
     if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==false){
         QMessageBox::critical(this,QApplication::applicationName()+"| Error",
                               "Unable to lock App, Enable AppLock in settings First.");
@@ -295,21 +302,39 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::notify(QString title,QString message)
 {
+
     if(settings.value("disableNotificationPopups",false).toBool() == true){
         return;
     }
-    auto popup = new NotificationPopup(webEngine);
-    connect(popup,&NotificationPopup::notification_clicked,[=](){
-        if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
-            activateWindow();
-            raise();
-            showNormal();
-        }
-    });
-    popup->style()->polish(qApp);
-    popup->setMinimumWidth(300);
-    popup->adjustSize();
-    popup->present(title,message,QPixmap(":/icons/app/icon-64.png"));
+
+    if(title.isEmpty()) title = QApplication::applicationName();
+
+    if(settings.value("notificationCombo",1).toInt() == 0 && trayIcon != nullptr)
+    {
+        trayIcon->showMessage(title,message,QIcon(":/icons/app/icon-64.png"),100);
+        trayIcon->disconnect(trayIcon,SIGNAL(messageClicked()));
+        connect(trayIcon,&QSystemTrayIcon::messageClicked,[=](){
+            if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+                activateWindow();
+                raise();
+                showNormal();
+            }
+        });
+    }
+    else{
+        auto popup = new NotificationPopup(webEngine);
+        connect(popup,&NotificationPopup::notification_clicked,[=](){
+            if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+                activateWindow();
+                raise();
+                showNormal();
+            }
+        });
+        popup->style()->polish(qApp);
+        popup->setMinimumWidth(300);
+        popup->adjustSize();
+        popup->present(title,message,QPixmap(":/icons/app/icon-64.png"));
+    }
 }
 
 void MainWindow::createActions()
@@ -585,8 +610,24 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile* profile)
         if(settings.value("disableNotificationPopups",false).toBool() == true){
             return;
         }
-        popup->setMinimumWidth(300);
-        popup->present(notification);
+        if(settings.value("notificationCombo",1).toInt() == 0 && trayIcon != nullptr)
+        {
+            QIcon icon(QPixmap::fromImage(notification->icon()));
+            trayIcon->showMessage(notification->title(),notification->message(),icon,100);
+            trayIcon->disconnect(trayIcon,SIGNAL(messageClicked()));
+            connect(trayIcon,&QSystemTrayIcon::messageClicked,[=](){
+                if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+                    activateWindow();
+                    raise();
+                    showNormal();
+                }
+            });
+
+        }else{
+            popup->setMinimumWidth(300);
+            popup->present(notification);
+        }
+
     });
 }
 
