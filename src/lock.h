@@ -34,6 +34,7 @@ private slots:
     void checkCaps();
     void on_cancelSetting_clicked();
 
+    void animate();
 public slots:
     void lock_app();
     void applyThemeQuirks();

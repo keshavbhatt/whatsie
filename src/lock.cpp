@@ -20,16 +20,10 @@ Lock::Lock(QWidget *parent) :
     ui->setPass->setEnabled(false);
     ui->wrong->hide();
 
-    ui->centerWidget->hide();
     QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
     ui->centerWidget->setGraphicsEffect(eff);
-    QPropertyAnimation *a = new QPropertyAnimation(eff,"opacity");
-    a->setDuration(400);
-    a->setStartValue(0);
-    a->setEndValue(1);
-    a->setEasingCurve(QEasingCurve::InCurve);
-    a->start(QPropertyAnimation::DeleteWhenStopped);
-    ui->centerWidget->show();
+
+    animate();
 
     if(settings.value("asdfg").isValid() == false)
     {
@@ -53,6 +47,18 @@ Lock::Lock(QWidget *parent) :
     ui->signup_warning->setStyleSheet(capsStyle);
     ui->wrong->setStyleSheet(capsStyle);
 
+}
+
+void Lock::animate()
+{
+    ui->centerWidget->hide();
+    QPropertyAnimation *a = new QPropertyAnimation(ui->centerWidget->graphicsEffect(),"opacity");
+    a->setDuration(400);
+    a->setStartValue(0);
+    a->setEndValue(1);
+    a->setEasingCurve(QEasingCurve::InCurve);
+    a->start(QPropertyAnimation::DeleteWhenStopped);
+    ui->centerWidget->show();
 }
 
 void Lock::applyThemeQuirks(){
@@ -176,9 +182,10 @@ void Lock::lock_app()
     ui->wrong->hide();
     ui->signup->hide();
     ui->login->show();
-    ui->passcodeLogin->setFocus();
     isLocked = true;
     this->show();
+    animate();
+    ui->passcodeLogin->setFocus();
 }
 
 void Lock::on_passcodeLogin_returnPressed()
