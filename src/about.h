@@ -20,6 +20,12 @@ private slots:
 
 private:
     Ui::About *ui;
+
+    QString appName, appDescription,
+            appSourceCodeLink, appAuthorLink,
+            appAuthorName, appAuthorEmail,
+            donateLink,moreAppsLink, appRateLink;
+    bool isOpenSource;
 };
 
 #endif // ABOUT_H
