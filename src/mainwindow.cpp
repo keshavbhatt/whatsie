@@ -207,7 +207,7 @@ void MainWindow::init_settingWidget()
 
 void MainWindow::lockApp()
 {
-    if(lockWidget->isLocked)
+    if(lockWidget != nullptr && lockWidget->isLocked)
         return;
 
     if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==false){
@@ -220,7 +220,6 @@ void MainWindow::lockApp()
     if(settings.value("asdfg").isValid()){
         init_lock();
     }else{
-        if(settings.value("asdfg").isValid() ==false){
             QMessageBox msgBox;
               msgBox.setText("App lock is not configured.");
               msgBox.setIconPixmap(QPixmap(":/icons/information-line.png").scaled(42,42,Qt::KeepAspectRatio,Qt::SmoothTransformation));
@@ -232,7 +231,6 @@ void MainWindow::lockApp()
                     init_lock();
               });
               msgBox.exec();
-        }
     }
 }
 

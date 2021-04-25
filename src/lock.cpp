@@ -30,9 +30,9 @@ Lock::Lock(QWidget *parent) :
         isLocked = false;
         ui->signup->show();
         ui->login->hide();
+        animate();
         ui->passcode1->setFocus();
-    }
-    else
+    }else
     {
         lock_app();
     }
