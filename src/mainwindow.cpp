@@ -210,15 +210,16 @@ void MainWindow::lockApp()
     if(lockWidget != nullptr && lockWidget->isLocked)
         return;
 
-    if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==false){
-        QMessageBox::critical(this,QApplication::applicationName()+"| Error",
-                              "Unable to lock App, Enable AppLock in settings First.");
-        this->show();
-        return;
-    }
+//    if(settings.value("asdfg").isValid() && settings.value("lockscreen").toBool()==false){
+//        QMessageBox::critical(this,QApplication::applicationName()+"| Error",
+//                              "Unable to lock App, Enable AppLock in settings First.");
+//        this->show();
+//        return;
+//    }
 
     if(settings.value("asdfg").isValid()){
         init_lock();
+        lockWidget->lock_app();
     }else{
             QMessageBox msgBox;
               msgBox.setText("App lock is not configured.");
