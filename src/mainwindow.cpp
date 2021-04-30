@@ -310,7 +310,7 @@ void MainWindow::notify(QString title,QString message)
 
     if(settings.value("notificationCombo",1).toInt() == 0 && trayIcon != nullptr)
     {
-        trayIcon->showMessage(title,message,QIcon(":/icons/app/icon-64.png"),100);
+        trayIcon->showMessage(title,message,QIcon(":/icons/app/icon-64.png"),settings.value("notificationTimeOut",9000).toInt());
         trayIcon->disconnect(trayIcon,SIGNAL(messageClicked()));
         connect(trayIcon,&QSystemTrayIcon::messageClicked,[=](){
             if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
@@ -612,7 +612,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile* profile)
         if(settings.value("notificationCombo",1).toInt() == 0 && trayIcon != nullptr)
         {
             QIcon icon(QPixmap::fromImage(notification->icon()));
-            trayIcon->showMessage(notification->title(),notification->message(),icon,100);
+            trayIcon->showMessage(notification->title(),notification->message(),icon,settings.value("notificationTimeOut",9000).toInt());
             trayIcon->disconnect(trayIcon,SIGNAL(messageClicked()));
             connect(trayIcon,&QSystemTrayIcon::messageClicked,[=](){
                 if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
