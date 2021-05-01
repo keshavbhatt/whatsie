@@ -144,5 +144,12 @@
         <file>icons/app/whatsapp-message.svg</file>
         <file>icons/app/whatsapp.svg</file>
         <file>icons/wa_bg.png</file>
+        <file>icons/direction-line.png</file>
+        <file>icons/share-forward-line.png</file>
+        <file>icons/moon-line.png</file>
+        <file>icons/lightbulb-line.png</file>
+        <file>icons/window-2-line.png</file>
+        <file>icons/shut-down-line.png</file>
+        <file>icons/app/icon-48.png</file>
     </qresource>
 </RCC>
