@@ -6,14 +6,17 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>533</width>
-    <height>628</height>
+    <width>512</width>
+    <height>613</height>
    </rect>
   </property>
   <property name="windowTitle">
    <string>Form</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout">
+   <property name="spacing">
+    <number>0</number>
+   </property>
    <property name="leftMargin">
     <number>0</number>
    </property>
@@ -35,7 +38,9 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">background-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:1, y2:1, stop:0 rgba(63, 129, 216, 255), stop:0.328358 rgba(63, 129, 216, 111), stop:0.61194 rgba(63, 129, 216, 48), stop:0.895522 rgba(63, 129, 216, 15));
+      <string notr="true">/*background-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:1, y2:1, stop:0 rgba(63, 129, 216, 255), stop:0.328358 rgba(63, 129, 216, 111), stop:0.61194 rgba(63, 129, 216, 48), stop:0.895522 rgba(63, 129, 216, 15));*/
+
+background-color: qlineargradient(spread:reflect, x1:0, y1:1, x2:1, y2:1, stop:0 rgba(28, 139, 130, 255), stop:0.328358 rgba(28, 139, 130, 144), stop:0.61194 rgba(28, 139, 130, 78), stop:0.895522 rgba(28, 139, 130, 6));
 </string>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
@@ -49,7 +54,7 @@ padding: 8px 0px 8px 8px;</string>
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="icons.qrc">:/icons/app/icon-64.png</pixmap>
+         <pixmap resource="icons.qrc">:/icons/app/icon-48.png</pixmap>
         </property>
        </widget>
       </item>
@@ -104,6 +109,149 @@ background:transparent;
          <string>General settings</string>
         </property>
         <layout class="QGridLayout" name="gridLayout_4">
+         <item row="9" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_8">
+           <property name="topMargin">
+            <number>0</number>
+           </property>
+           <item>
+            <widget class="QLabel" name="label_10">
+             <property name="text">
+              <string>App permissions</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="showPermissionsButton">
+             <property name="text">
+              <string>  Show permissions</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/categories/security.png</normaloff>:/icons/categories/security.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="0" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_11">
+           <item>
+            <widget class="QLabel" name="label_16">
+             <property name="text">
+              <string>Notification type</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="notificationCombo">
+             <item>
+              <property name="text">
+               <string>Native notification</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/categories/featured.png</normaloff>:/icons/categories/featured.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Customized notification</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/categories/devices-and-iot.png</normaloff>:/icons/categories/devices-and-iot.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="tryNotification">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="text">
+              <string>  Try</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/categories/science.png</normaloff>:/icons/categories/science.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="2" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_5">
+           <item>
+            <widget class="QCheckBox" name="enableSpellCheck">
+             <property name="text">
+              <string>Enable Spell Checker</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="Line" name="line">
+             <property name="minimumSize">
+              <size>
+               <width>1</width>
+               <height>0</height>
+              </size>
+             </property>
+             <property name="maximumSize">
+              <size>
+               <width>1</width>
+               <height>16777215</height>
+              </size>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
+             </property>
+             <property name="frameShadow">
+              <enum>QFrame::Raised</enum>
+             </property>
+             <property name="orientation">
+              <enum>Qt::Vertical</enum>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QLabel" name="label_8">
+             <property name="text">
+              <string>SpellChecker Language</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="dictComboBox"/>
+           </item>
+          </layout>
+         </item>
+         <item row="8" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_6">
+           <item>
+            <widget class="QLabel" name="label_9">
+             <property name="text">
+              <string>Global App shortcuts</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="showShortcutsButton">
+             <property name="text">
+              <string>  Show shortcuts</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/share-forward-line.png</normaloff>:/icons/share-forward-line.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
          <item row="1" column="0">
           <layout class="QGridLayout" name="gridLayout">
            <item row="0" column="1">
@@ -199,25 +347,69 @@ background:transparent;
            </item>
           </layout>
          </item>
-         <item row="5" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout">
+         <item row="11" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_3">
            <item>
-            <widget class="QLabel" name="label">
+            <widget class="QLabel" name="label_4">
              <property name="text">
-              <string>Close button action</string>
+              <string>User Agent</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QComboBox" name="closeButtonActionComboBox">
+            <widget class="QLineEdit" name="userAgentLineEdit"/>
+           </item>
+           <item>
+            <widget class="QPushButton" name="setUserAgent">
+             <property name="text">
+              <string>  Set</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/categories/utilities.png</normaloff>:/icons/categories/utilities.png</iconset>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="defaultUserAgentButton">
+             <property name="text">
+              <string>  Default</string>
+             </property>
+             <property name="icon">
+              <iconset resource="icons.qrc">
+               <normaloff>:/icons/refresh-line.png</normaloff>:/icons/refresh-line.png</iconset>
+             </property>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="6" column="0">
+          <layout class="QHBoxLayout" name="horizontalLayout_2">
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Theme</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="themeComboBox">
              <item>
               <property name="text">
-               <string>Minimize to tray</string>
+               <string>Dark</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/moon-line.png</normaloff>:/icons/moon-line.png</iconset>
               </property>
              </item>
              <item>
               <property name="text">
-               <string>Quit Application</string>
+               <string>Light</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/lightbulb-line.png</normaloff>:/icons/lightbulb-line.png</iconset>
               </property>
              </item>
             </widget>
@@ -249,197 +441,63 @@ background:transparent;
            </property>
           </widget>
          </item>
-         <item row="8" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_2">
-           <item>
-            <widget class="QLabel" name="label_2">
-             <property name="text">
-              <string>Theme</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="themeComboBox">
-             <item>
-              <property name="text">
-               <string>Dark</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Light</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="2" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_5">
-           <item>
-            <widget class="QCheckBox" name="enableSpellCheck">
-             <property name="text">
-              <string>Enable Spell Checker</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="Line" name="line">
-             <property name="minimumSize">
-              <size>
-               <width>1</width>
-               <height>0</height>
-              </size>
-             </property>
-             <property name="maximumSize">
-              <size>
-               <width>1</width>
-               <height>16777215</height>
-              </size>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
-             </property>
-             <property name="frameShadow">
-              <enum>QFrame::Raised</enum>
-             </property>
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLabel" name="label_8">
-             <property name="text">
-              <string>SpellChecker Language</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="dictComboBox"/>
-           </item>
-          </layout>
-         </item>
-         <item row="9" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_3">
-           <item>
-            <widget class="QLabel" name="label_4">
-             <property name="text">
-              <string>User Agent</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QLineEdit" name="userAgentLineEdit"/>
-           </item>
-           <item>
-            <widget class="QPushButton" name="setUserAgent">
-             <property name="text">
-              <string>Set</string>
-             </property>
-             <property name="icon">
-              <iconset resource="icons.qrc">
-               <normaloff>:/icons/categories/utilities.png</normaloff>:/icons/categories/utilities.png</iconset>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="defaultUserAgentButton">
-             <property name="text">
-              <string>Default</string>
-             </property>
-             <property name="icon">
-              <iconset resource="icons.qrc">
-               <normaloff>:/icons/refresh-line.png</normaloff>:/icons/refresh-line.png</iconset>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
          <item row="7" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_8">
-           <property name="topMargin">
-            <number>0</number>
+          <layout class="QHBoxLayout" name="horizontalLayout">
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Close button action</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QComboBox" name="closeButtonActionComboBox">
+             <item>
+              <property name="text">
+               <string>Minimize to tray</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/window-2-line.png</normaloff>:/icons/window-2-line.png</iconset>
+              </property>
+             </item>
+             <item>
+              <property name="text">
+               <string>Quit Application</string>
+              </property>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/shut-down-line.png</normaloff>:/icons/shut-down-line.png</iconset>
+              </property>
+             </item>
+            </widget>
+           </item>
+          </layout>
+         </item>
+         <item row="10" column="0">
+          <widget class="Line" name="line_4">
+           <property name="minimumSize">
+            <size>
+             <width>0</width>
+             <height>1</height>
+            </size>
            </property>
-           <item>
-            <widget class="QLabel" name="label_10">
-             <property name="text">
-              <string>App permissions</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="showPermissionsButton">
-             <property name="text">
-              <string>Show permissions</string>
-             </property>
-             <property name="icon">
-              <iconset resource="icons.qrc">
-               <normaloff>:/icons/eye-line.png</normaloff>:/icons/eye-line.png</iconset>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="6" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_6">
-           <item>
-            <widget class="QLabel" name="label_9">
-             <property name="text">
-              <string>Global App shortcuts</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="showShortcutsButton">
-             <property name="text">
-              <string>Show shortcuts</string>
-             </property>
-             <property name="icon">
-              <iconset resource="icons.qrc">
-               <normaloff>:/icons/eye-line.png</normaloff>:/icons/eye-line.png</iconset>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         <item row="0" column="0">
-          <layout class="QHBoxLayout" name="horizontalLayout_11">
-           <item>
-            <widget class="QLabel" name="label_16">
-             <property name="text">
-              <string>Notification type</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QComboBox" name="notificationCombo">
-             <item>
-              <property name="text">
-               <string>Native notification</string>
-              </property>
-             </item>
-             <item>
-              <property name="text">
-               <string>Customized notification</string>
-              </property>
-             </item>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="tryNotification">
-             <property name="sizePolicy">
-              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-               <horstretch>0</horstretch>
-               <verstretch>0</verstretch>
-              </sizepolicy>
-             </property>
-             <property name="text">
-              <string>Try</string>
-             </property>
-            </widget>
-           </item>
-          </layout>
+           <property name="maximumSize">
+            <size>
+             <width>16777215</width>
+             <height>1</height>
+            </size>
+           </property>
+           <property name="styleSheet">
+            <string notr="true">background-color: rgba(63, 129, 216, 48);</string>
+           </property>
+           <property name="frameShadow">
+            <enum>QFrame::Raised</enum>
+           </property>
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+          </widget>
          </item>
         </layout>
        </widget>
@@ -455,7 +513,7 @@ background:transparent;
            <item row="1" column="2">
             <widget class="QPushButton" name="deleteCache">
              <property name="text">
-              <string>Clear</string>
+              <string>  Clear</string>
              </property>
              <property name="icon">
               <iconset resource="icons.qrc">
@@ -548,7 +606,7 @@ background:transparent;
            <item row="2" column="2">
             <widget class="QPushButton" name="deletePersistentData">
              <property name="text">
-              <string>Clear</string>
+              <string>  Clear</string>
              </property>
              <property name="icon">
               <iconset resource="icons.qrc">
@@ -576,6 +634,26 @@ background:transparent;
       </size>
      </property>
     </spacer>
+   </item>
+   <item>
+    <widget class="QWidget" name="bottomLine" native="true">
+     <property name="minimumSize">
+      <size>
+       <width>6</width>
+       <height>0</height>
+      </size>
+     </property>
+     <property name="maximumSize">
+      <size>
+       <width>16777215</width>
+       <height>6</height>
+      </size>
+     </property>
+     <property name="styleSheet">
+      <string notr="true">background-color: rgb(74, 223, 131);</string>
+     </property>
+     <layout class="QVBoxLayout" name="verticalLayout_4"/>
+    </widget>
    </item>
   </layout>
  </widget>

@@ -168,8 +168,10 @@ void SettingsWidget::applyThemeQuirks()
     //little quirks
     if(QString::compare(ui->themeComboBox->currentText(),"dark",Qt::CaseInsensitive)==0)
     {
+        ui->bottomLine->setStyleSheet("background-color: rgb(5, 97, 98);");
         ui->label_7->setStyleSheet("color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
     }else{
+        ui->bottomLine->setStyleSheet("background-color: rgb(74, 223, 131);");
         ui->label_7->setStyleSheet("color:#1e1f21;padding: 0px 8px 0px 8px;background:transparent;");
     }
 }
