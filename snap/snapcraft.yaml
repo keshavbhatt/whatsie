@@ -36,14 +36,14 @@ apps:
         - wayland
         - hardware-observe #might help geoclue & qtpositioning
         - network-observe  #might help geoclue & qtpositioning
+        - network-bind  #might help geoclue & qtpositioning
         #- upower-observe
         #- avahi-observe
         #- u2f-devices
         #- hostname-control
         #- mount-observe
         #- network-control
-        #- network-observe
-        #- network-bind
+
 plugs:
   gsettings:
   gtk-3-themes:
