@@ -35,7 +35,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->automaticThemeCheckBox->blockSignals(false);
 
     themeSwitchTimer = new QTimer(this);
-    themeSwitchTimer->setInterval(5000);
+    themeSwitchTimer->setInterval(60000); // 1 min
     connect(themeSwitchTimer,&QTimer::timeout,[=](){
         themeSwitchTimerTimeout();
     });
