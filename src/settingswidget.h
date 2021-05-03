@@ -82,10 +82,15 @@ private slots:
 
     void on_tryNotification_clicked();
 
+    void on_automaticThemeCheckBox_toggled(bool checked);
+
+    void updateAutomaticTheme();
+    void themeSwitchTimerTimeout();
 private:
     Ui::SettingsWidget *ui;
     QString engineCachePath,enginePersistentStoragePath;
     QSettings settings;
+    QTimer *themeSwitchTimer;
 };
 
 #endif // SETTINGSWIDGET_H

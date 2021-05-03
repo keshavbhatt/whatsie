@@ -1,8 +1,12 @@
 #include "settingswidget.h"
 #include "ui_settingswidget.h"
 
+#include <QDateTime>
 #include <QMessageBox>
 #include "mainwindow.h"
+
+#include "automatictheme.h"
+
 
 extern QString defaultUserAgentStr;
 
@@ -25,12 +29,56 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->notificationTimeOutspinBox->setValue(settings.value("notificationTimeOut",9000).toInt()/1000);
     ui->notificationCombo->setCurrentIndex(settings.value("notificationCombo",1).toInt());
 
+    ui->automaticThemeCheckBox->blockSignals(true);
+    bool automaticThemeSwitching = settings.value("automaticTheme",false).toBool();
+    ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
+    ui->automaticThemeCheckBox->blockSignals(false);
+
+    themeSwitchTimer = new QTimer(this);
+    themeSwitchTimer->setInterval(5000);
+    connect(themeSwitchTimer,&QTimer::timeout,[=](){
+        themeSwitchTimerTimeout();
+    });
+
+    //instantly call the timeout slot if automatic theme switching enabled
+    if(automaticThemeSwitching)
+        themeSwitchTimerTimeout();
+    //start regular timer to update theme
+    updateAutomaticTheme();
+
     this->setCurrentPasswordText("Current Password: <i>"
             +QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8())+"</i>");
 
     applyThemeQuirks();
 
     ui->setUserAgent->setEnabled(false);
+}
+
+void SettingsWidget::themeSwitchTimerTimeout()
+{
+    if(settings.value("automaticTheme",false).toBool()){
+        QDateTime sunrise; sunrise.setSecsSinceEpoch(settings.value("sunrise").toLongLong());
+        QDateTime sunset;  sunset.setSecsSinceEpoch(settings.value("sunset").toLongLong());
+        QTime currentTime = QDateTime::currentDateTime().time();
+        bool isEve = currentTime >= sunset.time();
+        qDebug()<<"is eve:"<<isEve<<currentTime<<sunset.time();
+
+        if( isEve ){
+            ui->themeComboBox->setCurrentText("Dark");
+        }else{
+            ui->themeComboBox->setCurrentText("Light");
+        }
+    }
+}
+
+void SettingsWidget::updateAutomaticTheme()
+{
+    bool automaticThemeSwitching = settings.value("automaticTheme",false).toBool();
+    if(automaticThemeSwitching && !themeSwitchTimer->isActive()){
+        themeSwitchTimer->start();
+    }else if(!automaticThemeSwitching){
+        themeSwitchTimer->stop();
+    }
 }
 
 SettingsWidget::~SettingsWidget()
@@ -45,11 +93,23 @@ void SettingsWidget::loadDictionaries(QStringList dictionaries)
        foreach(QString dictionary_name, dictionaries) {
            ui_dictionary_names.append(dictionary_name);
        }
+
+       ui_dictionary_names.removeDuplicates();
        ui_dictionary_names.sort();
+
        //add to ui
        ui->dictComboBox->blockSignals(true);
-       foreach(QString dict_name, ui_dictionary_names) {
-           ui->dictComboBox->addItem(dict_name);
+       foreach(const QString dict_name, ui_dictionary_names)
+       {
+           QString short_name = QString(dict_name).split("_").last();
+           short_name = (short_name.isEmpty() || short_name.contains("-")) ? QString(dict_name).split("-").last() : short_name;
+           short_name = short_name.isEmpty() ? "XX" : short_name;
+           short_name = short_name.length() > 2  ? short_name.left(2) : short_name;
+           QIcon icon(QString(":/icons/flags/%1.png").arg(short_name.toLower()));
+           if(icon.isNull() == false)
+            ui->dictComboBox->addItem(icon,dict_name);
+           else
+            ui->dictComboBox->addItem(QIcon(":/icons/flags/xx.png"),dict_name);
        }
        ui->dictComboBox->blockSignals(false);
 
@@ -318,4 +378,25 @@ void SettingsWidget::on_notificationCombo_currentIndexChanged(int index)
 void SettingsWidget::on_tryNotification_clicked()
 {
     emit notify("Test Notification");
+}
+
+void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked)
+{
+    if(checked)
+    {
+        AutomaticTheme *automaticTheme = new AutomaticTheme(this);
+        automaticTheme->setWindowTitle(QApplication::applicationName()+" | Automatic theme switcher setup");
+        automaticTheme->setWindowFlag(Qt::Dialog);
+        automaticTheme->setAttribute(Qt::WA_DeleteOnClose,true);
+        connect(automaticTheme,&AutomaticTheme::destroyed,[=](){
+           // ui->automaticThemeCheckBox->blockSignals(true);
+            ui->automaticThemeCheckBox->setChecked(settings.value("automaticTheme",false).toBool());
+            updateAutomaticTheme();
+           // ui->automaticThemeCheckBox->blockSignals(false);
+        });
+        automaticTheme->show();
+    }else{
+       settings.setValue("automaticTheme",false);
+       updateAutomaticTheme();
+    }
 }

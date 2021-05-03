@@ -393,6 +393,22 @@ background:transparent;
             </widget>
            </item>
            <item>
+            <widget class="QCheckBox" name="automaticThemeCheckBox">
+             <property name="sizePolicy">
+              <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+               <horstretch>0</horstretch>
+               <verstretch>0</verstretch>
+              </sizepolicy>
+             </property>
+             <property name="toolTip">
+              <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Based on your system timezone and location.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+             </property>
+             <property name="text">
+              <string>Automatic</string>
+             </property>
+            </widget>
+           </item>
+           <item>
             <widget class="QComboBox" name="themeComboBox">
              <item>
               <property name="text">
