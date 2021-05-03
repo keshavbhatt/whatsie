@@ -34,6 +34,8 @@ apps:
         - x11
         - network
         - wayland
+        - hardware-observe #might help geoclue & qtpositioning
+        - network-observe  #might help geoclue & qtpositioning
         #- upower-observe
         #- avahi-observe
         #- u2f-devices
