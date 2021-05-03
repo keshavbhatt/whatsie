@@ -148,6 +148,7 @@ void MainWindow::init_settingWidget()
         connect(settingsWidget,SIGNAL(init_lock()),this,SLOT(init_lock()));
         connect(settingsWidget,SIGNAL(updateWindowTheme()),this,SLOT(updateWindowTheme()));
         connect(settingsWidget,SIGNAL(updatePageTheme()),this,SLOT(updatePageTheme()));
+
         connect(settingsWidget,&SettingsWidget::muteToggled,[=](const bool checked)
         {
             this->toggleMute(checked);
@@ -414,6 +415,7 @@ void MainWindow::createTrayIcon()
             this, &MainWindow::messageClicked);
     connect(trayIcon, &QSystemTrayIcon::activated,
             this, &MainWindow::iconActivated);
+
 
     //enable show shortcuts in menu
     if(qApp->styleHints()->showShortcutsInContextMenus())
