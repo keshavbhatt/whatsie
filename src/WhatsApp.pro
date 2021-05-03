@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT += core gui webengine webenginewidgets webchannel xml
+QT += core gui webengine webenginewidgets webchannel xml positioning
 
 CONFIG += c++11
 
@@ -47,7 +47,9 @@ VERSION = 1.0
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 SOURCES += \
+        SunClock.cpp \
         about.cpp \
+        automatictheme.cpp \
         dictionaries.cpp \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
@@ -67,7 +69,9 @@ RESOURCES += \
         icons.qrc
 
 HEADERS += \
+    SunClock.hpp \
     about.h \
+    automatictheme.h \
     common.h \
     dictionaries.h \
     downloadmanagerwidget.h \
@@ -88,6 +92,7 @@ HEADERS += \
 
 FORMS += \
     about.ui \
+    automatictheme.ui \
     certificateerrordialog.ui \
     downloadmanagerwidget.ui \
     downloadwidget.ui \
