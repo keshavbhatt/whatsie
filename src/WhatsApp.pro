@@ -1,6 +1,6 @@
 #-------------------------------------------------
 #
-# Project created by QtCreator 2020-03-26T13:53:21
+# Project created by QtCreator Wed Apr  7 02:25:15 IST 2021
 #
 #-------------------------------------------------
 
@@ -58,6 +58,7 @@ SOURCES += \
         main.cpp \
         mainwindow.cpp \
         permissiondialog.cpp \
+        rateapp.cpp \
         rungaurd.cpp \
         settingswidget.cpp \
         utils.cpp \
@@ -81,6 +82,7 @@ HEADERS += \
     mainwindow.h \
     notificationpopup.h \
     permissiondialog.h \
+    rateapp.h \
     requestinterceptor.h \
     rungaurd.h \
     settingswidget.h \
@@ -99,6 +101,7 @@ FORMS += \
     lock.ui \
     passworddialog.ui \
     permissiondialog.ui \
+    rateapp.ui \
     settingswidget.ui
 
 DISTFILES += \
