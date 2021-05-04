@@ -29,7 +29,6 @@ MainWindow::MainWindow(QWidget *parent)
     restoreState(settings.value("windowState").toByteArray());
 
     createActions();
-    createStatusBar();
     createTrayIcon();
     createWebEngine();
 
@@ -55,6 +54,22 @@ MainWindow::MainWindow(QWidget *parent)
     m_downloadManagerWidget.setAttribute(Qt::WA_QuitOnClose, false);
 
     updateWindowTheme();
+
+    RateApp *rateApp = new RateApp(this, "snap://whatsie", 3, 5, 1000 * 30);
+    rateApp->setWindowTitle(QApplication::applicationName()+" | "+tr("Rate Application"));
+    rateApp->setVisible(false);
+    rateApp->setWindowFlags(Qt::Dialog);
+    rateApp->setAttribute(Qt::WA_DeleteOnClose,true);
+    QPoint centerPos = this->geometry().center()-rateApp->geometry().center();
+    connect(rateApp,&RateApp::showRateDialog,[=]()
+    {
+        if(this->windowState() != Qt::WindowMinimized && this->isVisible() && isActiveWindow()){
+            rateApp->move(centerPos);
+            rateApp->show();
+        }else{
+            rateApp->delayShowEvent();
+        }
+    });
 }
 
 void MainWindow::updatePageTheme()
@@ -324,7 +339,7 @@ void MainWindow::notify(QString title,QString message)
     else{
         auto popup = new NotificationPopup(webEngine);
         connect(popup,&NotificationPopup::notification_clicked,[=](){
-            if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+            if(windowState() == Qt::WindowMinimized || windowState() != Qt::WindowActive){
                 activateWindow();
                 raise();
                 showNormal();
@@ -380,14 +395,6 @@ void MainWindow::createActions()
     connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
     addAction(quitAction);
     this->addAction(quitAction);
-}
-
-void MainWindow::createStatusBar()
-{
-    QStatusBar *statusBar = new QStatusBar(this);
-    setStatusBar(statusBar);
-    statusBar->hide();
-    this->statusBar = statusBar;
 }
 
 void MainWindow::createTrayIcon()
@@ -543,8 +550,8 @@ void MainWindow::createWebEngine()
 
     createWebPage(false);
 
-    QWebEngineCookieStore *browser_cookie_store = this->webEngine->page()->profile()->cookieStore();
-    connect( browser_cookie_store, &QWebEngineCookieStore::cookieAdded, this, &MainWindow::handleCookieAdded );
+//    QWebEngineCookieStore *browser_cookie_store = this->webEngine->page()->profile()->cookieStore();
+//    connect( browser_cookie_store, &QWebEngineCookieStore::cookieAdded, this, &MainWindow::handleCookieAdded );
 
 }
 
@@ -617,7 +624,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile* profile)
             trayIcon->showMessage(notification->title(),notification->message(),icon,settings.value("notificationTimeOut",9000).toInt());
             trayIcon->disconnect(trayIcon,SIGNAL(messageClicked()));
             connect(trayIcon,&QSystemTrayIcon::messageClicked,[=](){
-                if(windowState()==Qt::WindowMinimized || windowState()!=Qt::WindowActive){
+                if(windowState() == Qt::WindowMinimized || windowState() != Qt::WindowActive){
                     activateWindow();
                     raise();
                     showNormal();
@@ -673,14 +680,8 @@ void MainWindow::handleWebViewTitleChanged(QString title)
     }
 }
 
-void MainWindow::handleLoadStarted()
-{
-    statusBar->show();
-}
-
 void MainWindow::handleLoadFinished(bool loaded)
 {
-    statusBar->hide();
     if(loaded){
         //check if page has loaded correctly
         checkLoadedCorrectly();
@@ -698,6 +699,7 @@ void MainWindow::checkLoadedCorrectly()
             if(result.toString().contains("page-version",Qt::CaseInsensitive))
             {
                 qWarning()<<"Test 1 found"<<result.toString();
+                webEngine->page()->runJavaScript("document.getElementsByTagName('body')[0].innerText = ''");
                 loadingQuirk("test1");
             }else if(webEngine->title().contains("Error",Qt::CaseInsensitive))
             {
@@ -749,16 +751,6 @@ void MainWindow::loadingQuirk(QString test)
         util->DisplayExceptionErrorDialog(test+" checkLoadedCorrectly()/loadingQuirk() reload retries 0, Resetting UA, Quiting!\nUA: "+settings.value("useragent","DefaultUA").toString());
 
         quitAction->trigger();
-    }
-}
-
-
-void MainWindow::handleLoadProgress(int progress)
-{
-    statusBar->showMessage("Loading "+QString::number(progress)+"%");
-    if (progress >= 50)
-    {
-        statusBar->hide();
     }
 }
 

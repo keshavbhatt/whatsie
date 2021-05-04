@@ -35,6 +35,7 @@
 #include "about.h"
 #include "dictionaries.h"
 #include "webview.h"
+#include "rateapp.h"
 
 
 class MainWindow : public QMainWindow
@@ -47,8 +48,6 @@ public slots:
     void updatePageTheme();
 
     void handleWebViewTitleChanged(QString title);
-    void handleLoadStarted();
-    void handleLoadProgress(int progress);
     void handleLoadFinished(bool loaded);
     void handleDownloadRequested(QWebEngineDownloadItem *download);
 
@@ -58,7 +57,6 @@ protected slots:
 private:
     QPalette lightPalette;
     void createActions();
-    void createStatusBar();
     void createTrayIcon();
     void createWebEngine();
 
@@ -81,7 +79,7 @@ private:
     QSystemTrayIcon *trayIcon;
 
     QWebEngineView *webEngine;
-    QStatusBar *statusBar;
+    //QStatusBar *statusBar;
 
 
     SettingsWidget * settingsWidget = nullptr;
