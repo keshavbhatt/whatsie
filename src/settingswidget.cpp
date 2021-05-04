@@ -54,22 +54,37 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->setUserAgent->setEnabled(false);
 }
 
+inline bool inRange(unsigned low, unsigned high, unsigned x)
+{
+    return  ((x-low) <= (high-low));
+}
+
 void SettingsWidget::themeSwitchTimerTimeout()
 {
-    if(settings.value("automaticTheme",false).toBool()){
+    if(settings.value("automaticTheme",false).toBool())
+    {
+        //start time
         QDateTime sunrise; sunrise.setSecsSinceEpoch(settings.value("sunrise").toLongLong());
+        //end time
         QDateTime sunset;  sunset.setSecsSinceEpoch(settings.value("sunset").toLongLong());
-        QTime currentTime = QDateTime::currentDateTime().time();
-        bool isEve = currentTime >= sunset.time();
-        qDebug()<<"is eve:"<<isEve<<currentTime<<sunset.time();
+        QDateTime currentTime = QDateTime::currentDateTime();
 
-        if( isEve ){
+        int sunsetSeconds  = QTime(0,0).secsTo(sunset.time());
+        int sunriseSeconds = QTime(0,0).secsTo(sunrise.time());
+        int currentSeconds = QTime(0,0).secsTo(currentTime.time());
+
+        if(inRange(sunsetSeconds,sunriseSeconds,currentSeconds))
+        {
+            qDebug()<<"is night: ";
             ui->themeComboBox->setCurrentText("Dark");
         }else{
+            qDebug()<<"is morn: ";
             ui->themeComboBox->setCurrentText("Light");
         }
     }
 }
+
+
 
 void SettingsWidget::updateAutomaticTheme()
 {
@@ -389,10 +404,8 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked)
         automaticTheme->setWindowFlag(Qt::Dialog);
         automaticTheme->setAttribute(Qt::WA_DeleteOnClose,true);
         connect(automaticTheme,&AutomaticTheme::destroyed,[=](){
-           // ui->automaticThemeCheckBox->blockSignals(true);
             ui->automaticThemeCheckBox->setChecked(settings.value("automaticTheme",false).toBool());
             updateAutomaticTheme();
-           // ui->automaticThemeCheckBox->blockSignals(false);
         });
         automaticTheme->show();
     }else{
