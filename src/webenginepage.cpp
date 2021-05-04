@@ -123,7 +123,7 @@ void WebEnginePage::handleLoadFinished(bool ok)
 
 void WebEnginePage::fullScreenRequestedByPage(QWebEngineFullScreenRequest request)
 {
-    qDebug()<<"Fullscreen";
+    //qDebug()<<"Fullscreen";
     request.accept();
 }
 
@@ -138,8 +138,13 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode, c
         }
 
         QFileDialog* dialog = new QFileDialog();
+        dialog->setAttribute(Qt::WA_DeleteOnClose,true);
         dialog->setFileMode(dialogMode);
-        dialog->setOption(QFileDialog::DontUseNativeDialog,settings.value("useNativeFileDialog",true).toBool());
+        if(settings.value("useNativeFileDialog",true).toBool() == false){
+            dialog->setOption(QFileDialog::DontUseNativeDialog,true);
+        }else{
+            dialog->setOption(QFileDialog::DontUseNativeDialog,false);
+        }
 
         QStringList mimeFilters = acceptedMimeTypes;
         mimeFilters.append("application/octet-stream"); // to show All files(*)

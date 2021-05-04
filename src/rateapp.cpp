@@ -88,7 +88,6 @@ RateApp::~RateApp()
     delete ui;
 }
 
-
 void RateApp::on_rateNowBtn_clicked()
 {
     QDesktopServices::openUrl(QUrl(app_rating_url));

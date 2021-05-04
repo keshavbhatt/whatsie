@@ -86,6 +86,8 @@ private slots:
 
     void updateAutomaticTheme();
     void themeSwitchTimerTimeout();
+    void on_useNativeFileDialog_toggled(bool checked);
+
 private:
     Ui::SettingsWidget *ui;
     QString engineCachePath,enginePersistentStoragePath;

@@ -55,7 +55,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     updateWindowTheme();
 
-    RateApp *rateApp = new RateApp(this, "snap://whatsie", 3, 5, 1000 * 30);
+    RateApp *rateApp = new RateApp(this, "snap://whatsie", 5, 5, 1000 * 30);
     rateApp->setWindowTitle(QApplication::applicationName()+" | "+tr("Rate Application"));
     rateApp->setVisible(false);
     rateApp->setWindowFlags(Qt::Dialog);

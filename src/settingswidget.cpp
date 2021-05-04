@@ -28,6 +28,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
     ui->notificationTimeOutspinBox->setValue(settings.value("notificationTimeOut",9000).toInt()/1000);
     ui->notificationCombo->setCurrentIndex(settings.value("notificationCombo",1).toInt());
+    ui->useNativeFileDialog->setChecked(settings.value("useNativeFileDialog",true).toBool());
 
     ui->automaticThemeCheckBox->blockSignals(true);
     bool automaticThemeSwitching = settings.value("automaticTheme",false).toBool();
@@ -412,4 +413,9 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked)
        settings.setValue("automaticTheme",false);
        updateAutomaticTheme();
     }
+}
+
+void SettingsWidget::on_useNativeFileDialog_toggled(bool checked)
+{
+    settings.setValue("useNativeFileDialog",checked);
 }
