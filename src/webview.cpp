@@ -19,10 +19,6 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
 
     connect(this, &WebView::titleChanged,
             mainWindow, &MainWindow::handleWebViewTitleChanged);
-    connect(this, &WebView::loadStarted,
-            mainWindow, &MainWindow::handleLoadStarted);
-    connect(this, &WebView::loadProgress,
-            mainWindow, &MainWindow::handleLoadProgress);
     connect(this, &WebView::loadFinished,
             mainWindow, &MainWindow::handleLoadFinished);
     connect(this, &WebView::renderProcessTerminated,
@@ -48,6 +44,7 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
             QTimer::singleShot(0, [this] { this->reload(); });
     });
 }
+
 
 void WebView::contextMenuEvent(QContextMenuEvent *event)
 {
