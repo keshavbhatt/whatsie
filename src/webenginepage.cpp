@@ -138,17 +138,18 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode, c
         }
 
         QFileDialog* dialog = new QFileDialog();
-
         dialog->setFileMode(dialogMode);
-        dialog->setOption(QFileDialog::DontUseNativeDialog,true);
+        dialog->setOption(QFileDialog::DontUseNativeDialog,settings.value("useNativeFileDialog",true).toBool());
 
         QStringList mimeFilters = acceptedMimeTypes;
+        mimeFilters.append("application/octet-stream"); // to show All files(*)
 
         if(acceptedMimeTypes.contains("image/*")){
             foreach(QByteArray mime,QImageReader::supportedImageFormats()){
                     mimeFilters.append("image/"+mime);
             }
         }
+        mimeFilters.sort(Qt::CaseSensitive);
 
         dialog->setMimeTypeFilters(mimeFilters);
 
