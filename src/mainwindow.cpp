@@ -757,8 +757,12 @@ void MainWindow::loadingQuirk(QString test)
 //unused direct method to download file without having entry in download manager
 void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download)
 {
-    QFileDialog dialog;
-    dialog.setParent(this);
+    QFileDialog dialog(this);
+    if(settings.value("useNativeFileDialog",true).toBool() == false){
+        dialog.setOption(QFileDialog::DontUseNativeDialog,true);
+    }else{
+        dialog.setOption(QFileDialog::DontUseNativeDialog,false);
+    }
     dialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
     dialog.setFileMode(QFileDialog::FileMode::AnyFile);
     QString suggestedFileName = QUrl(download->path()).fileName();
