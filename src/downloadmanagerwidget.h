@@ -54,6 +54,7 @@
 #include "ui_downloadmanagerwidget.h"
 
 #include <QWidget>
+#include <QSettings>
 
 QT_BEGIN_NAMESPACE
 class QWebEngineDownloadItem;
@@ -78,6 +79,7 @@ private:
     void remove(DownloadWidget *downloadWidget);
 
     int m_numDownloads;
+    QSettings settings;
 };
 
 #endif // DOWNLOADMANAGERWIDGET_H
