@@ -405,7 +405,10 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked)
         automaticTheme->setWindowFlag(Qt::Dialog);
         automaticTheme->setAttribute(Qt::WA_DeleteOnClose,true);
         connect(automaticTheme,&AutomaticTheme::destroyed,[=](){
-            ui->automaticThemeCheckBox->setChecked(settings.value("automaticTheme",false).toBool());
+            bool automaticThemeSwitching = settings.value("automaticTheme",false).toBool();
+            ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
+            if(automaticThemeSwitching)
+                themeSwitchTimerTimeout();
             updateAutomaticTheme();
         });
         automaticTheme->show();
