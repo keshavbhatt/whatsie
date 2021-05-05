@@ -758,7 +758,7 @@ void MainWindow::loadingQuirk(QString test)
 void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download)
 {
     QFileDialog dialog(this);
-    if(settings.value("useNativeFileDialog",true).toBool() == false){
+    if(settings.value("useNativeFileDialog",false).toBool() == false){
         dialog.setOption(QFileDialog::DontUseNativeDialog,true);
     }else{
         dialog.setOption(QFileDialog::DontUseNativeDialog,false);
