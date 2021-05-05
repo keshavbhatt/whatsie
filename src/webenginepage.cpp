@@ -138,7 +138,6 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode, c
         }
 
         QFileDialog* dialog = new QFileDialog();
-        dialog->setAttribute(Qt::WA_DeleteOnClose,true);
         dialog->setFileMode(dialogMode);
         if(settings.value("useNativeFileDialog",true).toBool() == false){
             dialog->setOption(QFileDialog::DontUseNativeDialog,true);
@@ -155,7 +154,6 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode, c
             }
         }
         mimeFilters.sort(Qt::CaseSensitive);
-
         dialog->setMimeTypeFilters(mimeFilters);
 
         QStringList selectedFiles;
