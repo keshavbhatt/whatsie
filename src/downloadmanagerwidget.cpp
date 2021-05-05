@@ -16,8 +16,9 @@ void DownloadManagerWidget::downloadRequested(QWebEngineDownloadItem *download)
 {
     //Q_ASSERT(download && download->state() == QWebEngineDownloadItem::DownloadRequested);
     QString path;
-    if(settings.value("useNativeFileDialog",false).toBool() == false)
-    {
+
+    bool usenativeFileDialog = settings.value("useNativeFileDialog",false).toBool();
+    if(usenativeFileDialog == false){
         path = QFileDialog::getSaveFileName(this, tr("Save as"), download->path(),tr("Any file (*)"),nullptr,QFileDialog::DontUseNativeDialog);
     }else{
         path = QFileDialog::getSaveFileName(this, tr("Save as"), download->path(),tr("Any file (*)"),nullptr);

@@ -138,12 +138,13 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode, c
         }
 
         QFileDialog* dialog = new QFileDialog();
-        dialog->setFileMode(dialogMode);
-        if(settings.value("useNativeFileDialog",false).toBool() == false){
+        bool usenativeFileDialog = settings.value("useNativeFileDialog",false).toBool();
+
+        if(usenativeFileDialog == false){
             dialog->setOption(QFileDialog::DontUseNativeDialog,true);
-        }else{
-            dialog->setOption(QFileDialog::DontUseNativeDialog,false);
         }
+
+        dialog->setFileMode(dialogMode);
 
         QStringList mimeFilters;
         mimeFilters.append("application/octet-stream"); // to show All files(*)

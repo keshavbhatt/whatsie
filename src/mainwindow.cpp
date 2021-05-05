@@ -758,11 +758,12 @@ void MainWindow::loadingQuirk(QString test)
 void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download)
 {
     QFileDialog dialog(this);
-    if(settings.value("useNativeFileDialog",false).toBool() == false){
+    bool usenativeFileDialog = settings.value("useNativeFileDialog",false).toBool();
+
+    if(usenativeFileDialog == false){
         dialog.setOption(QFileDialog::DontUseNativeDialog,true);
-    }else{
-        dialog.setOption(QFileDialog::DontUseNativeDialog,false);
     }
+
     dialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
     dialog.setFileMode(QFileDialog::FileMode::AnyFile);
     QString suggestedFileName = QUrl(download->path()).fileName();
