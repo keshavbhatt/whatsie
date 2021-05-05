@@ -22,7 +22,7 @@ About::About(QWidget *parent) :
     donateLink          = "https://paypal.me/keshavnrj/5";
     moreAppsLink        = "https://snapcraft.io/search?q=keshavnrj";
 
-    appSourceCodeLink   = "https://github.com/whatsie";
+    appSourceCodeLink   = "https://github.com/keshavbhatt/whatsie";
     appRateLink         = "snap://whatsie";
 
 
