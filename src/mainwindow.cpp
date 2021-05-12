@@ -203,6 +203,12 @@ void MainWindow::init_settingWidget()
             }
         });
 
+        connect(settingsWidget,&SettingsWidget::zoomChanged,[=]()
+        {
+            double currentFactor = settings.value("zoomFactor",1.0).toDouble();
+            webEngine->page()->setZoomFactor(currentFactor);
+        });
+
         connect(settingsWidget,&SettingsWidget::notificationPopupTimeOutChanged,[=](){
            setNotificationPresenter(this->webEngine->page()->profile());
         });
@@ -593,6 +599,9 @@ void MainWindow::createWebPage(bool offTheRecord)
 
     connect(webEngine->page(), SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)),
                 this, SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
+
+    double currentFactor = settings.value("zoomFactor",1.0).toDouble();
+    webEngine->page()->setZoomFactor(currentFactor);
 }
 
 void MainWindow::setNotificationPresenter(QWebEngineProfile* profile)

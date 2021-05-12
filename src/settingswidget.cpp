@@ -19,6 +19,10 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath, QString
     this->engineCachePath             = engineCachePath;
     this->enginePersistentStoragePath = enginePersistentStoragePath;
 
+    ui->zoomFactorSpinBox->setRange(0.25,5.0);
+    ui->zoomFactorSpinBox->setValue(settings.value("zoomFactor",1.0).toDouble());
+    //emit zoomChanged();
+
     ui->closeButtonActionComboBox->setCurrentIndex(settings.value("closeButtonActionCombo",0).toInt());
     ui->notificationCheckBox->setChecked(settings.value("disableNotificationPopups",false).toBool());
     ui->muteAudioCheckBox->setChecked(settings.value("muteAudio",false).toBool());
@@ -421,4 +425,33 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked)
 void SettingsWidget::on_useNativeFileDialog_toggled(bool checked)
 {
     settings.setValue("useNativeFileDialog",checked);
+}
+
+void SettingsWidget::on_zoomPlus_clicked()
+{
+    double currentFactor = settings.value("zoomFactor",1.0).toDouble();
+    double newFactor = currentFactor + 0.25;
+    ui->zoomFactorSpinBox->setValue(newFactor);
+
+    settings.setValue("zoomFactor",ui->zoomFactorSpinBox->value());
+    emit zoomChanged();
+}
+
+void SettingsWidget::on_zoomMinus_clicked()
+{
+    double currentFactor = settings.value("zoomFactor",1.0).toDouble();
+    double newFactor = currentFactor - 0.25;
+    ui->zoomFactorSpinBox->setValue(newFactor);
+
+    settings.setValue("zoomFactor",ui->zoomFactorSpinBox->value());
+    emit zoomChanged();
+}
+
+void SettingsWidget::on_zoomReset_clicked()
+{
+    double newFactor = 1.0;
+    ui->zoomFactorSpinBox->setValue(newFactor);
+
+    settings.setValue("zoomFactor",ui->zoomFactorSpinBox->value());
+    emit zoomChanged();
 }

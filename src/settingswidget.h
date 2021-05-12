@@ -28,6 +28,7 @@ signals:
     void spellCheckChanged(bool checked);
     void notificationPopupTimeOutChanged();
     void notify(QString message);
+    void zoomChanged();
 
 public:
     explicit SettingsWidget(QWidget *parent = nullptr,QString engineCachePath = "",
@@ -87,6 +88,11 @@ private slots:
     void updateAutomaticTheme();
     void themeSwitchTimerTimeout();
     void on_useNativeFileDialog_toggled(bool checked);
+
+    void on_zoomPlus_clicked();
+    void on_zoomMinus_clicked();
+
+    void on_zoomReset_clicked();
 
 private:
     Ui::SettingsWidget *ui;
