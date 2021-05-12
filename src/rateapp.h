@@ -26,8 +26,7 @@ public:
 
 public slots:
     void delayShowEvent();
-protected slots:
-    void closeEvent(QCloseEvent *event);
+
 private slots:
     void on_rateNowBtn_clicked();
 
@@ -36,6 +35,7 @@ private slots:
     void on_laterBtn_clicked();
 
     bool shouldShow();
+    void reset();
 private:
     Ui::RateApp *ui;
     QString app_rating_url;

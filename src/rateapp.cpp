@@ -73,6 +73,9 @@ bool RateApp::shouldShow()
     qint64 installed_date_time  = settings.value("app_install_time").toLongLong();
     bool ratedAlready           = settings.value("rated_already",false).toBool();
 
+    if(ratedAlready) //return false if already reated;
+        return false;
+
     shouldShow = (((currentDateTime - installed_date_time > app_install_days * 86400) ||
                    app_launched_count >= this->app_launch_count)
             && ratedAlready == false);
@@ -91,8 +94,7 @@ RateApp::~RateApp()
 void RateApp::on_rateNowBtn_clicked()
 {
     QDesktopServices::openUrl(QUrl(app_rating_url));
-    settings.setValue("app_launched_count",0);
-    settings.setValue("app_install_time",QDateTime::currentSecsSinceEpoch());
+    this->reset();
     this->close();
 }
 
@@ -104,16 +106,13 @@ void RateApp::on_alreadyDoneBtn_clicked()
 
 void RateApp::on_laterBtn_clicked()
 {
-    settings.setValue("rated_already",false);
-    settings.setValue("app_launched_count",0);
-    settings.setValue("app_install_time",QDateTime::currentSecsSinceEpoch());
+    this->reset();
     this->close();
 }
 
-void RateApp::closeEvent(QCloseEvent *event)
+void RateApp::reset()
 {
     settings.setValue("rated_already",false);
     settings.setValue("app_launched_count",0);
     settings.setValue("app_install_time",QDateTime::currentSecsSinceEpoch());
-    QWidget::closeEvent(event);
 }
