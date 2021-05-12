@@ -401,5 +401,7 @@
         <file>icons/flags/za.png</file>
         <file>icons/flags/zm.png</file>
         <file>icons/flags/zw.png</file>
+        <file>icons/minus.png</file>
+        <file>icons/plus.png</file>
     </qresource>
 </RCC>
