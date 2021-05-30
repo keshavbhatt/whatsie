@@ -314,6 +314,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
+    settings.setValue("windowTheme",getPageTheme());
 
     if(QSystemTrayIcon::isSystemTrayAvailable() && settings.value("closeButtonActionCombo",0).toInt() == 0){
         this->hide();
