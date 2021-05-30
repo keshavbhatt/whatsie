@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-    setMinimumWidth(800);
+    setMinimumWidth(500);
     setMinimumHeight(600);
 
     restoreGeometry(settings.value("geometry").toByteArray());
@@ -71,6 +71,12 @@ MainWindow::MainWindow(QWidget *parent)
             rateApp->delayShowEvent();
         }
     });
+}
+
+void MainWindow::loadAppWithArgument(const QString arg)
+{
+    qWarning()<<"Opening"<<arg;
+    this->webEngine->page()->load(QUrl(arg));
 }
 
 void MainWindow::updatePageTheme()
@@ -315,11 +321,10 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
-
-//    getPageTheme();
-//    QTimer::singleShot(500,[=](){
-//        qWarning()<<"THEME"<<settings.value("windowTheme").toString();
-//    });
+    getPageTheme();
+    QTimer::singleShot(500,[=](){
+        settingsWidget->refresh();
+    });
 
     if(QSystemTrayIcon::isSystemTrayAvailable() && settings.value("closeButtonActionCombo",0).toInt() == 0){
         this->hide();
@@ -423,7 +428,7 @@ void MainWindow::createActions()
 void MainWindow::quitApp()
 {
     getPageTheme();
-    QTimer::singleShot(800,[=](){
+    QTimer::singleShot(500,[=](){
         qWarning()<<"THEME"<<settings.value("windowTheme").toString();
         qApp->quit();
     });
@@ -439,6 +444,7 @@ void MainWindow::createTrayIcon()
     trayIconMenu->addAction(reloadAction);
     trayIconMenu->addAction(lockAction);
     trayIconMenu->addSeparator();
+    trayIconMenu->addAction(openUrlAction);
     trayIconMenu->addAction(settingsAction);
     trayIconMenu->addAction(aboutAction);
     trayIconMenu->addSeparator();
@@ -843,20 +849,20 @@ void MainWindow::newChat()
 {
     bool ok;
     QString text = QInputDialog::getText(this, tr("New Chat"),
-                                             tr("Enter a valid WhatsApp number you want to chat with."), QLineEdit::Normal,
+                                             tr("Enter a valid WhatsApp number with country code (ex- +91XXXXXXXXXX)"), QLineEdit::Normal,
                                          "",&ok);
-    if (ok && isPhoneNumber(text)){
-        qWarning()<<"Opening new Chat with"<<text;
-        this->webEngine->page()->load(QUrl("https://web.whatsapp.com/send?phone="+text));
-    }else{
-        QMessageBox::information(this,QApplication::applicationName()+"| Error",
+    if (ok){
+        if(isPhoneNumber(text))
+            this->webEngine->page()->load(QUrl("https://web.whatsapp.com/send?phone="+text));
+        else
+            QMessageBox::information(this,QApplication::applicationName()+"| Error",
                                       "Invalid Phone Number");
     }
 }
 
 bool MainWindow::isPhoneNumber(const QString phoneNumber)
 {
-    const QString phone = "^((\\+?(\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?(\\d{3,15})(\\-(\\d{3,15}))?$";
+    const QString phone = "^\\+(((\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?(\\d{3,15})(\\-(\\d{3,15}))?$";
     QRegularExpression reg(phone);
     return reg.match(phoneNumber).hasMatch();
 }

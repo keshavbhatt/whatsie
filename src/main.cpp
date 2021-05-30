@@ -16,7 +16,6 @@ int main(int argc, char *argv[])
 {
     QApplication app(argc, argv);
     app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-    //argv[argc++] = "--single-process";
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
@@ -48,6 +47,15 @@ int main(int argc, char *argv[])
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
 
     MainWindow window;
+
+    QStringList argsList = app.arguments();
+    qWarning()<<"Launching with argument"<<argsList;
+    foreach (QString argStr, argsList) {
+        if(argStr.contains("http")){
+            qWarning()<<"Link passed as argument";
+            window.loadAppWithArgument(argsList.last());
+        }
+    }
     window.show();
 
     return app.exec();

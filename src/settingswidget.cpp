@@ -147,6 +147,8 @@ void SettingsWidget::loadDictionaries(QStringList dictionaries)
 
 void SettingsWidget::refresh()
 {
+    ui->themeComboBox->setCurrentText(utils::toCamelCase(settings.value("windowTheme","light").toString()));
+
     ui->cacheSize->setText(utils::refreshCacheSize(cachePath()));
     ui->cookieSize->setText(utils::refreshCacheSize(persistentStoragePath()));
 
@@ -164,6 +166,7 @@ void SettingsWidget::refresh()
 
     //enable disable spell check
     ui->enableSpellCheck->setChecked(settings.value("sc_enabled",true).toBool());
+
 
 }
 

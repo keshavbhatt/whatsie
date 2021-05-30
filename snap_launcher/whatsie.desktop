@@ -2,12 +2,13 @@
 Version=1.0
 GenericName=WhatSie
 Name[en_US]=WhatSie
-Comment=Qt WhatsApp Client 
+Comment=Qt WhatsApp Web Client 
 Name=WhatSie
 Type=Application
 Icon=${SNAP}/meta/gui/icon.png
 Keywords=WhatSie;WhatsApp
-Exec=whatsie %F
-Categories=Network;Qt;
+Exec=whatsie %u
+Categories=Chat;Network;InstantMessaging;Qt;
+MimeType=x-scheme-handler/web.whatsapp.com;x-scheme-handler/http;x-scheme-handler/https;
 Terminal=false
-StartupNotify=false
+X-GNOME-UsesNotifications=true

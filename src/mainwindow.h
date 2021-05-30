@@ -50,6 +50,8 @@ public slots:
     void handleWebViewTitleChanged(QString title);
     void handleLoadFinished(bool loaded);
     void handleDownloadRequested(QWebEngineDownloadItem *download);
+    void loadAppWithArgument(const QString arg);
+
 
 protected slots:
     void closeEvent(QCloseEvent *event) override;
