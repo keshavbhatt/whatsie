@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 
+#include <QInputDialog>
 #include <QRegularExpression>
 #include <QStyleHints>
 #include <QWebEngineNotification>
@@ -314,7 +315,11 @@ void MainWindow::closeEvent(QCloseEvent *event)
 {
     settings.setValue("geometry", saveGeometry());
     settings.setValue("windowState", saveState());
-    settings.setValue("windowTheme",getPageTheme());
+
+//    getPageTheme();
+//    QTimer::singleShot(500,[=](){
+//        qWarning()<<"THEME"<<settings.value("windowTheme").toString();
+//    });
 
     if(QSystemTrayIcon::isSystemTrayAvailable() && settings.value("closeButtonActionCombo",0).toInt() == 0){
         this->hide();
@@ -366,6 +371,12 @@ void MainWindow::notify(QString title,QString message)
 
 void MainWindow::createActions()
 {
+
+    openUrlAction = new QAction("New Chat",this);
+    this->addAction(openUrlAction);
+    openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL+Qt::Key_N));
+    connect(openUrlAction,&QAction::triggered,this,&MainWindow::newChat);
+
     fullscreenAction = new QAction(tr("Fullscreen"),this);
     fullscreenAction->setShortcut(Qt::Key_F11);
     connect(fullscreenAction, &QAction::triggered,[=](){
@@ -404,9 +415,18 @@ void MainWindow::createActions()
 
     quitAction = new QAction(tr("&Quit"), this);
     quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
-    connect(quitAction, &QAction::triggered, qApp, &QCoreApplication::quit);
+    connect(quitAction, &QAction::triggered,this,&MainWindow::quitApp);
     addAction(quitAction);
     this->addAction(quitAction);
+}
+
+void MainWindow::quitApp()
+{
+    getPageTheme();
+    QTimer::singleShot(800,[=](){
+        qWarning()<<"THEME"<<settings.value("windowTheme").toString();
+        qApp->quit();
+    });
 }
 
 void MainWindow::createTrayIcon()
@@ -819,6 +839,28 @@ void MainWindow::doAppReload()
     createWebPage(false);
 }
 
+void MainWindow::newChat()
+{
+    bool ok;
+    QString text = QInputDialog::getText(this, tr("New Chat"),
+                                             tr("Enter a valid WhatsApp number you want to chat with."), QLineEdit::Normal,
+                                         "",&ok);
+    if (ok && isPhoneNumber(text)){
+        qWarning()<<"Opening new Chat with"<<text;
+        this->webEngine->page()->load(QUrl("https://web.whatsapp.com/send?phone="+text));
+    }else{
+        QMessageBox::information(this,QApplication::applicationName()+"| Error",
+                                      "Invalid Phone Number");
+    }
+}
+
+bool MainWindow::isPhoneNumber(const QString phoneNumber)
+{
+    const QString phone = "^((\\+?(\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?(\\d{3,15})(\\-(\\d{3,15}))?$";
+    QRegularExpression reg(phone);
+    return reg.match(phoneNumber).hasMatch();
+}
+
 void MainWindow::doReload()
 {
     this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache, false);
@@ -837,8 +879,10 @@ QString MainWindow::getPageTheme()
     {
         webEngine->page()->runJavaScript(
             "document.querySelector('body').className;",
-            [](const QVariant &result){
+            [this](const QVariant &result){
                 theme = result.toString();
+                theme.contains("dark") ? theme = "dark" : theme = "light";
+                settings.setValue("windowTheme",theme);
             }
         );
     }

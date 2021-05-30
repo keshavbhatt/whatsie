@@ -74,6 +74,7 @@ private:
     QAction *quitAction;
     QAction *lockAction;
     QAction *fullscreenAction;
+    QAction *openUrlAction;
 
     QMenu *trayIconMenu;
     QSystemTrayIcon *trayIcon;
@@ -123,6 +124,9 @@ private slots:
     void checkLoadedCorrectly();
     void loadingQuirk(QString test);
     void setNotificationPresenter(QWebEngineProfile *profile);
+    void newChat();
+    bool isPhoneNumber(const QString phoneNumber);
+    void quitApp();
 };
 
 #endif // MAINWINDOW_H
