@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QRegularExpression>
 #include <QStyleHints>
+#include <QUrlQuery>
 #include <QWebEngineNotification>
 
 extern QString defaultUserAgentStr;
@@ -75,8 +76,37 @@ MainWindow::MainWindow(QWidget *parent)
 
 void MainWindow::loadAppWithArgument(const QString arg)
 {
-    qWarning()<<"Opening"<<arg;
-    this->webEngine->page()->load(QUrl(arg));
+    //https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
+
+    //The WhatsApp Messenger application
+    if(arg.contains("://app")){
+        qWarning()<<"WhatsApp Messenger application";
+        this->show(); //restore app
+        return;
+    }
+    //PASSED SCHEME whatsapp://send?text=Hello%2C%20World!&phone=919568388397"
+    //CONVERTED URI https://web.whatsapp.com/send?phone=919568388397&text=Hello%2C%20World
+    //New chat composer
+    if(arg.contains("send?") || arg.contains("send/?"))
+    {
+        QString newArg =  arg;
+        qWarning()<<"New chat composer";
+        newArg = newArg.replace("?","&");
+        QUrlQuery query(newArg);
+        qWarning()<<query.hasQueryItem("phone");
+        QString phone, phoneStr, text, textStr, urlStr;
+        //create send url equivalent
+        phone   = query.queryItemValue("phone");
+        text    = query.queryItemValue("text");
+
+        phoneStr = phone.isEmpty() ? "" : "phone="+phone;
+        textStr  = text.isEmpty() ? "" : "text="+text;
+
+        urlStr  = "https://web.whatsapp.com/send?"+phoneStr+"&"+textStr;
+        qWarning()<<"Loading"<<urlStr;
+        this->webEngine->page()->load(QUrl(urlStr));
+        return;
+    }
 }
 
 void MainWindow::updatePageTheme()

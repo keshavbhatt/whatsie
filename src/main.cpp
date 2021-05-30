@@ -51,9 +51,9 @@ int main(int argc, char *argv[])
     QStringList argsList = app.arguments();
     qWarning()<<"Launching with argument"<<argsList;
     foreach (QString argStr, argsList) {
-        if(argStr.contains("http")){
-            qWarning()<<"Link passed as argument";
-            window.loadAppWithArgument(argsList.last());
+        if(argStr.contains("whatsapp://")){
+            qWarning()<<"Link passed as argument"<<argStr;
+            window.loadAppWithArgument(argStr);
         }
     }
     window.show();
