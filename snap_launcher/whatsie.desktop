@@ -9,6 +9,6 @@ Icon=${SNAP}/meta/gui/icon.png
 Keywords=WhatSie;WhatsApp
 Exec=whatsie %u
 Categories=Chat;Network;InstantMessaging;Qt;
-MimeType=x-scheme-handler/web.whatsapp.com;x-scheme-handler/http;x-scheme-handler/https;
+MimeType=x-scheme-handler/whatsapp;
 Terminal=false
 X-GNOME-UsesNotifications=true
