@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget *parent)
     });
 }
 
-void MainWindow::loadAppWithArgument(const QString arg)
+void MainWindow::loadAppWithArgument(const QString &arg)
 {
     //https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
 
@@ -367,7 +367,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-void MainWindow::notify(QString title,QString message)
+void MainWindow::notify(QString title, QString message)
 {
 
     if(settings.value("disableNotificationPopups",false).toBool() == true){
@@ -890,7 +890,7 @@ void MainWindow::newChat()
     }
 }
 
-bool MainWindow::isPhoneNumber(const QString phoneNumber)
+bool MainWindow::isPhoneNumber(const QString &phoneNumber)
 {
     const QString phone = "^\\+(((\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?(\\d{3,15})(\\-(\\d{3,15}))?$";
     QRegularExpression reg(phone);
@@ -902,7 +902,7 @@ void MainWindow::doReload()
     this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache, false);
 }
 
-void MainWindow::toggleMute(const bool checked)
+void MainWindow::toggleMute(const bool &checked)
 {
     this->webEngine->page()->setAudioMuted(checked);
 }

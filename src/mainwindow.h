@@ -50,7 +50,7 @@ public slots:
     void handleWebViewTitleChanged(QString title);
     void handleLoadFinished(bool loaded);
     void handleDownloadRequested(QWebEngineDownloadItem *download);
-    void loadAppWithArgument(const QString arg);
+    void loadAppWithArgument(const QString &arg);
 
 
 protected slots:
@@ -109,7 +109,7 @@ private slots:
     void handleCookieAdded(const QNetworkCookie &cookie);
 
     QString getPageTheme();
-    void toggleMute(const bool checked);
+    void toggleMute(const bool &checked);
     void doAppReload();
     void askToReloadPage();
     void updateSettingsUserAgentWidget();
@@ -127,7 +127,7 @@ private slots:
     void loadingQuirk(QString test);
     void setNotificationPresenter(QWebEngineProfile *profile);
     void newChat();
-    bool isPhoneNumber(const QString phoneNumber);
+    bool isPhoneNumber(const QString &phoneNumber);
     void quitApp();
 };
 
