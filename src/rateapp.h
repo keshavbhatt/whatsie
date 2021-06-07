@@ -36,6 +36,10 @@ private slots:
 
     bool shouldShow();
     void reset();
+    void on_rateOnGithub_clicked();
+
+    void on_donate_clicked();
+
 private:
     Ui::RateApp *ui;
     QString app_rating_url;

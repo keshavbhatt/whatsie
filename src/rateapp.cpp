@@ -116,3 +116,17 @@ void RateApp::reset()
     settings.setValue("app_launched_count",0);
     settings.setValue("app_install_time",QDateTime::currentSecsSinceEpoch());
 }
+
+void RateApp::on_rateOnGithub_clicked()
+{
+    QDesktopServices::openUrl(QUrl("https://github.com/keshavbhatt/whatsie"));
+    this->reset();
+    this->close();
+}
+
+void RateApp::on_donate_clicked()
+{
+    QDesktopServices::openUrl(QUrl("https://paypal.me/keshavnrj/5.00"));
+    this->reset();
+    this->close();
+}
