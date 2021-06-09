@@ -17,6 +17,7 @@ apps:
     command: desktop-launch whatsie
     environment:
        DISABLE_WAYLAND: 1
+       XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
     desktop: usr/share/applications/whatsie.desktop
     plugs:
         - browser-support
