@@ -14,7 +14,7 @@ DownloadManagerWidget::DownloadManagerWidget(QWidget *parent)
 
 void DownloadManagerWidget::downloadRequested(QWebEngineDownloadItem *download)
 {
-    //Q_ASSERT(download && download->state() == QWebEngineDownloadItem::DownloadRequested);
+    Q_ASSERT(download && download->state() == QWebEngineDownloadItem::DownloadRequested);
     QString path;
 
     bool usenativeFileDialog = settings.value("useNativeFileDialog",false).toBool();
@@ -30,7 +30,6 @@ void DownloadManagerWidget::downloadRequested(QWebEngineDownloadItem *download)
     download->setPath(path);
     download->accept();
     add(new DownloadWidget(download));
-
     show();
 }
 
