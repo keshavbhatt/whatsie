@@ -24,7 +24,7 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-    setMinimumWidth(500);
+    setMinimumWidth(800);
     setMinimumHeight(600);
 
     restoreGeometry(settings.value("geometry").toByteArray());
@@ -359,11 +359,15 @@ void MainWindow::closeEvent(QCloseEvent *event)
     if(QSystemTrayIcon::isSystemTrayAvailable() && settings.value("closeButtonActionCombo",0).toInt() == 0){
         this->hide();
         event->ignore();
-        notify(QApplication::applicationName(),"Application is minimized to system tray.");
+        if(settings.value("firstrun_tray",true).toBool()){
+            notify(QApplication::applicationName(),"Application is minimized to system tray.");
+            settings.setValue("firstrun_tray", false);
+        }
         return;
     }
     event->accept();
     qApp->quit();
+    settings.setValue("firstrun_tray", true);
     QMainWindow::closeEvent(event);
 }
 
@@ -460,6 +464,7 @@ void MainWindow::quitApp()
     getPageTheme();
     QTimer::singleShot(500,[=](){
         qWarning()<<"THEME"<<settings.value("windowTheme").toString();
+        settings.setValue("firstrun_tray", true);
         qApp->quit();
     });
 }
