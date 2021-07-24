@@ -24,8 +24,8 @@ MainWindow::MainWindow(QWidget *parent)
 
     setWindowTitle(QApplication::applicationName());
     setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-    setMinimumWidth(800);
-    setMinimumHeight(500);
+    setMinimumWidth(650);
+    setMinimumHeight(520);
 
     restoreGeometry(settings.value("geometry").toByteArray());
     restoreState(settings.value("windowState").toByteArray());
