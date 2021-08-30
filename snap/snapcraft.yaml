@@ -1,5 +1,5 @@
 name: whatsie
-version: git
+version: '2.0'
 summary: Qt Based WhatsApp Client
 description: |
   Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies. 
@@ -7,6 +7,8 @@ grade: stable
 confinement: strict
 icon: snap/gui/icon.png
 base: core18
+
+compression: lzo
 
 architectures:
   - build-on: amd64
