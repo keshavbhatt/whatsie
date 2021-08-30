@@ -100,3 +100,8 @@ void About::on_debugInfoButton_clicked()
     }
 
 }
+
+void About::on_donate_2_clicked()
+{
+    QDesktopServices::openUrl(QUrl("https://opencollective.com/whatsie"));
+}

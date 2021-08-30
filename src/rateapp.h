@@ -40,6 +40,8 @@ private slots:
 
     void on_donate_clicked();
 
+    void on_donate_2_clicked();
+
 private:
     Ui::RateApp *ui;
     QString app_rating_url;

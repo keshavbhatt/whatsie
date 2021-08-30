@@ -168,7 +168,14 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QPushButton" name="donate">
              <property name="text">
-              <string>Donate</string>
+              <string>Donate Paypal</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="donate_2">
+             <property name="text">
+              <string>Donate OpenCollective</string>
              </property>
             </widget>
            </item>
@@ -176,13 +183,6 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="rate">
              <property name="text">
               <string>Rate in Store</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="source_code">
-             <property name="text">
-              <string>Source Code</string>
              </property>
             </widget>
            </item>
@@ -194,6 +194,13 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="more_apps">
              <property name="text">
               <string>More Application by Developer</string>
+             </property>
+            </widget>
+           </item>
+           <item>
+            <widget class="QPushButton" name="source_code">
+             <property name="text">
+              <string>Source Code</string>
              </property>
             </widget>
            </item>

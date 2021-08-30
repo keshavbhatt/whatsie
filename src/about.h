@@ -18,6 +18,8 @@ public:
 private slots:
     void on_debugInfoButton_clicked();
 
+    void on_donate_2_clicked();
+
 private:
     Ui::About *ui;
 

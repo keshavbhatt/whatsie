@@ -130,3 +130,10 @@ void RateApp::on_donate_clicked()
     this->reset();
     this->close();
 }
+
+void RateApp::on_donate_2_clicked()
+{
+    QDesktopServices::openUrl(QUrl("https://opencollective.com/whatsie"));
+    this->reset();
+    this->close();
+}
