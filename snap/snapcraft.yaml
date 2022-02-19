@@ -100,17 +100,24 @@ parts:
             make -j4
 
             /opt/qt515/bin/qmake -install qinstall -exe whatsie ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
-            
-            cp -r ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/bin/
 
             strip ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
+            
+            cp -rf ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/bin/
+            
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/whatsie.desktop
+            
+            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
+            
+            cp -rf ${SNAPCRAFT_PART_SRC}/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
 
-   snap-launcher:
-     plugin: dump
-     source: snap_launcher/
+   desktop-launch:
+     plugin: nil
+     source: https://github.com/keshavbhatt/qt515-core20.git
      after: [build-src]
      override-build: |
             snapcraftctl build
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/whatsie.desktop
-            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
-            cp -rf ${SNAPCRAFT_PART_SRC}/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
+            
+            mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin/
+            
+            cp -rf ${SNAPCRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${SNAPCRAFT_PART_INSTALL}/bin/
