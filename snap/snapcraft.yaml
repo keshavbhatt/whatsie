@@ -50,8 +50,6 @@ apps:
         - hardware-observe #might help geoclue & qtpositioning
         - network-observe  #might help geoclue & qtpositioning
         - network-bind  #might help geoclue & qtpositioning
-    slots:
-        - whatsie-mpris
 
 plugs:
   gsettings:
@@ -71,11 +69,6 @@ plugs:
     interface: content
     target: $SNAP/qt515-core20
     default-provider: qt515-core20
-    
-slots:
-  whatsie-mpris:
-    interface: mpris
-    name: whatsie
 
 parts:
    build-src:
