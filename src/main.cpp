@@ -14,9 +14,6 @@
 
 int main(int argc, char *argv[])
 {
-    QApplication app(argc, argv);
-    app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
     if (!qEnvironmentVariableIsSet(ENV_VAR_QT_DEVICE_PIXEL_RATIO)
@@ -25,6 +22,9 @@ int main(int argc, char *argv[])
             && !qEnvironmentVariableIsSet("QT_SCREEN_SCALE_FACTORS")) {
         QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     }
+    
+    QApplication app(argc, argv);
+    app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
 
     QApplication::setApplicationName("WhatSie");
     QApplication::setOrganizationName("org.keshavnrj.ubuntu");
@@ -41,6 +41,11 @@ int main(int argc, char *argv[])
         }
     #endif
 
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS","--single-process");
+#ifdef QT_DEBUG
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS","--remote-debugging-port=9421");
+#endif
+    qputenv("QTWEBENGINE_CHROMIUM_FLAGS","--disable-logging");
 
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::PluginsEnabled, true);
     QWebEngineSettings::defaultSettings()->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
