@@ -106,8 +106,13 @@ parts:
    snap-launcher:
      plugin: dump
      source: snap_launcher/
+     after: [build-src]
      override-build: |
             snapcraftctl build
+            
+            #install dictionary files
+            cp -r ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/bin/
+            
             sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/whatsie.desktop
             mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
             cp -rf ${SNAPCRAFT_PART_SRC}/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
