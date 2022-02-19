@@ -29,6 +29,7 @@ apps:
     command: bin/desktop-launch $SNAP/usr/bin/whatsie
     environment:
        XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
+       IS_SNAP: 1
     desktop: usr/share/applications/whatsie.desktop
     plugs:
         - browser-support
@@ -49,6 +50,7 @@ apps:
         - hardware-observe #might help geoclue & qtpositioning
         - network-observe  #might help geoclue & qtpositioning
         - network-bind  #might help geoclue & qtpositioning
+        - mpris
 
 plugs:
   gsettings:
