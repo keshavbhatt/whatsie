@@ -105,11 +105,11 @@ parts:
             
             cp -rf ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/bin/
             
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/whatsie.desktop
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/src/whatsie.desktop
             
             mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
             
-            cp -rf ${SNAPCRAFT_PART_SRC}/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
+            cp -rf ${SNAPCRAFT_PART_SRC}/src/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
 
    desktop-launch:
      plugin: nil
