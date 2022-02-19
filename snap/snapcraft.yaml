@@ -50,7 +50,7 @@ apps:
         - hardware-observe #might help geoclue & qtpositioning
         - network-observe  #might help geoclue & qtpositioning
         - network-bind  #might help geoclue & qtpositioning
-     slots:
+    slots:
         - whatsie-mpris
 
 plugs:
