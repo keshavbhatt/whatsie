@@ -2,7 +2,8 @@ name: whatsie
 version: '2.0'
 summary: Qt Based WhatsApp Client
 description: |
-  Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies. 
+  Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies.
+
 grade: stable
 confinement: strict
 icon: snap/gui/icon.png
@@ -28,8 +29,9 @@ apps:
   whatsie:
     command: bin/desktop-launch $SNAP/usr/bin/whatsie
     environment:
-       XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
        IS_SNAP: 1
+       XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
+       LANG: en_US.UTF-8 #issue 7,21
     desktop: usr/share/applications/whatsie.desktop
     plugs:
         - browser-support
