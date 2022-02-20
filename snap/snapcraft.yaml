@@ -31,7 +31,8 @@ apps:
     environment:
        IS_SNAP: 1
        XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
-       LANG: en_US.UTF-8 #issue 7,21
+       LANG: en_US.UTF-8 # issue 7,21
+       QT_QPA_PLATFORMTHEME: gtk3
     desktop: usr/share/applications/whatsie.desktop
     plugs:
         - browser-support
