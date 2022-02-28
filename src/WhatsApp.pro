@@ -43,7 +43,7 @@ CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
 
 
 # Set program version
-VERSION = 2.0
+VERSION = 3.0
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 SOURCES += \

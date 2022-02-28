@@ -387,7 +387,7 @@ void SettingsWidget::on_notificationCombo_currentIndexChanged(int index) {
 }
 
 void SettingsWidget::on_tryNotification_clicked() {
-  emit notify("Test Notification");
+  emit notify("This is a test notification...");
 }
 
 void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked) {

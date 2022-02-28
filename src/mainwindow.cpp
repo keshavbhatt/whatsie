@@ -707,7 +707,7 @@ void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
 }
 
 void MainWindow::handleWebViewTitleChanged(QString title) {
-  setWindowTitle(title);
+  setWindowTitle( QApplication::applicationName() +": "+ title);
 
   if (notificationsTitleRegExp.exactMatch(title)) {
     if (notificationsTitleRegExp.isEmpty() == false) {
