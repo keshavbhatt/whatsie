@@ -19,116 +19,109 @@
 #include <QWebEngineCookieStore>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineProfile>
-#include <QWebEngineView>
 #include <QWebEngineSettings>
+#include <QWebEngineView>
 
 #include <QRadioButton>
 #include <QWebEngineContextMenuData>
 
+#include "lock.h"
 #include "notificationpopup.h"
 #include "requestinterceptor.h"
 #include "settingswidget.h"
 #include "webenginepage.h"
-#include "lock.h"
 
-#include "downloadmanagerwidget.h"
 #include "about.h"
 #include "dictionaries.h"
-#include "webview.h"
+#include "downloadmanagerwidget.h"
 #include "rateapp.h"
+#include "webview.h"
 
-
-class MainWindow : public QMainWindow
-{
-    Q_OBJECT
+class MainWindow : public QMainWindow {
+  Q_OBJECT
 public:
-    explicit MainWindow(QWidget *parent = nullptr);
+  explicit MainWindow(QWidget *parent = nullptr);
 public slots:
-    void updateWindowTheme();
-    void updatePageTheme();
+  void updateWindowTheme();
+  void updatePageTheme();
 
-    void handleWebViewTitleChanged(QString title);
-    void handleLoadFinished(bool loaded);
-    void handleDownloadRequested(QWebEngineDownloadItem *download);
-    void loadAppWithArgument(const QString &arg);
-
+  void handleWebViewTitleChanged(QString title);
+  void handleLoadFinished(bool loaded);
+  void handleDownloadRequested(QWebEngineDownloadItem *download);
+  void loadAppWithArgument(const QString &arg);
 
 protected slots:
-    void closeEvent(QCloseEvent *event) override;
-    void resizeEvent(QResizeEvent *event);
+  void closeEvent(QCloseEvent *event) override;
+  void resizeEvent(QResizeEvent *event) override;
+
 private:
-    QPalette lightPalette;
-    void createActions();
-    void createTrayIcon();
-    void createWebEngine();
+  QPalette lightPalette;
+  void createActions();
+  void createTrayIcon();
+  void createWebEngine();
 
-    QSettings settings;
+  QSettings settings;
 
-    QRegExp notificationsTitleRegExp;
-    QIcon trayIconRead;
-    QIcon trayIconUnread;
+  QRegExp notificationsTitleRegExp;
+  QIcon trayIconRead;
+  QIcon trayIconUnread;
 
-    QAction *reloadAction;
-    QAction *minimizeAction;
-    QAction *restoreAction;
-    QAction *aboutAction;
-    QAction *settingsAction;
-    QAction *quitAction;
-    QAction *lockAction;
-    QAction *fullscreenAction;
-    QAction *openUrlAction;
+  QAction *reloadAction;
+  QAction *minimizeAction;
+  QAction *restoreAction;
+  QAction *aboutAction;
+  QAction *settingsAction;
+  QAction *quitAction;
+  QAction *lockAction;
+  QAction *fullscreenAction;
+  QAction *openUrlAction;
 
-    QMenu *trayIconMenu;
-    QSystemTrayIcon *trayIcon;
+  QMenu *trayIconMenu;
+  QSystemTrayIcon *trayIcon;
 
-    QWebEngineView *webEngine;
-    //QStatusBar *statusBar;
+  QWebEngineView *webEngine;
 
+  SettingsWidget *settingsWidget = nullptr;
 
-    SettingsWidget * settingsWidget = nullptr;
+  DownloadManagerWidget m_downloadManagerWidget;
+  QScopedPointer<QWebEngineProfile> m_otrProfile;
 
-    //void reload();
+  Lock *lockWidget = nullptr;
 
-    DownloadManagerWidget m_downloadManagerWidget;
-    QScopedPointer<QWebEngineProfile> m_otrProfile;
+  int correctlyLoaderRetries = 4;
 
-    Lock *lockWidget = nullptr;
-
-    int correctlyLoaderRetries = 4;
-
-    QStringList m_dictionaries;
+  QStringList m_dictionaries;
 
 private slots:
 
-    void iconActivated(QSystemTrayIcon::ActivationReason reason);
-    void messageClicked();
-    void doReload();
-    void showAbout();
-    void notify(QString title, QString message);
-    void showSettings();
-    void handleCookieAdded(const QNetworkCookie &cookie);
+  void iconActivated(QSystemTrayIcon::ActivationReason reason);
+  void messageClicked();
+  void doReload();
+  void showAbout();
+  void notify(QString title, QString message);
+  void showSettings();
+  void handleCookieAdded(const QNetworkCookie &cookie);
 
-    QString getPageTheme();
-    void toggleMute(const bool &checked);
-    void doAppReload();
-    void askToReloadPage();
-    void updateSettingsUserAgentWidget();
-    void fullScreenRequested(QWebEngineFullScreenRequest request);
+  QString getPageTheme();
+  void toggleMute(const bool &checked);
+  void doAppReload();
+  void askToReloadPage();
+  void updateSettingsUserAgentWidget();
+  void fullScreenRequested(QWebEngineFullScreenRequest request);
 
-    void createWebPage(bool offTheRecord =false);
-    void init_settingWidget();
-    void init_globalWebProfile();
-    void check_window_state();
-    void init_lock();
-    void lockApp();
+  void createWebPage(bool offTheRecord = false);
+  void init_settingWidget();
+  void init_globalWebProfile();
+  void check_window_state();
+  void init_lock();
+  void lockApp();
 
-
-    void checkLoadedCorrectly();
-    void loadingQuirk(QString test);
-    void setNotificationPresenter(QWebEngineProfile *profile);
-    void newChat();
-    bool isPhoneNumber(const QString &phoneNumber);
-    void quitApp();
+  void checkLoadedCorrectly();
+  void loadingQuirk(QString test);
+  void setNotificationPresenter(QWebEngineProfile *profile);
+  void newChat();
+  bool isPhoneNumber(const QString &phoneNumber);
+  void quitApp();
 };
 
 #endif // MAINWINDOW_H

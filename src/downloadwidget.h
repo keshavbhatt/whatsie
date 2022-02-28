@@ -57,6 +57,7 @@
 
 #include <QFrame>
 #include <QTime>
+#include <QElapsedTimer>
 
 QT_BEGIN_NAMESPACE
 class QWebEngineDownloadItem;
@@ -82,7 +83,7 @@ private:
     QString withUnit(qreal bytes);
 
     QWebEngineDownloadItem *m_download;
-    QTime m_timeAdded;
+    QElapsedTimer m_timeAdded;
 };
 
 #endif // DOWNLOADWIDGET_H
