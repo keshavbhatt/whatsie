@@ -21,6 +21,12 @@ int main(int argc, char *argv[]) {
     QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   }
 
+#ifdef QT_DEBUG
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");
+#endif
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
+
+
   QApplication app(argc, argv);
   app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
 
@@ -39,12 +45,6 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 #endif
-
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--single-process");
-#ifdef QT_DEBUG
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");
-#endif
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging");
 
   QWebEngineSettings::defaultSettings()->setAttribute(
       QWebEngineSettings::PluginsEnabled, true);
