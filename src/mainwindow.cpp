@@ -1,11 +1,11 @@
 #include "mainwindow.h"
 
 #include <QInputDialog>
+#include <QRandomGenerator>
 #include <QRegularExpression>
 #include <QStyleHints>
 #include <QUrlQuery>
 #include <QWebEngineNotification>
-#include <QRandomGenerator>
 
 extern QString defaultUserAgentStr;
 
@@ -71,6 +71,11 @@ MainWindow::MainWindow(QWidget *parent)
       rateApp->delayShowEvent();
     }
   });
+}
+
+MainWindow::~MainWindow()
+{
+    webEngine->deleteLater();
 }
 
 void MainWindow::loadAppWithArgument(const QString &arg) {
@@ -166,7 +171,9 @@ void MainWindow::updateWindowTheme() {
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
 
-  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
+  foreach (QWidget *w, widgets) {
+    w->setPalette(qApp->palette());
+  }
 
   setNotificationPresenter(webEngine->page()->profile());
 
@@ -198,7 +205,7 @@ void MainWindow::init_settingWidget() {
     connect(settingsWidget, SIGNAL(updatePageTheme()), this,
             SLOT(updatePageTheme()));
 
-    connect(settingsWidget, &SettingsWidget::muteToggled,settingsWidget,
+    connect(settingsWidget, &SettingsWidget::muteToggled, settingsWidget,
             [=](const bool checked) { this->toggleMute(checked); });
     connect(settingsWidget, &SettingsWidget::userAgentChanged, settingsWidget,
             [=](QString userAgentStr) {
@@ -209,8 +216,8 @@ void MainWindow::init_settingWidget() {
                 this->askToReloadPage();
               }
             });
-    connect(settingsWidget, &SettingsWidget::autoPlayMediaToggled,settingsWidget,
-            [=](bool checked) {
+    connect(settingsWidget, &SettingsWidget::autoPlayMediaToggled,
+            settingsWidget, [=](bool checked) {
               QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
               auto *webSettings = profile->settings();
               webSettings->setAttribute(
@@ -228,24 +235,25 @@ void MainWindow::init_settingWidget() {
               }
             });
 
-    connect(settingsWidget, &SettingsWidget::spellCheckChanged,settingsWidget,
+    connect(settingsWidget, &SettingsWidget::spellCheckChanged, settingsWidget,
             [=](bool checked) {
               if (webEngine && webEngine->page()) {
                 webEngine->page()->profile()->setSpellCheckEnabled(checked);
               }
             });
 
-    connect(settingsWidget, &SettingsWidget::zoomChanged,settingsWidget, [=]() {
-      double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
-      webEngine->page()->setZoomFactor(currentFactor);
-    });
+    connect(
+        settingsWidget, &SettingsWidget::zoomChanged, settingsWidget, [=]() {
+          double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
+          webEngine->page()->setZoomFactor(currentFactor);
+        });
 
-    connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,settingsWidget,
-            [=]() {
+    connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
+            settingsWidget, [=]() {
               setNotificationPresenter(this->webEngine->page()->profile());
             });
 
-    connect(settingsWidget, &SettingsWidget::notify,settingsWidget,
+    connect(settingsWidget, &SettingsWidget::notify, settingsWidget,
             [=](QString message) { notify("", message); });
 
     settingsWidget->appLockSetChecked(
@@ -276,7 +284,8 @@ void MainWindow::lockApp() {
     msgBox.setStandardButtons(QMessageBox::Cancel);
     QPushButton *setAppLock = new QPushButton("Yes", nullptr);
     msgBox.addButton(setAppLock, QMessageBox::NoRole);
-    connect(setAppLock, &QPushButton::clicked,setAppLock, [=]() { init_lock(); });
+    connect(setAppLock, &QPushButton::clicked, setAppLock,
+            [=]() { init_lock(); });
     msgBox.exec();
   }
 }
@@ -329,7 +338,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   settings.setValue("geometry", saveGeometry());
   settings.setValue("windowState", saveState());
   getPageTheme();
-  QTimer::singleShot(500,settingsWidget, [=]() { settingsWidget->refresh(); });
+  QTimer::singleShot(500, settingsWidget, [=]() { settingsWidget->refresh(); });
 
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
       settings.value("closeButtonActionCombo", 0).toInt() == 0) {
@@ -362,7 +371,7 @@ void MainWindow::notify(QString title, QString message) {
     trayIcon->showMessage(title, message, QIcon(":/icons/app/icon-64.png"),
                           settings.value("notificationTimeOut", 9000).toInt());
     trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
-    connect(trayIcon, &QSystemTrayIcon::messageClicked,trayIcon, [=]() {
+    connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
       if (windowState() == Qt::WindowMinimized ||
           windowState() != Qt::WindowActive) {
         activateWindow();
@@ -372,7 +381,7 @@ void MainWindow::notify(QString title, QString message) {
     });
   } else {
     auto popup = new NotificationPopup(webEngine);
-    connect(popup, &NotificationPopup::notification_clicked, popup,[=]() {
+    connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
       if (windowState() == Qt::WindowMinimized ||
           windowState() != Qt::WindowActive) {
         activateWindow();
@@ -396,7 +405,7 @@ void MainWindow::createActions() {
 
   fullscreenAction = new QAction(tr("Fullscreen"), this);
   fullscreenAction->setShortcut(Qt::Key_F11);
-  connect(fullscreenAction, &QAction::triggered,fullscreenAction,
+  connect(fullscreenAction, &QAction::triggered, fullscreenAction,
           [=]() { setWindowState(windowState() ^ Qt::WindowFullScreen); });
   this->addAction(fullscreenAction);
 
@@ -436,7 +445,7 @@ void MainWindow::createActions() {
 
 void MainWindow::quitApp() {
   getPageTheme();
-  QTimer::singleShot(500, &settings,[=]() {
+  QTimer::singleShot(500, &settings, [=]() {
     qWarning() << "THEME" << settings.value("windowTheme").toString();
     settings.setValue("firstrun_tray", true);
     qApp->quit();
@@ -489,7 +498,7 @@ void MainWindow::init_lock() {
   lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   lockWidget->setGeometry(this->rect());
 
-  connect(lockWidget, &Lock::passwordNotSet,settingsWidget, [=]() {
+  connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
     settings.setValue("lockscreen", false);
     settingsWidget->appLockSetChecked(false);
   });
@@ -498,7 +507,7 @@ void MainWindow::init_lock() {
     // unlock event
   });
 
-  connect(lockWidget, &Lock::passwordSet,settingsWidget, [=]() {
+  connect(lockWidget, &Lock::passwordSet, settingsWidget, [=]() {
     // enable disable lock screen
     if (settings.value("asdfg").isValid()) {
       settingsWidget->setCurrentPasswordText(
@@ -596,11 +605,6 @@ void MainWindow::createWebEngine() {
   webEngine->addAction(quitAction);
 
   createWebPage(false);
-
-  //    QWebEngineCookieStore *browser_cookie_store =
-  //    this->webEngine->page()->profile()->cookieStore(); connect(
-  //    browser_cookie_store, &QWebEngineCookieStore::cookieAdded, this,
-  //    &MainWindow::handleCookieAdded );
 }
 
 void MainWindow::createWebPage(bool offTheRecord) {
@@ -656,7 +660,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
   auto popup = new NotificationPopup(webEngine);
   popup->setObjectName("engineNotifier");
-  connect(popup, &NotificationPopup::notification_clicked,popup,[=]() {
+  connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState() == Qt::WindowMinimized ||
         windowState() != Qt::WindowActive) {
       activateWindow();
@@ -678,7 +682,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
               notification->title(), notification->message(), icon,
               settings.value("notificationTimeOut", 9000).toInt());
           trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
-          connect(trayIcon, &QSystemTrayIcon::messageClicked,trayIcon, [=]() {
+          connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
             if (windowState() == Qt::WindowMinimized ||
                 windowState() != Qt::WindowActive) {
               activateWindow();
@@ -707,7 +711,7 @@ void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
 }
 
 void MainWindow::handleWebViewTitleChanged(QString title) {
-  setWindowTitle( QApplication::applicationName() +": "+ title);
+  setWindowTitle(QApplication::applicationName() + ": " + title);
 
   if (notificationsTitleRegExp.exactMatch(title)) {
     if (notificationsTitleRegExp.isEmpty() == false) {
@@ -743,54 +747,30 @@ void MainWindow::checkLoadedCorrectly() {
   if (webEngine && webEngine->page()) {
     // test 1 based on the class name of body of the page
     webEngine->page()->runJavaScript(
-        "document.querySelector('body').className",
-        [this](const QVariant &result) {
-          if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
-            qWarning() << "Test 1 found" << result.toString();
-            webEngine->page()->runJavaScript(
-                "document.getElementsByTagName('body')[0].innerText = ''");
-            loadingQuirk("test1");
-          } else if (webEngine->title().contains("Error",
-                                                 Qt::CaseInsensitive)) {
-            utils::delete_cache(webEngine->page()->profile()->cachePath());
-            utils::delete_cache(
-                webEngine->page()->profile()->persistentStoragePath());
-            settings.setValue("useragent", defaultUserAgentStr);
-            utils *util = new utils(this);
-            util->DisplayExceptionErrorDialog(
-                "test1 handleWebViewTitleChanged(title) title: Error, "
-                "Resetting UA, Quiting!\nUA: " +
-                settings.value("useragent", "DefaultUA").toString());
+    "document.querySelector('body').className",
+    [this](const QVariant &result) {
+      if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
+        qWarning() << "Test 1 found" << result.toString();
+        webEngine->page()->runJavaScript(
+            "document.getElementsByTagName('body')[0].innerText = ''");
+        loadingQuirk("test1");
+      } else if (webEngine->title().contains("Error",
+                                             Qt::CaseInsensitive)) {
+        utils::delete_cache(webEngine->page()->profile()->cachePath());
+        utils::delete_cache(
+            webEngine->page()->profile()->persistentStoragePath());
+        settings.setValue("useragent", defaultUserAgentStr);
+        utils *util = new utils(this);
+        util->DisplayExceptionErrorDialog(
+            "test1 handleWebViewTitleChanged(title) title: Error, "
+            "Resetting UA, Quiting!\nUA: " +
+            settings.value("useragent", "DefaultUA").toString());
 
-            quitAction->trigger();
-          } else {
-            qWarning() << "Test 1 Loaded correctly value:" << result.toString();
-          }
-        });
-
-    //        //test #2 based on the content of landing-title class of page
-    //        webEngine->page()->runJavaScript(
-    //            "document.getElementsByClassName('landing-title')[0].innerText",
-    //            [this](const QVariant &result){
-    //                qWarning()<<"Test #1 Loaded correctly
-    //                value:"<<result.toString();
-    //                if(result.toString().contains("WhatsApp works
-    //                with",Qt::CaseInsensitive)){
-    //                    loadingQuirk("test2");
-    //                }else
-    //                if(webEngine->title().contains("Error",Qt::CaseInsensitive)){
-    //                    utils::delete_cache(webEngine->page()->profile()->cachePath());
-    //                    utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
-    //                    settings.setValue("useragent",defaultUserAgentStr);
-    //                    utils * util = new utils(this);
-    //                    util->DisplayExceptionErrorDialog("handleWebViewTitleChanged(title)
-    //                    title: Error, Resetting UA, Quiting!\nUA:
-    //                    "+settings.value("useragent","DefaultUA").toString());
-
-    //                    quitAction->trigger();
-    //                }
-    //            }
-    //        );
+        quitAction->trigger();
+      } else {
+        qWarning() << "Test 1 Loaded correctly value:" << result.toString();
+      }
+    });
   }
 }
 

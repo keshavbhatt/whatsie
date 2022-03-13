@@ -10,20 +10,19 @@
 #include <QMenu>
 #include <QMessageBox>
 #include <QProgressBar>
+#include <QRadioButton>
 #include <QRegExp>
 #include <QSettings>
 #include <QStatusBar>
 #include <QStyle>
 #include <QStyleFactory>
 #include <QSystemTrayIcon>
+#include <QWebEngineContextMenuData>
 #include <QWebEngineCookieStore>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QWebEngineView>
-
-#include <QRadioButton>
-#include <QWebEngineContextMenuData>
 
 #include "lock.h"
 #include "notificationpopup.h"
@@ -41,6 +40,7 @@ class MainWindow : public QMainWindow {
   Q_OBJECT
 public:
   explicit MainWindow(QWidget *parent = nullptr);
+  ~MainWindow();
 public slots:
   void updateWindowTheme();
   void updatePageTheme();
@@ -61,7 +61,6 @@ private:
   void createWebEngine();
 
   QSettings settings;
-
   QRegExp notificationsTitleRegExp;
   QIcon trayIconRead;
   QIcon trayIconUnread;
@@ -78,18 +77,12 @@ private:
 
   QMenu *trayIconMenu;
   QSystemTrayIcon *trayIcon;
-
   QWebEngineView *webEngine;
-
   SettingsWidget *settingsWidget = nullptr;
-
   DownloadManagerWidget m_downloadManagerWidget;
   QScopedPointer<QWebEngineProfile> m_otrProfile;
-
   Lock *lockWidget = nullptr;
-
   int correctlyLoaderRetries = 4;
-
   QStringList m_dictionaries;
 
 private slots:
