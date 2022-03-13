@@ -12,6 +12,17 @@
 #include "rungaurd.h"
 
 int main(int argc, char *argv[]) {
+
+  QStringList args;
+  for (int i = 0; i < argc; i++)
+    args << QString(argv[i]);
+
+  if (args.contains("-v") || args.contains("--version")) {
+    qInfo() << QString("version: %1, branch: %2, commit: %3, built_at: %4")
+                    .arg(VERSIONSTR, GIT_BRANCH, GIT_HASH, BUILD_TIMESTAMP);
+    return 0;
+  }
+
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
   if (!qEnvironmentVariableIsSet(ENV_VAR_QT_DEVICE_PIXEL_RATIO) &&
@@ -25,7 +36,6 @@ int main(int argc, char *argv[]) {
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");
 #endif
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
-
 
   QApplication app(argc, argv);
   app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));

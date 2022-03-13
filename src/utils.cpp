@@ -3,6 +3,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QProcessEnvironment>
+#include <QRandomGenerator>
 #include <QRegularExpression>
 #include <time.h>
 
@@ -59,7 +60,7 @@ bool utils::delete_cache(const QString cache_dir) {
 
 // returns string with first letter capitalized
 QString utils::toCamelCase(const QString &s) {
-  QStringList parts = s.split(' ', QString::SkipEmptyParts);
+  QStringList parts = s.split(' ', Qt::SkipEmptyParts);
   for (int i = 0; i < parts.size(); ++i)
     parts[i].replace(0, 1, parts[i][0].toUpper());
   return parts.join(" ");
@@ -92,9 +93,9 @@ QString utils::genRand(int length) {
 
   const int randomStringLength = length;
   QString randomString;
-  qsrand(cd.toTime_t());
+  int rand = QRandomGenerator::global()->generate();
   for (int i = 0; i < randomStringLength; ++i) {
-    int index = qrand() % possibleCharacters.length();
+    int index = rand % possibleCharacters.length();
     QChar nextChar = possibleCharacters.at(index);
     randomString.append(nextChar);
   }
@@ -201,6 +202,10 @@ QString utils::appDebugInfo() {
             << "<ul>"
             << "<li><b>" + QObject::tr("Version") + ":</b>             " +
                    QString(VERSIONSTR) + "</li>"
+            << "<li><b>" + QObject::tr("Source Branch") + ":</b>             " +
+                   QString(GIT_BRANCH) + "</li>"
+            << "<li><b>" + QObject::tr("Commit Hash") + ":</b>             " +
+                   QString(GIT_HASH) + "</li>"
             << "<li><b>" + QObject::tr("Build Date") + ":</b>          " +
                    QString::fromLatin1(__DATE__) + "</li>"
             << "<li><b>" + QObject::tr("Build Time") + ":</b>          " +
@@ -236,6 +241,8 @@ void utils::DisplayExceptionErrorDialog(const QString &error_info) {
   QStringList detailed_text;
   detailed_text << "Error info: " + error_info
                 << "\nApp version: " + QString(VERSIONSTR)
+                << "\nSource Branch: " + QString(GIT_BRANCH)
+                << "\nCommit Hash: " + QString(GIT_HASH)
                 << "\nQt Runtime Version: " + QString(qVersion())
                 << "\nQt Compiled Version: " + QString(QT_VERSION_STR)
                 << "\nSystem: " + QSysInfo::prettyProductName()
