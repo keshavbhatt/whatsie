@@ -73,10 +73,9 @@ MainWindow::MainWindow(QWidget *parent)
   });
 }
 
-MainWindow::~MainWindow()
-{
-    webEngine->deleteLater();
-}
+void MainWindow::runMinimized() { this->minimizeAction->trigger(); }
+
+MainWindow::~MainWindow() { webEngine->deleteLater(); }
 
 void MainWindow::loadAppWithArgument(const QString &arg) {
   // https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
@@ -261,9 +260,6 @@ void MainWindow::init_settingWidget() {
 
     // spell checker
     settingsWidget->loadDictionaries(m_dictionaries);
-
-    settingsWidget->resize(settingsWidget->sizeHint().width(),
-                           settingsWidget->minimumSizeHint().height());
   }
 }
 
@@ -307,7 +303,7 @@ void MainWindow::showSettings() {
   if (!settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
     settingsWidget->refresh();
-    settingsWidget->showNormal();
+    settingsWidget->show();
   }
 }
 
@@ -747,30 +743,30 @@ void MainWindow::checkLoadedCorrectly() {
   if (webEngine && webEngine->page()) {
     // test 1 based on the class name of body of the page
     webEngine->page()->runJavaScript(
-    "document.querySelector('body').className",
-    [this](const QVariant &result) {
-      if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
-        qWarning() << "Test 1 found" << result.toString();
-        webEngine->page()->runJavaScript(
-            "document.getElementsByTagName('body')[0].innerText = ''");
-        loadingQuirk("test1");
-      } else if (webEngine->title().contains("Error",
-                                             Qt::CaseInsensitive)) {
-        utils::delete_cache(webEngine->page()->profile()->cachePath());
-        utils::delete_cache(
-            webEngine->page()->profile()->persistentStoragePath());
-        settings.setValue("useragent", defaultUserAgentStr);
-        utils *util = new utils(this);
-        util->DisplayExceptionErrorDialog(
-            "test1 handleWebViewTitleChanged(title) title: Error, "
-            "Resetting UA, Quiting!\nUA: " +
-            settings.value("useragent", "DefaultUA").toString());
+        "document.querySelector('body').className",
+        [this](const QVariant &result) {
+          if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
+            qWarning() << "Test 1 found" << result.toString();
+            webEngine->page()->runJavaScript(
+                "document.getElementsByTagName('body')[0].innerText = ''");
+            loadingQuirk("test1");
+          } else if (webEngine->title().contains("Error",
+                                                 Qt::CaseInsensitive)) {
+            utils::delete_cache(webEngine->page()->profile()->cachePath());
+            utils::delete_cache(
+                webEngine->page()->profile()->persistentStoragePath());
+            settings.setValue("useragent", defaultUserAgentStr);
+            utils *util = new utils(this);
+            util->DisplayExceptionErrorDialog(
+                "test1 handleWebViewTitleChanged(title) title: Error, "
+                "Resetting UA, Quiting!\nUA: " +
+                settings.value("useragent", "DefaultUA").toString());
 
-        quitAction->trigger();
-      } else {
-        qWarning() << "Test 1 Loaded correctly value:" << result.toString();
-      }
-    });
+            quitAction->trigger();
+          } else {
+            qWarning() << "Test 1 Loaded correctly value:" << result.toString();
+          }
+        });
   }
 }
 

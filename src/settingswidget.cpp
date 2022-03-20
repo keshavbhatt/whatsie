@@ -19,7 +19,6 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
 
   ui->zoomFactorSpinBox->setRange(0.25, 5.0);
   ui->zoomFactorSpinBox->setValue(settings.value("zoomFactor", 1.0).toDouble());
-  // emit zoomChanged();
 
   ui->closeButtonActionComboBox->setCurrentIndex(
       settings.value("closeButtonActionCombo", 0).toInt());
@@ -40,6 +39,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
       settings.value("notificationCombo", 1).toInt());
   ui->useNativeFileDialog->setChecked(
       settings.value("useNativeFileDialog", false).toBool());
+  ui->startMinimized->setChecked(
+      settings.value("startMinimized", false).toBool());
 
   ui->automaticThemeCheckBox->blockSignals(true);
   bool automaticThemeSwitching =
@@ -66,6 +67,51 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
   applyThemeQuirks();
 
   ui->setUserAgent->setEnabled(false);
+
+  // event filter to prevent wheel event on certain widgets
+  foreach (QSlider *slider, this->findChildren<QSlider *>()) {
+    slider->installEventFilter(this);
+  }
+  foreach (QComboBox *box, this->findChildren<QComboBox *>()) {
+    box->installEventFilter(this);
+  }
+  foreach (QSpinBox *spinBox, this->findChildren<QSpinBox *>()) {
+    spinBox->installEventFilter(this);
+  }
+
+  ui->scrollArea->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+
+  this->setMinimumHeight(580);
+
+  ui->scrollArea->setMinimumWidth(
+      ui->groupBox_8->sizeHint().width() + ui->scrollArea->sizeHint().width() +
+      ui->scrollAreaWidgetContents->layout()->spacing());
+  if (settings.value("settingsGeo").isValid()) {
+    this->restoreGeometry(settings.value("settingsGeo").toByteArray());
+  }
+}
+
+bool SettingsWidget::eventFilter(QObject *obj, QEvent *event) {
+
+  if (isChildOf(this, obj)) {
+    if (event->type() == QEvent::Wheel) {
+      return true;
+    }
+  }
+  return QWidget::eventFilter(obj, event);
+}
+
+void SettingsWidget::closeEvent(QCloseEvent *event) {
+  settings.setValue("settingsGeo", this->saveGeometry());
+  QWidget::closeEvent(event);
+}
+
+bool SettingsWidget::isChildOf(QObject *Of, QObject *self) {
+  bool ischild = false;
+  if (Of->findChild<QWidget *>(self->objectName())) {
+    ischild = true;
+  }
+  return ischild;
 }
 
 inline bool inRange(unsigned low, unsigned high, unsigned x) {
@@ -440,4 +486,8 @@ void SettingsWidget::on_zoomReset_clicked() {
 
   settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
+}
+
+void SettingsWidget::on_startMinimized_toggled(bool checked) {
+  settings.setValue("startMinimized", checked);
 }

@@ -49,7 +49,7 @@ public slots:
   void handleLoadFinished(bool loaded);
   void handleDownloadRequested(QWebEngineDownloadItem *download);
   void loadAppWithArgument(const QString &arg);
-
+  void runMinimized();
 protected slots:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;

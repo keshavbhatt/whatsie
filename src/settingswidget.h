@@ -41,6 +41,9 @@ public slots:
     void appLockSetChecked(bool checked);
     void setCurrentPasswordText(QString str);
     void loadDictionaries(QStringList dictionaries);
+protected slots:
+    bool eventFilter(QObject *obj, QEvent *event);
+    void closeEvent(QCloseEvent *event);
 private slots:
     QString cachePath();
     QString persistentStoragePath();
@@ -93,6 +96,9 @@ private slots:
     void on_zoomMinus_clicked();
 
     void on_zoomReset_clicked();
+
+    bool isChildOf(QObject *Of, QObject *self);
+    void on_startMinimized_toggled(bool checked);
 
 private:
     Ui::SettingsWidget *ui;

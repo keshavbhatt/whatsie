@@ -68,14 +68,18 @@ int main(int argc, char *argv[]) {
   MainWindow window;
 
   QStringList argsList = app.arguments();
-  qWarning() << "Launching with argument" << argsList;
   foreach (QString argStr, argsList) {
     if (argStr.contains("whatsapp://")) {
-      qWarning() << "Link passed as argument" << argStr;
       window.loadAppWithArgument(argStr);
     }
   }
-  window.show();
+  QSettings settings;
+  if (QSystemTrayIcon::isSystemTrayAvailable() &&
+      settings.value("startMinimized", false).toBool()) {
+      window.runMinimized();
+  }else{
+      window.show();
+  }
 
   return app.exec();
 }
