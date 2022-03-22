@@ -8,7 +8,6 @@ DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
                                QWidget *parent)
     : QFrame(parent), m_download(download) {
   setupUi(this);
-  //m_timeAdded(QTime::currentTime());
   m_dstName->setText(QFileInfo(m_download->downloadDirectory()).fileName());
   m_srcUrl->setText(m_download->url().toDisplayString());
 
