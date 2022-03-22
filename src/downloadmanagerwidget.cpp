@@ -19,18 +19,18 @@ void DownloadManagerWidget::downloadRequested(
   bool usenativeFileDialog =
       settings.value("useNativeFileDialog", false).toBool();
   if (usenativeFileDialog == false) {
-    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadDirectory(),
+    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadFileName(),
                                         tr("Any file (*)"), nullptr,
                                         QFileDialog::DontUseNativeDialog);
   } else {
-    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadDirectory(),
+    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadFileName(),
                                         tr("Any file (*)"), nullptr);
   }
 
   if (path.isEmpty())
     return;
 
-  download->setDownloadDirectory(path);
+  download->setDownloadFileName(path);
   download->accept();
   add(new DownloadWidget(download));
   show();
