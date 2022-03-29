@@ -8,53 +8,90 @@
 #include <QWebEngineNotification>
 
 extern QString defaultUserAgentStr;
+extern double defaultZoomFactorMaximized;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
-      trayIconRead(":/icons/app/whatsapp.svg"),
-      trayIconUnread(":/icons/app/whatsapp-message.svg") {
-  this->setObjectName("MainWindow");
+      trayIconRead(":/icons/app/icon-32.png"),
+      trayIconUnread(":/icons/app/whatsapp-message-32.png") {
 
-  qApp->setQuitOnLastWindowClosed(false);
-
-  lightPalette = qApp->palette();
-  lightPalette.setColor(QPalette::Window,
-                        QColor(240, 240, 240)); // whatsapp light palette
-
+  setObjectName("MainWindow");
   setWindowTitle(QApplication::applicationName());
   setWindowIcon(QIcon(":/icons/app/icon-256.png"));
   setMinimumWidth(750);
   setMinimumHeight(640);
-
   restoreGeometry(settings.value("geometry").toByteArray());
   restoreState(settings.value("windowState").toByteArray());
-
+  initThemes();
   createActions();
   createTrayIcon();
   createWebEngine();
-
-  if (settings.value("lockscreen", false).toBool()) {
-    init_lock();
-  }
-  QTimer *timer = new QTimer(this);
-  timer->setInterval(1000);
-  connect(timer, &QTimer::timeout, lockWidget, [=]() {
-    if (settings.value("asdfg").isValid()) {
-      if (lockWidget && lockWidget->isLocked == false) {
-        timer->stop();
-      }
-    }
-  });
-  timer->start();
-
   init_settingWidget();
-
-  // quit application if the download manager window is the only remaining
-  // window
-  m_downloadManagerWidget.setAttribute(Qt::WA_QuitOnClose, false);
-
+  initRateWidget();
+  tryLock();
   updateWindowTheme();
+}
 
+void MainWindow::initThemes() {
+  // Light
+  lightPalette.setColor(QPalette::Window, QColor(240, 240, 240));
+  lightPalette.setColor(QPalette::WindowText, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::Button, QColor(240, 240, 240));
+  lightPalette.setColor(QPalette::Light, QColor(180, 180, 180));
+  lightPalette.setColor(QPalette::Midlight, QColor(200, 200, 200));
+  lightPalette.setColor(QPalette::Dark, QColor(225, 225, 225));
+  lightPalette.setColor(QPalette::Text, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::BrightText, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::Base, QColor(237, 237, 237));
+  lightPalette.setColor(QPalette::Shadow, QColor(20, 20, 20));
+  lightPalette.setColor(QPalette::Highlight, QColor(76, 163, 224));
+  lightPalette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::Link, QColor(0, 162, 232));
+  lightPalette.setColor(QPalette::AlternateBase, QColor(225, 225, 225));
+  lightPalette.setColor(QPalette::ToolTipBase, QColor(240, 240, 240));
+  lightPalette.setColor(QPalette::ToolTipText, QColor(0, 0, 0));
+  lightPalette.setColor(QPalette::LinkVisited, QColor(222, 222, 222));
+  lightPalette.setColor(QPalette::Disabled, QPalette::WindowText,
+                        QColor(115, 115, 115));
+  lightPalette.setColor(QPalette::Disabled, QPalette::Text,
+                        QColor(115, 115, 115));
+  lightPalette.setColor(QPalette::Disabled, QPalette::ButtonText,
+                        QColor(115, 115, 115));
+  lightPalette.setColor(QPalette::Disabled, QPalette::Highlight,
+                        QColor(190, 190, 190));
+  lightPalette.setColor(QPalette::Disabled, QPalette::HighlightedText,
+                        QColor(115, 115, 115));
+
+  // Dark
+  darkPalette.setColor(QPalette::Window, QColor(17, 27, 33));
+  darkPalette.setColor(QPalette::Text, Qt::white);
+  darkPalette.setColor(QPalette::WindowText, Qt::white);
+  darkPalette.setColor(QPalette::Base, QColor(32, 44, 51));
+  darkPalette.setColor(QPalette::AlternateBase, QColor(95, 108, 115));
+  darkPalette.setColor(QPalette::ToolTipBase, QColor(66, 66, 66));
+  darkPalette.setColor(QPalette::ToolTipText, QColor(192, 192, 192));
+  darkPalette.setColor(QPalette::Dark, QColor(35, 35, 35));
+  darkPalette.setColor(QPalette::Shadow, QColor(20, 20, 20));
+  darkPalette.setColor(QPalette::Button, QColor(17, 27, 33));
+  darkPalette.setColor(QPalette::ButtonText, Qt::white);
+  darkPalette.setColor(QPalette::BrightText, Qt::red);
+  darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
+  darkPalette.setColor(QPalette::Highlight, QColor(38, 140, 196));
+  darkPalette.setColor(QPalette::HighlightedText, Qt::white);
+  darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText,
+                       QColor(127, 127, 127));
+  darkPalette.setColor(QPalette::Disabled, QPalette::Window,
+                       QColor(65, 65, 67));
+  darkPalette.setColor(QPalette::Disabled, QPalette::Highlight,
+                       QColor(80, 80, 80));
+  darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText,
+                       QColor(127, 127, 127));
+  darkPalette.setColor(QPalette::Disabled, QPalette::Text,
+                       QColor(127, 127, 127));
+}
+
+void MainWindow::initRateWidget() {
   RateApp *rateApp = new RateApp(this, "snap://whatsie", 5, 5, 1000 * 30);
   rateApp->setWindowTitle(QApplication::applicationName() + " | " +
                           tr("Rate Application"));
@@ -82,10 +119,10 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
 
   // The WhatsApp Messenger application
   if (arg.contains("://app")) {
-    qWarning() << "WhatsApp Messenger application";
     this->show(); // restore app
     return;
   }
+
   // PASSED SCHEME whatsapp://send?text=Hello%2C%20World!&phone=919568388397"
   // CONVERTED URI
   // https://web.whatsapp.com/send?phone=919568388397&text=Hello%2C%20World New
@@ -100,10 +137,8 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
     // create send url equivalent
     phone = query.queryItemValue("phone");
     text = query.queryItemValue("text");
-
     phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
     textStr = text.isEmpty() ? "" : "text=" + text;
-
     urlStr = "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
     qWarning() << "Loading" << urlStr;
     this->webEngine->page()->load(QUrl(urlStr));
@@ -117,6 +152,7 @@ void MainWindow::updatePageTheme() {
   if (windowTheme == "dark") {
     webPageTheme = "web dark";
   }
+#ifdef QT_DEBUG
   if (webEngine && webEngine->page()) {
     webEngine->page()->runJavaScript(
         "document.querySelector('body').className='" + webPageTheme + "';",
@@ -124,6 +160,7 @@ void MainWindow::updatePageTheme() {
           qDebug() << "Value is: " << result.toString() << Qt::endl;
         });
   }
+#endif
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -133,35 +170,12 @@ void MainWindow::resizeEvent(QResizeEvent *event) {
 }
 
 void MainWindow::updateWindowTheme() {
+  qApp->setStyle(QStyleFactory::create(
+      settings.value("widgetStyle", "Fusion").toString()));
   if (settings.value("windowTheme", "light").toString() == "dark") {
-    qApp->setStyle(QStyleFactory::create("fusion"));
-    QPalette palette;
-    palette.setColor(QPalette::Window, QColor(38, 45, 49));
-    palette.setColor(QPalette::Text, Qt::white);
-    palette.setColor(QPalette::WindowText, Qt::white);
-    palette.setColor(QPalette::Base, QColor(50, 55, 57));
-    palette.setColor(QPalette::AlternateBase, QColor(95, 108, 115));
-    palette.setColor(QPalette::ToolTipBase, QColor(66, 66, 66));
-    palette.setColor(QPalette::Disabled, QPalette::Window, QColor(65, 65, 67));
-    palette.setColor(QPalette::ToolTipText, QColor("silver"));
-    palette.setColor(QPalette::Disabled, QPalette::Text, QColor(127, 127, 127));
-    palette.setColor(QPalette::Dark, QColor(35, 35, 35));
-    palette.setColor(QPalette::Shadow, QColor(20, 20, 20));
-    palette.setColor(QPalette::Button, QColor(38, 45, 49));
-    palette.setColor(QPalette::ButtonText, Qt::white);
-    palette.setColor(QPalette::Disabled, QPalette::ButtonText,
-                     QColor(127, 127, 127));
-    palette.setColor(QPalette::BrightText, Qt::red);
-    palette.setColor(QPalette::Link, QColor(42, 130, 218));
-    palette.setColor(QPalette::Highlight, QColor(38, 140, 196));
-    palette.setColor(QPalette::Disabled, QPalette::Highlight,
-                     QColor(80, 80, 80));
-    palette.setColor(QPalette::HighlightedText, Qt::white);
-    palette.setColor(QPalette::Disabled, QPalette::HighlightedText,
-                     QColor(127, 127, 127));
-    qApp->setPalette(palette);
+    qApp->setPalette(darkPalette);
     this->webEngine->setStyleSheet(
-        "QWebEngineView{background:#131C21;}"); // whatsapp dark color
+        "QWebEngineView{background:rgb(17,  27, 33);}"); // whatsapp dark color
   } else {
     qApp->setPalette(lightPalette);
     this->webEngine->setStyleSheet(
@@ -170,9 +184,7 @@ void MainWindow::updateWindowTheme() {
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
 
-  foreach (QWidget *w, widgets) {
-    w->setPalette(qApp->palette());
-  }
+  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
 
   setNotificationPresenter(webEngine->page()->profile());
 
@@ -199,6 +211,9 @@ void MainWindow::init_settingWidget() {
     settingsWidget->setWindowFlags(Qt::Dialog);
 
     connect(settingsWidget, SIGNAL(init_lock()), this, SLOT(init_lock()));
+    connect(settingsWidget, SIGNAL(change_lock_password()), this,
+            SLOT(change_lock_password()));
+
     connect(settingsWidget, SIGNAL(updateWindowTheme()), this,
             SLOT(updateWindowTheme()));
     connect(settingsWidget, SIGNAL(updatePageTheme()), this,
@@ -243,9 +258,23 @@ void MainWindow::init_settingWidget() {
 
     connect(
         settingsWidget, &SettingsWidget::zoomChanged, settingsWidget, [=]() {
-          double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
-          webEngine->page()->setZoomFactor(currentFactor);
+          if (windowState() == Qt::WindowNoState) {
+            double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
+            webEngine->page()->setZoomFactor(currentFactor);
+          }
         });
+
+    connect(settingsWidget, &SettingsWidget::zoomMaximizedChanged,
+            settingsWidget, [=]() {
+              if (windowState() == Qt::WindowMaximized ||
+                  windowState() == Qt::WindowFullScreen) {
+                double currentFactor = settings
+                                           .value("zoomFactorMaximized",
+                                                  defaultZoomFactorMaximized)
+                                           .toDouble();
+                webEngine->page()->setZoomFactor(currentFactor);
+              }
+            });
 
     connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
             settingsWidget, [=]() {
@@ -260,6 +289,40 @@ void MainWindow::init_settingWidget() {
 
     // spell checker
     settingsWidget->loadDictionaries(m_dictionaries);
+  }
+}
+
+void MainWindow::changeEvent(QEvent *e) {
+  if (e->type() == QEvent::WindowStateChange) {
+    handleZoomOnWindowStateChange(static_cast<QWindowStateChangeEvent *>(e));
+  }
+  QMainWindow::changeEvent(e);
+}
+
+void MainWindow::handleZoomOnWindowStateChange(QWindowStateChangeEvent *ev) {
+  if (settingsWidget != nullptr) {
+    if (ev->oldState().testFlag(Qt::WindowMaximized) &&
+        windowState().testFlag(Qt::WindowNoState)) {
+      emit settingsWidget->zoomChanged();
+    } else if ((!ev->oldState().testFlag(Qt::WindowMaximized) &&
+                windowState().testFlag(Qt::WindowMaximized)) ||
+               (!ev->oldState().testFlag(Qt::WindowMaximized) &&
+                windowState().testFlag(Qt::WindowFullScreen))) {
+      emit settingsWidget->zoomMaximizedChanged();
+    }
+  }
+}
+
+void MainWindow::handleZoom() {
+  if (windowState() == Qt::WindowMaximized ||
+      windowState() == Qt::WindowFullScreen) {
+    double currentFactor =
+        settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+            .toDouble();
+    webEngine->page()->setZoomFactor(currentFactor);
+  } else if (windowState() == Qt::WindowNoState) {
+    double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
+    webEngine->page()->setZoomFactor(currentFactor);
   }
 }
 
@@ -278,7 +341,9 @@ void MainWindow::lockApp() {
             .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
     msgBox.setInformativeText("Do you want to setup App lock now ?");
     msgBox.setStandardButtons(QMessageBox::Cancel);
-    QPushButton *setAppLock = new QPushButton("Yes", nullptr);
+    QPushButton *setAppLock =
+        new QPushButton(this->style()->standardIcon(QStyle::SP_DialogYesButton),
+                        "Yes", nullptr);
     msgBox.addButton(setAppLock, QMessageBox::NoRole);
     connect(setAppLock, &QPushButton::clicked, setAppLock,
             [=]() { init_lock(); });
@@ -484,15 +549,18 @@ void MainWindow::createTrayIcon() {
 }
 
 void MainWindow::init_lock() {
+
   if (lockWidget == nullptr) {
     lockWidget = new Lock(this);
     lockWidget->setObjectName("lockWidget");
   }
+
   lockWidget->setWindowFlags(Qt::Widget);
   lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
                             "QWidget#signup{background-color:palette(window)}");
   lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   lockWidget->setGeometry(this->rect());
+  // lockWidget->disconnect();
 
   connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
     settings.setValue("lockscreen", false);
@@ -504,26 +572,36 @@ void MainWindow::init_lock() {
   });
 
   connect(lockWidget, &Lock::passwordSet, settingsWidget, [=]() {
-    // enable disable lock screen
     if (settings.value("asdfg").isValid()) {
       settingsWidget->setCurrentPasswordText(
-          "Current Password: <i>" +
-          QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()) +
-          "</i>");
+          QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
     } else {
-      settingsWidget->setCurrentPasswordText(
-          "Current Password: <i>Require setup</i>");
+      settingsWidget->setCurrentPasswordText("Require setup");
     }
     settingsWidget->appLockSetChecked(
         settings.value("lockscreen", false).toBool());
   });
+
   lockWidget->applyThemeQuirks();
   lockWidget->show();
   if (settings.value("asdfg").isValid() &&
-      settings.value("lockscreen").toBool() == true) {
+      settings.value("lockscreen").toBool()) {
     lockWidget->lock_app();
+  } else if (settings.value("lockscreen").toBool() &&
+             !settings.value("asdfg").isValid()) {
+    lockWidget->signUp();
+  } else {
+    lockWidget->hide();
   }
   updateWindowTheme();
+}
+
+void MainWindow::change_lock_password() {
+  settings.remove("asdfg");
+  settingsWidget->appLockSetChecked(false);
+  settingsWidget->clearAllData();
+  doReload(true);
+  init_lock();
 }
 
 // check window state and set tray menus
@@ -574,6 +652,10 @@ void MainWindow::init_globalWebProfile() {
                             false);
   webSettings->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled,
                             false);
+  webSettings->setAttribute(QWebEngineSettings::SpatialNavigationEnabled, true);
+  webSettings->setAttribute(QWebEngineSettings::JavascriptCanPaste, true);
+  webSettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard,
+                            true);
   webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
                             settings.value("autoPlayMedia", false).toBool());
 }
@@ -622,7 +704,7 @@ void MainWindow::createWebPage(bool offTheRecord) {
 
   QWebEnginePage *page = new WebEnginePage(profile, webEngine);
   if (settings.value("windowTheme", "light").toString() == "dark") {
-    page->setBackgroundColor(QColor(19, 28, 33)); // whatsapp dark bg color
+    page->setBackgroundColor(QColor(17, 27, 33)); // whatsapp dark bg color
   } else {
     page->setBackgroundColor(QColor(240, 240, 240)); // whatsapp light bg color
   }
@@ -710,13 +792,14 @@ void MainWindow::handleWebViewTitleChanged(QString title) {
   setWindowTitle(QApplication::applicationName() + ": " + title);
 
   if (notificationsTitleRegExp.exactMatch(title)) {
-    if (notificationsTitleRegExp.isEmpty() == false) {
-      QString capturedTitle = notificationsTitleRegExp.capturedTexts().first();
+    if (notificationsTitleRegExp.isEmpty() == false &&
+        notificationsTitleRegExp.capturedTexts().isEmpty() == false) {
+      QString capturedTitle =
+          notificationsTitleRegExp.capturedTexts().constFirst();
       QRegExp rgex("\\([^\\d]*(\\d+)[^\\d]*\\)");
       rgex.setMinimal(true);
       if (rgex.indexIn(capturedTitle) != -1) {
-        qDebug() << rgex.capturedTexts();
-        QString unreadMessageCount = rgex.capturedTexts().last();
+        QString unreadMessageCount = rgex.capturedTexts().constLast();
         QString suffix =
             unreadMessageCount.toInt() > 1 ? tr("messages") : tr("message");
         restoreAction->setText(tr("Restore") + " | " + unreadMessageCount +
@@ -733,9 +816,9 @@ void MainWindow::handleWebViewTitleChanged(QString title) {
 
 void MainWindow::handleLoadFinished(bool loaded) {
   if (loaded) {
-    // check if page has loaded correctly
     checkLoadedCorrectly();
     updatePageTheme();
+    handleZoom();
   }
 }
 
@@ -764,7 +847,7 @@ void MainWindow::checkLoadedCorrectly() {
 
             quitAction->trigger();
           } else {
-            qWarning() << "Test 1 Loaded correctly value:" << result.toString();
+            qWarning() << "Test 1 loaded correctly value:" << result.toString();
           }
         });
   }
@@ -816,6 +899,8 @@ void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
   Q_UNUSED(reason);
+  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false)
+    return;
   if (isVisible()) {
     hide();
   } else {
@@ -863,9 +948,9 @@ bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
   return reg.match(phoneNumber).hasMatch();
 }
 
-void MainWindow::doReload() {
+void MainWindow::doReload(bool byPassCache) {
   this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                     false);
+                                     byPassCache);
 }
 
 void MainWindow::toggleMute(const bool &checked) {
@@ -885,4 +970,16 @@ QString MainWindow::getPageTheme() {
         });
   }
   return theme;
+}
+
+void MainWindow::tryLock() {
+  if (settings.value("asdfg").isValid() &&
+      settings.value("lockscreen", false).toBool()) {
+    init_lock();
+  }
+  if (settings.value("asdfg").isValid() == false) {
+    settings.setValue("lockscreen", false);
+    settingsWidget->appLockSetChecked(false);
+    init_lock();
+  }
 }

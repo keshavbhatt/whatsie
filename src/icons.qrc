@@ -80,8 +80,6 @@
         <file>icons/white/white_arrow-right-line.png</file>
         <file>icons/white/white_arrow-left-line.png</file>
         <file>icons/white/white_picture-in-picture-line.png</file>
-        <file>icons/others/monitor.png</file>
-        <file>icons/others/wall_placeholder_180.jpg</file>
         <file>icons/categories/devices-and-iot.png</file>
         <file>icons/categories/social.png</file>
         <file>icons/categories/server-and-cloud.png</file>
@@ -102,7 +100,6 @@
         <file>icons/categories/development.png</file>
         <file>icons/categories/books-and-reference.png</file>
         <file>icons/categories/utilities.png</file>
-        <file>icons/others/snapcraft.png</file>
         <file>icons/mail-line.png</file>
         <file>icons/app/icon-256.png</file>
         <file>icons/app/icon-128.png</file>
@@ -111,7 +108,6 @@
         <file>icons/app/icon-16.png</file>
         <file>icons/app/icon-512.png</file>
         <file>icons/app/resize.sh</file>
-        <file>icons/others/greendot.png</file>
         <file>icons/anticlockwise-line.png</file>
         <file>icons/arrow-go-back-line.png</file>
         <file>icons/arrow-go-forward-line.png</file>
@@ -133,14 +129,10 @@
         <file>icons/fullscreen-line.png</file>
         <file>icons/clockwise-fill.png</file>
         <file>icons/anticlockwise-fill.png</file>
-        <file>icons/others/Histogram.png</file>
-        <file>icons/tiktok-downloader.png</file>
-        <file>icons/icon-512.xcf</file>
         <file>icons/blur-off-line.png</file>
         <file>icons/lock-line.png</file>
         <file>icons/lock-unlock-line.png</file>
         <file>icons/funds-line.png</file>
-        <file>icons/others/tt_tbc_head.png</file>
         <file>icons/app/whatsapp-message.svg</file>
         <file>icons/app/whatsapp.svg</file>
         <file>icons/wa_bg.png</file>
@@ -403,5 +395,6 @@
         <file>icons/flags/zw.png</file>
         <file>icons/minus.png</file>
         <file>icons/plus.png</file>
+        <file>icons/app/whatsapp-message-32.png</file>
     </qresource>
 </RCC>

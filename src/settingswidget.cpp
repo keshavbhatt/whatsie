@@ -4,10 +4,14 @@
 #include "mainwindow.h"
 #include <QDateTime>
 #include <QMessageBox>
+#include <QStyle>
 
 #include "automatictheme.h"
 
 extern QString defaultUserAgentStr;
+extern int defaultAppAutoLockDuration;
+extern bool defaultAppAutoLock;
+extern double defaultZoomFactorMaximized;
 
 SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
                                QString enginePersistentStoragePath)
@@ -20,6 +24,11 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
   ui->zoomFactorSpinBox->setRange(0.25, 5.0);
   ui->zoomFactorSpinBox->setValue(settings.value("zoomFactor", 1.0).toDouble());
 
+  ui->zoomFactorSpinBoxMaximized->setRange(0.25, 5.0);
+  ui->zoomFactorSpinBoxMaximized->setValue(
+      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+          .toDouble());
+
   ui->closeButtonActionComboBox->setCurrentIndex(
       settings.value("closeButtonActionCombo", 0).toInt());
   ui->notificationCheckBox->setChecked(
@@ -30,8 +39,12 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
       settings.value("autoPlayMedia", false).toBool());
   ui->themeComboBox->setCurrentText(
       utils::toCamelCase(settings.value("windowTheme", "light").toString()));
+
   ui->userAgentLineEdit->setText(
       settings.value("useragent", defaultUserAgentStr).toString());
+  ui->userAgentLineEdit->home(true);
+  ui->userAgentLineEdit->deselect();
+
   ui->enableSpellCheck->setChecked(settings.value("sc_enabled", true).toBool());
   ui->notificationTimeOutspinBox->setValue(
       settings.value("notificationTimeOut", 9000).toInt() / 1000);
@@ -41,6 +54,25 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
       settings.value("useNativeFileDialog", false).toBool());
   ui->startMinimized->setChecked(
       settings.value("startMinimized", false).toBool());
+  ui->appAutoLockcheckBox->setChecked(
+      settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+  ui->autoLockDurationSpinbox->setValue(
+      settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
+  ui->minimizeOnTrayIconClick->setChecked(
+      settings.value("minimizeOnTrayIconClick", false).toBool());
+  ui->defaultDownloadLocation->setText(
+      settings
+          .value("defaultDownloadLocation",
+                 QStandardPaths::writableLocation(
+                     QStandardPaths::DownloadLocation) +
+                     QDir::separator() + QApplication::applicationName())
+          .toString());
+
+  ui->styleComboBox->blockSignals(true);
+  ui->styleComboBox->addItems(QStyleFactory::keys());
+  ui->styleComboBox->blockSignals(false);
+  ui->styleComboBox->setCurrentText(
+      settings.value("widgetStyle", "Fusion").toString());
 
   ui->automaticThemeCheckBox->blockSignals(true);
   bool automaticThemeSwitching =
@@ -50,7 +82,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
 
   themeSwitchTimer = new QTimer(this);
   themeSwitchTimer->setInterval(60000); // 1 min
-  connect(themeSwitchTimer, &QTimer::timeout,
+  connect(themeSwitchTimer, &QTimer::timeout, &settings,
           [=]() { themeSwitchTimerTimeout(); });
 
   // instantly call the timeout slot if automatic theme switching enabled
@@ -60,9 +92,7 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
   updateAutomaticTheme();
 
   this->setCurrentPasswordText(
-      "Current Password: <i>" +
-      QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()) +
-      "</i>");
+      QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
 
   applyThemeQuirks();
 
@@ -152,7 +182,11 @@ void SettingsWidget::updateAutomaticTheme() {
   }
 }
 
-SettingsWidget::~SettingsWidget() { delete ui; }
+SettingsWidget::~SettingsWidget() {
+  themeSwitchTimer->stop();
+  themeSwitchTimer->deleteLater();
+  delete ui;
+}
 
 void SettingsWidget::loadDictionaries(QStringList dictionaries) {
   // set up supported spellcheck dictionaries
@@ -240,7 +274,7 @@ void SettingsWidget::on_deleteCache_clicked() {
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-  msgBox.setInformativeText("Delete Application cache ?");
+  msgBox.setInformativeText("Delete Application cache?");
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   int ret = msgBox.exec();
@@ -263,19 +297,24 @@ void SettingsWidget::on_deletePersistentData_clicked() {
   msgBox.setIconPixmap(
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-  msgBox.setInformativeText("Delete Application Cookies ?");
+  msgBox.setInformativeText("Delete Application Cookies?");
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   int ret = msgBox.exec();
   switch (ret) {
   case QMessageBox::Yes: {
-    utils::delete_cache(this->persistentStoragePath());
-    refresh();
+    clearAllData();
     break;
   }
   case QMessageBox::No:
     break;
   }
+}
+
+void SettingsWidget::clearAllData() {
+  utils::delete_cache(this->cachePath());
+  utils::delete_cache(this->persistentStoragePath());
+  refresh();
 }
 
 void SettingsWidget::on_notificationCheckBox_toggled(bool checked) {
@@ -356,21 +395,54 @@ void SettingsWidget::on_closeButtonActionComboBox_currentIndexChanged(
 }
 
 void SettingsWidget::appLockSetChecked(bool checked) {
+  ui->applock_checkbox->blockSignals(true);
   ui->applock_checkbox->setChecked(checked);
+  ui->applock_checkbox->blockSignals(false);
 }
 
 void SettingsWidget::setCurrentPasswordText(QString str) {
-  ui->current_password->setText(str);
+  ui->current_password->setStyleSheet(
+      "QLineEdit[echoMode=\"2\"]{lineedit-password-character: 9899}");
+  if (str == "Require setup") {
+    ui->current_password->setEchoMode(QLineEdit::Normal);
+  } else {
+    ui->current_password->setEchoMode(QLineEdit::Password);
+    ui->current_password->setText(str);
+  }
 }
 
 void SettingsWidget::on_applock_checkbox_toggled(bool checked) {
   if (settings.value("asdfg").isValid()) {
     settings.setValue("lockscreen", checked);
+  } else if (checked && !settings.value("asdfg").isValid()) {
+    settings.setValue("lockscreen", true);
+    if (checked)
+      showSetApplockPasswordDialog();
   } else {
     settings.setValue("lockscreen", false);
+    if (checked)
+      showSetApplockPasswordDialog();
   }
-  if (checked) {
-    emit init_lock();
+}
+
+void SettingsWidget::showSetApplockPasswordDialog() {
+  QMessageBox msgBox;
+  msgBox.setText("App lock is not configured.");
+  msgBox.setIconPixmap(
+      QPixmap(":/icons/information-line.png")
+          .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+  msgBox.setInformativeText("Do you want to setup App lock now?");
+  msgBox.setStandardButtons(QMessageBox::Cancel);
+  QPushButton *setAppLock = new QPushButton(
+      this->style()->standardIcon(QStyle::SP_DialogYesButton), "Yes", nullptr);
+  msgBox.addButton(setAppLock, QMessageBox::NoRole);
+  connect(setAppLock, &QPushButton::clicked, setAppLock,
+          [=]() { emit init_lock(); });
+  int ret = msgBox.exec();
+  if (ret == QMessageBox::Cancel) {
+    ui->applock_checkbox->blockSignals(true);
+    ui->applock_checkbox->setChecked(false);
+    ui->applock_checkbox->blockSignals(false);
   }
 }
 
@@ -443,14 +515,15 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked) {
                                    " | Automatic theme switcher setup");
     automaticTheme->setWindowFlag(Qt::Dialog);
     automaticTheme->setAttribute(Qt::WA_DeleteOnClose, true);
-    connect(automaticTheme, &AutomaticTheme::destroyed, [=]() {
-      bool automaticThemeSwitching =
-          settings.value("automaticTheme", false).toBool();
-      ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
-      if (automaticThemeSwitching)
-        themeSwitchTimerTimeout();
-      updateAutomaticTheme();
-    });
+    connect(automaticTheme, &AutomaticTheme::destroyed,
+            ui->automaticThemeCheckBox, [=]() {
+              bool automaticThemeSwitching =
+                  settings.value("automaticTheme", false).toBool();
+              ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
+              if (automaticThemeSwitching)
+                themeSwitchTimerTimeout();
+              updateAutomaticTheme();
+            });
     automaticTheme->show();
   } else {
     settings.setValue("automaticTheme", false);
@@ -462,11 +535,38 @@ void SettingsWidget::on_useNativeFileDialog_toggled(bool checked) {
   settings.setValue("useNativeFileDialog", checked);
 }
 
+void SettingsWidget::on_startMinimized_toggled(bool checked) {
+  settings.setValue("startMinimized", checked);
+}
+
+void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
+  settings.setValue("appAutoLocking", checked);
+}
+
+void SettingsWidget::on_autoLockDurationSpinbox_valueChanged(int arg1) {
+  settings.setValue("autoLockDuration", arg1);
+}
+
+void SettingsWidget::on_resetAppAutoLockPushButton_clicked() {
+  ui->appAutoLockcheckBox->setChecked(defaultAppAutoLock);
+  ui->autoLockDurationSpinbox->setValue(defaultAppAutoLockDuration);
+}
+
+void SettingsWidget::on_minimizeOnTrayIconClick_toggled(bool checked) {
+  settings.setValue("minimizeOnTrayIconClick", checked);
+}
+
+void SettingsWidget::on_styleComboBox_currentTextChanged(const QString &arg1) {
+  applyThemeQuirks();
+  settings.setValue("widgetStyle", arg1);
+  emit updateWindowTheme();
+  emit updatePageTheme();
+}
+
 void SettingsWidget::on_zoomPlus_clicked() {
   double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
   double newFactor = currentFactor + 0.25;
   ui->zoomFactorSpinBox->setValue(newFactor);
-
   settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
@@ -475,19 +575,119 @@ void SettingsWidget::on_zoomMinus_clicked() {
   double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
   double newFactor = currentFactor - 0.25;
   ui->zoomFactorSpinBox->setValue(newFactor);
-
   settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
 
 void SettingsWidget::on_zoomReset_clicked() {
-  double newFactor = 1.0;
-  ui->zoomFactorSpinBox->setValue(newFactor);
-
+  ui->zoomFactorSpinBox->setValue(1.0);
   settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
 
-void SettingsWidget::on_startMinimized_toggled(bool checked) {
-  settings.setValue("startMinimized", checked);
+void SettingsWidget::on_zoomResetMaximized_clicked() {
+  ui->zoomFactorSpinBoxMaximized->setValue(defaultZoomFactorMaximized);
+  settings.setValue("zoomFactorMaximized",
+                    ui->zoomFactorSpinBoxMaximized->value());
+  emit zoomMaximizedChanged();
+}
+
+void SettingsWidget::on_zoomPlusMaximized_clicked() {
+  double currentFactor =
+      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+          .toDouble();
+  double newFactor = currentFactor + 0.25;
+  ui->zoomFactorSpinBoxMaximized->setValue(newFactor);
+  settings.setValue("zoomFactorMaximized",
+                    ui->zoomFactorSpinBoxMaximized->value());
+  emit zoomMaximizedChanged();
+}
+
+void SettingsWidget::on_zoomMinusMaximized_clicked() {
+  double currentFactor =
+      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+          .toDouble();
+  double newFactor = currentFactor - 0.25;
+  ui->zoomFactorSpinBoxMaximized->setValue(newFactor);
+  settings.setValue("zoomFactorMaximized",
+                    ui->zoomFactorSpinBoxMaximized->value());
+  emit zoomMaximizedChanged();
+}
+
+void SettingsWidget::on_changeDefaultDownloadLocationPb_clicked() {
+  QFileDialog dialog(this);
+  dialog.setFileMode(QFileDialog::Directory);
+  dialog.setOption(QFileDialog::ShowDirsOnly);
+
+  QString path;
+  bool usenativeFileDialog =
+      settings.value("useNativeFileDialog", false).toBool();
+  if (usenativeFileDialog == false) {
+    path = QFileDialog::getExistingDirectory(
+        this, tr("Select download directory"),
+        settings
+            .value("defaultDownloadLocation",
+                   QStandardPaths::writableLocation(
+                       QStandardPaths::DownloadLocation) +
+                       QDir::separator() + QApplication::applicationName())
+            .toString(),
+        QFileDialog::DontUseNativeDialog);
+  } else {
+    path = QFileDialog::getSaveFileName(
+        this, tr("Select download directory"),
+        settings
+            .value("defaultDownloadLocation",
+                   QStandardPaths::writableLocation(
+                       QStandardPaths::DownloadLocation) +
+                       QDir::separator() + QApplication::applicationName())
+            .toString());
+  }
+
+  if (!path.isNull() && !path.isEmpty()) {
+    ui->defaultDownloadLocation->setText(path);
+    settings.setValue("defaultDownloadLocation", path);
+  }
+}
+
+void SettingsWidget::on_userAgentLineEdit_editingFinished() {
+  ui->userAgentLineEdit->home(true);
+  ui->userAgentLineEdit->deselect();
+}
+
+void SettingsWidget::on_viewPassword_clicked() {
+  ui->current_password->setEchoMode(QLineEdit::Normal);
+  ui->viewPassword->setEnabled(false);
+  QTimer *timer = new QTimer(this);
+  timer->setInterval(5000);
+  connect(timer, &QTimer::timeout, ui->current_password, [=]() {
+    ui->current_password->setEchoMode(QLineEdit::Password);
+    ui->viewPassword->setEnabled(true);
+    timer->stop();
+    timer->deleteLater();
+  });
+  timer->start();
+}
+
+void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
+  if (settings.value("asdfg").isValid()) {
+    QMessageBox msgBox;
+    msgBox.setText("You are about to change your current app lock password!"
+                   "\n\nThis will LogOut your current session.");
+    msgBox.setIconPixmap(
+        QPixmap(":/icons/information-line.png")
+            .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+    msgBox.setInformativeText("Do you want to proceed?");
+    msgBox.setStandardButtons(QMessageBox::Cancel);
+    QPushButton *changePassword =
+        new QPushButton(this->style()->standardIcon(QStyle::SP_DialogYesButton),
+                        "Change password", nullptr);
+    msgBox.addButton(changePassword, QMessageBox::NoRole);
+    connect(changePassword, &QPushButton::clicked, changePassword,
+            [=]() { emit change_lock_password(); });
+    msgBox.exec();
+
+  } else {
+    settings.setValue("lockscreen", false);
+    showSetApplockPasswordDialog();
+  }
 }

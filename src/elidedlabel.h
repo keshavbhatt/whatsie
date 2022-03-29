@@ -16,9 +16,9 @@ private:
 
 
 public:
-    ElidedLabel(QWidget* parent = NULL, Qt::WindowFlags f = 0);
-    ElidedLabel(const QString& txt, QWidget* parent = NULL, Qt::WindowFlags f = 0);
-    ElidedLabel(const QString& txt, Qt::TextElideMode elideMode = Qt::ElideRight, QWidget* parent = NULL, Qt::WindowFlags f = 0);
+    ElidedLabel(QWidget* parent = NULL);
+    ElidedLabel(const QString& txt, QWidget* parent = NULL);
+    ElidedLabel(const QString& txt, Qt::TextElideMode elideMode = Qt::ElideRight, QWidget* parent = NULL);
 
 public:
     // Set the elide mode used for displaying text.

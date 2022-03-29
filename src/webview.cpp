@@ -44,7 +44,7 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
                                          "Do you want to reload the page ?")
                                           .arg(statusCode));
             if (btn == QMessageBox::Yes)
-              QTimer::singleShot(0, [this] { this->reload(); });
+              QTimer::singleShot(0, this, [this] { this->reload(); });
           });
 }
 
@@ -80,7 +80,7 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
   if (profile->isSpellCheckEnabled()) {
     QMenu *subMenu = menu->addMenu(tr("Select Language"));
-    for (const QString &dict : m_dictionaries) {
+    for (const QString &dict : qAsConst(m_dictionaries)) {
       QAction *action = subMenu->addAction(dict);
       action->setCheckable(true);
       action->setChecked(languages.contains(dict));

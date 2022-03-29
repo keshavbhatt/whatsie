@@ -6,7 +6,6 @@
 
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
-  // Connect signals and slots
   profile->setHttpUserAgent(
       profile->httpUserAgent().replace("QtWebEngine/5.13.0", ""));
   connect(this, &QWebEnginePage::loadFinished, this,
@@ -29,8 +28,6 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
 bool WebEnginePage::acceptNavigationRequest(const QUrl &url,
                                             QWebEnginePage::NavigationType type,
                                             bool isMainFrame) {
-  qDebug() << "Navigation request: [" + url.toDisplayString() + "] " + type;
-
   if (QWebEnginePage::NavigationType::NavigationTypeLinkClicked == type) {
     QDesktopServices::openUrl(url);
     return false;
@@ -132,7 +129,6 @@ void WebEnginePage::handleLoadFinished(bool ok) {
 
 void WebEnginePage::fullScreenRequestedByPage(
     QWebEngineFullScreenRequest request) {
-  // qDebug()<<"Fullscreen";
   request.accept();
 }
 
@@ -216,9 +212,9 @@ void WebEnginePage::handleAuthenticationRequired(const QUrl &requestUrl,
                                                nullptr, mainWindow));
   passwordDialog.m_iconLabel->setPixmap(icon.pixmap(32, 32));
 
-  QString introMessage(tr("Enter username and password for \"%1\" at %2")
-                           .arg(auth->realm())
-                           .arg(requestUrl.toString().toHtmlEscaped()));
+  QString introMessage(
+      tr("Enter username and password for \"%1\" at %2")
+          .arg(auth->realm(), requestUrl.toString().toHtmlEscaped()));
   passwordDialog.m_infoLabel->setText(introMessage);
   passwordDialog.m_infoLabel->setWordWrap(true);
 
@@ -264,11 +260,10 @@ void WebEnginePage::handleProxyAuthenticationRequired(
 //! [registerProtocolHandlerRequested]
 void WebEnginePage::handleRegisterProtocolHandlerRequested(
     QWebEngineRegisterProtocolHandlerRequest request) {
-  auto answer =
-      QMessageBox::question(view()->window(), tr("Permission Request"),
-                            tr("Allow %1 to open all %2 links?")
-                                .arg(request.origin().host())
-                                .arg(request.scheme()));
+  auto answer = QMessageBox::question(
+      view()->window(), tr("Permission Request"),
+      tr("Allow %1 to open all %2 links?")
+          .arg(request.origin().host(), request.scheme()));
   if (answer == QMessageBox::Yes)
     request.accept();
   else
@@ -283,7 +278,7 @@ void WebEnginePage::handleSelectClientCertificate(
   selection.select(selection.certificates().at(0));
 
   qDebug() << __FUNCTION__;
-  for (QSslCertificate cert : selection.certificates()) {
+  for (const QSslCertificate &cert : selection.certificates()) {
     qDebug() << cert;
     selection.select(cert); // select the first available cert
     break;

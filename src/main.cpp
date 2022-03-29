@@ -38,23 +38,19 @@ int main(int argc, char *argv[]) {
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
 
   QApplication app(argc, argv);
+  app.setQuitOnLastWindowClosed(false);
   app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-
   QApplication::setApplicationName("WhatSie");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
-
   QString appname = QApplication::applicationName();
 
-// allow multiple instances in debug builds
-#ifndef QT_DEBUG
   RunGuard guard("org.keshavnrj.ubuntu." + appname);
   if (!guard.tryToRun()) {
     QMessageBox::critical(0, appname,
                           "An instance of " + appname + " is already running.");
     return 0;
   }
-#endif
 
   QWebEngineSettings::defaultSettings()->setAttribute(
       QWebEngineSettings::PluginsEnabled, true);

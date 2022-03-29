@@ -5,19 +5,19 @@
 #include <QResizeEvent>
 #include <QStyle>
 
-ElidedLabel::ElidedLabel(QWidget *parent, Qt::WindowFlags f)
-    : QLabel(parent, f), m_elide_mode(Qt::ElideRight) {
+ElidedLabel::ElidedLabel(QWidget *parent)
+    : QLabel(parent), m_elide_mode(Qt::ElideRight) {
   setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 }
 
-ElidedLabel::ElidedLabel(const QString &txt, QWidget *parent, Qt::WindowFlags f)
-    : QLabel(txt, parent, f), m_elide_mode(Qt::ElideRight) {
+ElidedLabel::ElidedLabel(const QString &txt, QWidget *parent)
+    : QLabel(txt, parent), m_elide_mode(Qt::ElideRight) {
   setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 }
 
 ElidedLabel::ElidedLabel(const QString &txt, Qt::TextElideMode elideMode,
-                         QWidget *parent, Qt::WindowFlags f)
-    : QLabel(txt, parent, f), m_elide_mode(elideMode) {
+                         QWidget *parent)
+    : QLabel(txt, parent), m_elide_mode(elideMode) {
   setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Preferred);
 }
 
