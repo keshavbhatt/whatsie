@@ -23,11 +23,7 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   animate();
 
   if (settings.value("asdfg").isValid() == false) {
-    isLocked = false;
-    ui->signup->show();
-    ui->login->hide();
-    animate();
-    ui->passcode1->setFocus();
+    signUp();
   } else {
     lock_app();
   }
@@ -41,6 +37,15 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->caps2->setStyleSheet(capsStyle);
   ui->signup_warning->setStyleSheet(capsStyle);
   ui->wrong->setStyleSheet(capsStyle);
+}
+
+
+void Lock::signUp(){
+    isLocked = false;
+    ui->signup->show();
+    ui->login->hide();
+    animate();
+    ui->passcode1->setFocus();
 }
 
 void Lock::animate() {

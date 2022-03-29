@@ -3,6 +3,7 @@
 #include "downloadwidget.h"
 
 #include <QFileDialog>
+#include <QStandardPaths>
 #include <QWebEngineDownloadItem>
 
 DownloadManagerWidget::DownloadManagerWidget(QWidget *parent)
@@ -14,23 +15,18 @@ void DownloadManagerWidget::downloadRequested(
     QWebEngineDownloadItem *download) {
   Q_ASSERT(download &&
            download->state() == QWebEngineDownloadItem::DownloadRequested);
-  QString path;
+  QString path =
+      settings
+          .value("defaultDownloadLocation",
+                 QStandardPaths::writableLocation(
+                     QStandardPaths::DownloadLocation) +
+                     QDir::separator() + QApplication::applicationName())
+          .toString();
+  QDir d;
+  d.mkpath(path);
 
-  bool usenativeFileDialog =
-      settings.value("useNativeFileDialog", false).toBool();
-  if (usenativeFileDialog == false) {
-    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadFileName(),
-                                        tr("Any file (*)"), nullptr,
-                                        QFileDialog::DontUseNativeDialog);
-  } else {
-    path = QFileDialog::getSaveFileName(this, tr("Save as"), download->downloadFileName(),
-                                        tr("Any file (*)"), nullptr);
-  }
-
-  if (path.isEmpty())
-    return;
-
-  download->setDownloadFileName(path);
+  download->setDownloadFileName(path + QDir::separator() +
+                                download->downloadFileName());
   download->accept();
   add(new DownloadWidget(download));
   show();

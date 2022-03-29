@@ -23,7 +23,7 @@ public slots:
     static QString generateRandomId(int length);
     static QString genRand(int length);
     static QString convertSectoDay(qint64 secs);
-    static QString returnPath(QString pathname);
+    static QString returnPath(QString pathname, QString standardLocation);
     static QString EncodeXML ( const QString& encodeMe );
     static QString DecodeXML ( const QString& decodeMe );
     static QString htmlToPlainText(QString str);

@@ -38,7 +38,7 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count,
     settings.setValue("app_install_time", QDateTime::currentSecsSinceEpoch());
 
   } else if (settings.value("app_install_time").isValid()) {
-    qDebug() << "RATEAPP should show:" << shouldShow();
+    //qDebug() << "RATEAPP should show:" << shouldShow();
     if (shouldShow()) {
       showTimer->start();
     } else {
@@ -86,7 +86,6 @@ bool RateApp::shouldShow() {
 }
 
 RateApp::~RateApp() {
-  qDebug() << "RateApp Obj deleted";
   showTimer->disconnect();
   showTimer->deleteLater();
   delete ui;

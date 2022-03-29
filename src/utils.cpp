@@ -122,14 +122,12 @@ QString utils::convertSectoDay(qint64 secs) {
 }
 
 // static on demand path maker
-QString utils::returnPath(QString pathname) {
-  QString _data_path =
-      QStandardPaths::writableLocation(QStandardPaths::DataLocation);
-  if (!QDir(_data_path + "/" + pathname).exists()) {
-    QDir d(_data_path + "/" + pathname);
-    d.mkpath(_data_path + "/" + pathname);
-  }
-  return _data_path + "/" + pathname + "/";
+QString utils::returnPath(QString pathname,QString standardLocation = QStandardPaths::writableLocation(
+            QStandardPaths::DataLocation)) {
+    QChar sepe = QDir::separator();
+    QDir d(standardLocation + sepe + pathname);
+    d.mkpath(standardLocation + sepe + pathname);
+  return standardLocation + sepe + pathname + sepe;
 }
 
 QString utils::EncodeXML(const QString &encodeMe) {

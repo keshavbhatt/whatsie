@@ -1,22 +1,21 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
 
-#include <QWebEngineView>
 #include <QSettings>
+#include <QWebEngineView>
 
-class WebView: public QWebEngineView
-{
-    Q_OBJECT
+class WebView : public QWebEngineView {
+  Q_OBJECT
 
 public:
-    WebView(QWidget *parent = nullptr, QStringList dictionaries = {});
+  WebView(QWidget *parent = nullptr, QStringList dictionaries = {});
 
 protected:
-    void contextMenuEvent(QContextMenuEvent *event) override;
+  void contextMenuEvent(QContextMenuEvent *event) override;
 
 private:
-    QStringList m_dictionaries;
-    QSettings settings;
+  QStringList m_dictionaries;
+  QSettings settings;
 };
 
 #endif // WEBVIEW_H
