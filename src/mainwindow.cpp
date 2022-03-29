@@ -152,7 +152,6 @@ void MainWindow::updatePageTheme() {
   if (windowTheme == "dark") {
     webPageTheme = "web dark";
   }
-#ifdef QT_DEBUG
   if (webEngine && webEngine->page()) {
     webEngine->page()->runJavaScript(
         "document.querySelector('body').className='" + webPageTheme + "';",
@@ -160,7 +159,6 @@ void MainWindow::updatePageTheme() {
           qDebug() << "Value is: " << result.toString() << Qt::endl;
         });
   }
-#endif
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
@@ -600,7 +598,7 @@ void MainWindow::change_lock_password() {
   settings.remove("asdfg");
   settingsWidget->appLockSetChecked(false);
   settingsWidget->clearAllData();
-  doReload(true);
+  doAppReload();
   init_lock();
 }
 
@@ -819,6 +817,7 @@ void MainWindow::handleLoadFinished(bool loaded) {
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
+    settingsWidget->refresh();
   }
 }
 
