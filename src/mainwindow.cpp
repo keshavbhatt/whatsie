@@ -129,10 +129,8 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
   // chat composer
   if (arg.contains("send?") || arg.contains("send/?")) {
     QString newArg = arg;
-    qWarning() << "New chat composer";
     newArg = newArg.replace("?", "&");
     QUrlQuery query(newArg);
-    qWarning() << query.hasQueryItem("phone");
     QString phone, phoneStr, text, textStr, urlStr;
     // create send url equivalent
     phone = query.queryItemValue("phone");
@@ -140,7 +138,6 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
     phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
     textStr = text.isEmpty() ? "" : "text=" + text;
     urlStr = "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-    qWarning() << "Loading" << urlStr;
     this->webEngine->page()->load(QUrl(urlStr));
     return;
   }
@@ -872,7 +869,7 @@ void MainWindow::checkLoadedCorrectly() {
         "document.querySelector('body').className",
         [this](const QVariant &result) {
           if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
-            qWarning() << "Test 1 found" << result.toString();
+            qDebug() << "Test 1 found" << result.toString();
             webEngine->page()->runJavaScript(
                 "document.getElementsByTagName('body')[0].innerText = ''");
             loadingQuirk("test1");
@@ -890,7 +887,7 @@ void MainWindow::checkLoadedCorrectly() {
 
             quitAction->trigger();
           } else {
-            qWarning() << "Test 1 loaded correctly value:" << result.toString();
+            qDebug() << "Test 1 loaded correctly, value:" << result.toString();
           }
         });
   }
