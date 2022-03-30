@@ -33,6 +33,7 @@ apps:
        XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
        LANG: en_US.UTF-8 # issue 7,21
        QT_QPA_PLATFORMTHEME: gtk3
+       NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
     desktop: usr/share/applications/whatsie.desktop
     plugs:
         - browser-support
@@ -50,9 +51,9 @@ apps:
         - x11
         - network
         - wayland
-        - hardware-observe #might help geoclue & qtpositioning
-        - network-observe  #might help geoclue & qtpositioning
-        - network-bind  #might help geoclue & qtpositioning
+        - hardware-observe # to assist geoclue & qtpositioning
+        - network-observe  # to assistgeoclue & qtpositioning
+        - network-bind  # to assistgeoclue & qtpositioning
 
 plugs:
   gsettings:
