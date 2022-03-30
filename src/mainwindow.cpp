@@ -173,7 +173,7 @@ void MainWindow::updateWindowTheme() {
   if (settings.value("windowTheme", "light").toString() == "dark") {
     qApp->setPalette(darkPalette);
     this->webEngine->setStyleSheet(
-        "QWebEngineView{background:rgb(17,  27, 33);}"); // whatsapp dark color
+        "QWebEngineView{background:rgb(17, 27, 33);}"); // whatsapp dark color
   } else {
     qApp->setPalette(lightPalette);
     this->webEngine->setStyleSheet(

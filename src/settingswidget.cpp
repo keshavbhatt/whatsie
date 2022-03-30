@@ -672,7 +672,8 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
   if (settings.value("asdfg").isValid()) {
     QMessageBox msgBox;
     msgBox.setText("You are about to change your current app lock password!"
-                   "\n\nThis will LogOut your current session.");
+                   "\n\nThis will LogOut your current session."
+                   "\nYou may also require a complete restart of Application!");
     msgBox.setIconPixmap(
         QPixmap(":/icons/information-line.png")
             .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -687,7 +688,7 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     msgBox.exec();
 
   } else {
-    settings.setValue("lockscreen", false);
+    settings.setValue("lockscreen", true);
     showSetApplockPasswordDialog();
   }
 }
