@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>637</width>
-    <height>792</height>
+    <width>691</width>
+    <height>860</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -98,8 +98,8 @@ background:transparent;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>621</width>
-        <height>791</height>
+        <width>675</width>
+        <height>808</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -371,7 +371,8 @@ background:transparent;
             <item row="4" column="0">
              <widget class="QCheckBox" name="minimizeOnTrayIconClick">
               <property name="text">
-               <string>Minimize/Maximize on right clicking tray Icon</string>
+               <string>Minimize/Maximize on right clicking tray Icon
+(if supported by system tray)</string>
               </property>
              </widget>
             </item>
@@ -805,13 +806,10 @@ background:transparent;
                <string> Secs</string>
               </property>
               <property name="minimum">
-               <number>10</number>
+               <number>8</number>
               </property>
               <property name="maximum">
                <number>14400</number>
-              </property>
-              <property name="value">
-               <number>60</number>
               </property>
              </widget>
             </item>

@@ -34,6 +34,7 @@
 #include "settingswidget.h"
 #include "webenginepage.h"
 #include "webview.h"
+#include "autolockeventfilter.h"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -84,6 +85,7 @@ private:
   Lock *lockWidget = nullptr;
   int correctlyLoaderRetries = 4;
   QStringList m_dictionaries;
+  AutoLockEventFilter *autoLockEventFilter = nullptr;
 
 private slots:
 
@@ -121,6 +123,8 @@ private slots:
   void forceLogOut();
   void tryLogOut();
   bool isLoggedIn();
+  void initAutoLock();
+  void appAutoLockChanged();
 };
 
 #endif // MAINWINDOW_H

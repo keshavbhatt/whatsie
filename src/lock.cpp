@@ -30,7 +30,6 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   checkCaps();
   QString capsStyle = QString("background-color: palette(window);"
                               "padding:4px;"
-                              "border:0px solid palette(highlight);"
                               "border-radius: 2px;"
                               "color:palette(window-text);");
   ui->caps1->setStyleSheet(capsStyle);

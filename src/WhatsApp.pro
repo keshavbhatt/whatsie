@@ -76,6 +76,7 @@ RESOURCES += \
 HEADERS += \
     SunClock.hpp \
     about.h \
+    autolockeventfilter.h \
     automatictheme.h \
     common.h \
     dictionaries.h \

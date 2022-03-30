@@ -54,8 +54,10 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
       settings.value("useNativeFileDialog", false).toBool());
   ui->startMinimized->setChecked(
       settings.value("startMinimized", false).toBool());
-  ui->appAutoLockcheckBox->setChecked(
+
+  appLockSetChecked(
       settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+
   ui->autoLockDurationSpinbox->setValue(
       settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
   ui->minimizeOnTrayIconClick->setChecked(
@@ -394,6 +396,17 @@ void SettingsWidget::on_closeButtonActionComboBox_currentIndexChanged(
   settings.setValue("closeButtonActionCombo", index);
 }
 
+void SettingsWidget::autoAppLockSetChecked(bool checked) {
+  ui->appAutoLockcheckBox->blockSignals(true);
+  ui->appAutoLockcheckBox->setChecked(checked);
+  ui->appAutoLockcheckBox->blockSignals(false);
+}
+
+void SettingsWidget::updateAppLockPasswordViewer() {
+  this->setCurrentPasswordText(
+      QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
+}
+
 void SettingsWidget::appLockSetChecked(bool checked) {
   ui->applock_checkbox->blockSignals(true);
   ui->applock_checkbox->setChecked(checked);
@@ -540,11 +553,21 @@ void SettingsWidget::on_startMinimized_toggled(bool checked) {
 }
 
 void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
-  settings.setValue("appAutoLocking", checked);
+  if (settings.value("asdfg").isValid()) {
+    settings.setValue("appAutoLocking", checked);
+  } else {
+    showSetApplockPasswordDialog();
+    if (settings.value("asdfg").isValid() == false) {
+      settings.setValue("appAutoLocking", false);
+      autoAppLockSetChecked(false);
+    }
+  }
+  emit appAutoLockChanged();
 }
 
 void SettingsWidget::on_autoLockDurationSpinbox_valueChanged(int arg1) {
   settings.setValue("autoLockDuration", arg1);
+  emit appAutoLockChanged();
 }
 
 void SettingsWidget::on_resetAppAutoLockPushButton_clicked() {

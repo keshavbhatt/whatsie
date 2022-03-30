@@ -9,6 +9,8 @@
 
 extern QString defaultUserAgentStr;
 extern double defaultZoomFactorMaximized;
+extern int defaultAppAutoLockDuration;
+extern bool defaultAppAutoLock;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
@@ -30,6 +32,22 @@ MainWindow::MainWindow(QWidget *parent)
   initRateWidget();
   tryLock();
   updateWindowTheme();
+  initAutoLock();
+}
+
+void MainWindow::initAutoLock() {
+  autoLockEventFilter = new AutoLockEventFilter(
+      settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt() *
+      1000);
+  connect(autoLockEventFilter, &AutoLockEventFilter::autoLockTimerTimeout, this,
+          [=]() {
+            if (settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
+              this->lockApp();
+            }
+          });
+  if (settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
+    qApp->installEventFilter(autoLockEventFilter);
+  }
 }
 
 void MainWindow::initThemes() {
@@ -204,22 +222,22 @@ void MainWindow::forceLogOut() {
   }
 }
 
-bool MainWindow::isLoggedIn(){
-    static bool loggedIn = false;
-    if (webEngine && webEngine->page()) {
-        webEngine->page()->runJavaScript(
-          "window.localStorage.getItem('WAToken2')",
-          [=](const QVariant &result) { qDebug() <<Q_FUNC_INFO << result;
-            if(result.isValid() && result.toString().isEmpty() == false){
-                loggedIn = true;
-            }
+bool MainWindow::isLoggedIn() {
+  static bool loggedIn = false;
+  if (webEngine && webEngine->page()) {
+    webEngine->page()->runJavaScript(
+        "window.localStorage.getItem('WAToken2')", [=](const QVariant &result) {
+          qDebug() << Q_FUNC_INFO << result;
+          if (result.isValid() && result.toString().isEmpty() == false) {
+            loggedIn = true;
+          }
         });
-        qDebug() << "isLoggedIn" <<loggedIn;
-        return loggedIn;
-    }else{
-        qDebug() << "isLoggedIn" <<loggedIn;
-        return loggedIn;
-    }
+    qDebug() << "isLoggedIn" << loggedIn;
+    return loggedIn;
+  } else {
+    qDebug() << "isLoggedIn" << loggedIn;
+    return loggedIn;
+  }
 }
 
 void MainWindow::tryLogOut() {
@@ -244,6 +262,8 @@ void MainWindow::init_settingWidget() {
     connect(settingsWidget, SIGNAL(init_lock()), this, SLOT(init_lock()));
     connect(settingsWidget, SIGNAL(change_lock_password()), this,
             SLOT(change_lock_password()));
+    connect(settingsWidget, SIGNAL(appAutoLockChanged()), this,
+            SLOT(appAutoLockChanged()));
 
     connect(settingsWidget, SIGNAL(updateWindowTheme()), this,
             SLOT(updateWindowTheme()));
@@ -630,17 +650,31 @@ void MainWindow::init_lock() {
 void MainWindow::change_lock_password() {
   settings.remove("asdfg");
   settingsWidget->appLockSetChecked(false);
-
+  settingsWidget->autoAppLockSetChecked(false);
+  settingsWidget->updateAppLockPasswordViewer();
   tryLogOut();
-  QTimer::singleShot(2000, this, [=]() {
-      if(isLoggedIn()){
-        forceLogOut();
-        doAppReload();
-      }
-      init_lock();
+  QTimer::singleShot(1500, this, [=]() {
+    if (isLoggedIn()) {
+      forceLogOut();
+      doAppReload();
+    }
+    appAutoLockChanged();
+    init_lock();
   });
+}
 
-
+void MainWindow::appAutoLockChanged() {
+  bool enabled = settings.value("appAutoLocking", defaultAppAutoLock).toBool();
+  if (enabled) {
+    qApp->installEventFilter(autoLockEventFilter);
+    autoLockEventFilter->setTimeoutmillis(
+        settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt() *
+        1000);
+    autoLockEventFilter->resetTimer();
+  } else {
+    qApp->removeEventFilter(autoLockEventFilter);
+    autoLockEventFilter->stopTimer();
+  }
 }
 
 // check window state and set tray menus

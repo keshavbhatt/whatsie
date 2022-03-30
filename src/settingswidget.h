@@ -28,6 +28,7 @@ signals:
   void notify(QString message);
   void zoomChanged();
   void zoomMaximizedChanged();
+  void appAutoLockChanged();
 
 public:
   explicit SettingsWidget(QWidget *parent = nullptr,
@@ -43,6 +44,8 @@ public slots:
   void loadDictionaries(QStringList dictionaries);
 
   void clearAllData();
+  void autoAppLockSetChecked(bool checked);
+  void updateAppLockPasswordViewer();
 protected slots:
   bool eventFilter(QObject *obj, QEvent *event);
   void closeEvent(QCloseEvent *event);
