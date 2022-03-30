@@ -204,10 +204,8 @@ QString utils::appDebugInfo() {
                    QString(GIT_BRANCH) + "</li>"
             << "<li><b>" + QObject::tr("Commit Hash") + ":</b>             " +
                    QString(GIT_HASH) + "</li>"
-            << "<li><b>" + QObject::tr("Build Date") + ":</b>          " +
-                   QString::fromLatin1(__DATE__) + "</li>"
-            << "<li><b>" + QObject::tr("Build Time") + ":</b>          " +
-                   QString::fromLatin1(__TIME__) + "</li>"
+            << "<li><b>" + QObject::tr("Build Datetime") + ":</b>          " +
+                   QString::fromLatin1(BUILD_TIMESTAMP) + "</li>"
             << "<li><b>" + QObject::tr("Qt Runtime Version") + ":</b>   " +
                    QString(qVersion()) + "</li>"
             << "<li><b>" + QObject::tr("Qt Compiled Version") + ":</b> " +
@@ -241,6 +239,7 @@ void utils::DisplayExceptionErrorDialog(const QString &error_info) {
                 << "\nApp version: " + QString(VERSIONSTR)
                 << "\nSource Branch: " + QString(GIT_BRANCH)
                 << "\nCommit Hash: " + QString(GIT_HASH)
+                << "\nBuild Datetime: " + QString(BUILD_TIMESTAMP)
                 << "\nQt Runtime Version: " + QString(qVersion())
                 << "\nQt Compiled Version: " + QString(QT_VERSION_STR)
                 << "\nSystem: " + QSysInfo::prettyProductName()

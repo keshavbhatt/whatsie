@@ -39,7 +39,7 @@ int main(int argc, char *argv[]) {
 
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
-  app.setWindowIcon(QIcon(":/icons/app/icon-256.png"));
+  app.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);

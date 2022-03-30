@@ -99,7 +99,7 @@ background:transparent;
         <x>0</x>
         <y>0</y>
         <width>675</width>
-        <height>808</height>
+        <height>791</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -364,15 +364,14 @@ background:transparent;
             <item row="3" column="1">
              <widget class="QCheckBox" name="startMinimized">
               <property name="text">
-               <string>Minimize app in tray on start</string>
+               <string>Minimize App in tray on start</string>
               </property>
              </widget>
             </item>
             <item row="4" column="0">
              <widget class="QCheckBox" name="minimizeOnTrayIconClick">
               <property name="text">
-               <string>Minimize/Maximize on right clicking tray Icon
-(if supported by system tray)</string>
+               <string>Show/Hide on clicking tray Icon (if supported)</string>
               </property>
              </widget>
             </item>

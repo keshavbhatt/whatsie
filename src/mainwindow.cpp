@@ -128,7 +128,10 @@ void MainWindow::initRateWidget() {
   });
 }
 
-void MainWindow::runMinimized() { this->minimizeAction->trigger(); }
+void MainWindow::runMinimized() {
+    this->minimizeAction->trigger();
+    notify("Whatsie", "Whatsie started minimized in tray");
+}
 
 MainWindow::~MainWindow() { webEngine->deleteLater(); }
 
@@ -196,9 +199,7 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-
   foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
-
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
