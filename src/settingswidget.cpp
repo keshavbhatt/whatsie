@@ -518,7 +518,7 @@ void SettingsWidget::on_notificationCombo_currentIndexChanged(int index) {
 }
 
 void SettingsWidget::on_tryNotification_clicked() {
-  emit notify("This is a test notification...");
+  emit notify("This is a long long long test notification......");
 }
 
 void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked) {

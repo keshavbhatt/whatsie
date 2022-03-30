@@ -494,12 +494,10 @@ void MainWindow::notify(QString title, QString message) {
   } else {
     auto popup = new NotificationPopup(webEngine);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
-      if (windowState() == Qt::WindowMinimized ||
-          windowState() != Qt::WindowActive) {
-        activateWindow();
-        raise();
-        showNormal();
-      }
+        if (windowState().testFlag(Qt::WindowMinimized) ||
+            !windowState().testFlag(Qt::WindowActive)) {
+            setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+        }
     });
     popup->style()->polish(qApp);
     popup->setMinimumWidth(300);
@@ -812,11 +810,9 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
   auto popup = new NotificationPopup(webEngine);
   popup->setObjectName("engineNotifier");
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
-    if (windowState() == Qt::WindowMinimized ||
-        windowState() != Qt::WindowActive) {
-      activateWindow();
-      raise();
-      showNormal();
+    if (windowState().testFlag(Qt::WindowMinimized) ||
+        !windowState().testFlag(Qt::WindowActive)) {
+        setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     }
   });
 
@@ -834,12 +830,10 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
               settings.value("notificationTimeOut", 9000).toInt());
           trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
           connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
-            if (windowState() == Qt::WindowMinimized ||
-                windowState() != Qt::WindowActive) {
-              activateWindow();
-              raise();
-              showNormal();
-            }
+              if (windowState().testFlag(Qt::WindowMinimized) ||
+                  !windowState().testFlag(Qt::WindowActive)) {
+                  setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+              }
           });
 
         } else {

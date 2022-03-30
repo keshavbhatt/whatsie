@@ -133,7 +133,6 @@ protected:
   void mouseReleaseEvent(QMouseEvent *event) override {
     QWidget::mouseReleaseEvent(event);
     if (event->button() == Qt::LeftButton) {
-      qDebug() << "noti clicked";
       emit notification_clicked();
       if (notification)
         notification->click();
