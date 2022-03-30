@@ -199,6 +199,42 @@ void MainWindow::handleCookieAdded(const QNetworkCookie &cookie) {
   qDebug() << cookie.toRawForm() << "\n\n\n";
 }
 
+void MainWindow::forceLogOut() {
+  if (webEngine && webEngine->page()) {
+    webEngine->page()->runJavaScript(
+        "window.localStorage.clear();",
+        [=](const QVariant &result) { qDebug() << result; });
+  }
+}
+
+bool MainWindow::isLoggedIn(){
+    static bool loggedIn = false;
+    if (webEngine && webEngine->page()) {
+        webEngine->page()->runJavaScript(
+          "window.localStorage.getItem('WAToken2')",
+          [=](const QVariant &result) { qDebug() <<Q_FUNC_INFO << result;
+            if(result.isValid() && result.toString().isEmpty() == false){
+                loggedIn = true;
+            }
+        });
+        qDebug() << "isLoggedIn" <<loggedIn;
+        return loggedIn;
+    }else{
+        qDebug() << "isLoggedIn" <<loggedIn;
+        return loggedIn;
+    }
+}
+
+void MainWindow::tryLogOut() {
+  if (webEngine && webEngine->page()) {
+    webEngine->page()->runJavaScript(
+        "document.querySelector(\"span[data-testid|='menu']\").click();"
+        "document.querySelector(\"#side > header > div > div > span > div > "
+        "span > div > ul > li:nth-child(5) > div\").click()",
+        [=](const QVariant &result) { qDebug() << Q_FUNC_INFO << result; });
+  }
+}
+
 void MainWindow::init_settingWidget() {
   if (settingsWidget == nullptr) {
     settingsWidget = new SettingsWidget(
@@ -597,9 +633,17 @@ void MainWindow::init_lock() {
 void MainWindow::change_lock_password() {
   settings.remove("asdfg");
   settingsWidget->appLockSetChecked(false);
-  settingsWidget->clearAllData();
-  doAppReload();
-  init_lock();
+
+  tryLogOut();
+  QTimer::singleShot(2000, this, [=]() {
+      if(isLoggedIn()){
+        forceLogOut();
+        doAppReload();
+      }
+      init_lock();
+  });
+
+
 }
 
 // check window state and set tray menus

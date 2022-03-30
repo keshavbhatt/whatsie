@@ -118,6 +118,9 @@ private slots:
   void handleZoom();
   void change_lock_password();
   void tryLock();
+  void forceLogOut();
+  void tryLogOut();
+  bool isLoggedIn();
 };
 
 #endif // MAINWINDOW_H
