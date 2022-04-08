@@ -80,6 +80,7 @@ parts:
      source: https://github.com/keshavbhatt/whatsie.git
      source-subdir: src/
      override-build: |
+            snapcraftctl build
 
             apt install -y build-essential qt515base qt515tools qt515webengine qt515location qt515xmlpatterns libgl1-mesa-dev
 
