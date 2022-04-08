@@ -34,8 +34,9 @@ int main(int argc, char *argv[]) {
 
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");
-#endif
+#else
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
+#endif
 
   QApplication app(argc, argv);
   app.setQuitOnLastWindowClosed(false);
