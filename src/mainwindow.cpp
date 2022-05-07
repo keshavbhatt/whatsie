@@ -496,7 +496,9 @@ void MainWindow::notify(QString title, QString message) {
     auto popup = new NotificationPopup(webEngine);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
         if (windowState().testFlag(Qt::WindowMinimized) ||
-            !windowState().testFlag(Qt::WindowActive)) {
+            !windowState().testFlag(Qt::WindowActive) ||
+             this->isHidden()) {
+            this->show();
             setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
         }
     });
@@ -812,7 +814,8 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
   popup->setObjectName("engineNotifier");
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState().testFlag(Qt::WindowMinimized) ||
-        !windowState().testFlag(Qt::WindowActive)) {
+        !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
+        this->show();
         setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     }
   });
@@ -832,7 +835,8 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
           connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
               if (windowState().testFlag(Qt::WindowMinimized) ||
-                  !windowState().testFlag(Qt::WindowActive)) {
+                  !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
+                  this->show();
                   setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
               }
           });
