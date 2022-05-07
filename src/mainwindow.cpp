@@ -19,11 +19,10 @@ MainWindow::MainWindow(QWidget *parent)
 
   setObjectName("MainWindow");
   setWindowTitle(QApplication::applicationName());
-  setWindowIcon(QIcon(":/icons/app/icon-256.png"));
-  setMinimumWidth(750);
-  setMinimumHeight(640);
+  setWindowIcon(QIcon(":/icons/app/icon-128.png"));
+  setMinimumWidth(525);
+  setMinimumHeight(448);
   restoreGeometry(settings.value("geometry").toByteArray());
-  restoreState(settings.value("windowState").toByteArray());
   initThemes();
   createActions();
   createTrayIcon();
@@ -449,7 +448,6 @@ void MainWindow::showAbout() {
 
 void MainWindow::closeEvent(QCloseEvent *event) {
   settings.setValue("geometry", saveGeometry());
-  settings.setValue("windowState", saveState());
   getPageTheme();
   QTimer::singleShot(500, settingsWidget, [=]() { settingsWidget->refresh(); });
 
@@ -465,8 +463,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     return;
   }
   event->accept();
-  qApp->quit();
-  settings.setValue("firstrun_tray", true);
+  quitApp();
   QMainWindow::closeEvent(event);
 }
 
@@ -557,6 +554,7 @@ void MainWindow::createActions() {
 }
 
 void MainWindow::quitApp() {
+  settings.setValue("geometry", saveGeometry());
   getPageTheme();
   QTimer::singleShot(500, &settings, [=]() {
     qWarning() << "THEME" << settings.value("windowTheme").toString();
