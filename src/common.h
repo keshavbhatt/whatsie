@@ -8,7 +8,7 @@ QString defaultUserAgentStr = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.3
 //appAutoLock
 int defaultAppAutoLockDuration = 30;
 bool defaultAppAutoLock = false;
-double defaultZoomFactorMaximized = 1.50;
+double defaultZoomFactorMaximized = 1.00;
 
 #endif // COMMON_H
 
