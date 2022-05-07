@@ -6,8 +6,13 @@
 
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
-  profile->setHttpUserAgent(
-      profile->httpUserAgent().replace("QtWebEngine/5.13.0", ""));
+
+  auto userAgent = profile->httpUserAgent();
+  auto webengineversion = userAgent.split("QtWebEngine").last().split(" ").first();
+  auto toRemove = "QtWebEngine"+webengineversion;
+  auto cleanUserAgent = userAgent.remove(toRemove).replace("  ", " ");
+  profile->setHttpUserAgent(cleanUserAgent);
+
   connect(this, &QWebEnginePage::loadFinished, this,
           &WebEnginePage::handleLoadFinished);
   connect(this, &QWebEnginePage::authenticationRequired, this,
@@ -286,3 +291,12 @@ void WebEnginePage::handleSelectClientCertificate(
   qDebug() << selection.host();
 }
 #endif
+
+void WebEnginePage::javaScriptConsoleMessage(
+    WebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message,
+    int lineId, const QString &sourceId) {
+  Q_UNUSED(level);
+  Q_UNUSED(message);
+  Q_UNUSED(lineId);
+  Q_UNUSED(sourceId);
+}
