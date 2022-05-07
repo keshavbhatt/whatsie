@@ -8,6 +8,14 @@
 #include <QDir>
 #include <QTextDocument>
 #include <QUuid>
+#include <QApplication>
+#include <QDateTime>
+#include <QDesktopServices>
+#include <QMessageBox>
+#include <QProcessEnvironment>
+#include <QRandomGenerator>
+#include <QRegularExpression>
+#include <QProcess>
 
 class utils : public QObject
 {
@@ -31,6 +39,7 @@ public slots:
     static float RoundToOneDecimal(float number);
     void DisplayExceptionErrorDialog(const QString &error_info);
     static QString appDebugInfo();
+    static void desktopOpenUrl(const QString str);
 
 private slots:
     //use refreshCacheSize

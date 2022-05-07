@@ -46,3 +46,13 @@ void DownloadManagerWidget::remove(DownloadWidget *downloadWidget) {
   if (--m_numDownloads == 0)
     m_zeroItemsLabel->show();
 }
+
+void DownloadManagerWidget::on_open_download_dir_clicked() {
+  utils::desktopOpenUrl(settings
+                            .value("defaultDownloadLocation",
+                                   QStandardPaths::writableLocation(
+                                       QStandardPaths::DownloadLocation) +
+                                       QDir::separator() +
+                                       QApplication::applicationName())
+                            .toString());
+}

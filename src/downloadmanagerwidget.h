@@ -55,6 +55,7 @@
 
 #include <QWidget>
 #include <QSettings>
+#include "utils.h"
 
 QT_BEGIN_NAMESPACE
 class QWebEngineDownloadItem;
@@ -73,6 +74,9 @@ public:
     // the QWebEngineDownloadItem will be accepted and the DownloadManagerWidget
     // will be shown on the screen.
     void downloadRequested(QWebEngineDownloadItem *webItem);
+
+private slots:
+    void on_open_download_dir_clicked();
 
 private:
     void add(DownloadWidget *downloadWidget);

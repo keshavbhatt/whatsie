@@ -1,10 +1,4 @@
 #include "utils.h"
-#include <QApplication>
-#include <QDateTime>
-#include <QMessageBox>
-#include <QProcessEnvironment>
-#include <QRandomGenerator>
-#include <QRegularExpression>
 #include <time.h>
 
 utils::utils(QObject *parent) : QObject(parent) { setParent(parent); }
@@ -267,4 +261,25 @@ QString utils::GetEnvironmentVar(const QString &variable_name) {
       .value(variable_name, "")
       .trimmed();
 #endif
+}
+
+void utils::desktopOpenUrl(const QString str) {
+  QProcess *xdg_open = new QProcess(0);
+  xdg_open->start("xdg-open", QStringList() << str);
+  if (xdg_open->waitForStarted(1000) == false) {
+    // try using QdesktopServices
+    bool opened = QDesktopServices::openUrl(QUrl(str));
+    if (opened == false) {
+      qWarning() << "failed to open url" << str;
+    }
+  }
+  connect(xdg_open,
+          static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
+              &QProcess::finished),
+          [xdg_open](int exitCode, QProcess::ExitStatus exitStatus) {
+            Q_UNUSED(exitCode);
+            Q_UNUSED(exitStatus);
+            xdg_open->close();
+            xdg_open->deleteLater();
+          });
 }
