@@ -1,5 +1,5 @@
 name: whatsie
-version: '4.0'
+version: '4.1'
 summary: Qt Based WhatsApp Client
 description: |
   Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies.
