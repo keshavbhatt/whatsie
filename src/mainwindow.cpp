@@ -366,13 +366,13 @@ void MainWindow::handleZoomOnWindowStateChange(QWindowStateChangeEvent *ev) {
 }
 
 void MainWindow::handleZoom() {
-  if (windowState() == Qt::WindowMaximized ||
-      windowState() == Qt::WindowFullScreen) {
+  if (windowState().testFlag(Qt::WindowMaximized) ||
+      windowState().testFlag(Qt::WindowFullScreen)) {
     double currentFactor =
         settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
             .toDouble();
     webEngine->page()->setZoomFactor(currentFactor);
-  } else if (windowState() == Qt::WindowNoState) {
+  } else if (windowState().testFlag(Qt::WindowNoState)) {
     double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
     webEngine->page()->setZoomFactor(currentFactor);
   }
@@ -792,10 +792,11 @@ void MainWindow::createWebPage(bool offTheRecord) {
   auto randomValue = QRandomGenerator::global()->generateDouble() * 300;
   page->setUrl(
       QUrl("https://web.whatsapp.com?v=" + QString::number(randomValue)));
+
   connect(profile, &QWebEngineProfile::downloadRequested,
           &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 
-  connect(webEngine->page(),
+  connect(page,
           SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this,
           SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
 
