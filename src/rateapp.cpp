@@ -43,6 +43,7 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count,
       showTimer->start();
     } else {
       // if shouldshow is false, delete this obj to free resources
+      showTimer->stop();
       this->deleteLater();
     }
   }
