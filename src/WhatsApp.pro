@@ -26,6 +26,9 @@ win32{
     LIBS += User32.Lib
 }
 
+include(singleapplication/singleapplication.pri)
+DEFINES += QAPPLICATION_CLASS=QApplication
+
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
 # depend on your compiler). Refer to the documentation for the
@@ -63,7 +66,6 @@ SOURCES += \
         mainwindow.cpp \
         permissiondialog.cpp \
         rateapp.cpp \
-        rungaurd.cpp \
         settingswidget.cpp \
         utils.cpp \
         webenginepage.cpp \
@@ -89,7 +91,6 @@ HEADERS += \
     permissiondialog.h \
     rateapp.h \
     requestinterceptor.h \
-    rungaurd.h \
     settingswidget.h \
     utils.h \
     webenginepage.h \

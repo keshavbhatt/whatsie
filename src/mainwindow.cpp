@@ -128,20 +128,14 @@ void MainWindow::initRateWidget() {
 }
 
 void MainWindow::runMinimized() {
-    this->minimizeAction->trigger();
-    notify("Whatsie", "Whatsie started minimized in tray");
+  this->minimizeAction->trigger();
+  notify("Whatsie", "Whatsie started minimized in tray. Click to Open.");
 }
 
 MainWindow::~MainWindow() { webEngine->deleteLater(); }
 
 void MainWindow::loadAppWithArgument(const QString &arg) {
   // https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
-
-  // The WhatsApp Messenger application
-  if (arg.contains("://app")) {
-    this->show(); // restore app
-    return;
-  }
 
   // PASSED SCHEME whatsapp://send?text=Hello%2C%20World!&phone=919568388397"
   // CONVERTED URI
@@ -151,15 +145,28 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
     QString newArg = arg;
     newArg = newArg.replace("?", "&");
     QUrlQuery query(newArg);
-    QString phone, phoneStr, text, textStr, urlStr;
-    // create send url equivalent
+
+    static QString phone, phoneStr, text, textStr, urlStr;
     phone = query.queryItemValue("phone");
     text = query.queryItemValue("text");
-    phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
-    textStr = text.isEmpty() ? "" : "text=" + text;
-    urlStr = "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-    this->webEngine->page()->load(QUrl(urlStr));
-    return;
+
+    webEngine->page()->runJavaScript(
+        "openNewChatWhatsieDefined()", [this](const QVariant &result) {
+          if (result.toString().contains("true")) {
+            this->webEngine->page()->runJavaScript(
+                QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
+            this->notify(QApplication::applicationName(),
+                         "New chat with " + phoneStr +
+                             " is ready. Click to Open.");
+          } else {
+            // create send url equivalent
+            phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
+            textStr = text.isEmpty() ? "" : "text=" + text;
+            urlStr =
+                "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
+            this->webEngine->page()->load(QUrl(urlStr));
+          }
+        });
   }
 }
 
@@ -198,7 +205,9 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
+  foreach (QWidget *w, widgets) {
+    w->setPalette(qApp->palette());
+  }
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
@@ -485,19 +494,19 @@ void MainWindow::notify(QString title, QString message) {
       if (windowState().testFlag(Qt::WindowMinimized) ||
           !windowState().testFlag(Qt::WindowActive)) {
         activateWindow();
-        //raise();
+        // raise();
         this->show();
       }
     });
   } else {
     auto popup = new NotificationPopup(webEngine);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
-        if (windowState().testFlag(Qt::WindowMinimized) ||
-            !windowState().testFlag(Qt::WindowActive) ||
-             this->isHidden()) {
-            this->show();
-            setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-        }
+      if (windowState().testFlag(Qt::WindowMinimized) ||
+          !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
+        this->show();
+        setWindowState((windowState() & ~Qt::WindowMinimized) |
+                       Qt::WindowActive);
+      }
     });
     popup->style()->polish(qApp);
     popup->setMinimumWidth(300);
@@ -794,8 +803,7 @@ void MainWindow::createWebPage(bool offTheRecord) {
   connect(profile, &QWebEngineProfile::downloadRequested,
           &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 
-  connect(page,
-          SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this,
+  connect(page, SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this,
           SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
 
   double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
@@ -814,8 +822,8 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState().testFlag(Qt::WindowMinimized) ||
         !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
-        this->show();
-        setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+      this->show();
+      setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
     }
   });
 
@@ -833,11 +841,12 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
               settings.value("notificationTimeOut", 9000).toInt());
           trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
           connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
-              if (windowState().testFlag(Qt::WindowMinimized) ||
-                  !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
-                  this->show();
-                  setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-              }
+            if (windowState().testFlag(Qt::WindowMinimized) ||
+                !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
+              this->show();
+              setWindowState((windowState() & ~Qt::WindowMinimized) |
+                             Qt::WindowActive);
+            }
           });
 
         } else {
@@ -890,8 +899,25 @@ void MainWindow::handleLoadFinished(bool loaded) {
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
+    injectNewChatJavaScript();
     settingsWidget->refresh();
   }
+}
+
+void MainWindow::injectNewChatJavaScript() {
+  QString js = "const openNewChatWhatsie = (phone,text) => { "
+               "const link = document.createElement('a');"
+               "link.setAttribute('href', "
+               "`whatsapp://send/?phone=${phone}&text=${text}`);"
+               "document.body.append(link);"
+               "link.click();"
+               "document.body.removeChild(link);"
+               "};"
+               "function openNewChatWhatsieDefined()"
+               "{"
+               "    return (openNewChatWhatsie != 'undefined');"
+               "}";
+  webEngine->page()->runJavaScript(js);
 }
 
 void MainWindow::checkLoadedCorrectly() {
@@ -1054,4 +1080,12 @@ void MainWindow::tryLock() {
     settingsWidget->appLockSetChecked(false);
     init_lock();
   }
+}
+
+void MainWindow::alreadyRunning() {
+  QString appname = QApplication::applicationName();
+  this->notify(
+      appname,
+      QString("An instance of %1 is already Running, click to restore.")
+          .arg(appname));
 }

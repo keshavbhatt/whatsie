@@ -6,10 +6,9 @@
 #include <QtWebEngine>
 #include <QtWidgets>
 
-#include "mainwindow.h"
-
 #include "common.h"
-#include "rungaurd.h"
+#include "mainwindow.h"
+#include <singleapplication.h>
 
 int main(int argc, char *argv[]) {
 
@@ -19,7 +18,7 @@ int main(int argc, char *argv[]) {
 
   if (args.contains("-v") || args.contains("--version")) {
     qInfo() << QString("version: %1, branch: %2, commit: %3, built_at: %4")
-                    .arg(VERSIONSTR, GIT_BRANCH, GIT_HASH, BUILD_TIMESTAMP);
+                   .arg(VERSIONSTR, GIT_BRANCH, GIT_HASH, BUILD_TIMESTAMP);
     return 0;
   }
 
@@ -38,18 +37,20 @@ int main(int argc, char *argv[]) {
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
 #endif
 
-  QApplication app(argc, argv);
+  SingleApplication app(argc, argv, true);
   app.setQuitOnLastWindowClosed(false);
   app.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
-  QString appname = QApplication::applicationName();
 
-  RunGuard guard("org.keshavnrj.ubuntu." + appname);
-  if (!guard.tryToRun()) {
-    QMessageBox::critical(0, appname,
-                          "An instance of " + appname + " is already running.");
+  // if secondary instance is invoked
+  if (app.isSecondary()) {
+    app.sendMessage(app.arguments().join(' ').toUtf8());
+    qInfo() << QApplication::applicationName() +
+                   " is already running with PID:" +
+                   QString::number(app.primaryPid()) + "; by USER: "
+            << app.primaryUser();
     return 0;
   }
 
@@ -64,18 +65,38 @@ int main(int argc, char *argv[]) {
 
   MainWindow window;
 
+  // else
+  QObject::connect(
+      &app, &SingleApplication::receivedMessage,
+      [&window](int instanceId, QByteArray message) {
+        qInfo() << "Another instance with PID: " + QString::number(instanceId) +
+                       ", sent argument: " + message;
+        QString messageStr = QTextCodec::codecForMib(106)->toUnicode(message);
+        if (messageStr.contains("whatsapp://whatsie", Qt::CaseInsensitive)) {
+          window.show();
+          return;
+        } else if (messageStr.contains("whatsapp://", Qt::CaseInsensitive)) {
+          QString urlStr =
+              "whatsapp://" + messageStr.split("whatsapp://").last();
+          window.loadAppWithArgument(urlStr);
+        } else {
+          window.alreadyRunning();
+        }
+      });
+
   QStringList argsList = app.arguments();
   foreach (QString argStr, argsList) {
     if (argStr.contains("whatsapp://")) {
       window.loadAppWithArgument(argStr);
     }
   }
+
   QSettings settings;
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
       settings.value("startMinimized", false).toBool()) {
-      window.runMinimized();
-  }else{
-      window.show();
+    window.runMinimized();
+  } else {
+    window.show();
   }
 
   return app.exec();

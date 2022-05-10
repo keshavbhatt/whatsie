@@ -50,6 +50,7 @@ public slots:
   void handleDownloadRequested(QWebEngineDownloadItem *download);
   void loadAppWithArgument(const QString &arg);
   void runMinimized();
+  void alreadyRunning();
 protected slots:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
@@ -125,6 +126,7 @@ private slots:
   bool isLoggedIn();
   void initAutoLock();
   void appAutoLockChanged();
+  void injectNewChatJavaScript();
 };
 
 #endif // MAINWINDOW_H
