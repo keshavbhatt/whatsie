@@ -80,7 +80,7 @@ int main(int argc, char *argv[]) {
               "whatsapp://" + messageStr.split("whatsapp://").last();
           window.loadAppWithArgument(urlStr);
         } else {
-          window.alreadyRunning();
+          window.alreadyRunning(true);
         }
       });
 

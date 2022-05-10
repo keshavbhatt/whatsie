@@ -50,7 +50,7 @@ public slots:
   void handleDownloadRequested(QWebEngineDownloadItem *download);
   void loadAppWithArgument(const QString &arg);
   void runMinimized();
-  void alreadyRunning();
+  void alreadyRunning(bool notify = false);
 protected slots:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;

@@ -146,7 +146,7 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
     newArg = newArg.replace("?", "&");
     QUrlQuery query(newArg);
 
-    QString phone,  text;
+    QString phone, text;
     phone = query.queryItemValue("phone");
     text = query.queryItemValue("text");
     triggerNewChat(phone, text);
@@ -188,9 +188,7 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-  foreach (QWidget *w, widgets) {
-    w->setPalette(qApp->palette());
-  }
+  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
@@ -549,7 +547,6 @@ void MainWindow::quitApp() {
   settings.setValue("geometry", saveGeometry());
   getPageTheme();
   QTimer::singleShot(500, &settings, [=]() {
-    qWarning() << "THEME" << settings.value("windowTheme").toString();
     settings.setValue("firstrun_tray", true);
     qApp->quit();
   });
@@ -1021,25 +1018,24 @@ void MainWindow::newChat() {
   }
 }
 
-void MainWindow::triggerNewChat(QString phone, QString text){
-    static QString phoneStr, textStr;
-    webEngine->page()->runJavaScript(
-        "openNewChatWhatsieDefined()", [this, phone, text](const QVariant &result) {
-          if (result.toString().contains("true")) {
-            this->webEngine->page()->runJavaScript(
-                QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
-            this->notify(QApplication::applicationName(),
-                         "New chat with " + phone +
-                             " is ready. Click to Open.");
-          } else {
-            // create send url equivalent
-            phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
-            textStr = text.isEmpty() ? "" : "text=" + text;
-            QString urlStr =
-                "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-            this->webEngine->page()->load(QUrl(urlStr));
-          }
-        });
+void MainWindow::triggerNewChat(QString phone, QString text) {
+  static QString phoneStr, textStr;
+  webEngine->page()->runJavaScript(
+      "openNewChatWhatsieDefined()",
+      [this, phone, text](const QVariant &result) {
+        if (result.toString().contains("true")) {
+          this->webEngine->page()->runJavaScript(
+              QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
+        } else {
+          // create send url equivalent
+          phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
+          textStr = text.isEmpty() ? "" : "text=" + text;
+          QString urlStr =
+              "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
+          this->webEngine->page()->load(QUrl(urlStr));
+        }
+        this->alreadyRunning();
+      });
 }
 
 bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
@@ -1085,10 +1081,10 @@ void MainWindow::tryLock() {
   }
 }
 
-void MainWindow::alreadyRunning() {
-  QString appname = QApplication::applicationName();
-  this->notify(
-      appname,
-      QString("An instance of %1 is already Running, click to restore.")
-          .arg(appname));
+void MainWindow::alreadyRunning(bool notify) {
+  this->show();
+  if (notify) {
+    QString appname = QApplication::applicationName();
+    this->notify(appname, "Restored an already running instance.");
+  }
 }
