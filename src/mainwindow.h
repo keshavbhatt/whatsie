@@ -127,6 +127,7 @@ private slots:
   void initAutoLock();
   void appAutoLockChanged();
   void injectNewChatJavaScript();
+  void triggerNewChat(QString phone, QString text);
 };
 
 #endif // MAINWINDOW_H

@@ -146,27 +146,10 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
     newArg = newArg.replace("?", "&");
     QUrlQuery query(newArg);
 
-    static QString phone, phoneStr, text, textStr, urlStr;
+    QString phone,  text;
     phone = query.queryItemValue("phone");
     text = query.queryItemValue("text");
-
-    webEngine->page()->runJavaScript(
-        "openNewChatWhatsieDefined()", [this](const QVariant &result) {
-          if (result.toString().contains("true")) {
-            this->webEngine->page()->runJavaScript(
-                QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
-            this->notify(QApplication::applicationName(),
-                         "New chat with " + phoneStr +
-                             " is ready. Click to Open.");
-          } else {
-            // create send url equivalent
-            phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
-            textStr = text.isEmpty() ? "" : "text=" + text;
-            urlStr =
-                "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-            this->webEngine->page()->load(QUrl(urlStr));
-          }
-        });
+    triggerNewChat(phone, text);
   }
 }
 
@@ -1024,19 +1007,39 @@ void MainWindow::doAppReload() {
 
 void MainWindow::newChat() {
   bool ok;
-  QString text = QInputDialog::getText(
+  QString phoneNumber = QInputDialog::getText(
       this, tr("New Chat"),
       tr("Enter a valid WhatsApp number with country code (ex- +91XXXXXXXXXX)"),
       QLineEdit::Normal, "", &ok);
   if (ok) {
-    if (isPhoneNumber(text))
-      this->webEngine->page()->load(
-          QUrl("https://web.whatsapp.com/send?phone=" + text));
+    if (isPhoneNumber(phoneNumber))
+      triggerNewChat(phoneNumber, "");
     else
       QMessageBox::information(this,
                                QApplication::applicationName() + "| Error",
                                "Invalid Phone Number");
   }
+}
+
+void MainWindow::triggerNewChat(QString phone, QString text){
+    static QString phoneStr, textStr;
+    webEngine->page()->runJavaScript(
+        "openNewChatWhatsieDefined()", [this, phone, text](const QVariant &result) {
+          if (result.toString().contains("true")) {
+            this->webEngine->page()->runJavaScript(
+                QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
+            this->notify(QApplication::applicationName(),
+                         "New chat with " + phone +
+                             " is ready. Click to Open.");
+          } else {
+            // create send url equivalent
+            phoneStr = phone.isEmpty() ? "" : "phone=" + phone;
+            textStr = text.isEmpty() ? "" : "text=" + text;
+            QString urlStr =
+                "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
+            this->webEngine->page()->load(QUrl(urlStr));
+          }
+        });
 }
 
 bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
