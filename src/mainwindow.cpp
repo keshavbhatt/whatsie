@@ -482,11 +482,11 @@ void MainWindow::notify(QString title, QString message) {
                           settings.value("notificationTimeOut", 9000).toInt());
     trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
     connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
-      if (windowState() == Qt::WindowMinimized ||
-          windowState() != Qt::WindowActive) {
+      if (windowState().testFlag(Qt::WindowMinimized) ||
+          !windowState().testFlag(Qt::WindowActive)) {
         activateWindow();
-        raise();
-        showNormal();
+        //raise();
+        this->show();
       }
     });
   } else {
@@ -854,7 +854,7 @@ void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
     request.accept();
   } else {
     webEngine->showNormal();
-    this->showNormal();
+    this->show();
     request.accept();
   }
 }
@@ -976,7 +976,7 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
   if (isVisible()) {
     hide();
   } else {
-    showNormal();
+    this->show();
   }
 }
 
@@ -984,7 +984,7 @@ void MainWindow::messageClicked() {
   if (isVisible()) {
     hide();
   } else {
-    showNormal();
+    this->show();
   }
 }
 
