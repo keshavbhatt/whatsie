@@ -49,6 +49,19 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
+
+  QMenu *menu = page()->createStandardContextMenu();
+  // hide reload, back, forward, savepage, copyimagelink menus
+  foreach (auto *action, menu->actions()) {
+    if (action == page()->action(QWebEnginePage::SavePage)
+            || action == page()->action(QWebEnginePage::Reload)
+            || action == page()->action(QWebEnginePage::Back)
+            || action == page()->action(QWebEnginePage::Forward)
+            || action == page()->action(QWebEnginePage::CopyImageUrlToClipboard)) {
+      action->setVisible(false);
+    }
+  }
+
   const QWebEngineContextMenuData &data = page()->contextMenuData();
   Q_ASSERT(data.isValid());
 
@@ -58,17 +71,17 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     return;
   }
   // if content is not editable
-  if (!data.isContentEditable()) {
+  if (data.selectedText().isEmpty() && !data.isContentEditable()) {
     event->ignore();
     return;
   }
 
   QWebEngineProfile *profile = page()->profile();
   const QStringList &languages = profile->spellCheckLanguages();
-  QMenu *menu = page()->createStandardContextMenu();
+
   menu->addSeparator();
 
-  QAction *spellcheckAction = new QAction(tr("Check Spelling"), nullptr);
+  QAction *spellcheckAction = new QAction(tr("Check Spelling"), menu);
   spellcheckAction->setCheckable(true);
   spellcheckAction->setChecked(profile->isSpellCheckEnabled());
   connect(spellcheckAction, &QAction::toggled, this,
