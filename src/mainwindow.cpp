@@ -40,7 +40,8 @@ void MainWindow::initAutoLock() {
       1000);
   connect(autoLockEventFilter, &AutoLockEventFilter::autoLockTimerTimeout, this,
           [=]() {
-            if (settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
+            if ((settingsWidget && !settingsWidget->isVisible()) &&
+                settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
               this->lockApp();
             }
           });
@@ -188,7 +189,9 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
+  foreach (QWidget *w, widgets) {
+    w->setPalette(qApp->palette());
+  }
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
@@ -216,7 +219,8 @@ bool MainWindow::isLoggedIn() {
   static bool loggedIn = false;
   if (webEngine && webEngine->page()) {
     webEngine->page()->runJavaScript(
-        "window.localStorage.getItem('WAToken2')", [=](const QVariant &result) {
+        "window.localStorage.getItem('last-wid-md')",
+        [=](const QVariant &result) {
           qDebug() << Q_FUNC_INFO << result;
           if (result.isValid() && result.toString().isEmpty() == false) {
             loggedIn = true;
@@ -235,7 +239,15 @@ void MainWindow::tryLogOut() {
     webEngine->page()->runJavaScript(
         "document.querySelector(\"span[data-testid|='menu']\").click();"
         "document.querySelector(\"#side > header > div > div > span > div > "
-        "span > div > ul > li:nth-child(5) > div\").click()",
+        "span > div > ul > li:nth-child(4) > div\").click();"
+        "var dialogEle,dialogEleLastElem;"
+        "function logoutC(){"
+        "  dialogEle=document.activeElement.querySelectorAll(\":last-child\");"
+        "  dialogEleLastElem=dialogEle[dialogEle.length-1];"
+        "  dialogEleLastElem.click();"
+        "}"
+        "setTimeout(logoutC, 600);"
+        "",
         [=](const QVariant &result) { qDebug() << Q_FUNC_INFO << result; });
   }
 }
@@ -641,7 +653,7 @@ void MainWindow::change_lock_password() {
   settingsWidget->autoAppLockSetChecked(false);
   settingsWidget->updateAppLockPasswordViewer();
   tryLogOut();
-  QTimer::singleShot(1500, this, [=]() {
+  QTimer::singleShot(1000, this, [=]() {
     if (isLoggedIn()) {
       forceLogOut();
       doAppReload();
@@ -654,14 +666,14 @@ void MainWindow::change_lock_password() {
 void MainWindow::appAutoLockChanged() {
   bool enabled = settings.value("appAutoLocking", defaultAppAutoLock).toBool();
   if (enabled) {
-    qApp->installEventFilter(autoLockEventFilter);
     autoLockEventFilter->setTimeoutmillis(
         settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt() *
         1000);
+    qApp->installEventFilter(autoLockEventFilter);
     autoLockEventFilter->resetTimer();
   } else {
-    qApp->removeEventFilter(autoLockEventFilter);
     autoLockEventFilter->stopTimer();
+    qApp->removeEventFilter(autoLockEventFilter);
   }
 }
 
