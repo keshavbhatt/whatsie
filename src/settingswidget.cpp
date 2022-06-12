@@ -55,9 +55,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
   ui->startMinimized->setChecked(
       settings.value("startMinimized", false).toBool());
 
-  appLockSetChecked(
+  ui->appAutoLockcheckBox->setChecked(
       settings.value("appAutoLocking", defaultAppAutoLock).toBool());
-
   ui->autoLockDurationSpinbox->setValue(
       settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
   ui->minimizeOnTrayIconClick->setChecked(
@@ -445,14 +444,12 @@ void SettingsWidget::showSetApplockPasswordDialog() {
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
   msgBox.setInformativeText("Do you want to setup App lock now?");
-  msgBox.setStandardButtons(QMessageBox::Cancel);
-  QPushButton *setAppLock = new QPushButton(
-      this->style()->standardIcon(QStyle::SP_DialogYesButton), "Yes", nullptr);
-  msgBox.addButton(setAppLock, QMessageBox::NoRole);
-  connect(setAppLock, &QPushButton::clicked, setAppLock,
-          [=]() { emit init_lock(); });
+  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::Cancel);
   int ret = msgBox.exec();
-  if (ret == QMessageBox::Cancel) {
+  if (ret == QMessageBox::Yes) {
+    this->close();
+    emit init_lock();
+  } else {
     ui->applock_checkbox->blockSignals(true);
     ui->applock_checkbox->setChecked(false);
     ui->applock_checkbox->blockSignals(false);
@@ -556,7 +553,9 @@ void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
   if (settings.value("asdfg").isValid()) {
     settings.setValue("appAutoLocking", checked);
   } else {
-    showSetApplockPasswordDialog();
+    QMessageBox::information(this, "App Lock Setup",
+                             "Please setup the App lock password first.",
+                             QMessageBox::Ok);
     if (settings.value("asdfg").isValid() == false) {
       settings.setValue("appAutoLocking", false);
       autoAppLockSetChecked(false);
@@ -707,7 +706,7 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
                         "Change password", nullptr);
     msgBox.addButton(changePassword, QMessageBox::NoRole);
     connect(changePassword, &QPushButton::clicked, changePassword,
-            [=]() { emit change_lock_password(); });
+            [=]() { this->close(); emit change_lock_password(); });
     msgBox.exec();
 
   } else {
