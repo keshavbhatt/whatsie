@@ -128,6 +128,7 @@ private slots:
   void appAutoLockChanged();
   void injectNewChatJavaScript();
   void triggerNewChat(QString phone, QString text);
+  void restoreMainWindow();
 };
 
 #endif // MAINWINDOW_H

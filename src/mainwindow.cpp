@@ -23,7 +23,7 @@ MainWindow::MainWindow(QWidget *parent)
   setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   setMinimumWidth(525);
   setMinimumHeight(448);
-  restoreGeometry(settings.value("geometry").toByteArray());
+  restoreMainWindow();
   initThemes();
   createActions();
   createTrayIcon();
@@ -33,6 +33,21 @@ MainWindow::MainWindow(QWidget *parent)
   tryLock();
   updateWindowTheme();
   initAutoLock();
+}
+
+void MainWindow::restoreMainWindow() {
+  if (settings.value("geometry").isValid()) {
+    restoreGeometry(settings.value("geometry").toByteArray());
+    QPoint pos = QCursor::pos();
+    for (QScreen *screen : QGuiApplication::screens()) {
+      QRect screenRect = screen->geometry();
+      if (screenRect.contains(pos)) {
+        this->move(screenRect.center() - this->rect().center());
+      }
+    }
+  }else{
+      this->resize(636, 760);
+  }
 }
 
 void MainWindow::initAutoLock() {
@@ -252,9 +267,10 @@ void MainWindow::tryLogOut() {
 }
 
 void MainWindow::init_settingWidget() {
+  int screenNumber = qApp->desktop()->screenNumber(this);
   if (settingsWidget == nullptr) {
     settingsWidget = new SettingsWidget(
-        this, webEngine->page()->profile()->cachePath(),
+        this, screenNumber, webEngine->page()->profile()->cachePath(),
         webEngine->page()->profile()->persistentStoragePath());
     settingsWidget->setWindowTitle(QApplication::applicationName() +
                                    " | Settings");
@@ -414,12 +430,18 @@ void MainWindow::showSettings() {
   if (webEngine == nullptr) {
     QMessageBox::critical(
         this, QApplication::applicationName() + "| Error",
-        "Unable to initialize settings module.\nIs webengine initialized?");
+        "Unable to initialize settings module.\nWebengine is not initialized.");
     return;
   }
   if (!settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
     settingsWidget->refresh();
+    int screenNumber = qApp->desktop()->screenNumber(this);
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    if (!screenRect.contains(settingsWidget->pos())) {
+      settingsWidget->move(screenRect.center() -
+                           settingsWidget->rect().center());
+    }
     settingsWidget->show();
   }
 }
