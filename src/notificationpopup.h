@@ -59,24 +59,12 @@ public:
     m_message.setText(message);
     m_icon.setPixmap(
         image.scaledToHeight(m_icon.height(), Qt::SmoothTransformation));
-
+    this->adjustSize();
 
     QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
                        this, [=]() { onClosed(); });
 
-    this->adjustSize();
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
-    int x = (screenRect.x() + screenRect.width() - 30) - this->width();
-    int y = 40;
-
-    QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
-    a->setDuration(200);
-    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 20, y)));
-    a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
-    a->setEasingCurve(QEasingCurve::Linear);
-    a->start(QPropertyAnimation::DeleteWhenStopped);
-
-    this->show();
+    animateIn(screenNumber);
   }
 
   void present(int screenNumber,
@@ -94,35 +82,51 @@ public:
                          .scaledToHeight(m_icon.height()));
 
     notification->show();
+    this->adjustSize();
 
     connect(notification.get(), &QWebEngineNotification::closed, this,
             &NotificationPopup::onClosed);
     QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
                        notification.get(), [&]() { onClosed(); });
-    this->adjustSize();
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
-    int x = (screenRect.x() + screenRect.width() - 30) - this->width();
-    int y = 40;
 
+    animateIn(screenNumber);
+  }
+
+protected slots:
+
+  void animateIn(int screenNumber) {
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    int x = (screenRect.x() + screenRect.width() - 20) - this->width();
+    int y = 40;
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
     a->setDuration(200);
-    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 20, y)));
+    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 10, y)));
     a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
-    a->setEasingCurve(QEasingCurve::Linear);
+    a->setEasingCurve(QEasingCurve::InCubic);
     a->start(QPropertyAnimation::DeleteWhenStopped);
 
     this->show();
   }
 
-protected slots:
   void onClosed() {
-    hide();
-    if (notification) {
-      notification->close();
-      notification.reset();
-    } else {
-      this->deleteLater();
-    }
+    auto x = this->pos().x();
+    auto y = this->pos().y();
+    QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
+    a->setDuration(100);
+    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
+    a->setEndValue(QApplication::desktop()->mapToGlobal(
+        QPoint(x + (this->width() - 10), 18)));
+    a->setEasingCurve(QEasingCurve::OutCubic);
+    a->start(QPropertyAnimation::DeleteWhenStopped);
+
+    connect(a, &QPropertyAnimation::finished, this, [=]() {
+      if (notification) {
+        notification->close();
+        notification.reset();
+      } else {
+        this->deleteLater();
+      }
+    });
   }
 
 protected:
