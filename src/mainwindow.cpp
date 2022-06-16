@@ -190,9 +190,7 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-  foreach (QWidget *w, widgets) {
-    w->setPalette(qApp->palette());
-  }
+  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
@@ -505,7 +503,9 @@ void MainWindow::notify(QString title, QString message) {
     popup->style()->polish(qApp);
     popup->setMinimumWidth(300);
     popup->adjustSize();
-    popup->present(title, message, QPixmap(":/icons/app/icon-64.png"));
+    int screenNumber = qApp->desktop()->screenNumber(this);
+    popup->present(screenNumber < 0 ? 0 : screenNumber, title, message,
+                   QPixmap(":/icons/app/icon-64.png"));
   }
 }
 
@@ -844,7 +844,8 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
         } else {
           popup->setMinimumWidth(300);
-          popup->present(notification);
+          int screenNumber = qApp->desktop()->screenNumber(this);
+          popup->present(screenNumber, notification);
         }
       });
 }

@@ -1,4 +1,4 @@
-# Change log:
+## Change log:
 
 ### 4.3
 - feat: IPC; restore window directly when another instance is launched
@@ -21,7 +21,7 @@
           example: `whatsie whatsapp://whatsie`
           will restore the primary instance of whatsie process
 
-## 4.0
+### 4.0
 - fix(SystemTray) tray icon uses png rather than SVG
 - feat(SystemTray) added settings to lets users change the system tray icon click behavior(minimize/maximize on right-click)
 - feat(Download) added setting that lets the user set default download directory, avoid asking while saving files

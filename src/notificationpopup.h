@@ -12,6 +12,7 @@
 #include <QMouseEvent>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QScreen>
 #include <QSettings>
 #include <QSpacerItem>
 #include <QTimer>
@@ -52,27 +53,25 @@ public:
     adjustSize();
   }
 
-  void present(QString title, QString message, const QPixmap image) {
+  void present(int screenNumber, QString title, QString message,
+               const QPixmap image) {
     m_title.setText("<b>" + title + "</b>");
     m_message.setText(message);
     m_icon.setPixmap(
         image.scaledToHeight(m_icon.height(), Qt::SmoothTransformation));
 
-    this->adjustSize();
-    qApp->processEvents();
-
-    int x = QApplication::desktop()->geometry().width() - (this->width() + 10);
-    int y = 40;
-
-    this->update();
 
     QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
                        this, [=]() { onClosed(); });
 
+    this->adjustSize();
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    int x = (screenRect.x() + screenRect.width() - 30) - this->width();
+    int y = 40;
+
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
     a->setDuration(200);
-    a->setStartValue(
-        QApplication::desktop()->mapToGlobal(QPoint(x + this->width(), y)));
+    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 20, y)));
     a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
     a->setEasingCurve(QEasingCurve::Linear);
     a->start(QPropertyAnimation::DeleteWhenStopped);
@@ -80,7 +79,8 @@ public:
     this->show();
   }
 
-  void present(std::unique_ptr<QWebEngineNotification> &newNotification) {
+  void present(int screenNumber,
+               std::unique_ptr<QWebEngineNotification> &newNotification) {
     if (notification) {
       notification->close();
       notification.reset();
@@ -99,22 +99,18 @@ public:
             &NotificationPopup::onClosed);
     QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
                        notification.get(), [&]() { onClosed(); });
-
     this->adjustSize();
-    qApp->processEvents();
-
-    int x = QApplication::desktop()->geometry().width() - (this->width() + 10);
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    int x = (screenRect.x() + screenRect.width() - 30) - this->width();
     int y = 40;
-
-    this->update();
 
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
     a->setDuration(200);
-    a->setStartValue(
-        QApplication::desktop()->mapToGlobal(QPoint(x + this->width(), y)));
+    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 20, y)));
     a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
     a->setEasingCurve(QEasingCurve::Linear);
     a->start(QPropertyAnimation::DeleteWhenStopped);
+
     this->show();
   }
 
