@@ -486,6 +486,14 @@ void SettingsWidget::on_showShortcutsButton_clicked() {
         label->setAlignment(Qt::AlignHCenter);
         layout->addWidget(label);
       }
+      // handle special case for minimize to try action
+      if (action->text().contains("minimize", Qt::CaseInsensitive) ||
+          action->text().contains("Mi&nimize to tray")) {
+          QLabel *label = new QLabel(
+              action->text().remove("&") + "  |  " + "Ctrl+W", sheet);
+          label->setAlignment(Qt::AlignHCenter);
+          layout->addWidget(label);
+      }
     }
   }
   sheet->setAttribute(Qt::WA_DeleteOnClose);

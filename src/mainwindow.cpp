@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QShortcut>
 #include <QStyleHints>
 #include <QUrlQuery>
 #include <QWebEngineNotification>
@@ -511,24 +512,26 @@ void MainWindow::notify(QString title, QString message) {
 void MainWindow::createActions() {
 
   openUrlAction = new QAction("New Chat", this);
-  this->addAction(openUrlAction);
   openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_N));
   connect(openUrlAction, &QAction::triggered, this, &MainWindow::newChat);
+  addAction(openUrlAction);
 
   fullscreenAction = new QAction(tr("Fullscreen"), this);
   fullscreenAction->setShortcut(Qt::Key_F11);
   connect(fullscreenAction, &QAction::triggered, fullscreenAction,
           [=]() { setWindowState(windowState() ^ Qt::WindowFullScreen); });
-  this->addAction(fullscreenAction);
+  addAction(fullscreenAction);
 
   minimizeAction = new QAction(tr("Mi&nimize to tray"), this);
-  minimizeAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_H));
-  connect(minimizeAction, &QAction::triggered, this, &QWidget::hide);
+  connect(minimizeAction, &QAction::triggered, this, &QMainWindow::hide);
   addAction(minimizeAction);
-  this->addAction(minimizeAction);
+
+  QShortcut *minimizeShortcut = new QShortcut(
+      QKeySequence(Qt::Modifier::CTRL + Qt::Key_W), this, SLOT(hide()));
+  minimizeShortcut->setAutoRepeat(false);
 
   restoreAction = new QAction(tr("&Restore"), this);
-  connect(restoreAction, &QAction::triggered, this, &QWidget::show);
+  connect(restoreAction, &QAction::triggered, this, &QMainWindow::show);
   addAction(restoreAction);
 
   reloadAction = new QAction(tr("Re&load"), this);
@@ -540,7 +543,6 @@ void MainWindow::createActions() {
   lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_L));
   connect(lockAction, &QAction::triggered, this, &MainWindow::lockApp);
   addAction(lockAction);
-  this->addAction(lockAction);
 
   settingsAction = new QAction(tr("&Settings"), this);
   connect(settingsAction, &QAction::triggered, this, &MainWindow::showSettings);
@@ -552,7 +554,6 @@ void MainWindow::createActions() {
   quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
   connect(quitAction, &QAction::triggered, this, &MainWindow::quitApp);
   addAction(quitAction);
-  this->addAction(quitAction);
 }
 
 void MainWindow::quitApp() {
