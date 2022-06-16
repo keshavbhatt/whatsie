@@ -31,7 +31,7 @@ signals:
   void appAutoLockChanged();
 
 public:
-  explicit SettingsWidget(QWidget *parent = nullptr,
+  explicit SettingsWidget(QWidget *parent = nullptr,int screenNumber = 0,
                           QString engineCachePath = "",
                           QString enginePersistentStoragePath = "");
   ~SettingsWidget();

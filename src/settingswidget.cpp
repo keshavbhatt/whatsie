@@ -13,7 +13,8 @@ extern int defaultAppAutoLockDuration;
 extern bool defaultAppAutoLock;
 extern double defaultZoomFactorMaximized;
 
-SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
+SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
+                               QString engineCachePath,
                                QString enginePersistentStoragePath)
     : QWidget(parent), ui(new Ui::SettingsWidget) {
   ui->setupUi(this);
@@ -119,6 +120,10 @@ SettingsWidget::SettingsWidget(QWidget *parent, QString engineCachePath,
       ui->scrollAreaWidgetContents->layout()->spacing());
   if (settings.value("settingsGeo").isValid()) {
     this->restoreGeometry(settings.value("settingsGeo").toByteArray());
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    if(!screenRect.contains(this->pos())){
+        this->move(screenRect.center()-this->rect().center());
+    }
   }
 }
 
@@ -489,10 +494,10 @@ void SettingsWidget::on_showShortcutsButton_clicked() {
       // handle special case for minimize to try action
       if (action->text().contains("minimize", Qt::CaseInsensitive) ||
           action->text().contains("Mi&nimize to tray")) {
-          QLabel *label = new QLabel(
-              action->text().remove("&") + "  |  " + "Ctrl+W", sheet);
-          label->setAlignment(Qt::AlignHCenter);
-          layout->addWidget(label);
+        QLabel *label =
+            new QLabel(action->text().remove("&") + "  |  " + "Ctrl+W", sheet);
+        label->setAlignment(Qt::AlignHCenter);
+        layout->addWidget(label);
       }
     }
   }
@@ -713,8 +718,10 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
         new QPushButton(this->style()->standardIcon(QStyle::SP_DialogYesButton),
                         "Change password", nullptr);
     msgBox.addButton(changePassword, QMessageBox::NoRole);
-    connect(changePassword, &QPushButton::clicked, changePassword,
-            [=]() { this->close(); emit change_lock_password(); });
+    connect(changePassword, &QPushButton::clicked, changePassword, [=]() {
+      this->close();
+      emit change_lock_password();
+    });
     msgBox.exec();
 
   } else {
