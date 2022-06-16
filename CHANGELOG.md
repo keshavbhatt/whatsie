@@ -1,5 +1,26 @@
 # Change log:
 
+### 4.3
+- feat: IPC; restore window directly when another instance is launched
+- feat: allow context menu on editable, selected and copyble data types
+- fix: properly load setting for autoapplock checkbox
+- fix: logout flow during changepassword
+- fix: the minimize behavior; replace Ctrl+H with Ctrl+W to hide window to tray
+
+### 4.2
+- fix: raise window from hidden state when clicked on notification
+- updated new UA
+- fix: window geometry persistence behavior
+- feat: open download directory straight from the download manager
+- fix: consistent window show behavior
+- feat: implement IPC
+   - lets run only one instance of application
+   - lets pass arguments from secondary instances to main instance
+   - open new chat without reloading page
+   - restore application with command line argument to secondary instance:
+          example: `whatsie whatsapp://whatsie`
+          will restore the primary instance of whatsie process
+
 ## 4.0
 - fix(SystemTray) tray icon uses png rather than SVG
 - feat(SystemTray) added settings to lets users change the system tray icon click behavior(minimize/maximize on right-click)
@@ -16,16 +37,4 @@
 - feat(WebApp) tested for new WhatsApp Web that lets users use Whatsie without requiring the phone connected to the internet
 - fix(Lock) unify passowrd echomode in lock widget
 
-### 4.2
-- fix: raise window from hidden state when clicked on notification 
-- updated new UA
-- fix: window geometry persistence behavior
-- feat: open download directory straight from the download manager
-- fix: consistent window show behavior 
-- feat: implement IPC 
-   - lets run only one instance of application
-   - lets pass arguments from secondary instances to main instance
-   - open new chat without reloading page
-   - restore application with command line argument to secondary instance:
-          example: `whatsie whatsapp://whatsie`
-          will restore the primary instance of whatsie process
+

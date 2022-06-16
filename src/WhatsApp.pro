@@ -45,7 +45,7 @@ BUILD_TIMESTAMP="\\\"$$system(date -u +\""%Y-%m-%dT%H:%M:%SUTC\"")\\\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 # Set program version
-VERSION = 4.2
+VERSION = 4.3
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 # You can also make your code fail to compile if you use deprecated APIs.
