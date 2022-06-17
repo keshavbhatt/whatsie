@@ -1,5 +1,5 @@
 name: whatsie
-version: '4.3'
+adopt-info: whatsie-build-src
 summary: Qt Based WhatsApp Client
 description: |
   Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies.
@@ -75,12 +75,16 @@ plugs:
     default-provider: qt515-core20
 
 parts:
-   build-src:
+   whatsie-build-src:
      plugin: nil
      source: https://github.com/keshavbhatt/whatsie.git
      source-subdir: src/
      override-build: |
             snapcraftctl build
+
+            version="$(printf %s.%s $(git describe --tags --abbrev=0) $(git rev-parse --short HEAD))"
+
+            snapcraftctl set-version "$version"
 
             apt install -y build-essential qt515base qt515tools qt515webengine qt515location qt515xmlpatterns libgl1-mesa-dev
 
@@ -113,7 +117,7 @@ parts:
    desktop-launch:
      plugin: nil
      source: https://github.com/keshavbhatt/qt515-core20.git
-     after: [build-src]
+     after: [whatsie-build-src]
      override-build: |
             snapcraftctl build
             
