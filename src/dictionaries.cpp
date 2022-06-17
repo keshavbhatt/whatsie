@@ -6,7 +6,6 @@
 #include <QString>
 #include <QStringList>
 
-
 QString DICTIONARY_FILE_SUFFIX = ".bdic";
 
 Dictionaries::Dictionaries(QObject *parent) : QObject(parent) {
@@ -24,18 +23,29 @@ QString Dictionaries::GetDictionaryPath() {
     return dict_path;
   }
 
+  QString dict_dir = "qtwebengine_dictionaries";
+
+  // inside appdata dir /usr/share/org/appname
+  QString appdata_path = QStandardPaths::standardLocations(QStandardPaths::GenericDataLocation).filter("/usr/share").first();
+  dict_path =
+      QString("%1/%2/%3/%4")
+          .arg(appdata_path,QApplication::organizationName(),
+               QApplication::applicationName(), dict_dir);
+  qDebug()<< dict_path;
+  if (QDir(dict_path).exists()) {
+    return dict_path;
+  }
+
   // next look relative to the executable
   dict_path =
-      QCoreApplication::applicationDirPath() + "/qtwebengine_dictionaries";
-
+      QCoreApplication::applicationDirPath() + QDir::separator() + dict_dir;
   if (QDir(dict_path).exists()) {
     return dict_path;
   }
 
   // inside the installed Qt directories
   dict_path = QLibraryInfo::location(QLibraryInfo::DataPath) +
-              "/qtwebengine_dictionaries";
-
+              QDir::separator() + dict_dir;
   if (QDir(dict_path).exists()) {
     return dict_path;
   }

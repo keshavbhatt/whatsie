@@ -99,8 +99,10 @@ parts:
             /opt/qt515/bin/qmake -install qinstall -exe whatsie ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
 
             strip ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
+
+            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/org.keshavnrj.ubuntu/WhatSie/
             
-            cp -rf ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/bin/
+            cp -rf ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/share/org.keshavnrj.ubuntu/WhatSie/
             
             sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/src/whatsie.desktop
             

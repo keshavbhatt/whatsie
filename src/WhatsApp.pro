@@ -110,26 +110,9 @@ FORMS += \
     rateapp.ui \
     settingswidget.ui
 
-DISTFILES += \
-    dict/de/de-DE.aff \
-    dict/de/de-DE.dic \
-    dict/en/en-US.aff \
-    dict/en/en-US.dic \
-    dict/es/es.aff \
-    dict/es/es.dic \
-    dict/fr/fr.aff \
-    dict/fr/fr.dic \
-    dict/gb/en-GB.aff \
-    dict/gb/en-GB.dic
-
 qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
 
-debug_and_release {
-    CONFIG(debug, debug|release): DICTIONARIES_DIR = debug/qtwebengine_dictionaries
-    else: DICTIONARIES_DIR = release/qtwebengine_dictionaries
-} else {
-    DICTIONARIES_DIR = qtwebengine_dictionaries
-}
+DICTIONARIES_DIR = qtwebengine_dictionaries
 
 dict.files = $$files($$PWD/dictionaries/*.dic, true)
 
@@ -152,11 +135,14 @@ DATADIR = $$PREFIX/share
 
 target.path = $$BINDIR
 
+dicts.files = $${DICTIONARIES_DIR}/
+dicts.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
+
 icon.files = icons/whatsie.png
-icon.path = $$DATADIR/icons/hicolor/512x512/apps/
+icon.path  = $$DATADIR/icons/hicolor/512x512/apps/
 
 desktop.files = whatsie.desktop
-desktop.path = $$DATADIR/applications/
+desktop.path  = $$DATADIR/applications/
 
-INSTALLS += target icon desktop
+INSTALLS += target dicts icon desktop
 
