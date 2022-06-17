@@ -1,36 +1,36 @@
 # C++ objects and libs
-*.slo
-*.lo
-*.o
 *.a
-*.la
-*.lai
-*.so
-*.so.*
 *.dll
 *.dylib
+*.la
+*.lai
+*.lo
+*.o
+*.slo
+*.so
+*.so.*
 
 # Qt-es
-object_script.*.Release
-object_script.*.Debug
-*_plugin_import.cpp
-/.qmake.cache
-/.qmake.stash
+*.jsc
+*.moc
+*.prl
 *.pro.user
 *.pro.user.*
 *.qbs.user
 *.qbs.user.*
-*.moc
+*.qm
+*.qmlc
+*_plugin_import.cpp
+*build-*
+.qmake.cache
+.qmake.stash
+Makefile*
 moc_*.cpp
 moc_*.h
+object_script.*.Debug
+object_script.*.Release
 qrc_*.cpp
 ui_*.h
-*.qmlc
-*.jsc
-Makefile*
-*build-*
-*.qm
-*.prl
 
 # Qt unit tests
 target_wrapper.*

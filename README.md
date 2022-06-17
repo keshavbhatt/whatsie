@@ -1,10 +1,12 @@
 # WhatSie
+
 WhatSie is Light, feature rich WhatsApp web client written in Qt and not on Electron.
 
 A simple & beautiful desktop client for WhatsApp Web. Chat without distractions
 on Linux. Not affiliated with WhatsApp or Facebook.
 
-## Features: 
+## Features
+
 - Light and Dark Themes with automatic switching
 - Customized Notifications & Native Notifications
 - Keyboard Shortcuts
@@ -15,20 +17,20 @@ on Linux. Not affiliated with WhatsApp or Facebook.
 - Built in Spell Checker (with support for 31 Major languages)
 - Other settings that let you control every aspect of WebApp
 
-
-## Install on snapd supported distributions:
+## Install on snapd supported distributions
 
  `snap install whatsie`
- 
+
  [![Get it from the Snap Store](https://snapcraft.io/static/images/badges/en/snap-store-black.svg)](https://snapcraft.io/whatsie)
 
-## Install from Arch Users Respository (AUR):
+## Install from Arch User Repository (AUR)
 
  `yay -S whatsie-git`
 
  The [AUR package for Whatsie](https://aur.archlinux.org/packages/whatsie-git) is maintained by [M0Rf30](https://github.com/M0Rf30)
 
-## Screenshot (could be old):
+## Screenshots (could be old)
+
 ![WhatSie for Linux Desktop Light Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/1.jpg?raw=true)
 ![WhatSie for Linux Desktop Dark Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/2.jpg?raw=true)
 ![WhatSie for Linux Desktop Setting module](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/4.jpg?raw=true)
