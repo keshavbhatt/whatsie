@@ -95,7 +95,7 @@ public:
 protected slots:
 
   void animateIn(int screenNumber) {
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    QRect screenRect = QGuiApplication::screens().at(screenNumber)->availableGeometry();
     int x = (screenRect.x() + screenRect.width() - 20) - this->width();
     int y = 40;
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
