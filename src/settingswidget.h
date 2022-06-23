@@ -29,6 +29,7 @@ signals:
   void zoomChanged();
   void zoomMaximizedChanged();
   void appAutoLockChanged();
+  void updateFullWidthView(bool checked);
 
 public:
   explicit SettingsWidget(QWidget *parent = nullptr,int screenNumber = 0,
@@ -94,6 +95,8 @@ private slots:
   void showSetApplockPasswordDialog();
   void themeSwitchTimerTimeout();
   void updateAutomaticTheme();
+
+  void on_fullWidthViewCheckbox_toggled(bool checked);
 
 private:
   Ui::SettingsWidget *ui;

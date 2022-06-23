@@ -76,6 +76,10 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->styleComboBox->setCurrentText(
       settings.value("widgetStyle", "Fusion").toString());
 
+  ui->fullWidthViewCheckbox->blockSignals(true);
+  ui->fullWidthViewCheckbox->setChecked(settings.value("fullWidthView", true).toBool());
+  ui->fullWidthViewCheckbox->blockSignals(false);
+
   ui->automaticThemeCheckBox->blockSignals(true);
   bool automaticThemeSwitching =
       settings.value("automaticTheme", false).toBool();
@@ -729,3 +733,10 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     showSetApplockPasswordDialog();
   }
 }
+
+void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked)
+{
+    settings.setValue("fullWidthView", checked);
+    emit updateFullWidthView(checked);
+}
+

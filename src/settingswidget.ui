@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>691</width>
-    <height>860</height>
+    <width>693</width>
+    <height>867</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -97,8 +97,8 @@ background:transparent;
       <property name="geometry">
        <rect>
         <x>0</x>
-        <y>0</y>
-        <width>675</width>
+        <y>-14</y>
+        <width>677</width>
         <height>791</height>
        </rect>
       </property>
@@ -372,6 +372,16 @@ background:transparent;
              <widget class="QCheckBox" name="minimizeOnTrayIconClick">
               <property name="text">
                <string>Show/Hide on clicking tray Icon (if supported)</string>
+              </property>
+             </widget>
+            </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="fullWidthViewCheckbox">
+              <property name="toolTip">
+               <string>Expand the view to full width of window</string>
+              </property>
+              <property name="text">
+               <string>Full width view</string>
               </property>
              </widget>
             </item>

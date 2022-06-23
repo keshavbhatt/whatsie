@@ -45,8 +45,8 @@ void MainWindow::restoreMainWindow() {
         this->move(screenRect.center() - this->rect().center());
       }
     }
-  }else{
-      this->resize(636, 760);
+  } else {
+    this->resize(636, 760);
   }
 }
 
@@ -171,17 +171,18 @@ void MainWindow::loadAppWithArgument(const QString &arg) {
 }
 
 void MainWindow::updatePageTheme() {
-  QString webPageTheme = "web"; // implies light
-  QString windowTheme = settings.value("windowTheme", "light").toString();
-  if (windowTheme == "dark") {
-    webPageTheme = "web dark";
-  }
   if (webEngine && webEngine->page()) {
-    webEngine->page()->runJavaScript(
-        "document.querySelector('body').className='" + webPageTheme + "';",
-        [](const QVariant &result) {
-          qDebug() << "Value is: " << result.toString() << Qt::endl;
-        });
+    QString webPageTheme = "web";
+    QString windowTheme = settings.value("windowTheme", "light").toString();
+    if (windowTheme == "dark") {
+      webPageTheme = "dark";
+      webEngine->page()->runJavaScript(
+          "document.querySelector('body').classList.add('" + webPageTheme +
+          "');");
+    } else {
+      webEngine->page()->runJavaScript(
+          "document.querySelector('body').classList.remove('dark');");
+    }
   }
 }
 
@@ -351,6 +352,20 @@ void MainWindow::init_settingWidget() {
 
     connect(settingsWidget, &SettingsWidget::notify, settingsWidget,
             [=](QString message) { notify("", message); });
+
+    connect(settingsWidget, &SettingsWidget::updateFullWidthView,
+            settingsWidget, [=](bool checked) {
+              if (webEngine && webEngine->page()) {
+                if (checked)
+                  webEngine->page()->runJavaScript(
+                      "document.querySelector('body').classList.add('whatsie-"
+                      "full-view');");
+                else
+                  webEngine->page()->runJavaScript(
+                      "document.querySelector('body').classList.remove('"
+                      "whatsie-full-view');");
+              }
+            });
 
     settingsWidget->appLockSetChecked(
         settings.value("lockscreen", false).toBool());
@@ -634,7 +649,6 @@ void MainWindow::init_lock() {
                             "QWidget#signup{background-color:palette(window)}");
   lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   lockWidget->setGeometry(this->rect());
-  // lockWidget->disconnect();
 
   connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
     settings.setValue("lockscreen", false);
@@ -915,24 +929,90 @@ void MainWindow::handleLoadFinished(bool loaded) {
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
+    injectMutationObserver();
+    injectClassChangeObserver();
     injectNewChatJavaScript();
+    injectFullWidthJavaScript();
     settingsWidget->refresh();
   }
 }
 
+void MainWindow::injectClassChangeObserver() {
+  QString js = R"(
+            const observer = new MutationObserver(() => {
+                var haveFullView = document.body.classList.contains('whatsie-full-view');
+                var container = document.querySelector('#app > .app-wrapper-web > div');
+                if(haveFullView){
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    container.style.top = '0';
+                    container.style.maxWidth = 'unset';
+                }else{
+                    container.style.width = null;
+                    container.style.height = null;
+                    container.style.top = null;
+                    container.style.maxWidth = null;
+                }
+            });
+            observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class'],
+            childList: false,
+            characterData: false
+        });)";
+  webEngine->page()->runJavaScript(js);
+}
+
+void MainWindow::injectMutationObserver() {
+  QString js =
+      R"(function waitForElement(selector) {
+                return new Promise(resolve => {
+                    if (document.querySelector(selector)) {
+                        return resolve(document.querySelector(selector));
+                    }
+                    const observer = new MutationObserver(mutations => {
+                        if (document.querySelector(selector)) {
+                            resolve(document.querySelector(selector));
+                            observer.disconnect();
+                        }
+                    });
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                });
+            })";
+  webEngine->page()->runJavaScript(js);
+}
+
+void MainWindow::injectFullWidthJavaScript() {
+  if (!settings.value("fullWidthView", true).toBool())
+    return;
+  QString js =
+      R"(waitForElement('#pane-side').then( () => {
+            var container = document.querySelector('#app > .app-wrapper-web > div');
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.top = '0';
+            container.style.maxWidth = 'unset';
+         });
+        )";
+  webEngine->page()->runJavaScript(js);
+}
+
 void MainWindow::injectNewChatJavaScript() {
-  QString js = "const openNewChatWhatsie = (phone,text) => { "
-               "const link = document.createElement('a');"
-               "link.setAttribute('href', "
-               "`whatsapp://send/?phone=${phone}&text=${text}`);"
-               "document.body.append(link);"
-               "link.click();"
-               "document.body.removeChild(link);"
-               "};"
-               "function openNewChatWhatsieDefined()"
-               "{"
-               "    return (openNewChatWhatsie != 'undefined');"
-               "}";
+  QString js = R"(const openNewChatWhatsie = (phone,text) => {
+                    const link = document.createElement('a');
+                    link.setAttribute('href',
+                    `whatsapp://send/?phone=${phone}&text=${text}`);
+                    document.body.append(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+                function openNewChatWhatsieDefined()
+                {
+                    return (openNewChatWhatsie != 'undefined');
+                })";
   webEngine->page()->runJavaScript(js);
 }
 

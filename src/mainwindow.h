@@ -129,6 +129,9 @@ private slots:
   void injectNewChatJavaScript();
   void triggerNewChat(QString phone, QString text);
   void restoreMainWindow();
+  void injectFullWidthJavaScript();
+  void injectMutationObserver();
+  void injectClassChangeObserver();
 };
 
 #endif // MAINWINDOW_H
