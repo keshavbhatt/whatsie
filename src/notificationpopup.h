@@ -32,6 +32,7 @@ class NotificationPopup : public QWidget {
 public:
   NotificationPopup(QWidget *parent) : QWidget(parent) {
     setWindowFlags(Qt::ToolTip);
+
     auto rootLayout = new QHBoxLayout(this);
 
     rootLayout->addWidget(&m_icon);
@@ -95,7 +96,8 @@ public:
 protected slots:
 
   void animateIn(int screenNumber) {
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->availableGeometry();
+    QRect screenRect =
+        QGuiApplication::screens().at(screenNumber)->availableGeometry();
     int x = (screenRect.x() + screenRect.width() - 20) - this->width();
     int y = 40;
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
@@ -112,20 +114,19 @@ protected slots:
     auto x = this->pos().x();
     auto y = this->pos().y();
     QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
-    a->setDuration(100);
+    a->setDuration(150);
     a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
     a->setEndValue(QApplication::desktop()->mapToGlobal(
-        QPoint(x + (this->width() - 10), 18)));
-    a->setEasingCurve(QEasingCurve::OutCubic);
+        QPoint(x, -(this->height() + 20))));
+    a->setEasingCurve(QEasingCurve::Linear);
     a->start(QPropertyAnimation::DeleteWhenStopped);
 
     connect(a, &QPropertyAnimation::finished, this, [=]() {
       if (notification) {
         notification->close();
         notification.reset();
-      } else {
-        this->deleteLater();
       }
+      this->close();
     });
   }
 
