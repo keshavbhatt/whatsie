@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-    QT_VERSION: '5.14.2'
+    QT_VERSION: '5.15.2'
 
 jobs:
   Linux-Build:
@@ -21,6 +21,7 @@ jobs:
         uses: jurplel/install-qt-action@v2
         with:
           version: ${{env.QT_VERSION}}
+          modules: qtwebengine
       - name: Build source
         run: |
           qmake src/
