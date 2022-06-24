@@ -1,0 +1,15 @@
+[Desktop Entry]
+Version=1.0
+GenericName=Qt Whatsapp Web Client
+Name[en_US]=WhatSie
+Comment=Qt WhatsApp Web Client 
+Name=WhatSie
+Type=Application
+Icon=com.ktechpit.whatsie
+StartupWMClass=whatsie
+Keywords=WhatSie;WhatsApp
+Exec=whatsie %u
+Categories=Chat;Network;InstantMessaging;Qt;
+MimeType=x-scheme-handler/whatsapp;
+Terminal=false
+X-GNOME-UsesNotifications=true

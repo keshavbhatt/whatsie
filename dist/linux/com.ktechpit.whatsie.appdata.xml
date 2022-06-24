@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>com.ktechpit.whatsie</id>
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>MIT</project_license>
+	<name>Whatsie</name>
+	<summary>Qt Whatsapp Web Client</summary>
+	<developer_name>Keshav Bhatt</developer_name>
+	<description>
+		<p>Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies</p>
+	</description>
+	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
+	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
+	<url type="bugtracker">https://github.com/keshavbhatt/whatsie</url>
+	<screenshots>
+		<screenshot type="default">
+			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/2.jpg</image>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/3.jpg</image>
+		</screenshot>
+	</screenshots>
+	<provides>
+		<binary>whatsie</binary>
+	</provides>
+	<content_rating type="oars-1.0" />
+	<releases>
+		<release version="4.4" date="2022-06-18" />
+	</releases>
+</component>
