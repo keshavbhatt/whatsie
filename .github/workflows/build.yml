@@ -1,0 +1,27 @@
+name: Build Src
+
+on:
+  push:
+    branches-ignore:
+      - main
+  pull_request:
+  workflow_dispatch:
+
+env:
+    QT_VERSION: '5.14.2'
+
+jobs:
+  Linux-Build:
+    name: Linux
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v2
+        with:
+          version: ${{env.QT_VERSION}}
+      - name: Build source
+        run: |
+          qmake src/
+          make
