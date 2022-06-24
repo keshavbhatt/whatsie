@@ -22,10 +22,6 @@ TARGET = whatsie
 TEMPLATE = app
 LIBS += -L/usr/X11/lib -lX11
 
-win32{
-    LIBS += User32.Lib
-}
-
 include(singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
 
@@ -37,6 +33,13 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 # No debug output in release mode
 CONFIG(release, debug|release):DEFINES += QT_NO_DEBUG_OUTPUT
+
+# Print if this is a debug or release build
+CONFIG(debug, debug|release) {
+    message("This is a debug build")
+} else {
+    message("This is a release build")
+}
 
 # Define git info
 GIT_HASH="\\\"$$system(git -C \""$$_PRO_FILE_PWD_"\" rev-parse --short HEAD)\\\""
@@ -51,7 +54,7 @@ DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 # You can also make your code fail to compile if you use deprecated APIs.
 # In order to do so, uncomment the following line.
 # You can also select to disable deprecated APIs only up to a certain version of Qt.
-#DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
+# DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
         SunClock.cpp \
@@ -98,7 +101,6 @@ HEADERS += \
     webview.h \
     widgets/scrolltext/scrolltext.h
 
-
 FORMS += \
     about.ui \
     automatictheme.ui \
@@ -126,24 +128,46 @@ dictoolbuild.CONFIG = no_link target_predeps
 QMAKE_EXTRA_COMPILERS += dictoolbuild
 
 
-# Default rules for deployment.
+# Default rules for deployment
 isEmpty(PREFIX){
  PREFIX = /usr
 }
+
+message("Installation prefix: $$PREFIX")
 
 BINDIR  = $$PREFIX/bin
 DATADIR = $$PREFIX/share
 
 target.path = $$BINDIR
 
-dicts.files = $${DICTIONARIES_DIR}/
-dicts.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
+dictionaries.files = $${DICTIONARIES_DIR}/
+dictionaries.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
 
-icon.files = icons/whatsie.png
-icon.path  = $$DATADIR/icons/hicolor/512x512/apps/
+icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps/
+icon16.files = ../dist/linux/hicolor/16x16/apps/com.ktechpit.whatsie.png
+icon32.path = $$PREFIX/share/icons/hicolor/32x32/apps/
+icon32.files = ../dist/linux/hicolor/32x32/apps/com.ktechpit.whatsie.png
+icon64.path = $$PREFIX/share/icons/hicolor/64x64/apps/
+icon64.files = ../dist/linux/hicolor/64x64/apps/com.ktechpit.whatsie.png
+icon128.path = $$PREFIX/share/icons/hicolor/128x128/apps/
+icon128.files = ../dist/linux/hicolor/128x128/apps/com.ktechpit.whatsie.png
+icon256.path = $$PREFIX/share/icons/hicolor/256x256/apps/
+icon256.files = ../dist/linux/hicolor/256x256/apps/com.ktechpit.whatsie.png
 
-desktop.files = whatsie.desktop
+iconscalable.path = $$PREFIX/share/icons/hicolor/scalable/apps/
+iconscalable.files = ../dist/linux/hicolor/scalable/apps/com.ktechpit.whatsie.svg
+
+iconsymbolic.path = $$PREFIX/share/icons/hicolor/symbolic/apps/
+iconsymbolic.files = ../dist/linux/hicolor/symbolic/apps/com.ktechpit.whatsie-symbolic.svg
+
+license.path = $$PREFIX/share/licenses/whatsie/
+license.files = ../LICENSE
+
+appstream.path = $$PREFIX/share/metainfo/
+appstream.files = ../dist/linux/com.ktechpit.whatsie.appdata.xml
+
 desktop.path  = $$DATADIR/applications/
+desktop.files = ../dist/linux/com.ktechpit.whatsie.desktop
 
-INSTALLS += target dicts icon desktop
-
+unix:INSTALLS += target dictionaries icon16 icon32 icon64 icon128 icon256
+unix:INSTALLS += iconscalable iconsymbolic license appstream desktop

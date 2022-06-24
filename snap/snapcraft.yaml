@@ -34,7 +34,7 @@ apps:
        LANG: en_US.UTF-8 # issue 7,21
        QT_QPA_PLATFORMTHEME: gtk3
        NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
-    desktop: usr/share/applications/whatsie.desktop
+    desktop: usr/share/applications/com.ktechpit.whatsie.desktop
     plugs:
         - browser-support
         - camera
@@ -94,25 +94,19 @@ parts:
             export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/$SNAPCRAFT_ARCH_TRIPLET:$QT_BASE_DIR/lib:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
             export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
 
-            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/bin/
+            PQMAKE=$(which qmake);
 
-            /opt/qt515/bin/qmake src
+            echo "Using" $PQMAKE;
+
+            echo $(${PQMAKE} --version)
+
+            qmake PREFIX=${SNAPCRAFT_PART_INSTALL}/usr src
 
             make -j4
 
-            /opt/qt515/bin/qmake -install qinstall -exe whatsie ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
+            make install
 
-            strip ${SNAPCRAFT_PART_INSTALL}/usr/bin/whatsie
-
-            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/org.keshavnrj.ubuntu/WhatSie/
-            
-            cp -rf ${SNAPCRAFT_PART_BUILD}/qtwebengine_dictionaries ${SNAPCRAFT_PART_INSTALL}/usr/share/org.keshavnrj.ubuntu/WhatSie/
-            
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_SRC}/src/whatsie.desktop
-            
-            mkdir -p ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/
-            
-            cp -rf ${SNAPCRAFT_PART_SRC}/src/whatsie.desktop ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/whatsie.desktop
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
 
    desktop-launch:
      plugin: nil
