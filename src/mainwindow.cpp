@@ -46,7 +46,7 @@ void MainWindow::restoreMainWindow() {
       }
     }
   } else {
-    this->resize(636, 760);
+    this->resize(800, 684);
   }
 }
 
@@ -930,9 +930,9 @@ void MainWindow::handleLoadFinished(bool loaded) {
     updatePageTheme();
     handleZoom();
     injectMutationObserver();
+    injectFullWidthJavaScript();
     injectClassChangeObserver();
     injectNewChatJavaScript();
-    injectFullWidthJavaScript();
     settingsWidget->refresh();
   }
 }

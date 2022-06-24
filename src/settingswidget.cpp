@@ -258,6 +258,7 @@ void SettingsWidget::refresh() {
 
   // enable disable spell check
   ui->enableSpellCheck->setChecked(settings.value("sc_enabled", true).toBool());
+  emit updateFullWidthView(settings.value("fullWidthView", true).toBool());
 }
 
 void SettingsWidget::updateDefaultUAButton(const QString engineUA) {
