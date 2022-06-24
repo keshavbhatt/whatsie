@@ -7,6 +7,7 @@
 #include <QtWidgets>
 
 #include "common.h"
+#include "def.h"
 #include "mainwindow.h"
 #include <singleapplication.h>
 

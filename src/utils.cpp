@@ -1,4 +1,5 @@
 #include "utils.h"
+#include "def.h"
 #include <time.h>
 
 utils::utils(QObject *parent) : QObject(parent) { setParent(parent); }
