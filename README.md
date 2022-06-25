@@ -1,9 +1,6 @@
 # WhatSie
 
-WhatSie is Light, feature rich WhatsApp web client written in Qt and not on Electron.
-
-A simple & beautiful desktop client for WhatsApp Web. Chat without distractions
-on Linux. Not affiliated with WhatsApp or Facebook.
+Feature rich WhatsApp web client based on Qt WebEngine
 
 ## Features
 

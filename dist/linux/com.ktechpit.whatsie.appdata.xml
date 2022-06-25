@@ -7,7 +7,7 @@
 	<summary>Qt Whatsapp Web Client</summary>
 	<developer_name>Keshav Bhatt</developer_name>
 	<description>
-		<p>Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies</p>
+		<p>Feature rich WhatsApp web client based on Qt WebEngine</p>
 	</description>
 	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
 	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
