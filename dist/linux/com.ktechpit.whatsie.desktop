@@ -15,7 +15,12 @@ StartupNotify=true
 MimeType=x-scheme-handler/whatsapp;
 X-GNOME-UsesNotifications=true
 
-Actions=Settings;Lock;About;
+Actions=Chat;Settings;Lock;About;
+
+[Desktop Action Chat]
+Name[it]=Nuova Chat
+Name=New Chat
+Exec=whatsie -n
 
 [Desktop Action Settings]
 Name[it]=Impostazioni
