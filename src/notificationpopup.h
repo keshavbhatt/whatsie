@@ -106,7 +106,6 @@ protected slots:
     a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
     a->setEasingCurve(QEasingCurve::InCubic);
     a->start(QPropertyAnimation::DeleteWhenStopped);
-
     this->show();
   }
 
@@ -119,7 +118,6 @@ protected slots:
     a->setEndValue(QApplication::desktop()->mapToGlobal(
         QPoint(x, -(this->height() + 20))));
     a->setEasingCurve(QEasingCurve::Linear);
-    a->start(QPropertyAnimation::DeleteWhenStopped);
 
     connect(a, &QPropertyAnimation::finished, this, [=]() {
       if (notification) {
@@ -128,6 +126,7 @@ protected slots:
       }
       this->close();
     });
+    a->start(QPropertyAnimation::DeleteWhenStopped);
   }
 
 protected:
