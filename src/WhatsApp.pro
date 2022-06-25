@@ -113,6 +113,9 @@ FORMS += \
     rateapp.ui \
     settingswidget.ui
 
+TRANSLATIONS += \
+    i18n/it_IT.ts
+
 qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
 
 DICTIONARIES_DIR = qtwebengine_dictionaries
