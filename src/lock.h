@@ -14,7 +14,7 @@ class Lock : public QWidget {
 public:
   explicit Lock(QWidget *parent = nullptr);
   ~Lock();
-  bool isLocked = true;
+  bool getIsLocked() const;
 
 private slots:
   void on_passcode1_textChanged(const QString &arg1);
@@ -27,7 +27,8 @@ private slots:
   bool getCapsLockOn();
   void checkCaps();
   void on_cancelSetting_clicked();
-  void animate();
+  void animateIn();
+  void animateOut();
 public slots:
   void lock_app();
   void applyThemeQuirks();
@@ -44,6 +45,7 @@ protected slots:
 
 private:
   Ui::Lock *ui;
+  bool isLocked = true;
   QSettings settings;
 };
 

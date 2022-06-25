@@ -1,15 +1,11 @@
 #include "lock.h"
 #include "ui_lock.h"
 #include <QDebug>
-#include <QKeyEvent>
-#ifdef Q_OS_WIN32
-#include <Windows.h>
-#else
-#include <X11/XKBlib.h> // apt install libx11-dev
-
 #include <QGraphicsOpacityEffect>
+#include <QKeyEvent>
 #include <QPropertyAnimation>
-#endif
+
+#include "X11/XKBlib.h" // keep this header at bottom
 
 Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->setupUi(this);
@@ -20,7 +16,7 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
   ui->centerWidget->setGraphicsEffect(eff);
 
-  animate();
+  animateIn();
 
   if (settings.value("asdfg").isValid() == false) {
     signUp();
@@ -28,17 +24,18 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
     lock_app();
   }
   checkCaps();
-  QString capsStyle = QString("background-color: palette(window);"
-                              "padding:4px;"
-                              "border-radius: 2px;"
-                              "color:palette(window-text);");
+  QString capsStyle = QString(R"(background-color: palette(window);
+                                padding: 4px;
+                                border-radius: 2px;
+                                color: palette(window-text);)");
   ui->caps1->setStyleSheet(capsStyle);
   ui->caps2->setStyleSheet(capsStyle);
   ui->signup_warning->setStyleSheet(capsStyle);
   ui->wrong->setStyleSheet(capsStyle);
   foreach (QLineEdit *le, this->findChildren<QLineEdit *>()) {
-    le->setStyleSheet(
-        "QLineEdit[echoMode=\"2\"]{lineedit-password-character: 9899}");
+    le->setStyleSheet(R"(QLineEdit[echoMode="2"]{
+                            lineedit-password-character: 9899;
+                        })");
   }
 }
 
@@ -46,50 +43,73 @@ void Lock::signUp() {
   isLocked = false;
   ui->signup->show();
   ui->login->hide();
-  animate();
+  animateIn();
   ui->passcode1->setFocus();
 }
 
-void Lock::animate() {
+void Lock::animateIn() {
   ui->centerWidget->hide();
   QPropertyAnimation *a =
       new QPropertyAnimation(ui->centerWidget->graphicsEffect(), "opacity");
-  a->setDuration(400);
+  a->setDuration(500);
   a->setStartValue(0);
   a->setEndValue(1);
-  a->setEasingCurve(QEasingCurve::InCurve);
+  a->setEasingCurve(QEasingCurve::InCubic);
   a->start(QPropertyAnimation::DeleteWhenStopped);
   ui->centerWidget->show();
 }
 
+void Lock::animateOut() {
+  ui->centerWidget->show();
+  QPropertyAnimation *a =
+      new QPropertyAnimation(ui->centerWidget->graphicsEffect(), "opacity");
+  a->setDuration(500);
+  a->setStartValue(1);
+  a->setEndValue(0);
+  a->setEasingCurve(QEasingCurve::OutCubic);
+  connect(a, &QPropertyAnimation::finished, this, [=] {
+    ui->login->hide();
+    ui->signup->hide();
+    ui->passcodeLogin->clear();
+    ui->centerWidget->hide();
+    this->hide();
+  });
+  a->start(QPropertyAnimation::DeleteWhenStopped);
+}
+
 void Lock::applyThemeQuirks() {
-  // little quirks
 
-  ui->label_4->setStyleSheet(
-      "color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
-  ui->label_3->setStyleSheet(
-      "color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
+  QString lblStyle = QString(R"(color: #c2c5d1;
+                                padding: 0px 8px 0px 8px;
+                                background: transparent;)");
+  ui->label_4->setStyleSheet(lblStyle);
+  ui->label_3->setStyleSheet(lblStyle);
 
-  ui->login->setStyleSheet("QWidget#login{background-color:palette(window);"
-                           "background-image:url(:/icons/wa_bg.png)};");
-  ui->signup->setStyleSheet("QWidget#signup{background-color:palette(window);"
-                            "background-image:url(:/icons/wa_bg.png)};");
+  ui->login->setStyleSheet(R"(QWidget#login {
+                              background-color: palette(window);
+                              background-image: url(":/icons/wa_bg.png");
+                            })");
 
-  ui->widget_2->setStyleSheet(
-      "QWidget#widget_2{\nborder-radius: "
-      "5px;\nbackground-image:url(:/icons/"
-      "texture.png);\nbackground-color:palette(shadow);\n}");
-  ui->widget->setStyleSheet(
-      "QWidget#widget{\nborder-radius: "
-      "5px;\nbackground-image:url(:/icons/"
-      "texture.png);\nbackground-color:palette(shadow);\n}");
+  ui->signup->setStyleSheet(R"(QWidget#signup {
+                              background-color: palette(window);
+                              background-image: url(":/icons/wa_bg.png");
+                            })");
 
-  ui->centerWidget->setStyleSheet(
-      "QWidget#centerWidget{background-image:url(:/icons/wa_bg.png)}");
-  if (settings.value("windowTheme", "light").toString() == "dark") {
+  ui->widget_2->setStyleSheet(R"(QWidget#widget_2 {
+                                  border-radius: 5px;
+                                  background-image: url(":/icons/texture.png");
+                                  background-color: palette(shadow);
+                            })");
 
-  } else {
-  }
+  ui->widget->setStyleSheet(R"(QWidget#widget{
+                                border-radius: 5px;
+                                background-image:url(":/icons/texture.png");
+                                background-color:palette(shadow);
+                            })");
+
+  ui->centerWidget->setStyleSheet(R"(QWidget#centerWidget {
+                              background-image: url(":/icons/wa_bg.png");
+                            })");
 }
 
 Lock::~Lock() { delete ui; }
@@ -111,6 +131,11 @@ void Lock::keyReleaseEvent(QKeyEvent *event) {
 }
 
 bool Lock::event(QEvent *e) { return QWidget::event(e); }
+
+bool Lock::getIsLocked() const
+{
+    return isLocked;
+}
 
 void Lock::on_passcode1_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
@@ -141,8 +166,6 @@ void Lock::on_setPass_clicked() {
       ui->login->show();
       ui->passcodeLogin->setFocus();
     }
-  } else {
-    return;
   }
 }
 
@@ -152,11 +175,8 @@ void Lock::on_unlock_clicked() {
   QString password =
       QByteArray::fromBase64(settings.value("asdfg").toByteArray());
   if (ui->passcodeLogin->text() == password && check_password_set()) {
-    ui->login->hide();
-    ui->signup->hide();
-    ui->passcodeLogin->clear();
     isLocked = false;
-    this->hide();
+    animateOut();
     emit unLocked();
   } else {
     ui->wrong->show();
@@ -178,17 +198,13 @@ void Lock::lock_app() {
   ui->login->show();
   isLocked = true;
   this->show();
-  animate();
+  animateIn();
   ui->passcodeLogin->setFocus();
 }
 
 void Lock::on_passcodeLogin_returnPressed() { on_unlock_clicked(); }
 
 bool Lock::getCapsLockOn() {
-// platform dependent method of determining if CAPS LOCK is on
-#ifdef Q_OS_WIN32 // MS Windows version
-  return GetKeyState(VK_CAPITAL) == 1;
-#else // X11 version (Linux/Unix/Mac OS X/etc...)
   Display *d = XOpenDisplay((char *)0);
   bool caps_state = false;
   if (d) {
@@ -197,7 +213,6 @@ bool Lock::getCapsLockOn() {
     caps_state = (n & 0x01) == 1;
   }
   return caps_state;
-#endif
 }
 
 void Lock::on_cancelSetting_clicked() {
