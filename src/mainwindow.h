@@ -25,6 +25,7 @@
 #include <QWebEngineView>
 
 #include "about.h"
+#include "autolockeventfilter.h"
 #include "dictionaries.h"
 #include "downloadmanagerwidget.h"
 #include "lock.h"
@@ -34,7 +35,6 @@
 #include "settingswidget.h"
 #include "webenginepage.h"
 #include "webview.h"
-#include "autolockeventfilter.h"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -44,13 +44,19 @@ public:
 public slots:
   void updateWindowTheme();
   void updatePageTheme();
-
   void handleWebViewTitleChanged(QString title);
   void handleLoadFinished(bool loaded);
   void handleDownloadRequested(QWebEngineDownloadItem *download);
-  void loadAppWithArgument(const QString &arg);
+  void loadSchemaUrl(const QString &arg);
+  void showSettings(bool isAskedByCLI = false);
+  void showAbout();
+  void lockApp();
   void runMinimized();
   void alreadyRunning(bool notify = false);
+  void notify(QString title, QString message);
+  void toggleTheme();
+  void doReload(bool byPassCache = false, bool isAskedByCLI = false);
+  void newChat();
 protected slots:
   void closeEvent(QCloseEvent *event) override;
   void resizeEvent(QResizeEvent *event) override;
@@ -72,6 +78,7 @@ private:
   QAction *restoreAction;
   QAction *aboutAction;
   QAction *settingsAction;
+  QAction *toggleThemeAction;
   QAction *quitAction;
   QAction *lockAction;
   QAction *fullscreenAction;
@@ -93,10 +100,6 @@ private slots:
   QString getPageTheme();
   void iconActivated(QSystemTrayIcon::ActivationReason reason);
   void messageClicked();
-  void doReload(bool byPassCache = false);
-  void showAbout();
-  void notify(QString title, QString message);
-  void showSettings();
   void handleCookieAdded(const QNetworkCookie &cookie);
   void toggleMute(const bool &checked);
   void doAppReload();
@@ -104,23 +107,21 @@ private slots:
   void updateSettingsUserAgentWidget();
   void fullScreenRequested(QWebEngineFullScreenRequest request);
   void createWebPage(bool offTheRecord = false);
-  void init_settingWidget();
-  void init_globalWebProfile();
-  void check_window_state();
-  void init_lock();
-  void lockApp();
+  void initSettingWidget();
+  void initGlobalWebProfile();
+  void checkWindowState();
+  void initLock();
+  void tryLock();
   void checkLoadedCorrectly();
   void loadingQuirk(QString test);
   void setNotificationPresenter(QWebEngineProfile *profile);
-  void newChat();
   bool isPhoneNumber(const QString &phoneNumber);
   void quitApp();
   void initRateWidget();
   void initThemes();
   void handleZoomOnWindowStateChange(QWindowStateChangeEvent *ev);
   void handleZoom();
-  void change_lock_password();
-  void tryLock();
+  void changeLockPassword();
   void forceLogOut();
   void tryLogOut();
   bool isLoggedIn();

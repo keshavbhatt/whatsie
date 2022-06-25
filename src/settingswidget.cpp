@@ -56,8 +56,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->startMinimized->setChecked(
       settings.value("startMinimized", false).toBool());
 
-  ui->appAutoLockcheckBox->setChecked(
-      settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+  this->appAutoLockingSetChecked(settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+
   ui->autoLockDurationSpinbox->setValue(
       settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
   ui->minimizeOnTrayIconClick->setChecked(
@@ -77,7 +77,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
       settings.value("widgetStyle", "Fusion").toString());
 
   ui->fullWidthViewCheckbox->blockSignals(true);
-  ui->fullWidthViewCheckbox->setChecked(settings.value("fullWidthView", true).toBool());
+  ui->fullWidthViewCheckbox->setChecked(
+      settings.value("fullWidthView", true).toBool());
   ui->fullWidthViewCheckbox->blockSignals(false);
 
   ui->automaticThemeCheckBox->blockSignals(true);
@@ -125,8 +126,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   if (settings.value("settingsGeo").isValid()) {
     this->restoreGeometry(settings.value("settingsGeo").toByteArray());
     QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
-    if(!screenRect.contains(this->pos())){
-        this->move(screenRect.center()-this->rect().center());
+    if (!screenRect.contains(this->pos())) {
+      this->move(screenRect.center() - this->rect().center());
     }
   }
 }
@@ -422,6 +423,26 @@ void SettingsWidget::appLockSetChecked(bool checked) {
   ui->applock_checkbox->blockSignals(false);
 }
 
+void SettingsWidget::appAutoLockingSetChecked(bool checked) {
+  ui->appAutoLockcheckBox->blockSignals(true);
+  ui->appAutoLockcheckBox->setChecked(checked);
+  ui->appAutoLockcheckBox->blockSignals(false);
+}
+
+void SettingsWidget::toggleTheme()
+{
+    //disable automatic theme first
+    if(settings.value("automaticTheme", false).toBool()){
+        emit notify(tr("Automatic theme switching was disabled due to manual theme toggle."));
+        ui->automaticThemeCheckBox->setChecked(false);
+    }
+    if(ui->themeComboBox->currentIndex() == 0){
+        ui->themeComboBox->setCurrentIndex(1);
+    }else{
+        ui->themeComboBox->setCurrentIndex(0);
+    }
+}
+
 void SettingsWidget::setCurrentPasswordText(QString str) {
   ui->current_password->setStyleSheet(
       "QLineEdit[echoMode=\"2\"]{lineedit-password-character: 9899}");
@@ -458,7 +479,7 @@ void SettingsWidget::showSetApplockPasswordDialog() {
   int ret = msgBox.exec();
   if (ret == QMessageBox::Yes) {
     this->close();
-    emit init_lock();
+    emit initLock();
   } else {
     ui->applock_checkbox->blockSignals(true);
     ui->applock_checkbox->setChecked(false);
@@ -725,7 +746,7 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     msgBox.addButton(changePassword, QMessageBox::NoRole);
     connect(changePassword, &QPushButton::clicked, changePassword, [=]() {
       this->close();
-      emit change_lock_password();
+      emit changeLockPassword();
     });
     msgBox.exec();
 
@@ -735,9 +756,7 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
   }
 }
 
-void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked)
-{
-    settings.setValue("fullWidthView", checked);
-    emit updateFullWidthView(checked);
+void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked) {
+  settings.setValue("fullWidthView", checked);
+  emit updateFullWidthView(checked);
 }
-

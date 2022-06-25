@@ -20,8 +20,8 @@ signals:
   void muteToggled(const bool checked);
   void autoPlayMediaToggled(const bool checked);
   void userAgentChanged(QString userAgentStr);
-  void init_lock();
-  void change_lock_password();
+  void initLock();
+  void changeLockPassword();
   void dictChanged(QString dict);
   void spellCheckChanged(bool checked);
   void notificationPopupTimeOutChanged();
@@ -43,10 +43,11 @@ public slots:
   void appLockSetChecked(bool checked);
   void setCurrentPasswordText(QString str);
   void loadDictionaries(QStringList dictionaries);
-
   void clearAllData();
   void autoAppLockSetChecked(bool checked);
   void updateAppLockPasswordViewer();
+  void appAutoLockingSetChecked(bool checked);
+  void toggleTheme();
 protected slots:
   bool eventFilter(QObject *obj, QEvent *event);
   void closeEvent(QCloseEvent *event);
@@ -54,6 +55,7 @@ protected slots:
 private slots:
   QString cachePath();
   QString persistentStoragePath();
+  void showSetApplockPasswordDialog();
   bool isChildOf(QObject *Of, QObject *self);
   void applyThemeQuirks();
   void on_appAutoLockcheckBox_toggled(bool checked);
@@ -92,7 +94,6 @@ private slots:
   void on_zoomPlus_clicked();
   void on_zoomResetMaximized_clicked();
   void on_zoomReset_clicked();
-  void showSetApplockPasswordDialog();
   void themeSwitchTimerTimeout();
   void updateAutomaticTheme();
 

@@ -28,7 +28,7 @@ MainWindow::MainWindow(QWidget *parent)
   createActions();
   createTrayIcon();
   createWebEngine();
-  init_settingWidget();
+  initSettingWidget();
   initRateWidget();
   tryLock();
   updateWindowTheme();
@@ -151,7 +151,7 @@ void MainWindow::runMinimized() {
 
 MainWindow::~MainWindow() { webEngine->deleteLater(); }
 
-void MainWindow::loadAppWithArgument(const QString &arg) {
+void MainWindow::loadSchemaUrl(const QString &arg) {
   // https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
 
   // PASSED SCHEME whatsapp://send?text=Hello%2C%20World!&phone=919568388397"
@@ -267,7 +267,7 @@ void MainWindow::tryLogOut() {
   }
 }
 
-void MainWindow::init_settingWidget() {
+void MainWindow::initSettingWidget() {
   int screenNumber = qApp->desktop()->screenNumber(this);
   if (settingsWidget == nullptr) {
     settingsWidget = new SettingsWidget(
@@ -277,9 +277,9 @@ void MainWindow::init_settingWidget() {
                                    " | Settings");
     settingsWidget->setWindowFlags(Qt::Dialog);
 
-    connect(settingsWidget, SIGNAL(init_lock()), this, SLOT(init_lock()));
-    connect(settingsWidget, SIGNAL(change_lock_password()), this,
-            SLOT(change_lock_password()));
+    connect(settingsWidget, SIGNAL(initLock()), this, SLOT(initLock()));
+    connect(settingsWidget, SIGNAL(changeLockPassword()), this,
+            SLOT(changeLockPassword()));
     connect(settingsWidget, SIGNAL(appAutoLockChanged()), this,
             SLOT(appAutoLockChanged()));
 
@@ -410,34 +410,40 @@ void MainWindow::handleZoom() {
 }
 
 void MainWindow::lockApp() {
-  if (lockWidget != nullptr && lockWidget->isLocked)
+  if (lockWidget != nullptr && lockWidget->getIsLocked())
     return;
 
   if (settings.value("asdfg").isValid()) {
-    init_lock();
+    initLock();
     lockWidget->lock_app();
   } else {
-    QMessageBox msgBox;
-    msgBox.setText("App lock is not configured.");
-    msgBox.setIconPixmap(
-        QPixmap(":/icons/information-line.png")
-            .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-    msgBox.setInformativeText("Do you want to setup App lock now ?");
-    msgBox.setStandardButtons(QMessageBox::Cancel);
-    QPushButton *setAppLock =
-        new QPushButton(this->style()->standardIcon(QStyle::SP_DialogYesButton),
-                        "Yes", nullptr);
-    msgBox.addButton(setAppLock, QMessageBox::NoRole);
-    connect(setAppLock, &QPushButton::clicked, setAppLock,
-            [=]() { init_lock(); });
-    msgBox.exec();
+    int ret = QMessageBox::information(
+        this, tr(QApplication::applicationName().toUtf8()),
+        tr("App lock is not configured, \n"
+           "Please setup the password in the Settings first.\n\nOpen "
+           "Application Settings now?"),
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (ret == QMessageBox::Yes) {
+      this->showSettings();
+    }
   }
 }
 
-void MainWindow::showSettings() {
-  if (lockWidget && lockWidget->isLocked) {
-    QMessageBox::critical(this, QApplication::applicationName() + "| Error",
-                          "UnLock Application to access Settings.");
+void MainWindow::toggleTheme() {
+  if (settingsWidget != nullptr) {
+    settingsWidget->toggleTheme();
+  }
+}
+
+void MainWindow::showSettings(bool isAskedByCLI) {
+  if (lockWidget && lockWidget->getIsLocked()) {
+    QString error = tr("UnLock Application to access Settings.");
+    if (isAskedByCLI) {
+      this->notify(QApplication::applicationName() + "| Error", error);
+    } else {
+      QMessageBox::critical(this, QApplication::applicationName() + "| Error",
+                            error);
+    }
     this->show();
     return;
   }
@@ -573,7 +579,9 @@ void MainWindow::createActions() {
 
   reloadAction = new QAction(tr("Re&load"), this);
   reloadAction->setShortcut(Qt::Key_F5);
-  connect(reloadAction, &QAction::triggered, this, &MainWindow::doReload);
+  connect(reloadAction, &QAction::triggered,this, [=]{
+      this->doReload();
+  });
   addAction(reloadAction);
 
   lockAction = new QAction(tr("Loc&k"), this);
@@ -582,7 +590,15 @@ void MainWindow::createActions() {
   addAction(lockAction);
 
   settingsAction = new QAction(tr("&Settings"), this);
+  settingsAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_P));
   connect(settingsAction, &QAction::triggered, this, &MainWindow::showSettings);
+  addAction(settingsAction);
+
+  toggleThemeAction = new QAction(tr("&Toggle theme"), this);
+  toggleThemeAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_T));
+  connect(toggleThemeAction, &QAction::triggered, this,
+          &MainWindow::toggleTheme);
+  addAction(toggleThemeAction);
 
   aboutAction = new QAction(tr("&About"), this);
   connect(aboutAction, &QAction::triggered, this, &MainWindow::showAbout);
@@ -612,6 +628,7 @@ void MainWindow::createTrayIcon() {
   trayIconMenu->addAction(lockAction);
   trayIconMenu->addSeparator();
   trayIconMenu->addAction(openUrlAction);
+  trayIconMenu->addAction(toggleThemeAction);
   trayIconMenu->addAction(settingsAction);
   trayIconMenu->addAction(aboutAction);
   trayIconMenu->addSeparator();
@@ -619,8 +636,7 @@ void MainWindow::createTrayIcon() {
 
   trayIcon = new QSystemTrayIcon(trayIconRead, this);
   trayIcon->setContextMenu(trayIconMenu);
-  connect(trayIconMenu, SIGNAL(aboutToShow()), this,
-          SLOT(check_window_state()));
+  connect(trayIconMenu, SIGNAL(aboutToShow()), this, SLOT(checkWindowState()));
 
   trayIcon->show();
 
@@ -637,54 +653,56 @@ void MainWindow::createTrayIcon() {
   }
 }
 
-void MainWindow::init_lock() {
+void MainWindow::initLock() {
 
   if (lockWidget == nullptr) {
     lockWidget = new Lock(this);
     lockWidget->setObjectName("lockWidget");
+
+    lockWidget->setWindowFlags(Qt::Widget);
+    lockWidget->setStyleSheet(
+        "QWidget#login{background-color:palette(window)};"
+        "QWidget#signup{background-color:palette(window)}");
+    lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+
+    connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
+      settings.setValue("lockscreen", false);
+      settingsWidget->appLockSetChecked(false);
+    });
+
+    connect(lockWidget, &Lock::unLocked, [=]() {
+      // unlock event
+    });
+
+    connect(lockWidget, &Lock::passwordSet, settingsWidget, [=]() {
+      if (settings.value("asdfg").isValid()) {
+        settingsWidget->setCurrentPasswordText(QByteArray::fromBase64(
+            settings.value("asdfg").toString().toUtf8()));
+      } else {
+        settingsWidget->setCurrentPasswordText("Require setup");
+      }
+      settingsWidget->appLockSetChecked(
+          settings.value("lockscreen", false).toBool());
+    });
+    lockWidget->applyThemeQuirks();
   }
 
-  lockWidget->setWindowFlags(Qt::Widget);
-  lockWidget->setStyleSheet("QWidget#login{background-color:palette(window)};"
-                            "QWidget#signup{background-color:palette(window)}");
-  lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
   lockWidget->setGeometry(this->rect());
 
-  connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
-    settings.setValue("lockscreen", false);
-    settingsWidget->appLockSetChecked(false);
-  });
-
-  connect(lockWidget, &Lock::unLocked, [=]() {
-    // unlock event
-  });
-
-  connect(lockWidget, &Lock::passwordSet, settingsWidget, [=]() {
+  if (settings.value("lockscreen").toBool()) {
     if (settings.value("asdfg").isValid()) {
-      settingsWidget->setCurrentPasswordText(
-          QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
+      lockWidget->lock_app();
     } else {
-      settingsWidget->setCurrentPasswordText("Require setup");
+      lockWidget->signUp();
     }
-    settingsWidget->appLockSetChecked(
-        settings.value("lockscreen", false).toBool());
-  });
-
-  lockWidget->applyThemeQuirks();
-  lockWidget->show();
-  if (settings.value("asdfg").isValid() &&
-      settings.value("lockscreen").toBool()) {
-    lockWidget->lock_app();
-  } else if (settings.value("lockscreen").toBool() &&
-             !settings.value("asdfg").isValid()) {
-    lockWidget->signUp();
+    lockWidget->show();
   } else {
     lockWidget->hide();
   }
   updateWindowTheme();
 }
 
-void MainWindow::change_lock_password() {
+void MainWindow::changeLockPassword() {
   settings.remove("asdfg");
   settingsWidget->appLockSetChecked(false);
   settingsWidget->autoAppLockSetChecked(false);
@@ -696,7 +714,7 @@ void MainWindow::change_lock_password() {
       doAppReload();
     }
     appAutoLockChanged();
-    init_lock();
+    initLock();
   });
 }
 
@@ -715,7 +733,7 @@ void MainWindow::appAutoLockChanged() {
 }
 
 // check window state and set tray menus
-void MainWindow::check_window_state() {
+void MainWindow::checkWindowState() {
   QObject *tray_icon_menu = this->findChild<QObject *>("trayIconMenu");
   if (tray_icon_menu != nullptr) {
     if (this->isVisible()) {
@@ -725,7 +743,7 @@ void MainWindow::check_window_state() {
       ((QMenu *)(tray_icon_menu))->actions().at(0)->setDisabled(true);
       ((QMenu *)(tray_icon_menu))->actions().at(1)->setDisabled(false);
     }
-    if (lockWidget && lockWidget->isLocked) {
+    if (lockWidget && lockWidget->getIsLocked()) {
       ((QMenu *)(tray_icon_menu))->actions().at(4)->setDisabled(true);
     } else {
       ((QMenu *)(tray_icon_menu))->actions().at(4)->setDisabled(false);
@@ -733,7 +751,7 @@ void MainWindow::check_window_state() {
   }
 }
 
-void MainWindow::init_globalWebProfile() {
+void MainWindow::initGlobalWebProfile() {
 
   QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
   profile->setHttpUserAgent(
@@ -771,7 +789,7 @@ void MainWindow::init_globalWebProfile() {
 }
 
 void MainWindow::createWebEngine() {
-  init_globalWebProfile();
+  initGlobalWebProfile();
 
   QSizePolicy widgetSize;
   widgetSize.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -933,7 +951,9 @@ void MainWindow::handleLoadFinished(bool loaded) {
     injectFullWidthJavaScript();
     injectClassChangeObserver();
     injectNewChatJavaScript();
-    settingsWidget->refresh();
+    if (settingsWidget != nullptr) {
+      settingsWidget->refresh();
+    }
   }
 }
 
@@ -1130,7 +1150,7 @@ void MainWindow::newChat() {
     else
       QMessageBox::information(this,
                                QApplication::applicationName() + "| Error",
-                               "Invalid Phone Number");
+                               tr("Invalid Phone Number"));
   }
 }
 
@@ -1161,7 +1181,20 @@ bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
   return reg.match(phoneNumber).hasMatch();
 }
 
-void MainWindow::doReload(bool byPassCache) {
+void MainWindow::doReload(bool byPassCache, bool isAskedByCLI) {
+  if (lockWidget && !lockWidget->getIsLocked()) {
+    this->notify(QApplication::applicationName(), QObject::tr("Reloading..."));
+  } else {
+    QString error = tr("UnLock Application to Reload the App.");
+    if (isAskedByCLI) {
+      this->notify(QApplication::applicationName() + "| Error", error);
+    } else {
+      QMessageBox::critical(this, QApplication::applicationName() + "| Error",
+                            error);
+    }
+    this->show();
+    return;
+  }
   this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
                                      byPassCache);
 }
@@ -1188,19 +1221,24 @@ QString MainWindow::getPageTheme() {
 void MainWindow::tryLock() {
   if (settings.value("asdfg").isValid() &&
       settings.value("lockscreen", false).toBool()) {
-    init_lock();
+    initLock();
+    return;
   }
   if (settings.value("asdfg").isValid() == false) {
     settings.setValue("lockscreen", false);
+    settings.setValue("appAutoLocking", false);
+    settingsWidget->appAutoLockingSetChecked(false);
     settingsWidget->appLockSetChecked(false);
-    init_lock();
+    initLock();
   }
 }
 
 void MainWindow::alreadyRunning(bool notify) {
-  this->show();
   if (notify) {
     QString appname = QApplication::applicationName();
     this->notify(appname, "Restored an already running instance.");
   }
+  this->setWindowState((this->windowState() & ~Qt::WindowMinimized) |
+                       Qt::WindowActive);
+  this->show();
 }

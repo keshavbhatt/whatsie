@@ -13,16 +13,6 @@
 
 int main(int argc, char *argv[]) {
 
-  QStringList args;
-  for (int i = 0; i < argc; i++)
-    args << QString(argv[i]);
-
-  if (args.contains("-v") || args.contains("--version")) {
-    qInfo() << QString("version: %1, branch: %2, commit: %3, built_at: %4")
-                   .arg(VERSIONSTR, GIT_BRANCH, GIT_HASH, BUILD_TIMESTAMP);
-    return 0;
-  }
-
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
   static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
   if (!qEnvironmentVariableIsSet(ENV_VAR_QT_DEVICE_PIXEL_RATIO) &&
@@ -38,20 +28,110 @@ int main(int argc, char *argv[]) {
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
 #endif
 
-  SingleApplication app(argc, argv, true);
-  app.setQuitOnLastWindowClosed(false);
-  app.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
+  SingleApplication instance(argc, argv, true);
+  //instance.setQuitOnLastWindowClosed(false);
+  instance.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   QApplication::setApplicationName("WhatSie");
+  QApplication::setOrganizationDomain("com.ktechpit");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
 
+  QCommandLineParser parser;
+  parser.setApplicationDescription(
+      QObject::tr("Feature rich WhatsApp web client based on Qt WebEngine"));
+
+  QList<QCommandLineOption> secondaryInstanceCLIOptions;
+
+  QCommandLineOption showCLIHelpOption(
+      QStringList() << "h"
+                    << "help",
+      QObject::tr("Displays help on commandline options"));
+
+  QCommandLineOption openSettingsOption(
+      QStringList() << "s"
+                    << "open-settings",
+      QObject::tr("Opens Settings dialog in a running instance of ") +
+          QApplication::applicationName());
+
+  QCommandLineOption lockAppOption(QStringList() << "l"
+                                                 << "lock-app",
+                                   QObject::tr("Locks a running instance of ") +
+                                       QApplication::applicationName());
+
+  QCommandLineOption openAboutOption(
+      QStringList() << "i"
+                    << "open-about",
+      QObject::tr("Opens About dialog in a running instance of ") +
+          QApplication::applicationName());
+
+  QCommandLineOption toggleThemeOption(
+      QStringList() << "t"
+                    << "toggle-theme",
+      QObject::tr(
+          "Toggle between dark & light theme in a running instance of ") +
+          QApplication::applicationName());
+
+  QCommandLineOption reloadAppOption(
+      QStringList() << "r"
+                    << "reload-app",
+      QObject::tr("Reload the app in a running instance of ") +
+          QApplication::applicationName());
+
+  QCommandLineOption newChatOption(
+      QStringList() << "n"
+                    << "new-chat",
+      QObject::tr("Open new chat prompt in a running instance of ") +
+          QApplication::applicationName());
+
+  QCommandLineOption buildInfoOption(QStringList() << "b"
+                                                   << "build-info",
+                                     "Shows detailed current build infomation");
+
+  QCommandLineOption showAppWindowOption(
+      QStringList() << "w"
+                    << "show-window",
+      QObject::tr("Show main window of running instance of ") +
+          QApplication::applicationName());
+
+  parser.addOption(showCLIHelpOption);   // [x]
+  parser.addVersionOption();             // [x]
+  parser.addOption(buildInfoOption);     // [x]
+  parser.addOption(showAppWindowOption); // [x]
+  parser.addOption(openSettingsOption);  // [x]
+  parser.addOption(lockAppOption);       // [x]
+  parser.addOption(openAboutOption);     // [x]
+  parser.addOption(toggleThemeOption);   // [x]
+  parser.addOption(reloadAppOption);     // [x]
+  parser.addOption(newChatOption);       // [x]
+
+  secondaryInstanceCLIOptions << showAppWindowOption << openSettingsOption
+                              << lockAppOption << openAboutOption
+                              << toggleThemeOption << reloadAppOption
+                              << newChatOption;
+
+  parser.process(instance);
+
+  if (parser.isSet(showCLIHelpOption)) {
+    parser.showHelp();
+  }
+
+  if (parser.isSet(buildInfoOption)) {
+
+    qInfo().noquote()
+        << parser.applicationDescription() << "\n"
+        << QStringLiteral("version: %1, branch: %2, commit: %3, built_at: %4")
+               .arg(VERSIONSTR, GIT_BRANCH, GIT_HASH, BUILD_TIMESTAMP);
+    return 0;
+  }
+
   // if secondary instance is invoked
-  if (app.isSecondary()) {
-    app.sendMessage(app.arguments().join(' ').toUtf8());
-    qInfo() << QApplication::applicationName() +
-                   " is already running with PID:" +
-                   QString::number(app.primaryPid()) + "; by USER: "
-            << app.primaryUser();
+  if (instance.isSecondary()) {
+    instance.sendMessage(instance.arguments().join(' ').toUtf8());
+    qInfo().noquote() << QApplication::applicationName() +
+                             " is already running with PID: " +
+                             QString::number(instance.primaryPid()) +
+                             " by USER:"
+                      << instance.primaryUser();
     return 0;
   }
 
@@ -64,41 +144,113 @@ int main(int argc, char *argv[]) {
   QWebEngineSettings::defaultSettings()->setAttribute(
       QWebEngineSettings::JavascriptCanAccessClipboard, true);
 
-  MainWindow window;
+  MainWindow whatsie;
 
   // else
   QObject::connect(
-      &app, &SingleApplication::receivedMessage,
-      [&window](int instanceId, QByteArray message) {
-        qInfo() << "Another instance with PID: " + QString::number(instanceId) +
-                       ", sent argument: " + message;
+      &instance, &SingleApplication::receivedMessage, &whatsie,
+      [&whatsie, &secondaryInstanceCLIOptions](int instanceId,
+                                               QByteArray message) {
+        qInfo().noquote() << "Another instance with PID: " +
+                                 QString::number(instanceId) +
+                                 ", sent argument: " + message;
         QString messageStr = QTextCodec::codecForMib(106)->toUnicode(message);
-        if (messageStr.contains("whatsapp://whatsie", Qt::CaseInsensitive)) {
-          window.show();
+
+        QCommandLineParser p;
+        p.addOptions(secondaryInstanceCLIOptions);
+        p.parse(QStringList(messageStr.split(" ")));
+
+        if (p.isSet("s")) {
+          qInfo() << "cmd:"
+                  << "OpenAppSettings";
+          whatsie.alreadyRunning();
+          whatsie.showSettings(true);
           return;
-        } else if (messageStr.contains("whatsapp://", Qt::CaseInsensitive)) {
+        }
+
+        if (p.isSet("l")) {
+          qInfo() << "cmd:"
+                  << "LockApp";
+          whatsie.alreadyRunning();
+          QSettings settings;
+          if (!settings.value("asdfg").isValid()) {
+            whatsie.notify(
+                QApplication::applicationName(),
+                QObject::tr("App lock is not configured, \n"
+                            "Please setup the password in the Settings "
+                            "first."));
+          } else {
+            whatsie.lockApp();
+          }
+          return;
+        }
+
+        if (p.isSet("i")) {
+          qInfo() << "cmd:"
+                  << "OpenAppAbout";
+          whatsie.alreadyRunning();
+          whatsie.showAbout();
+          return;
+        }
+
+        if (p.isSet("t")) {
+          qInfo() << "cmd:"
+                  << "ToggleAppTheme";
+          whatsie.alreadyRunning();
+          whatsie.toggleTheme();
+          return;
+        }
+
+        if (p.isSet("r")) {
+          qInfo() << "cmd:"
+                  << "ReloadApp";
+          whatsie.alreadyRunning();
+          whatsie.doReload(false, true);
+          return;
+        }
+
+        if (p.isSet("n")) {
+          qInfo() << "cmd:"
+                  << "OpenNewChatPrompt";
+          whatsie.alreadyRunning();
+          whatsie.newChat(); //TODO: invetigate the crash
+          return;
+        }
+
+        if (p.isSet("w")) {
+          qInfo() << "cmd:"
+                  << "ShowAppWindow";
+          whatsie.alreadyRunning();
+          whatsie.show();
+          return;
+        }
+
+        if (messageStr.contains("whatsapp://", Qt::CaseInsensitive)) {
           QString urlStr =
               "whatsapp://" + messageStr.split("whatsapp://").last();
-          window.loadAppWithArgument(urlStr);
+          qInfo() << "cmd:"
+                  << "x-schema-handler";
+          whatsie.loadSchemaUrl(urlStr);
         } else {
-          window.alreadyRunning(true);
+          whatsie.alreadyRunning(true);
         }
       });
 
-  QStringList argsList = app.arguments();
-  foreach (QString argStr, argsList) {
+  foreach (QString argStr, instance.arguments()) {
     if (argStr.contains("whatsapp://")) {
-      window.loadAppWithArgument(argStr);
+      qInfo() << "cmd:"
+              << "x-schema-handler";
+      whatsie.loadSchemaUrl(argStr);
     }
   }
 
   QSettings settings;
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
       settings.value("startMinimized", false).toBool()) {
-    window.runMinimized();
+    whatsie.runMinimized();
   } else {
-    window.show();
+    whatsie.show();
   }
 
-  return app.exec();
+  return instance.exec();
 }
