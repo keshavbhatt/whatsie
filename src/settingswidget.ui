@@ -78,7 +78,7 @@ background:transparent;
 }</string>
         </property>
         <property name="text">
-         <string>Application Settings</string>
+         <string>Settings</string>
         </property>
         <property name="textFormat">
          <enum>Qt::PlainText</enum>
@@ -273,14 +273,14 @@ background:transparent;
             <item row="1" column="0">
              <widget class="QCheckBox" name="notificationCheckBox">
               <property name="text">
-               <string>Disable Notifications PopUp</string>
+               <string>Disable Notifications Popup</string>
               </property>
              </widget>
             </item>
             <item row="1" column="1">
              <widget class="QLabel" name="label_14">
               <property name="text">
-               <string>PopUp timeout</string>
+               <string>Popup timeout</string>
               </property>
              </widget>
             </item>
@@ -364,7 +364,7 @@ background:transparent;
             <item row="3" column="1">
              <widget class="QCheckBox" name="startMinimized">
               <property name="text">
-               <string>Minimize App in tray on start</string>
+               <string>Minimize in tray on start</string>
               </property>
              </widget>
             </item>
@@ -715,7 +715,7 @@ background:transparent;
               </item>
               <item>
                <property name="text">
-                <string>Quit Application</string>
+                <string>Quit</string>
                </property>
                <property name="icon">
                 <iconset resource="icons.qrc">
@@ -727,7 +727,7 @@ background:transparent;
             <item row="1" column="0">
              <widget class="QLabel" name="label_9">
               <property name="text">
-               <string>Global App shortcuts</string>
+               <string>Global shortcuts</string>
               </property>
              </widget>
             </item>
@@ -752,7 +752,7 @@ background:transparent;
             <item row="2" column="0">
              <widget class="QLabel" name="label_10">
               <property name="text">
-               <string>App permissions</string>
+               <string>Permissions</string>
               </property>
              </widget>
             </item>
@@ -774,7 +774,7 @@ background:transparent;
             <item row="0" column="0">
              <widget class="QCheckBox" name="applock_checkbox">
               <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable application lock screen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Enable lock screen.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
                <string>Enable App lock on start</string>
@@ -805,7 +805,7 @@ background:transparent;
             <item row="1" column="0">
              <widget class="QCheckBox" name="appAutoLockcheckBox">
               <property name="text">
-               <string>Enable App auto locking after</string>
+               <string>Enable auto locking after</string>
               </property>
              </widget>
             </item>
@@ -919,7 +919,7 @@ background:transparent;
        <item>
         <widget class="QGroupBox" name="groupBox_7">
          <property name="title">
-          <string>Application Storage and Other Settings</string>
+          <string>Storage and Other Settings</string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
@@ -938,7 +938,7 @@ background:transparent;
             <item row="1" column="0">
              <widget class="QLabel" name="label_3">
               <property name="text">
-               <string>Application Cache</string>
+               <string>Cache</string>
               </property>
              </widget>
             </item>
@@ -986,7 +986,7 @@ background:transparent;
                </font>
               </property>
               <property name="text">
-               <string>Option</string>
+               <string>Action</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>

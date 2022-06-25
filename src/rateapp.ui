@@ -117,7 +117,7 @@
        <item>
         <widget class="QPushButton" name="donate">
          <property name="text">
-          <string>Donate via Paypal </string>
+          <string>Donate via PayPal </string>
          </property>
         </widget>
        </item>

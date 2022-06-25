@@ -139,7 +139,7 @@ p, li { white-space: pre-wrap; }
             <item>
              <widget class="QLabel" name="desc2">
               <property name="text">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Designed &amp;amp; Developed by:&lt;/span&gt; Keshav Bhatt &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Developer Email address: &lt;/span&gt;keshavnrj@gmail.com&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Developer Website:&lt;/span&gt; http://ktechpit.com&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Designed &amp;amp; Developed by:&lt;/span&gt; Keshav Bhatt &lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Email: &lt;/span&gt;keshavnrj@gmail.com&lt;/p&gt;&lt;p&gt;&lt;span style=&quot; font-weight:600;&quot;&gt;Website:&lt;/span&gt; http://ktechpit.com&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
              </widget>
             </item>
@@ -168,7 +168,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QPushButton" name="donate">
              <property name="text">
-              <string>Donate Paypal</string>
+              <string>Donate PayPal</string>
              </property>
             </widget>
            </item>
@@ -193,7 +193,7 @@ p, li { white-space: pre-wrap; }
            <item>
             <widget class="QPushButton" name="more_apps">
              <property name="text">
-              <string>More Application by Developer</string>
+              <string>More Applications</string>
              </property>
             </widget>
            </item>
