@@ -421,7 +421,7 @@ void MainWindow::lockApp() {
         this, tr(QApplication::applicationName().toUtf8()),
         tr("App lock is not configured, \n"
            "Please setup the password in the Settings first.\n\nOpen "
-           "Application Settings now?"),
+           "Settings now?"),
         QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
     if (ret == QMessageBox::Yes) {
       this->showSettings();
@@ -437,7 +437,7 @@ void MainWindow::toggleTheme() {
 
 void MainWindow::showSettings(bool isAskedByCLI) {
   if (lockWidget && lockWidget->getIsLocked()) {
-    QString error = tr("UnLock Application to access Settings.");
+    QString error = tr("Unlock to access Settings.");
     if (isAskedByCLI) {
       this->notify(QApplication::applicationName() + "| Error", error);
     } else {
@@ -501,7 +501,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     event->ignore();
     if (settings.value("firstrun_tray", true).toBool()) {
       notify(QApplication::applicationName(),
-             "Application is minimized to system tray.");
+             "Minimized to system tray.");
       settings.setValue("firstrun_tray", false);
     }
     return;
@@ -1185,7 +1185,7 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI) {
   if (lockWidget && !lockWidget->getIsLocked()) {
     this->notify(QApplication::applicationName(), QObject::tr("Reloading..."));
   } else {
-    QString error = tr("UnLock Application to Reload the App.");
+    QString error = tr("Unlock to Reload the App.");
     if (isAskedByCLI) {
       this->notify(QApplication::applicationName() + "| Error", error);
     } else {

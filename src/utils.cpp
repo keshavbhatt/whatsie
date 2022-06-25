@@ -231,7 +231,7 @@ void utils::DisplayExceptionErrorDialog(const QString &error_info) {
   message_box.setStandardButtons(QMessageBox::Close);
   QStringList detailed_text;
   detailed_text << "Error info: " + error_info
-                << "\nApp version: " + QString(VERSIONSTR)
+                << "\nVersion: " + QString(VERSIONSTR)
                 << "\nSource Branch: " + QString(GIT_BRANCH)
                 << "\nCommit Hash: " + QString(GIT_HASH)
                 << "\nBuild Datetime: " + QString(BUILD_TIMESTAMP)

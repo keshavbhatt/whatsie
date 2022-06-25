@@ -280,13 +280,13 @@ QString SettingsWidget::persistentStoragePath() {
 
 void SettingsWidget::on_deleteCache_clicked() {
   QMessageBox msgBox;
-  msgBox.setText("This will delete app cache! Application cache makes "
+  msgBox.setText("This will delete the cache! Cache makes "
                  "application load faster.");
   msgBox.setIconPixmap(
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
 
-  msgBox.setInformativeText("Delete Application cache?");
+  msgBox.setInformativeText("Delete cache?");
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   int ret = msgBox.exec();
@@ -304,12 +304,12 @@ void SettingsWidget::on_deleteCache_clicked() {
 void SettingsWidget::on_deletePersistentData_clicked() {
   QMessageBox msgBox;
   msgBox.setText(
-      "This will delete app Persistent Data ! Persistent data includes "
+      "This will delete Persistent Data ! Persistent data includes "
       "persistent cookies, HTML5 local storage, and visited links.");
   msgBox.setIconPixmap(
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-  msgBox.setInformativeText("Delete Application Cookies?");
+  msgBox.setInformativeText("Delete Cookies?");
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   int ret = msgBox.exec();

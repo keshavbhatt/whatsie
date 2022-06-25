@@ -185,7 +185,7 @@
                  </font>
                 </property>
                 <property name="text">
-                 <string>Set application lock passcode</string>
+                 <string>Set lock passcode</string>
                 </property>
                 <property name="alignment">
                  <set>Qt::AlignCenter</set>

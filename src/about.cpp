@@ -11,7 +11,7 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
 
   // init
   appName = QApplication::applicationName();
-  appDescription = "WhatsApp Web clinet for Linux Desktop";
+  appDescription = "WhatsApp Web client for Linux Desktop";
   isOpenSource = true;
   appAuthorName = "Keshav Bhatt";
   appAuthorEmail = "keshavnrj@gmail.com";
@@ -35,8 +35,8 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
       QString("<p><span style=' font-weight:600;'>Designed &amp; Developed "
               "by:</span>"
               " %1 </p><p><span style=' font-weight:600;'>"
-              "Developer Email address: </span>%2</p>"
-              "<p><span style=' font-weight:600;'>Developer Website:</span>"
+              "Email: </span>%2</p>"
+              "<p><span style=' font-weight:600;'>Website:</span>"
               " %3</p>")
           .arg(appAuthorName, appAuthorEmail, appAuthorLink));
 
