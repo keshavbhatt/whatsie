@@ -141,14 +141,14 @@ void Lock::on_passcode1_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
     ui->passcode1->setText(arg1.simplified());
   }
-  ui->setPass->setEnabled(arg1.length() > 4 && arg1 == ui->passcode2->text());
+  ui->setPass->setEnabled(arg1.length() > 3 && arg1 == ui->passcode2->text());
 }
 
 void Lock::on_passcode2_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
     ui->passcode2->setText(arg1.simplified());
   }
-  ui->setPass->setEnabled(arg1.length() > 4 && arg1 == ui->passcode1->text());
+  ui->setPass->setEnabled(arg1.length() > 3 && arg1 == ui->passcode1->text());
 }
 
 void Lock::on_setPass_clicked() {
@@ -188,7 +188,7 @@ void Lock::on_passcodeLogin_textChanged(const QString &arg1) {
     ui->passcodeLogin->setText(arg1.simplified());
   }
   ui->wrong->hide();
-  ui->unlock->setEnabled(arg1.length() > 4);
+  ui->unlock->setEnabled(arg1.length() > 3);
 }
 
 void Lock::lock_app() {

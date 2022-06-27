@@ -251,7 +251,7 @@ Desideri ignorare il controllo di sicurezza e continuare?</translation>
     </message>
     <message>
         <location filename="../lock.ui" line="311"/>
-        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Passcode must be more then 4 characters and must match in both fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Note: Passcode must be more then 3 characters and must match in both fields.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
         <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Nota: Il codice di blocco deve contenere più di 4 caratteri e deve corrispondere in entrambi i campi.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
     </message>
     <message>
