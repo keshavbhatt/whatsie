@@ -1,3 +1,39 @@
+## 4.6.5 (2022-07-03)
+
+#### 🚧 Chores
+
+* **ci:** update release wf (#59) (f40ac9c9)
+
+
+## 4.6.3 (2022-07-03)
+
+#### 📄 Documentation
+
+* **changelog:** update changelog after release (7699d885)
+
+#### 🚧 Chores
+
+* **ci:** fix update file name (c0158c0d)
+
+
+## 4.6.2 (2022-07-03)
+
+#### 📄 Documentation
+
+* **changelog:** update changelog after release (c87524db)
+
+#### 🚧 Chores
+
+* **ci:** update version on release (d715c8eb)
+
+
+## 4.6.1 (2022-07-03)
+
+#### 🚧 Chores
+
+* **CI:** commit changelog on release (75b0cffe)
+
+
 ## Change log:
 
 ### 4.3
