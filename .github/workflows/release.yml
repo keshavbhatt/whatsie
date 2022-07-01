@@ -1,0 +1,24 @@
+name: Release
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  Release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v2
+      - name: Go Semantic Release
+        uses: go-semantic-release/action@v1.17.0
+        id: semrel
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          changelog-file: CHANGELOG.md
+          update-file: VERSION
+          changelog-generator-opt: "emojis=true"
+          force-bump-patch-version: true
+          prepend: true
