@@ -29,7 +29,7 @@ int main(int argc, char *argv[]) {
 #endif
 
   SingleApplication instance(argc, argv, true);
-  //instance.setQuitOnLastWindowClosed(false);
+  instance.setQuitOnLastWindowClosed(false);
   instance.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setOrganizationDomain("com.ktechpit");
@@ -102,7 +102,7 @@ int main(int argc, char *argv[]) {
   parser.addOption(openAboutOption);     // [x]
   parser.addOption(toggleThemeOption);   // [x]
   parser.addOption(reloadAppOption);     // [x]
-  parser.addOption(newChatOption);       // [x]
+  parser.addOption(newChatOption);       // [-]
 
   secondaryInstanceCLIOptions << showAppWindowOption << openSettingsOption
                               << lockAppOption << openAboutOption
