@@ -1,3 +1,99 @@
+## 4.7.0 (2022-07-03)
+
+#### 🎁 Feature
+
+* **ci:** add release workflow (83cd6383)
+* **i18n:** add Italian localization (#55) (ced5547d)
+* enable support for traybar entries on GNOME dash (#53) (66d20d3e)
+* some new features (21113900)
+* unlock animation plus some cleanup (0a182a9e)
+* implement IPC & other improvements (81faa022)
+* add open downloads directory button in download widget (419ffb29)
+* app auto locking (d06a4abb)
+* v4.0 (#35) (474b9212)
+* start application minimized. closes #19 (c5bf7a98)
+
+#### 🐞 Bug Fixes
+
+* obey fullview settings on first launch & initial window size (b2f0fe49)
+* properly hide custom notification on multi monitor setups (20057675)
+* use availableGeometry to map position of notification (538d7d5d)
+* add missing icon, enabling install_icon target generation (clos… (#45) (48b9028f)
+* show notifications on correct screen (ff99a5f7)
+* logout flow during changepassword (92382d7b)
+* properly load setting for autoapplock checkbox (522eb75a)
+* save geometry in quit event (4a968554)
+* raise window from hidden state when clicked on notification (0620e43e)
+* debug in debug mode (147487f2)
+* notification popup click behavior (e800208f)
+* **snap:** supress warnings (f2b06da6)
+* improve logout flow, on change password (ed5f760b)
+* change lock screen password beahvior (fa4012a5)
+* theme switching (7cd4b219)
+* improve download file behavior (#32) (8f071469)
+
+#### 🎨 Styles
+
+* code refactor (21940ee6)
+
+#### 🚧 Chores
+
+* use pre-commit (f82dcc68)
+* update todo (2aa08e03)
+* setQuitOnLastWindowClosed false (c751be26)
+* set a minimum of 4 digits for the lock code (#56) (79b2b791)
+* notification connect before show (f8455de7)
+* update app description (c6fd2e8d)
+* use appinstall artifacts from dist (247ed75f)
+* distribution related files (88c46fad)
+* **CI:** use latest version of install-qt-action (60b6c225)
+* **CI:** build with github action (ac31abdb)
+* define fallback values for macros (14f190c0)
+* **qmake:** avoid error message when .git folder is missing (close #49) (#52) (91d0cf11)
+* add full view support closes #46 (b96a28db)
+* version 4.4 (26f5659b)
+* install dicts using qmake (90210de2)
+* add git sponser link (122828f4)
+* improve settings window show behavior (d9909011)
+* improve window geo restore (3a08d5d5)
+* nitification popup tweak; code cleanup (5c2764f7)
+* update readme (a4c73b0f)
+* version 4.3 (3dae93a1)
+* use Ctrl+W to hide window to tray (dba5a9bc)
+* filter contextmenu items (6f4750c8)
+* restore window directly when another instance is launched (39117158)
+* use new chat trigger method to invoke new chats (1d950cd8)
+* update changelog (59abd9d9)
+* version 4.2 (1f4816a2)
+* remove runguard (8c0df6d3)
+* window show behavior (7d302466)
+* update default UA (dfb5b9ca)
+* stop timer instantly if rated already (cc43d4c7)
+* bump version 4.1 (a1af1bde)
+* minor improvements (ea4056dc)
+* clean UA & disable js debug in app stdout (8cfbcf4b)
+* set default zoom factor for maximized windows to 1.0 (046e2e13)
+* inform app is minimized via notification (19734a99)
+* unify passowrd echomode in lock widget (5be4cae9)
+* test qpt gtk3 (020ac6da)
+* add Desktop entry GenericName (e4bbdd15)
+* move desktop file to src (4f0558a9)
+* use desktop-launch from content snap (dcc39239)
+
+#### 📦 Build
+
+* **snap:** use SNAPCRAFT_ARCH_TRIPLET (8962c8bb)
+* migrate to qt 5.15 (9867a6b6)
+
+#### chaore
+
+* **CI:** use Qt 5.15.2 (846d1218)
+
+#### cleanup
+
+* removed snap_launcher (e658c464)
+
+
 ## 4.6.5 (2022-07-03)
 
 #### 🚧 Chores
