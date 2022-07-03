@@ -18,18 +18,17 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           changelog-file: "CHANGELOG.md"
-          update-file: "VERSION.txt"
           changelog-generator-opt: "emojis=true"
           force-bump-patch-version: true
           prepend: true
       - name: Update Version file
-        uses: wow-actions/update-file@v1
+        uses: DamianReeves/write-file-action@v1.0
         with:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           path: VERSION.txt
-          content: steps.semrel.outputs.version
+          write-mode: overwrite
+          contents: ${{steps.semrel.outputs.version}}
       - name: Git Commit Changelog
         uses: stefanzweifel/git-auto-commit-action@v4.14.1
         with:
-          commit_message: "docs(changelog): update changelog after release"
+          commit_message: "docs(changelog): update cl & ver after release"
           file_pattern: CHANGELOG.md VERSION.txt
