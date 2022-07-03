@@ -1,3 +1,14 @@
+## 4.6.2 (2022-07-03)
+
+#### 📄 Documentation
+
+* **changelog:** update changelog after release (c87524db)
+
+#### 🚧 Chores
+
+* **ci:** update version on release (d715c8eb)
+
+
 ## 4.6.1 (2022-07-03)
 
 #### 🚧 Chores
