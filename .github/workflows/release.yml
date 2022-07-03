@@ -18,7 +18,7 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           changelog-file: "CHANGELOG.md"
-          update-file: "VERSION"
+          update-file: "VERSION.txt"
           changelog-generator-opt: "emojis=true"
           force-bump-patch-version: true
           prepend: true
