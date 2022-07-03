@@ -17,8 +17,13 @@ jobs:
         id: semrel
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
-          changelog-file: CHANGELOG.md
-          update-file: VERSION
+          changelog-file: "CHANGELOG.md"
+          update-file: "VERSION"
           changelog-generator-opt: "emojis=true"
           force-bump-patch-version: true
           prepend: true
+      - name: Git Commit Changelog
+        uses: stefanzweifel/git-auto-commit-action@v4.14.1
+        with:
+          commit_message: "docs(changelog): update changelog after release"
+          file_pattern: CHANGELOG.md VERSION
