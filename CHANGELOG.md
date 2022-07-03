@@ -1,3 +1,10 @@
+## 4.6.1 (2022-07-03)
+
+#### 🚧 Chores
+
+* **CI:** commit changelog on release (75b0cffe)
+
+
 ## Change log:
 
 ### 4.3
