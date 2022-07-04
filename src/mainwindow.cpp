@@ -500,8 +500,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
     this->hide();
     event->ignore();
     if (settings.value("firstrun_tray", true).toBool()) {
-      notify(QApplication::applicationName(),
-             "Minimized to system tray.");
+      notify(QApplication::applicationName(), "Minimized to system tray.");
       settings.setValue("firstrun_tray", false);
     }
     return;
@@ -579,9 +578,7 @@ void MainWindow::createActions() {
 
   reloadAction = new QAction(tr("Re&load"), this);
   reloadAction->setShortcut(Qt::Key_F5);
-  connect(reloadAction, &QAction::triggered,this, [=]{
-      this->doReload();
-  });
+  connect(reloadAction, &QAction::triggered, this, [=] { this->doReload(); });
   addAction(reloadAction);
 
   lockAction = new QAction(tr("Loc&k"), this);
@@ -1072,7 +1069,7 @@ void MainWindow::loadingQuirk(QString test) {
   if (correctlyLoaderRetries > -1) {
     qWarning() << test << "checkLoadedCorrectly()/loadingQuirk()/doReload()"
                << correctlyLoaderRetries;
-    doReload();
+    doReload(false, false, true);
     correctlyLoaderRetries--;
   } else {
     utils::delete_cache(webEngine->page()->profile()->cachePath());
@@ -1181,22 +1178,29 @@ bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
   return reg.match(phoneNumber).hasMatch();
 }
 
-void MainWindow::doReload(bool byPassCache, bool isAskedByCLI) {
-  if (lockWidget && !lockWidget->getIsLocked()) {
-    this->notify(QApplication::applicationName(), QObject::tr("Reloading..."));
+void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
+                          bool byLoadingQuirk) {
+  if (byLoadingQuirk) {
+    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+                                       byPassCache);
   } else {
-    QString error = tr("Unlock to Reload the App.");
-    if (isAskedByCLI) {
-      this->notify(QApplication::applicationName() + "| Error", error);
+    if (lockWidget && !lockWidget->getIsLocked()) {
+      this->notify(QApplication::applicationName(),
+                   QObject::tr("Reloading..."));
     } else {
-      QMessageBox::critical(this, QApplication::applicationName() + "| Error",
-                            error);
+      QString error = tr("Unlock to Reload the App.");
+      if (isAskedByCLI) {
+        this->notify(QApplication::applicationName() + "| Error", error);
+      } else {
+        QMessageBox::critical(this, QApplication::applicationName() + "| Error",
+                              error);
+      }
+      this->show();
+      return;
     }
-    this->show();
-    return;
+    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+                                       byPassCache);
   }
-  this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                     byPassCache);
 }
 
 void MainWindow::toggleMute(const bool &checked) {
