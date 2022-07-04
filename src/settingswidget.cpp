@@ -56,7 +56,8 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->startMinimized->setChecked(
       settings.value("startMinimized", false).toBool());
 
-  this->appAutoLockingSetChecked(settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+  this->appAutoLockingSetChecked(
+      settings.value("appAutoLocking", defaultAppAutoLock).toBool());
 
   ui->autoLockDurationSpinbox->setValue(
       settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
@@ -303,9 +304,8 @@ void SettingsWidget::on_deleteCache_clicked() {
 
 void SettingsWidget::on_deletePersistentData_clicked() {
   QMessageBox msgBox;
-  msgBox.setText(
-      "This will delete Persistent Data ! Persistent data includes "
-      "persistent cookies, HTML5 local storage, and visited links.");
+  msgBox.setText("This will delete Persistent Data ! Persistent data includes "
+                 "persistent cookies, HTML5 local storage, and visited links.");
   msgBox.setIconPixmap(
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
@@ -344,13 +344,25 @@ void SettingsWidget::applyThemeQuirks() {
   // little quirks
   if (QString::compare(ui->themeComboBox->currentText(), "dark",
                        Qt::CaseInsensitive) == 0) {
-    ui->bottomLine->setStyleSheet("background-color: rgb(5, 97, 98);");
+    ui->bottomLine->setStyleSheet("background-color: rgb(0, 117, 96);");
     ui->label_7->setStyleSheet(
         "color:#c2c5d1;padding: 0px 8px 0px 8px;background:transparent;");
+    ui->headerWidget->setStyleSheet("background-color: qlineargradient("
+                                    "spread:reflect, x1:0, y1:1, x2:1, y2:1,"
+                                    "stop:0 rgba(0, 117, 96, 255), "
+                                    "stop:0.328358 rgba(0, 117, 96, 144),"
+                                    "stop:0.61194 rgba(0, 117, 96, 78),"
+                                    "stop:0.895522 rgba(0, 117, 96, 6));");
   } else {
-    ui->bottomLine->setStyleSheet("background-color: rgb(74, 223, 131);");
+    ui->bottomLine->setStyleSheet("background-color: rgb(37, 211, 102);");
     ui->label_7->setStyleSheet(
         "color:#1e1f21;padding: 0px 8px 0px 8px;background:transparent;");
+    ui->headerWidget->setStyleSheet("background-color: qlineargradient("
+                                    "spread:reflect, x1:0, y1:1, x2:1, y2:1,"
+                                    "stop:0 rgba(37, 211, 102, 200), "
+                                    "stop:0.328358 rgba(37, 211, 102, 122),"
+                                    "stop:0.61194 rgba(37, 211, 102, 68),"
+                                    "stop:0.895522 rgba(37, 211, 102, 6));");
   }
 }
 
@@ -429,18 +441,18 @@ void SettingsWidget::appAutoLockingSetChecked(bool checked) {
   ui->appAutoLockcheckBox->blockSignals(false);
 }
 
-void SettingsWidget::toggleTheme()
-{
-    //disable automatic theme first
-    if(settings.value("automaticTheme", false).toBool()){
-        emit notify(tr("Automatic theme switching was disabled due to manual theme toggle."));
-        ui->automaticThemeCheckBox->setChecked(false);
-    }
-    if(ui->themeComboBox->currentIndex() == 0){
-        ui->themeComboBox->setCurrentIndex(1);
-    }else{
-        ui->themeComboBox->setCurrentIndex(0);
-    }
+void SettingsWidget::toggleTheme() {
+  // disable automatic theme first
+  if (settings.value("automaticTheme", false).toBool()) {
+    emit notify(tr(
+        "Automatic theme switching was disabled due to manual theme toggle."));
+    ui->automaticThemeCheckBox->setChecked(false);
+  }
+  if (ui->themeComboBox->currentIndex() == 0) {
+    ui->themeComboBox->setCurrentIndex(1);
+  } else {
+    ui->themeComboBox->setCurrentIndex(0);
+  }
 }
 
 void SettingsWidget::setCurrentPasswordText(QString str) {
