@@ -730,6 +730,7 @@ void SettingsWidget::on_userAgentLineEdit_editingFinished() {
 void SettingsWidget::on_viewPassword_clicked() {
   ui->current_password->setEchoMode(QLineEdit::Normal);
   ui->viewPassword->setEnabled(false);
+  ui->current_password->setFocus();
   QTimer *timer = new QTimer(this);
   timer->setInterval(5000);
   connect(timer, &QTimer::timeout, ui->current_password, [=]() {
