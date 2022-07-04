@@ -1,3 +1,20 @@
+## 4.7.1 (2022-07-04)
+
+#### 🐞 Bug Fixes
+
+* focus on password edit when echo (cee2dc85)
+* **web:** bypass lock check while loading quirk (6c6275c3)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (974933d0)
+
+#### 🚧 Chores
+
+* Merge branch 'dev' (9f566869)
+* **ui:** update ui color (8a74ccbc)
+
+
 ## 4.7.0 (2022-07-03)
 
 #### 🎁 Feature
