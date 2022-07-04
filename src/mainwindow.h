@@ -55,7 +55,7 @@ public slots:
   void alreadyRunning(bool notify = false);
   void notify(QString title, QString message);
   void toggleTheme();
-  void doReload(bool byPassCache = false, bool isAskedByCLI = false);
+  void doReload(bool byPassCache = false, bool isAskedByCLI = false, bool byLoadingQuirk = false);
   void newChat();
 protected slots:
   void closeEvent(QCloseEvent *event) override;

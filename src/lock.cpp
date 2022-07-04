@@ -96,13 +96,15 @@ void Lock::applyThemeQuirks() {
                             })");
 
   ui->widget_2->setStyleSheet(R"(QWidget#widget_2 {
-                                  border-radius: 5px;
-                                  background-image: url(":/icons/texture.png");
-                                  background-color: palette(shadow);
+                                border-top-left-radius: 4px;
+                                border-top-right-radius: 4px;
+                                background-image: url(":/icons/texture.png");
+                                background-color: palette(shadow);
                             })");
 
   ui->widget->setStyleSheet(R"(QWidget#widget{
-                                border-radius: 5px;
+                                border-top-left-radius: 4px;
+                                border-top-right-radius: 4px;
                                 background-image:url(":/icons/texture.png");
                                 background-color:palette(shadow);
                             })");
@@ -110,6 +112,20 @@ void Lock::applyThemeQuirks() {
   ui->centerWidget->setStyleSheet(R"(QWidget#centerWidget {
                               background-image: url(":/icons/wa_bg.png");
                             })");
+
+  // little quirks
+  QString border = "border-bottom-right-radius: 4px;"
+                   "border-bottom-left-radius: 4px;";
+  QString lightBg = "background-color: rgb(37, 211, 102);";
+  QString darkBg = "background-color: rgb(0, 117, 96);";
+  if (QString::compare(settings.value("windowTheme", "light").toString(),
+                       "dark", Qt::CaseInsensitive) == 0) { // light
+    ui->bottomLine->setStyleSheet(darkBg + border);
+    ui->bottomLine_2->setStyleSheet(darkBg + border);
+  } else { // dark
+    ui->bottomLine->setStyleSheet(lightBg + border);
+    ui->bottomLine_2->setStyleSheet(lightBg + border);
+  }
 }
 
 Lock::~Lock() { delete ui; }
@@ -132,10 +148,7 @@ void Lock::keyReleaseEvent(QKeyEvent *event) {
 
 bool Lock::event(QEvent *e) { return QWidget::event(e); }
 
-bool Lock::getIsLocked() const
-{
-    return isLocked;
-}
+bool Lock::getIsLocked() const { return isLocked; }
 
 void Lock::on_passcode1_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
