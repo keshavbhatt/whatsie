@@ -1,8 +1,7 @@
 name: Release
 
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 jobs:
   Release:
@@ -21,14 +20,8 @@ jobs:
           changelog-generator-opt: "emojis=true"
           force-bump-patch-version: true
           prepend: true
-      - name: Update Version file
-        uses: DamianReeves/write-file-action@v1.0
-        with:
-          path: VERSION.txt
-          write-mode: overwrite
-          contents: ${{steps.semrel.outputs.version}}
       - name: Git Commit Changelog
         uses: stefanzweifel/git-auto-commit-action@v4.14.1
         with:
           commit_message: "docs(changelog): update cl & ver after release"
-          file_pattern: CHANGELOG.md VERSION.txt
+          file_pattern: CHANGELOG.md
