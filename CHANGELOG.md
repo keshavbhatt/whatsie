@@ -1,3 +1,10 @@
+## 4.7.2 (2022-07-22)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (e0d15c2e)
+
+
 ## 4.7.1 (2022-07-04)
 
 #### 🐞 Bug Fixes
