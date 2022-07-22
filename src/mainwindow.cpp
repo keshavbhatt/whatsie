@@ -1110,7 +1110,7 @@ void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
   Q_UNUSED(reason);
-  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false)
+  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false || reason == QSystemTrayIcon::Context)
     return;
   if (isVisible()) {
     hide();
