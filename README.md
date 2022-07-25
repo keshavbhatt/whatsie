@@ -63,7 +63,7 @@ The source code can be built using the regular Qt application development proced
 
 ### Build requirements
  - git (to clone repo)
- - libx11-dev (required for x11 XKB module support at build time)
+ - libx11-dev libx11-xcb-dev (required for x11 XKB module support at build time)
  - Qt => 5.9 (5.15 recommended) with the following modules installed with development headers (lib*-dev packages on Ubuntu)
 	+ webengine
 	+ webenginewidgets
