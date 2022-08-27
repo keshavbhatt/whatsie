@@ -23,7 +23,7 @@ package-repositories:
     components: [main]
     suites: [focal]
     key-id: C65D51784EDC19A871DBDBB710C56D0DE9977759
-    url: https://ppa.launchpadcontent.net/beineri/opt-qt-5.15.2-focal/ubuntu
+    url: https://ppa.launchpadcontent.net/beineri/opt-qt-5.15.4-focal/ubuntu
 
 apps:
   whatsie:
