@@ -1,6 +1,7 @@
 #ifndef LOCK_H
 #define LOCK_H
 
+#include <QAction>
 #include <QSettings>
 #include <QWidget>
 
@@ -21,8 +22,7 @@ private slots:
   void on_passcode2_textChanged(const QString &arg1);
   void on_setPass_clicked();
   bool check_password_set();
-  void on_unlock_clicked();
-  void on_passcodeLogin_textChanged(const QString &arg1);
+   void on_passcodeLogin_textChanged(const QString &arg1);
   void on_passcodeLogin_returnPressed();
   bool getCapsLockOn();
   void checkCaps();
@@ -47,6 +47,7 @@ private:
   Ui::Lock *ui;
   bool isLocked = true;
   QSettings settings;
+  QAction *passcodeLoginAction;
 };
 
 #endif // LOCK_H

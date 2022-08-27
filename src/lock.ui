@@ -594,7 +594,7 @@ border-bottom-left-radius: 4px;</string>
                    </font>
                   </property>
                   <property name="text">
-                   <string>Enter your passcode to get access to app</string>
+                   <string>Enter your passcode to get access</string>
                   </property>
                   <property name="alignment">
                    <set>Qt::AlignCenter</set>
@@ -620,19 +620,6 @@ border-bottom-left-radius: 4px;</string>
                   </property>
                   <property name="placeholderText">
                    <string>enter your passcode</string>
-                  </property>
-                 </widget>
-                </item>
-                <item>
-                 <widget class="QPushButton" name="unlock">
-                  <property name="minimumSize">
-                   <size>
-                    <width>0</width>
-                    <height>30</height>
-                   </size>
-                  </property>
-                  <property name="text">
-                   <string>Unlock</string>
                   </property>
                  </widget>
                 </item>

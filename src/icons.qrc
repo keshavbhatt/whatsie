@@ -396,5 +396,7 @@
         <file>icons/minus.png</file>
         <file>icons/plus.png</file>
         <file>icons/app/whatsapp-message-32.png</file>
+        <file>icons/white/green_arrow-right-line.png</file>
+        <file>icons/green_arrow-right-line.png</file>
     </qresource>
 </RCC>

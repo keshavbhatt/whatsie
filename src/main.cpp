@@ -14,13 +14,6 @@
 int main(int argc, char *argv[]) {
 
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  static const char ENV_VAR_QT_DEVICE_PIXEL_RATIO[] = "QT_DEVICE_PIXEL_RATIO";
-  if (!qEnvironmentVariableIsSet(ENV_VAR_QT_DEVICE_PIXEL_RATIO) &&
-      !qEnvironmentVariableIsSet("QT_AUTO_SCREEN_SCALE_FACTOR") &&
-      !qEnvironmentVariableIsSet("QT_SCALE_FACTOR") &&
-      !qEnvironmentVariableIsSet("QT_SCREEN_SCALE_FACTORS")) {
-    QCoreApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-  }
 
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");

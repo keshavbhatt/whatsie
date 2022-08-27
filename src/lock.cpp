@@ -9,9 +9,25 @@
 
 Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->setupUi(this);
-  ui->unlock->setEnabled(false);
   ui->setPass->setEnabled(false);
   ui->wrong->hide();
+
+  passcodeLoginAction = ui->passcodeLogin->addAction(
+      QIcon(":/icons/green_arrow-right-line.png"),
+      QLineEdit::TrailingPosition);
+  passcodeLoginAction->setEnabled(false);
+  connect(passcodeLoginAction, &QAction::triggered, passcodeLoginAction,
+          [this]() {
+            QString password =
+                QByteArray::fromBase64(settings.value("asdfg").toByteArray());
+            if (ui->passcodeLogin->text() == password && check_password_set()) {
+              isLocked = false;
+              this->animateOut();
+              emit unLocked();
+            } else {
+              ui->wrong->show();
+            }
+          });
 
   QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
   ui->centerWidget->setGraphicsEffect(eff);
@@ -184,24 +200,12 @@ void Lock::on_setPass_clicked() {
 
 bool Lock::check_password_set() { return settings.value("asdfg").isValid(); }
 
-void Lock::on_unlock_clicked() {
-  QString password =
-      QByteArray::fromBase64(settings.value("asdfg").toByteArray());
-  if (ui->passcodeLogin->text() == password && check_password_set()) {
-    isLocked = false;
-    animateOut();
-    emit unLocked();
-  } else {
-    ui->wrong->show();
-  }
-}
-
 void Lock::on_passcodeLogin_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
     ui->passcodeLogin->setText(arg1.simplified());
   }
   ui->wrong->hide();
-  ui->unlock->setEnabled(arg1.length() > 3);
+  passcodeLoginAction->setEnabled(arg1.length() > 3);
 }
 
 void Lock::lock_app() {
@@ -215,7 +219,7 @@ void Lock::lock_app() {
   ui->passcodeLogin->setFocus();
 }
 
-void Lock::on_passcodeLogin_returnPressed() { on_unlock_clicked(); }
+void Lock::on_passcodeLogin_returnPressed() {passcodeLoginAction->trigger(); }
 
 bool Lock::getCapsLockOn() {
   Display *d = XOpenDisplay((char *)0);
