@@ -1,3 +1,24 @@
+## 4.8.0 (2022-08-27)
+
+#### 🎁 Feature
+
+* add toggle theme desktop action (f8c9b339)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (572d6948)
+
+#### 🚧 Chores
+
+* unlock action button (771625da)
+* **build:** use Qt5.15.4 for build (54f97210)
+* update readme (0d3bd466)
+* udapte new settings window screenshot (6f3f18c6)
+* remove unused xml module (2d71f12c)
+* version bump in pro (211699e3)
+* **ci:** disable auto release and version file (6f134db2)
+
+
 ## 4.7.2 (2022-07-22)
 
 #### 📄 Documentation
