@@ -1,3 +1,15 @@
+## 4.8.2 (2022-08-27)
+
+#### 🐞 Bug Fixes
+
+* duplicate action in desktop file (2837c87e)
+* auto lock while scrolling (baa52666)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (bd7386a1)
+
+
 ## 4.8.1 (2022-08-27)
 
 #### 🐞 Bug Fixes
