@@ -1,3 +1,18 @@
+## 4.8.1 (2022-08-27)
+
+#### 🐞 Bug Fixes
+
+* **build:** fix build due to missing icon (5464060d)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (554ceff4)
+
+#### 🚧 Chores
+
+* bump version 4.8 (7fde1e4c)
+
+
 ## 4.7.2 (2022-07-22)
 
 #### 📄 Documentation
