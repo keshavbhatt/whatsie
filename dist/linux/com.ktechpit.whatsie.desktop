@@ -15,14 +15,14 @@ StartupNotify=true
 MimeType=x-scheme-handler/whatsapp;
 X-GNOME-UsesNotifications=true
 
-Actions=Chat;Settings;Lock;About;
+Actions=Chat;Settings;Theme;Lock;About;
 
 [Desktop Action Chat]
 Name[it]=Nuova Chat
 Name=New Chat
 Exec=whatsie -n
 
-[Desktop Action Settings]
+[Desktop Action Theme]
 Name[it]=Cambia tema
 Name=Toggle theme
 Exec=whatsie -t
