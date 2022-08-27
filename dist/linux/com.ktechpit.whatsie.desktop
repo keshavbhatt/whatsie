@@ -23,6 +23,11 @@ Name=New Chat
 Exec=whatsie -n
 
 [Desktop Action Settings]
+Name[it]=Cambia tema
+Name=Toggle theme
+Exec=whatsie -t
+
+[Desktop Action Settings]
 Name[it]=Impostazioni
 Name=Settings
 Exec=whatsie -s
