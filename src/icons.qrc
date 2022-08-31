@@ -397,5 +397,17 @@
         <file>icons/plus.png</file>
         <file>icons/app/whatsapp-message-32.png</file>
         <file>icons/green_arrow-right-line.png</file>
+        <file>icons/app/notification/whatsie-notify-1.png</file>
+        <file>icons/app/notification/whatsie-notify-2.png</file>
+        <file>icons/app/notification/whatsie-notify-3.png</file>
+        <file>icons/app/notification/whatsie-notify-4.png</file>
+        <file>icons/app/notification/whatsie-notify-5.png</file>
+        <file>icons/app/notification/whatsie-notify-6.png</file>
+        <file>icons/app/notification/whatsie-notify-7.png</file>
+        <file>icons/app/notification/whatsie-notify-8.png</file>
+        <file>icons/app/notification/whatsie-notify-9.png</file>
+        <file>icons/app/notification/whatsie-notify-10.png</file>
+        <file>icons/app/notification/whatsie-notify.png</file>
+        <file>icons/app/notification/whatsie.png</file>
     </qresource>
 </RCC>
