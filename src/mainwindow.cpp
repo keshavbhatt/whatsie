@@ -15,12 +15,12 @@ extern bool defaultAppAutoLock;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent), notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
-      trayIconRead(":/icons/app/icon-32.png"),
-      trayIconUnread(":/icons/app/whatsapp-message-32.png") {
+      trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
+      unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
 
   setObjectName("MainWindow");
   setWindowTitle(QApplication::applicationName());
-  setWindowIcon(QIcon(":/icons/app/icon-128.png"));
+  setWindowIcon(QIcon(":/icons/app/icon-64.png"));
   setMinimumWidth(525);
   setMinimumHeight(448);
   restoreMainWindow();
@@ -523,20 +523,19 @@ void MainWindow::notify(QString title, QString message) {
 
   if (settings.value("notificationCombo", 1).toInt() == 0 &&
       trayIcon != nullptr) {
-    trayIcon->showMessage(title, message, QIcon(":/icons/app/icon-64.png"),
+    trayIcon->showMessage(title, message,
+                          QIcon(":/icons/app/notification/whatsie-notify.png"),
                           settings.value("notificationTimeOut", 9000).toInt());
     trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
     connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
       if (windowState().testFlag(Qt::WindowMinimized) ||
           !windowState().testFlag(Qt::WindowActive)) {
         activateWindow();
-        // raise();
         this->show();
       }
     });
   } else {
     auto popup = new NotificationPopup(webEngine);
-    popup->setAttribute(Qt::WA_DeleteOnClose, true);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
       if (windowState().testFlag(Qt::WindowMinimized) ||
           !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
@@ -550,7 +549,7 @@ void MainWindow::notify(QString title, QString message) {
     popup->adjustSize();
     int screenNumber = qApp->desktop()->screenNumber(this);
     popup->present(screenNumber < 0 ? 0 : screenNumber, title, message,
-                   QPixmap(":/icons/app/icon-64.png"));
+                   QPixmap(":/icons/app/notification/whatsie-notify.png"));
   }
 }
 
@@ -634,7 +633,7 @@ void MainWindow::createTrayIcon() {
   trayIconMenu->addSeparator();
   trayIconMenu->addAction(quitAction);
 
-  trayIcon = new QSystemTrayIcon(trayIconRead, this);
+  trayIcon = new QSystemTrayIcon(trayIconNormal, this);
   trayIcon->setContextMenu(trayIconMenu);
   connect(trayIconMenu, SIGNAL(aboutToShow()), this, SLOT(checkWindowState()));
 
@@ -813,6 +812,17 @@ void MainWindow::createWebEngine() {
   createWebPage(false);
 }
 
+const QIcon MainWindow::getTrayIcon(const int &notificationCount) const {
+  if (notificationCount == 0) {
+    return QIcon(":/icons/app/notification/whatsie-notify.png");
+  } else if (notificationCount >= 10) {
+    return QIcon(":/icons/app/notification/whatsie-notify-10.png");
+  } else {
+    return QIcon(":/icons/app/notification/whatsie-notify-" +
+                 QString::number(notificationCount) + ".png");
+  }
+}
+
 void MainWindow::createWebPage(bool offTheRecord) {
   if (offTheRecord && !m_otrProfile) {
     m_otrProfile.reset(new QWebEngineProfile);
@@ -829,8 +839,6 @@ void MainWindow::createWebPage(bool offTheRecord) {
       settings.value("useragent", defaultUserAgentStr).toString());
 
   setNotificationPresenter(profile);
-  //profile->setHttpCacheMaximumSize(209715200/2);
-  //profile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
 
   QWebEnginePage *page = new WebEnginePage(profile, webEngine);
   if (settings.value("windowTheme", "light").toString() == "dark") {
@@ -865,7 +873,6 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
   }
 
   auto popup = new NotificationPopup(webEngine);
-  popup->setAttribute(Qt::WA_DeleteOnClose, true);
   popup->setObjectName("engineNotifier");
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState().testFlag(Qt::WindowMinimized) ||
@@ -921,25 +928,25 @@ void MainWindow::handleWebViewTitleChanged(QString title) {
   setWindowTitle(QApplication::applicationName() + ": " + title);
 
   if (notificationsTitleRegExp.exactMatch(title)) {
-    if (notificationsTitleRegExp.isEmpty() == false &&
-        notificationsTitleRegExp.capturedTexts().isEmpty() == false) {
+    if (notificationsTitleRegExp.capturedTexts().isEmpty() == false) {
       QString capturedTitle =
           notificationsTitleRegExp.capturedTexts().constFirst();
-      QRegExp rgex("\\([^\\d]*(\\d+)[^\\d]*\\)");
-      rgex.setMinimal(true);
-      if (rgex.indexIn(capturedTitle) != -1) {
-        QString unreadMessageCount = rgex.capturedTexts().constLast();
-        QString suffix =
-            unreadMessageCount.toInt() > 1 ? tr("messages") : tr("message");
-        restoreAction->setText(tr("Restore") + " | " + unreadMessageCount +
-                               " " + suffix);
+      unreadMessageCountRegExp.setMinimal(true);
+      if (unreadMessageCountRegExp.indexIn(capturedTitle) != -1) {
+        QString unreadMessageCountStr =
+            unreadMessageCountRegExp.capturedTexts().constLast();
+        int unreadMessageCount = unreadMessageCountStr.toInt();
+
+        restoreAction->setText(
+            tr("Restore") + " | " + unreadMessageCountStr + " " +
+            (unreadMessageCount > 1 ? tr("messages") : tr("message")));
+        trayIcon->setIcon(getTrayIcon(unreadMessageCount));
+        setWindowIcon(getTrayIcon(unreadMessageCount));
       }
     }
-    trayIcon->setIcon(trayIconUnread);
-    setWindowIcon(trayIconUnread);
   } else {
-    trayIcon->setIcon(trayIconRead);
-    setWindowIcon(trayIconRead);
+    trayIcon->setIcon(trayIconNormal);
+    setWindowIcon(trayIconNormal);
   }
 }
 
@@ -1144,12 +1151,7 @@ void MainWindow::newChat() {
       tr("Enter a valid WhatsApp number with country code (ex- +91XXXXXXXXXX)"),
       QLineEdit::Normal, "", &ok);
   if (ok) {
-    if (isPhoneNumber(phoneNumber))
-      triggerNewChat(phoneNumber, "");
-    else
-      QMessageBox::information(this,
-                               QApplication::applicationName() + "| Error",
-                               tr("Invalid Phone Number"));
+    triggerNewChat(phoneNumber, "");
   }
 }
 
@@ -1173,17 +1175,10 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
       });
 }
 
-bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
-  const QString phone = "^\\+(((\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?("
-                        "\\d{3,15})(\\-(\\d{3,15}))?$";
-  static QRegularExpression reg(phone);
-  return reg.match(phoneNumber).hasMatch();
-}
-
 void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                           bool byLoadingQuirk) {
   if (byLoadingQuirk) {
-      this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
                                        byPassCache);
   } else {
     if (lockWidget && !lockWidget->getIsLocked()) {

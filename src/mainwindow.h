@@ -41,6 +41,7 @@ class MainWindow : public QMainWindow {
 public:
   explicit MainWindow(QWidget *parent = nullptr);
   ~MainWindow();
+
 public slots:
   void updateWindowTheme();
   void updatePageTheme();
@@ -55,7 +56,8 @@ public slots:
   void alreadyRunning(bool notify = false);
   void notify(QString title, QString message);
   void toggleTheme();
-  void doReload(bool byPassCache = false, bool isAskedByCLI = false, bool byLoadingQuirk = false);
+  void doReload(bool byPassCache = false, bool isAskedByCLI = false,
+                bool byLoadingQuirk = false);
   void newChat();
 protected slots:
   void closeEvent(QCloseEvent *event) override;
@@ -63,6 +65,7 @@ protected slots:
   void changeEvent(QEvent *e) override;
 
 private:
+  const QIcon getTrayIcon(const int &notificationCount) const;
   QPalette lightPalette, darkPalette;
   void createActions();
   void createTrayIcon();
@@ -70,8 +73,8 @@ private:
 
   QSettings settings;
   QRegExp notificationsTitleRegExp;
-  QIcon trayIconRead;
-  QIcon trayIconUnread;
+  QIcon trayIconNormal;
+  QRegExp unreadMessageCountRegExp;
 
   QAction *reloadAction;
   QAction *minimizeAction;
@@ -115,7 +118,6 @@ private slots:
   void checkLoadedCorrectly();
   void loadingQuirk(QString test);
   void setNotificationPresenter(QWebEngineProfile *profile);
-  bool isPhoneNumber(const QString &phoneNumber);
   void quitApp();
   void initRateWidget();
   void initThemes();

@@ -175,7 +175,7 @@ QString utils::DecodeXML(const QString &decodeMe) {
   return temp;
 }
 
-QString utils::htmlToPlainText(QString str) {
+QString utils::htmlToPlainText(const QString &str) {
   QString out;
   QTextDocument text;
   text.setHtml(str);
@@ -264,7 +264,7 @@ QString utils::GetEnvironmentVar(const QString &variable_name) {
 #endif
 }
 
-void utils::desktopOpenUrl(const QString str) {
+void utils::desktopOpenUrl(const QString &str) {
   QProcess *xdg_open = new QProcess(0);
   xdg_open->start("xdg-open", QStringList() << str);
   if (xdg_open->waitForStarted(1000) == false) {
@@ -283,4 +283,11 @@ void utils::desktopOpenUrl(const QString str) {
             xdg_open->close();
             xdg_open->deleteLater();
           });
+}
+
+bool utils::isPhoneNumber(const QString &phoneNumber) {
+  const QString phone = "^\\+(((\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?("
+                        "\\d{3,15})(\\-(\\d{3,15}))?$";
+  static QRegularExpression reg(phone);
+  return reg.match(phoneNumber).hasMatch();
 }
