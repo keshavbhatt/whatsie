@@ -129,8 +129,6 @@ int main(int argc, char *argv[]) {
   }
 
   QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::PluginsEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
       QWebEngineSettings::DnsPrefetchEnabled, true);
   QWebEngineSettings::defaultSettings()->setAttribute(
       QWebEngineSettings::FullScreenSupportEnabled, true);
