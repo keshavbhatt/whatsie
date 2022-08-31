@@ -8,8 +8,10 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
 
   auto userAgent = profile->httpUserAgent();
-  auto webengineversion = userAgent.split("QtWebEngine").last().split(" ").first();
-  auto toRemove = "QtWebEngine"+webengineversion;
+  qDebug() << "WebEnginePage::Profile::UserAgent" << userAgent;
+  auto webengineversion =
+      userAgent.split("QtWebEngine").last().split(" ").first();
+  auto toRemove = "QtWebEngine" + webengineversion;
   auto cleanUserAgent = userAgent.remove(toRemove).replace("  ", " ");
   profile->setHttpUserAgent(cleanUserAgent);
 
@@ -149,15 +151,14 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   }
 
   QFileDialog *dialog = new QFileDialog();
+  dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   bool usenativeFileDialog =
       settings.value("useNativeFileDialog", false).toBool();
 
   if (usenativeFileDialog == false) {
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
   }
-
   dialog->setFileMode(dialogMode);
-
   QStringList mimeFilters;
   mimeFilters.append("application/octet-stream"); // to show All files(*)
   mimeFilters.append(acceptedMimeTypes);
@@ -182,6 +183,7 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
   QWidget *mainWindow = view()->window();
   if (error.isOverridable()) {
     QDialog dialog(mainWindow);
+    dialog.setAttribute(Qt::WA_DeleteOnClose, true);
     dialog.setModal(true);
     dialog.setWindowFlags(dialog.windowFlags() &
                           ~Qt::WindowContextHelpButtonHint);

@@ -13,8 +13,7 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->wrong->hide();
 
   passcodeLoginAction = ui->passcodeLogin->addAction(
-      QIcon(":/icons/green_arrow-right-line.png"),
-      QLineEdit::TrailingPosition);
+      QIcon(":/icons/green_arrow-right-line.png"), QLineEdit::TrailingPosition);
   passcodeLoginAction->setEnabled(false);
   connect(passcodeLoginAction, &QAction::triggered, passcodeLoginAction,
           [this]() {
@@ -219,7 +218,7 @@ void Lock::lock_app() {
   ui->passcodeLogin->setFocus();
 }
 
-void Lock::on_passcodeLogin_returnPressed() {passcodeLoginAction->trigger(); }
+void Lock::on_passcodeLogin_returnPressed() { passcodeLoginAction->trigger(); }
 
 bool Lock::getCapsLockOn() {
   Display *d = XOpenDisplay((char *)0);

@@ -15,6 +15,7 @@ class Lock : public QWidget {
 public:
   explicit Lock(QWidget *parent = nullptr);
   ~Lock();
+
   bool getIsLocked() const;
 
 private slots:
@@ -22,7 +23,7 @@ private slots:
   void on_passcode2_textChanged(const QString &arg1);
   void on_setPass_clicked();
   bool check_password_set();
-   void on_passcodeLogin_textChanged(const QString &arg1);
+  void on_passcodeLogin_textChanged(const QString &arg1);
   void on_passcodeLogin_returnPressed();
   bool getCapsLockOn();
   void checkCaps();

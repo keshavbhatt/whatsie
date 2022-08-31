@@ -51,13 +51,14 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu *menu = page()->createStandardContextMenu();
+  menu->setAttribute(Qt::WA_DeleteOnClose, true);
   // hide reload, back, forward, savepage, copyimagelink menus
   foreach (auto *action, menu->actions()) {
-    if (action == page()->action(QWebEnginePage::SavePage)
-            || action == page()->action(QWebEnginePage::Reload)
-            || action == page()->action(QWebEnginePage::Back)
-            || action == page()->action(QWebEnginePage::Forward)
-            || action == page()->action(QWebEnginePage::CopyImageUrlToClipboard)) {
+    if (action == page()->action(QWebEnginePage::SavePage) ||
+        action == page()->action(QWebEnginePage::Reload) ||
+        action == page()->action(QWebEnginePage::Back) ||
+        action == page()->action(QWebEnginePage::Forward) ||
+        action == page()->action(QWebEnginePage::CopyImageUrlToClipboard)) {
       action->setVisible(false);
     }
   }

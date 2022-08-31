@@ -16,9 +16,9 @@ int main(int argc, char *argv[]) {
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #ifdef QT_DEBUG
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421");
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox");
 #else
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --single-process");
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --ignore-gpu-blocklist --no-sandbox"); //--single-process
 #endif
 
   SingleApplication instance(argc, argv, true);

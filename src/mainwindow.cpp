@@ -206,7 +206,9 @@ void MainWindow::updateWindowTheme() {
   }
 
   QList<QWidget *> widgets = this->findChildren<QWidget *>();
-  foreach (QWidget *w, widgets) { w->setPalette(qApp->palette()); }
+  foreach (QWidget *w, widgets) {
+    w->setPalette(qApp->palette());
+  }
   setNotificationPresenter(webEngine->page()->profile());
 
   if (lockWidget != nullptr) {
@@ -534,6 +536,7 @@ void MainWindow::notify(QString title, QString message) {
     });
   } else {
     auto popup = new NotificationPopup(webEngine);
+    popup->setAttribute(Qt::WA_DeleteOnClose, true);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
       if (windowState().testFlag(Qt::WindowMinimized) ||
           !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
@@ -826,6 +829,8 @@ void MainWindow::createWebPage(bool offTheRecord) {
       settings.value("useragent", defaultUserAgentStr).toString());
 
   setNotificationPresenter(profile);
+  //profile->setHttpCacheMaximumSize(209715200/2);
+  //profile->setHttpCacheType(QWebEngineProfile::MemoryHttpCache);
 
   QWebEnginePage *page = new WebEnginePage(profile, webEngine);
   if (settings.value("windowTheme", "light").toString() == "dark") {
@@ -838,8 +843,6 @@ void MainWindow::createWebPage(bool offTheRecord) {
   // Release of profile requested but WebEnginePage still not deleted. Expect
   // troubles !
   profile->setParent(page);
-  // RequestInterceptor *interceptor = new RequestInterceptor(profile);
-  // profile->setUrlRequestInterceptor(interceptor);
   auto randomValue = QRandomGenerator::global()->generateDouble() * 300;
   page->setUrl(
       QUrl("https://web.whatsapp.com?v=" + QString::number(randomValue)));
@@ -862,6 +865,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
   }
 
   auto popup = new NotificationPopup(webEngine);
+  popup->setAttribute(Qt::WA_DeleteOnClose, true);
   popup->setObjectName("engineNotifier");
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState().testFlag(Qt::WindowMinimized) ||
@@ -1035,7 +1039,7 @@ void MainWindow::injectNewChatJavaScript() {
 
 void MainWindow::checkLoadedCorrectly() {
   if (webEngine && webEngine->page()) {
-    // test 1 based on the class name of body of the page
+    // test 1 based on the class name of body tag of the page
     webEngine->page()->runJavaScript(
         "document.querySelector('body').className",
         [this](const QVariant &result) {
@@ -1050,12 +1054,10 @@ void MainWindow::checkLoadedCorrectly() {
             utils::delete_cache(
                 webEngine->page()->profile()->persistentStoragePath());
             settings.setValue("useragent", defaultUserAgentStr);
-            utils *util = new utils(this);
-            util->DisplayExceptionErrorDialog(
+            utils::DisplayExceptionErrorDialog(
                 "test1 handleWebViewTitleChanged(title) title: Error, "
                 "Resetting UA, Quiting!\nUA: " +
                 settings.value("useragent", "DefaultUA").toString());
-
             quitAction->trigger();
           } else {
             qDebug() << "Test 1 loaded correctly, value:" << result.toString();
@@ -1075,8 +1077,7 @@ void MainWindow::loadingQuirk(QString test) {
     utils::delete_cache(webEngine->page()->profile()->cachePath());
     utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
     settings.setValue("useragent", defaultUserAgentStr);
-    utils *util = new utils(this);
-    util->DisplayExceptionErrorDialog(
+    utils::DisplayExceptionErrorDialog(
         test +
         " checkLoadedCorrectly()/loadingQuirk() reload retries 0, Resetting "
         "UA, Quiting!\nUA: " +
@@ -1110,7 +1111,8 @@ void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
   Q_UNUSED(reason);
-  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false || reason == QSystemTrayIcon::Context)
+  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false ||
+      reason == QSystemTrayIcon::Context)
     return;
   if (isVisible()) {
     hide();
@@ -1181,7 +1183,7 @@ bool MainWindow::isPhoneNumber(const QString &phoneNumber) {
 void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                           bool byLoadingQuirk) {
   if (byLoadingQuirk) {
-    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+      this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
                                        byPassCache);
   } else {
     if (lockWidget && !lockWidget->getIsLocked()) {

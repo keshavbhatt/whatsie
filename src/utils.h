@@ -36,7 +36,7 @@ public slots:
   static QString htmlToPlainText(QString str);
   static QString GetEnvironmentVar(const QString &variable_name);
   static float RoundToOneDecimal(float number);
-  void DisplayExceptionErrorDialog(const QString &error_info);
+  static void DisplayExceptionErrorDialog(const QString &error_info);
   static QString appDebugInfo();
   static void desktopOpenUrl(const QString str);
 
