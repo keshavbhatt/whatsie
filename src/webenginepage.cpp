@@ -151,7 +151,6 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   }
 
   QFileDialog *dialog = new QFileDialog();
-  dialog->setAttribute(Qt::WA_DeleteOnClose, true);
   bool usenativeFileDialog =
       settings.value("useNativeFileDialog", false).toBool();
 
@@ -176,6 +175,7 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   if (dialog->exec()) {
     selectedFiles = dialog->selectedFiles();
   }
+  dialog->deleteLater();
   return selectedFiles;
 }
 
@@ -183,7 +183,6 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
   QWidget *mainWindow = view()->window();
   if (error.isOverridable()) {
     QDialog dialog(mainWindow);
-    dialog.setAttribute(Qt::WA_DeleteOnClose, true);
     dialog.setModal(true);
     dialog.setWindowFlags(dialog.windowFlags() &
                           ~Qt::WindowContextHelpButtonHint);
