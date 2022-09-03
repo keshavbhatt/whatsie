@@ -6,7 +6,7 @@ description: |
 
 grade: stable
 confinement: strict
-icon: snap/gui/icon.png
+icon: snap/gui/icon.svg
 base: core20
 compression: lzo
 
