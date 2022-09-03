@@ -1,3 +1,25 @@
+## 4.9.0 (2022-09-03)
+
+#### 🎁 Feature
+
+* systemtray notification counter (530c24bf)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (9472e9e6)
+
+#### 🚧 Chores
+
+* Version bump 4.9 (af39ff62)
+* **snap:** use svg icon for desktop entry (51dcb0d4)
+* **ci:** release dry-run action (7ef46aaf)
+* delete filedialog after exec (5e50519c)
+* add notification icons (997ae821)
+* **webengine:** disable support for Pepper plugins (325d841e)
+* some enhancements (ff575c45)
+* update UA to 104 (d03e9fc6)
+
+
 ## 4.8.2 (2022-08-27)
 
 #### 🐞 Bug Fixes
