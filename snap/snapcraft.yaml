@@ -106,7 +106,7 @@ parts:
 
             make install
 
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.png|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
+            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
 
    desktop-launch:
      plugin: nil
