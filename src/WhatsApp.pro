@@ -116,20 +116,6 @@ FORMS += \
 TRANSLATIONS += \
     i18n/it_IT.ts
 
-qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
-
-DICTIONARIES_DIR = qtwebengine_dictionaries
-
-dict.files = $$files($$PWD/dictionaries/*.dic, true)
-
-dictoolbuild.input = dict.files
-dictoolbuild.output = $${DICTIONARIES_DIR}/${QMAKE_FILE_BASE}.bdic
-dictoolbuild.depends = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.aff
-dictoolbuild.commands = $${CONVERT_TOOL} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
-dictoolbuild.name = Build ${QMAKE_FILE_IN_BASE}
-dictoolbuild.CONFIG = no_link target_predeps
-QMAKE_EXTRA_COMPILERS += dictoolbuild
-
 
 # Default rules for deployment
 isEmpty(PREFIX){
@@ -143,8 +129,29 @@ DATADIR = $$PREFIX/share
 
 target.path = $$BINDIR
 
-dictionaries.files = $${DICTIONARIES_DIR}/
-dictionaries.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
+CONFIG(FLATPAK){
+    message("This is a flatpak build, assuming dicts are not required.")
+}else{
+    qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
+
+    DICTIONARIES_DIR = qtwebengine_dictionaries
+
+    dict.files = $$files($$PWD/dictionaries/*.dic, true)
+
+    dictoolbuild.input = dict.files
+    dictoolbuild.output = $${DICTIONARIES_DIR}/${QMAKE_FILE_BASE}.bdic
+    dictoolbuild.depends = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.aff
+    dictoolbuild.commands = $${CONVERT_TOOL} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+    dictoolbuild.name = Build ${QMAKE_FILE_IN_BASE}
+    dictoolbuild.CONFIG = no_link target_predeps
+    QMAKE_EXTRA_COMPILERS += dictoolbuild
+    
+    dictionaries.files = $${DICTIONARIES_DIR}/
+    dictionaries.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
+    
+    unix:INSTALLS += dictionaries
+}
+
 
 icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps/
 icon16.files = ../dist/linux/hicolor/16x16/apps/com.ktechpit.whatsie.png
@@ -172,5 +179,5 @@ appstream.files = ../dist/linux/com.ktechpit.whatsie.appdata.xml
 desktop.path  = $$DATADIR/applications/
 desktop.files = ../dist/linux/com.ktechpit.whatsie.desktop
 
-unix:INSTALLS += target dictionaries icon16 icon32 icon64 icon128 icon256
+unix:INSTALLS += target icon16 icon32 icon64 icon128 icon256
 unix:INSTALLS += iconscalable iconsymbolic license appstream desktop
