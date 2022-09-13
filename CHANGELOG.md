@@ -1,3 +1,14 @@
+## 4.9.1 (2022-09-13)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (5cdba515)
+
+#### 🚧 Chores
+
+* skip dictionaries conversion if build type is flatpak build (f16086c2)
+
+
 ## 4.9.0 (2022-09-03)
 
 #### 🎁 Feature
