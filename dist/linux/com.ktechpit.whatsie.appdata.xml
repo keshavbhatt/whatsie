@@ -4,14 +4,71 @@
 	<metadata_license>CC0-1.0</metadata_license>
 	<project_license>MIT</project_license>
 	<name>Whatsie</name>
-	<summary>Qt Whatsapp Web Client</summary>
+	<summary>Qt Whatsapp Web Client for Linux Desktop</summary>
 	<developer_name>Keshav Bhatt</developer_name>
 	<description>
-		<p>Feature rich WhatsApp web client based on Qt WebEngine</p>
+		<p>Feature rich WhatsApp web client based on Qt WebEngine.</p>
+		<b>Key features of Whatsie:</b>
+		<ul>
+			<li>Light and Dark Themes with automatic switching</li>
+			<li>Customized Notifications &amp; Native Notifications</li>
+			<li>Keyboard Shortcuts</li>
+			<li>BuiltIn download manager</li>
+			<li>Mute Audio, Disable Notifications</li>
+			<li>App Lock feature</li>
+			<li>Hardware access permission manager</li>
+			<li>Built in Spell Checker (with support for 31 Major languages)</li>
+		</ul>
+
+		<p>
+			<b>Other settings that let you control every aspect of WebApp like:</b>
+			<ul>
+				<li>Do not disturb mode</li>
+				<li>Full view mode, lets you expand the main view to the full width of the window</li>
+				<li>Ability to switch between Native &amp; Custom notification</li>
+				<li>Configurable notification popup timeout</li>
+				<li>Mute all audio from Whatapp</li>
+				<li>Disabling auto playback of media</li>
+				<li>Minimize to tray on application start</li>
+				<li>Toggle to enable single click hide to the system tray</li>
+				<li>Switching download location</li>
+				<li>Enable disable app lock on application start</li>
+				<li>Auto-locking after a certain interval of time</li>
+				<li>App lock password management</li>
+				<li>Widget styling</li>
+				<li>Configurable auto Theme switching based on day night time</li>
+				<li>Configurable close button action</li>
+				<li>Global App shortcuts</li>
+				<li>Permission manager let you toggle camera mic and other hardware level permissions</li>
+				<li>Configurable page zoom factor, switching based on window state maximized on normal </li>
+				<li>Configurable App User Agent</li>
+				<li>Application Storage management, lets you clean residual cache and persistent data</li>
+			</ul>
+		</p>
+		<p>
+		<strong>Command line options:</strong>
+		Comes with general CLI support, with a bunch of options that let you interact with already running instances of Whatsie.</p>
+		<p>Run: <code>whatsie -h</code> to see all supported options.</p>
+		<pre><code>Usage: whatsie [options]
+		Feature rich WhatsApp web client based on Qt WebEngine
+
+		Options:
+		-h, --help           Displays help on commandline options
+		-v, --version        Displays version information.
+		-b, --build-info     Shows detailed current build infomation
+		-w, --show-window    Show main window of runninginstance of WhatSie
+		-s, --open-settings  Opens Settings dialog in a runninginstance of WhatSie
+		-l, --lock-app       Locks a runninginstance of WhatSie
+		-i, --open-about     Opens About dialog in a runninginstance of WhatSie
+		-t, --toggle-theme   Toggle between dark &amp; light theme in a runninginstance
+							 of WhatSie
+		-r, --reload-app     Reload the app in a runninginstance of WhatSie
+		-n, --new-chat       Opennew chat prompt in a runninginstance of WhatSie
+		</code></pre>
 	</description>
 	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
 	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
-	<url type="bugtracker">https://github.com/keshavbhatt/whatsie</url>
+	<url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
 	<screenshots>
 		<screenshot type="default">
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
@@ -22,6 +79,12 @@
 		<screenshot>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/3.jpg</image>
 		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/4.jpg</image>
+		</screenshot>
+		<screenshot>
+			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/5.jpg</image>
+		</screenshot>
 	</screenshots>
 	<provides>
 		<binary>whatsie</binary>
@@ -29,5 +92,6 @@
 	<content_rating type="oars-1.0" />
 	<releases>
 		<release version="4.4" date="2022-06-18" />
+		<release version="4.9" date="2022-09-14" />
 	</releases>
 </component>
