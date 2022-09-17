@@ -1,3 +1,14 @@
+## 4.10.1 (2022-09-17)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (56c06a92)
+
+#### 🚧 Chores
+
+* update appdata, to make flatpak-builder happy (c8b1b838)
+
+
 ## 4.10.0 (2022-09-17)
 
 #### 🎁 Feature
