@@ -47,9 +47,8 @@
 
 		<p>Command line options:</p>
 		Comes with general CLI support, with a bunch of options that let you interact with already running instances of Whatsie.
-		<p>Run: <code>whatsie -h</code> to see all supported options.</p>
+		<p>Run: whatsie -h to see all supported options
 		Usage: whatsie [options]
-		Feature rich WhatsApp web client based on Qt WebEngine
 
 		Options:
 		-h, --help           Displays help on commandline options
@@ -63,7 +62,7 @@
 							 of WhatSie
 		-r, --reload-app     Reload the app in a runninginstance of WhatSie
 		-n, --new-chat       Opennew chat prompt in a runninginstance of WhatSie
-
+		</p>
 	</description>
 	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
 	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
