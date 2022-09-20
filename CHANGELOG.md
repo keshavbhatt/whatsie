@@ -1,3 +1,14 @@
+## 4.10.2 (2022-09-20)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (3a71de33)
+
+#### 🚧 Chores
+
+* make description under 1000 chars (1c5bfc42)
+
+
 ## 4.10.1 (2022-09-17)
 
 #### 📄 Documentation
