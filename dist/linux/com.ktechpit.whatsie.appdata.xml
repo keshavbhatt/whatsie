@@ -7,66 +7,41 @@
 	<summary>Qt Whatsapp Web Client for Linux Desktop</summary>
 	<developer_name>Keshav Bhatt</developer_name>
 	<description>
-		<p>Feature rich WhatsApp web client based on Qt WebEngine. WhatSie is packed with lots of goodies, there are many features which are unique in WhatSie most notably the App Lock feature that allows users to set app lock passcode to lock the app so that someone cannot open and access your whatsapp messages while you are away from you laptop or system.
-
-		There are option to toggle Theme of both Application and Web Page in settings widget, which is also a unique feature. WhatSie also comes with built in download manager that lets you download Images, media documents etc. There is a app permission manager baked into the settings section which opens a dialog with bunch of webpage related permissions like : Allowing app to use Camera, Microphone, Geolocation and more. There are some App shortcuts too to control your app from Keyboard easily. Like pressing F11 key will toggle fullscreen view, Ctrl+H will hide app in system tray, F5 key will reload the app and few other can be seen by pressing “Show Shortcuts” button in app settings dialog. WhatSie also comes with built in Spell Checking feature which help you fixing your sellings while you type in the message. There are many more settings that you can tweak in settings dialog Like disable Notification Popups, Mute Sound Alert and any Audio coming from Application.</p>
+		<p>Feature rich WhatsApp web client based on Qt WebEngine.</p>
 		<p>Key features of Whatsie:</p>
 		<ul>
-			<li>Light and Dark Themes with automatic switching</li>
-			<li>Customized Notifications &amp; Native Notifications</li>
-			<li>Keyboard Shortcuts</li>
-			<li>BuiltIn download manager</li>
-			<li>Mute Audio, Disable Notifications</li>
-			<li>App Lock feature</li>
-			<li>Hardware access permission manager</li>
-			<li>Built in Spell Checker (with support for 31 Major languages)</li>
+		   <li>Light and Dark Themes with automatic switching</li>
+		   <li>Customized Notifications &amp; Native Notifications</li>
+		   <li>Global App shortcuts</li>
+		   <li>BuiltIn download manager</li>
+		   <li>Mute Audio, Disable Notifications</li>
+		   <li>App Lock feature</li>
+		   <li>Built in Spell Checker (with support for 31 Major languages)</li>
 		</ul>
-			<p>Other settings that let you control every aspect of WebApp like:</p>
-			<ul>
-				<li>Do not disturb mode</li>
-				<li>Full view mode, lets you expand the main view to the full width of the window</li>
-				<li>Ability to switch between Native &amp; Custom notification</li>
-				<li>Configurable notification popup timeout</li>
-				<li>Mute all audio from Whatapp</li>
-				<li>Disabling auto playback of media</li>
-				<li>Minimize to tray on application start</li>
-				<li>Toggle to enable single click hide to the system tray</li>
-				<li>Switching download location</li>
-				<li>Enable disable app lock on application start</li>
-				<li>Auto-locking after a certain interval of time</li>
-				<li>App lock password management</li>
-				<li>Widget styling</li>
-				<li>Configurable auto Theme switching based on day night time</li>
-				<li>Configurable close button action</li>
-				<li>Global App shortcuts</li>
-				<li>Permission manager let you toggle camera mic and other hardware level permissions</li>
-				<li>Configurable page zoom factor, switching based on window state maximized on normal </li>
-				<li>Configurable App User Agent</li>
-				<li>Application Storage management, lets you clean residual cache and persistent data</li>
-			</ul>
-
-		<p>Command line options:</p>
-		Comes with general CLI support, with a bunch of options that let you interact with already running instances of Whatsie.
-		<p>Run: whatsie -h to see all supported options
-		Usage: whatsie [options]
-
-		Options:
-		-h, --help           Displays help on commandline options
-		-v, --version        Displays version information.
-		-b, --build-info     Shows detailed current build infomation
-		-w, --show-window    Show main window of runninginstance of WhatSie
-		-s, --open-settings  Opens Settings dialog in a runninginstance of WhatSie
-		-l, --lock-app       Locks a runninginstance of WhatSie
-		-i, --open-about     Opens About dialog in a runninginstance of WhatSie
-		-t, --toggle-theme   Toggle between dark &amp; light theme in a runninginstance
-							 of WhatSie
-		-r, --reload-app     Reload the app in a runninginstance of WhatSie
-		-n, --new-chat       Opennew chat prompt in a runninginstance of WhatSie
-		</p>
+		<p>Other settings that let you control every aspect of WebApp like:</p>
+		<ul>
+		   <li>Do not disturb mode</li>
+		   <li>Full view mode, lets you expand the main view to the full width of the window</li>
+		   <li>Ability to switch between Native &amp; Custom notification</li>
+		   <li>Configurable notification popup timeout</li>
+		   <li>Mute all audio from Whatapp</li>
+		   <li>Minimize to tray on application start</li>
+		   <li>Enable disable app lock on application start</li>
+		   <li>Auto-locking after a certain interval of time</li>
+		</ul>
 	</description>
 	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
 	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
 	<url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
+	<url type="donation">https://www.paypal.me/keshavnrj</url>
+	<keywords>
+		<keyword translate="no">WhatsApp</keyword>
+		<keyword>social</keyword>
+		<keyword>social-media</keyword>
+		<keyword>messaging</keyword>
+		<keyword xml:lang="de">beurs</keyword>
+		<keyword xml:lang="pt">mensagens</keyword>
+	</keywords>
 	<screenshots>
 		<screenshot type="default">
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
