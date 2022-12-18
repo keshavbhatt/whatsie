@@ -1,3 +1,14 @@
+## 4.10.3 (2022-12-18)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (d7f1faee)
+
+#### 🚧 Chores
+
+* add moreapps widget in lock screen (074b0f98)
+
+
 ## 4.10.2 (2022-09-20)
 
 #### 📄 Documentation
