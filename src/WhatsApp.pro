@@ -6,7 +6,7 @@
 
 QT += core gui webengine webenginewidgets positioning
 
-CONFIG += c++11
+CONFIG += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -24,6 +24,8 @@ LIBS += -L/usr/X11/lib -lX11
 
 include(singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
+
+include(widgets/MoreApps/MoreApps.pri)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -48,7 +50,7 @@ BUILD_TIMESTAMP="\\\"$$system(date -u +\""%Y-%m-%dT%H:%M:%SUTC\"")\\\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 # Set program version
-VERSION = 4.9
+VERSION = 4.10
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 # You can also make your code fail to compile if you use deprecated APIs.

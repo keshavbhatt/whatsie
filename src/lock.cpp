@@ -4,6 +4,7 @@
 #include <QGraphicsOpacityEffect>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
+#include "moreapps.h"
 
 #include "X11/XKBlib.h" // keep this header at bottom
 
@@ -11,6 +12,15 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->setupUi(this);
   ui->setPass->setEnabled(false);
   ui->wrong->hide();
+
+  MoreApps *moreApps =
+      new MoreApps(this, nullptr, "keshavnrj",
+                   QUrl("https://raw.githubusercontent.com/keshavbhatt/appdata/"
+                        "main/moreapps.txt"),
+                   false);
+  moreApps->setWindowTitle("More Applications by developer");
+  moreApps->setFixedHeight(98);
+  ui->moreAppsLayout->addWidget(moreApps);
 
   passcodeLoginAction = ui->passcodeLogin->addAction(
       QIcon(":/icons/green_arrow-right-line.png"), QLineEdit::TrailingPosition);
