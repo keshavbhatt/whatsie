@@ -116,7 +116,7 @@ void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
 }
 
 void WebEnginePage::handleLoadFinished(bool ok) {
-  Q_UNUSED(ok);
+
   // turn on Notification settings by default
   if (settings.value("permissions/Notifications").isValid() == false) {
     settings.beginGroup("permissions");
@@ -131,6 +131,14 @@ void WebEnginePage::handleLoadFinished(bool ok) {
         QUrl("https://web.whatsapp.com/"),
         QWebEnginePage::Feature::Notifications,
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
+  }
+
+  if(ok){
+      injectMutationObserver();
+      injectPreventScrollWheelZoomHelper();
+      injectFullWidthJavaScript();
+      injectClassChangeObserver();
+      injectNewChatJavaScript();
   }
 }
 
@@ -300,4 +308,107 @@ void WebEnginePage::javaScriptConsoleMessage(
   Q_UNUSED(message);
   Q_UNUSED(lineId);
   Q_UNUSED(sourceId);
+}
+
+void WebEnginePage::injectPreventScrollWheelZoomHelper() {
+  QString js = R"(
+                    (function () {
+                        const SSWZ = function () {
+                            this.keyScrollHandler = function (e) {
+                                if (e.ctrlKey) {
+                                    e.preventDefault();
+                                    return false;
+                                }
+                            }
+                        };
+                        if (window === top) {
+                            const sswz = new SSWZ();
+                            window.addEventListener('wheel', sswz.keyScrollHandler, {
+                                passive: false
+                            });
+                        }
+                    })();
+                )";
+  this->runJavaScript(js);
+}
+
+void WebEnginePage::injectClassChangeObserver() {
+  QString js = R"(
+            const observer = new MutationObserver(() => {
+                var haveFullView = document.body.classList.contains('whatsie-full-view');
+                var container = document.querySelector('#app > .app-wrapper-web > div');
+                if(container){
+                    if(haveFullView){
+                        container.style.width = '100%';
+                        container.style.height = '100%';
+                        container.style.top = '0';
+                        container.style.maxWidth = 'unset';
+                    }else{
+                        container.style.width = null;
+                        container.style.height = null;
+                        container.style.top = null;
+                        container.style.maxWidth = null;
+                    }
+                }
+            });
+            observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class'],
+            childList: false,
+            characterData: false
+        });)";
+  this->runJavaScript(js);
+}
+
+void WebEnginePage::injectMutationObserver() {
+  QString js =
+      R"(function waitForElement(selector) {
+                return new Promise(resolve => {
+                    if (document.querySelector(selector)) {
+                        return resolve(document.querySelector(selector));
+                    }
+                    const observer = new MutationObserver(mutations => {
+                        if (document.querySelector(selector)) {
+                            resolve(document.querySelector(selector));
+                            observer.disconnect();
+                        }
+                    });
+                    observer.observe(document.body, {
+                        childList: true,
+                        subtree: true
+                    });
+                });
+            };)";
+  this->runJavaScript(js);
+}
+
+void WebEnginePage::injectFullWidthJavaScript() {
+  if (!settings.value("fullWidthView", true).toBool())
+    return;
+  QString js =
+      R"(waitForElement('#pane-side').then( () => {
+            var container = document.querySelector('#app > .app-wrapper-web > div');
+            container.style.width = '100%';
+            container.style.height = '100%';
+            container.style.top = '0';
+            container.style.maxWidth = 'unset';
+         });
+        )";
+  this->runJavaScript(js);
+}
+
+void WebEnginePage::injectNewChatJavaScript() {
+  QString js = R"(const openNewChatWhatsie = (phone,text) => {
+                    const link = document.createElement('a');
+                    link.setAttribute('href',
+                    `whatsapp://send/?phone=${phone}&text=${text}`);
+                    document.body.append(link);
+                    link.click();
+                    document.body.removeChild(link);
+                };
+                function openNewChatWhatsieDefined()
+                {
+                    return (openNewChatWhatsie != 'undefined');
+                })";
+  this->runJavaScript(js);
 }

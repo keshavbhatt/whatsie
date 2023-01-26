@@ -1,4 +1,4 @@
-#include <SunClock.hpp>
+#include <sunclock.hpp>
 #include <cmath>
 #include <stdexcept>
 

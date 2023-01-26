@@ -1,7 +1,7 @@
 #include "automatictheme.h"
 #include "ui_automatictheme.h"
 
-#include "SunClock.hpp"
+#include "sunclock.hpp"
 #include <QMessageBox>
 
 AutomaticTheme::AutomaticTheme(QWidget *parent)

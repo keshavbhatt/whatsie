@@ -129,13 +129,8 @@ private slots:
   bool isLoggedIn();
   void initAutoLock();
   void appAutoLockChanged();
-  void injectNewChatJavaScript();
   void triggerNewChat(QString phone, QString text);
   void restoreMainWindow();
-  void injectFullWidthJavaScript();
-  void injectMutationObserver();
-  void injectClassChangeObserver();
-  void injectPreventScrollWheelZoomHelper();
 };
 
 #endif // MAINWINDOW_H

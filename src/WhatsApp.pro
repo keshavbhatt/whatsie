@@ -59,29 +59,27 @@ DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 # DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 SOURCES += \
-        SunClock.cpp \
         about.cpp \
         automatictheme.cpp \
         dictionaries.cpp \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
-        elidedlabel.cpp \
         lock.cpp \
         main.cpp \
         mainwindow.cpp \
         permissiondialog.cpp \
         rateapp.cpp \
         settingswidget.cpp \
+        sunclock.cpp \
         utils.cpp \
         webenginepage.cpp \
         webview.cpp \
+        widgets/elidedlabel/elidedlabel.cpp \
         widgets/scrolltext/scrolltext.cpp
-
 RESOURCES += \
         icons.qrc
 
 HEADERS += \
-    SunClock.hpp \
     about.h \
     autolockeventfilter.h \
     automatictheme.h \
@@ -90,7 +88,6 @@ HEADERS += \
     dictionaries.h \
     downloadmanagerwidget.h \
     downloadwidget.h \
-    elidedlabel.h \
     lock.h \
     mainwindow.h \
     notificationpopup.h \
@@ -98,11 +95,12 @@ HEADERS += \
     rateapp.h \
     requestinterceptor.h \
     settingswidget.h \
+    sunclock.hpp \
     utils.h \
     webenginepage.h \
     webview.h \
+    widgets/elidedlabel/elidedlabel.h \
     widgets/scrolltext/scrolltext.h
-
 FORMS += \
     about.ui \
     automatictheme.ui \

@@ -52,7 +52,7 @@
 #define DOWNLOADWIDGET_H
 
 #include "ui_downloadwidget.h"
-#include "elidedlabel.h"
+#include "widgets/elidedlabel/elidedlabel.h"
 
 
 #include <QFrame>

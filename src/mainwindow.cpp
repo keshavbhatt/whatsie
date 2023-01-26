@@ -205,11 +205,11 @@ void MainWindow::updateWindowTheme() {
       settings.value("widgetStyle", "Fusion").toString()));
   if (settings.value("windowTheme", "light").toString() == "dark") {
     qApp->setPalette(darkPalette);
-    this->webEngine->setStyleSheet(
+    webEngine->setStyleSheet(
         "QWebEngineView{background:rgb(17, 27, 33);}"); // whatsapp dark color
   } else {
     qApp->setPalette(lightPalette);
-    this->webEngine->setStyleSheet(
+    webEngine->setStyleSheet(
         "QWebEngineView{background:#F0F0F0;}"); // whatsapp light color
   }
 
@@ -316,7 +316,7 @@ void MainWindow::initSettingWidget() {
               webSettings->setAttribute(
                   QWebEngineSettings::PlaybackRequiresUserGesture, checked);
 
-              this->webEngine->page()->profile()->settings()->setAttribute(
+              webEngine->page()->profile()->settings()->setAttribute(
                   QWebEngineSettings::PlaybackRequiresUserGesture, checked);
             });
 
@@ -357,7 +357,7 @@ void MainWindow::initSettingWidget() {
 
     connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
             settingsWidget, [=]() {
-              setNotificationPresenter(this->webEngine->page()->profile());
+              setNotificationPresenter(webEngine->page()->profile());
             });
 
     connect(settingsWidget, &SettingsWidget::notify, settingsWidget,
@@ -479,7 +479,7 @@ void MainWindow::showSettings(bool isAskedByCLI) {
 
 void MainWindow::updateSettingsUserAgentWidget() {
   settingsWidget->updateDefaultUAButton(
-      this->webEngine->page()->profile()->httpUserAgent());
+      webEngine->page()->profile()->httpUserAgent());
 }
 
 void MainWindow::askToReloadPage() {
@@ -806,16 +806,16 @@ void MainWindow::createWebEngine() {
 
   m_dictionaries = Dictionaries::GetDictionaries();
 
-  WebView *webEngine = new WebView(this, m_dictionaries);
-  setCentralWidget(webEngine);
-  webEngine->setSizePolicy(widgetSize);
-  webEngine->show();
+  WebView *webEngineView = new WebView(this, m_dictionaries);
+  setCentralWidget(webEngineView);
+  webEngineView->setSizePolicy(widgetSize);
+  webEngineView->show();
 
-  this->webEngine = webEngine;
+  this->webEngine = webEngineView;
 
-  webEngine->addAction(minimizeAction);
-  webEngine->addAction(lockAction);
-  webEngine->addAction(quitAction);
+  webEngineView->addAction(minimizeAction);
+  webEngineView->addAction(lockAction);
+  webEngineView->addAction(quitAction);
 
   createWebPage(false);
 }
@@ -964,119 +964,14 @@ void MainWindow::handleLoadFinished(bool loaded) {
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
-    injectMutationObserver();
-    injectPreventScrollWheelZoomHelper();
-    injectFullWidthJavaScript();
-    injectClassChangeObserver();
-    injectNewChatJavaScript();
+
     if (settingsWidget != nullptr) {
       settingsWidget->refresh();
     }
   }
 }
 
-void MainWindow::injectPreventScrollWheelZoomHelper() {
-  QString js = R"(
-                    (function () {
-                        const SSWZ = function () {
-                            this.keyScrollHandler = function (e) {
-                                if (e.ctrlKey) {
-                                    e.preventDefault();
-                                    return false;
-                                }
-                            }
-                        };
-                        if (window === top) {
-                            const sswz = new SSWZ();
-                            window.addEventListener('wheel', sswz.keyScrollHandler, {
-                                passive: false
-                            });
-                        }
-                    })();
-                )";
-  webEngine->page()->runJavaScript(js);
-}
 
-void MainWindow::injectClassChangeObserver() {
-  QString js = R"(
-            const observer = new MutationObserver(() => {
-                var haveFullView = document.body.classList.contains('whatsie-full-view');
-                var container = document.querySelector('#app > .app-wrapper-web > div');
-                if(container){
-                    if(haveFullView){
-                        container.style.width = '100%';
-                        container.style.height = '100%';
-                        container.style.top = '0';
-                        container.style.maxWidth = 'unset';
-                    }else{
-                        container.style.width = null;
-                        container.style.height = null;
-                        container.style.top = null;
-                        container.style.maxWidth = null;
-                    }
-                }
-            });
-            observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ['class'],
-            childList: false,
-            characterData: false
-        });)";
-  webEngine->page()->runJavaScript(js);
-}
-
-void MainWindow::injectMutationObserver() {
-  QString js =
-      R"(function waitForElement(selector) {
-                return new Promise(resolve => {
-                    if (document.querySelector(selector)) {
-                        return resolve(document.querySelector(selector));
-                    }
-                    const observer = new MutationObserver(mutations => {
-                        if (document.querySelector(selector)) {
-                            resolve(document.querySelector(selector));
-                            observer.disconnect();
-                        }
-                    });
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                });
-            };)";
-  webEngine->page()->runJavaScript(js);
-}
-
-void MainWindow::injectFullWidthJavaScript() {
-  if (!settings.value("fullWidthView", true).toBool())
-    return;
-  QString js =
-      R"(waitForElement('#pane-side').then( () => {
-            var container = document.querySelector('#app > .app-wrapper-web > div');
-            container.style.width = '100%';
-            container.style.height = '100%';
-            container.style.top = '0';
-            container.style.maxWidth = 'unset';
-         });
-        )";
-  webEngine->page()->runJavaScript(js);
-}
-
-void MainWindow::injectNewChatJavaScript() {
-  QString js = R"(const openNewChatWhatsie = (phone,text) => {
-                    const link = document.createElement('a');
-                    link.setAttribute('href',
-                    `whatsapp://send/?phone=${phone}&text=${text}`);
-                    document.body.append(link);
-                    link.click();
-                    document.body.removeChild(link);
-                };
-                function openNewChatWhatsieDefined()
-                {
-                    return (openNewChatWhatsie != 'undefined');
-                })";
-  webEngine->page()->runJavaScript(js);
-}
 
 void MainWindow::checkLoadedCorrectly() {
   if (webEngine && webEngine->page()) {
@@ -1172,8 +1067,8 @@ void MainWindow::messageClicked() {
 
 void MainWindow::doAppReload() {
 
-  if (this->webEngine->page()) {
-    this->webEngine->page()->disconnect();
+  if (webEngine->page()) {
+    webEngine->page()->disconnect();
   }
   createWebPage(false);
 }
@@ -1195,7 +1090,7 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
       "openNewChatWhatsieDefined()",
       [this, phone, text](const QVariant &result) {
         if (result.toString().contains("true")) {
-          this->webEngine->page()->runJavaScript(
+          webEngine->page()->runJavaScript(
               QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
         } else {
           // create send url equivalent
@@ -1203,7 +1098,7 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
           textStr = text.isEmpty() ? "" : "text=" + text;
           QString urlStr =
               "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-          this->webEngine->page()->load(QUrl(urlStr));
+          webEngine->page()->load(QUrl(urlStr));
         }
         this->alreadyRunning();
       });
@@ -1212,7 +1107,7 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
 void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                           bool byLoadingQuirk) {
   if (byLoadingQuirk) {
-    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+    webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
                                        byPassCache);
   } else {
     if (lockWidget && !lockWidget->getIsLocked()) {
@@ -1229,13 +1124,13 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
       this->show();
       return;
     }
-    this->webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+    webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
                                        byPassCache);
   }
 }
 
 void MainWindow::toggleMute(const bool &checked) {
-  this->webEngine->page()->setAudioMuted(checked);
+  webEngine->page()->setAudioMuted(checked);
 }
 
 // get value of page theme when page is loaded

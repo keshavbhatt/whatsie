@@ -47,7 +47,6 @@
     <widget class="ElidedLabel" name="m_dstName">
      <property name="font">
       <font>
-       <weight>75</weight>
        <bold>true</bold>
       </font>
      </property>
@@ -72,7 +71,7 @@
   <customwidget>
    <class>ElidedLabel</class>
    <extends>QLabel</extends>
-   <header>elidedlabel.h</header>
+   <header>widgets/elidedlabel/elidedlabel.h</header>
   </customwidget>
  </customwidgets>
  <resources/>
