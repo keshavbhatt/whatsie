@@ -9,22 +9,25 @@ namespace Ui {
 class PermissionDialog;
 }
 
-class PermissionDialog : public QWidget
-{
-    Q_OBJECT
+class PermissionDialog : public QWidget {
+  Q_OBJECT
 
 public:
-    explicit PermissionDialog(QWidget *parent = nullptr);
-    ~PermissionDialog();
+  explicit PermissionDialog(QWidget *parent = nullptr);
+  ~PermissionDialog();
 
 signals:
-    void webPageFeatureChanged(QWebEnginePage::Feature feature);
+  void webPageFeatureChanged(QWebEnginePage::Feature feature);
 
+protected slots:
+  void keyPressEvent(QKeyEvent *e);
 private slots:
-    void addToFeaturesTable(QWebEnginePage::Feature feature, QString &featureName);
+  void addToFeaturesTable(QWebEnginePage::Feature feature,
+                          QString &featureName);
+
 private:
-    Ui::PermissionDialog *ui;
-    QSettings settings;
+  Ui::PermissionDialog *ui;
+  QSettings settings;
 };
 
 #endif // PERMISSIONDIALOG_H
