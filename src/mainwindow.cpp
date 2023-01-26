@@ -175,17 +175,19 @@ void MainWindow::updatePageTheme() {
 
     QString windowTheme = settings.value("windowTheme", "light").toString();
 
-    if(windowTheme == "dark"){
-        webEngine->page()->runJavaScript("localStorage['system-theme-mode']='false'; localStorage.theme='\"dark\"'; ");
-    }else{
-        webEngine->page()->runJavaScript("localStorage['system-theme-mode']='false'; localStorage.theme='\"light\"'; ");
-    }
-
     if (windowTheme == "dark") {
+      webEngine->page()->runJavaScript(
+          "localStorage['system-theme-mode']='false'; "
+          "localStorage.theme='\"dark\"'; ");
+
       webEngine->page()->runJavaScript(
           "document.querySelector('body').classList.add('" + windowTheme +
           "');");
     } else {
+      webEngine->page()->runJavaScript(
+          "localStorage['system-theme-mode']='false'; "
+          "localStorage.theme='\"light\"'; ");
+
       webEngine->page()->runJavaScript(
           "document.querySelector('body').classList.remove('dark');");
     }
@@ -958,7 +960,7 @@ void MainWindow::handleWebViewTitleChanged(QString title) {
 
 void MainWindow::handleLoadFinished(bool loaded) {
   if (loaded) {
-      qDebug()<<"Loaded";
+    qDebug() << "Loaded";
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
