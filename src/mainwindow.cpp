@@ -172,12 +172,18 @@ void MainWindow::loadSchemaUrl(const QString &arg) {
 
 void MainWindow::updatePageTheme() {
   if (webEngine && webEngine->page()) {
-    QString webPageTheme = "web";
+
     QString windowTheme = settings.value("windowTheme", "light").toString();
+
+    if(windowTheme == "dark"){
+        webEngine->page()->runJavaScript("localStorage['system-theme-mode']='false'; localStorage.theme='\"dark\"'; ");
+    }else{
+        webEngine->page()->runJavaScript("localStorage['system-theme-mode']='false'; localStorage.theme='\"light\"'; ");
+    }
+
     if (windowTheme == "dark") {
-      webPageTheme = "dark";
       webEngine->page()->runJavaScript(
-          "document.querySelector('body').classList.add('" + webPageTheme +
+          "document.querySelector('body').classList.add('" + windowTheme +
           "');");
     } else {
       webEngine->page()->runJavaScript(
@@ -952,6 +958,7 @@ void MainWindow::handleWebViewTitleChanged(QString title) {
 
 void MainWindow::handleLoadFinished(bool loaded) {
   if (loaded) {
+      qDebug()<<"Loaded";
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
@@ -970,16 +977,18 @@ void MainWindow::injectClassChangeObserver() {
             const observer = new MutationObserver(() => {
                 var haveFullView = document.body.classList.contains('whatsie-full-view');
                 var container = document.querySelector('#app > .app-wrapper-web > div');
-                if(haveFullView){
-                    container.style.width = '100%';
-                    container.style.height = '100%';
-                    container.style.top = '0';
-                    container.style.maxWidth = 'unset';
-                }else{
-                    container.style.width = null;
-                    container.style.height = null;
-                    container.style.top = null;
-                    container.style.maxWidth = null;
+                if(container){
+                    if(haveFullView){
+                        container.style.width = '100%';
+                        container.style.height = '100%';
+                        container.style.top = '0';
+                        container.style.maxWidth = 'unset';
+                    }else{
+                        container.style.width = null;
+                        container.style.height = null;
+                        container.style.top = null;
+                        container.style.maxWidth = null;
+                    }
                 }
             });
             observer.observe(document.body, {
@@ -1009,7 +1018,7 @@ void MainWindow::injectMutationObserver() {
                         subtree: true
                     });
                 });
-            })";
+            };)";
   webEngine->page()->runJavaScript(js);
 }
 
@@ -1220,8 +1229,7 @@ QString MainWindow::getPageTheme() {
 }
 
 void MainWindow::tryLock() {
-  if (settings.value("asdfg").isValid() &&
-      settings.value("lockscreen", false).toBool()) {
+  if (settings.value("asdfg").isValid()) {
     initLock();
     return;
   }
