@@ -1,3 +1,24 @@
+## 4.12.0 (2023-01-26)
+
+#### 🎁 Feature
+
+* close permission dialog with esc key (ee519bcc)
+* close with esc button (2119c3d1)
+
+#### 🐞 Bug Fixes
+
+* prevent zoom with ctrl+mouse (0eb7ea05)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (b3e2a2be)
+
+#### 🚧 Chores
+
+* bump version 4.12 (12bce6d2)
+* cleanup (c78394d1)
+
+
 ## 4.11.0 (2023-01-26)
 
 #### 🎁 Feature
