@@ -4,6 +4,7 @@
 #include <QSettings>
 #include <QWebEnginePage>
 #include <QWidget>
+#include <QKeyEvent>
 
 namespace Ui {
 class PermissionDialog;

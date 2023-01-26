@@ -69,4 +69,12 @@ void PermissionDialog::addToFeaturesTable(QWebEnginePage::Feature feature,
   }
 }
 
+void PermissionDialog::keyPressEvent(QKeyEvent *e)
+{
+   if (e->key() == Qt::Key_Escape)
+      this->close();
+
+   QWidget::keyPressEvent(e);
+}
+
 PermissionDialog::~PermissionDialog() { delete ui; }
