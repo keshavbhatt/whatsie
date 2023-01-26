@@ -92,6 +92,14 @@ void About::on_debugInfoButton_clicked() {
   }
 }
 
+void About::keyPressEvent(QKeyEvent *e)
+{
+   if (e->key() == Qt::Key_Escape)
+      this->close();
+
+   QWidget::keyPressEvent(e);
+}
+
 void About::on_donate_2_clicked() {
   QDesktopServices::openUrl(QUrl("https://opencollective.com/whatsie"));
 }

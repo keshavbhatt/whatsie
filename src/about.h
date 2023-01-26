@@ -2,6 +2,7 @@
 #define ABOUT_H
 
 #include <QWidget>
+#include <QKeyEvent>
 
 namespace Ui {
 class About;
@@ -15,6 +16,8 @@ public:
     explicit About(QWidget *parent = nullptr);
     ~About();
 
+protected slots:
+    void keyPressEvent(QKeyEvent *e);
 private slots:
     void on_debugInfoButton_clicked();
 

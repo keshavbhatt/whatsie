@@ -75,6 +75,8 @@ public:
     // will be shown on the screen.
     void downloadRequested(QWebEngineDownloadItem *webItem);
 
+protected slots:
+    void keyPressEvent(QKeyEvent *e);
 private slots:
     void on_open_download_dir_clicked();
 

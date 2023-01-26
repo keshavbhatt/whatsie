@@ -56,3 +56,11 @@ void DownloadManagerWidget::on_open_download_dir_clicked() {
                                        QApplication::applicationName())
                             .toString());
 }
+
+void DownloadManagerWidget::keyPressEvent(QKeyEvent *e)
+{
+   if (e->key() == Qt::Key_Escape)
+      this->close();
+
+   QWidget::keyPressEvent(e);
+}
