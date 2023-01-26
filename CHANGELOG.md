@@ -1,3 +1,24 @@
+## 4.11.0 (2023-01-26)
+
+#### 🎁 Feature
+
+* bump version 4.11 (63440d96)
+
+#### 🐞 Bug Fixes
+
+* applock state fix (32b0e5ca)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (74216cfd)
+
+#### 🚧 Chores
+
+* remove debugging from MoreApps widget (103a3686)
+* cleanup + inhancements (f31197a4)
+* cleanup + addition (21ca36bd)
+
+
 ## 4.10.3 (2022-12-18)
 
 #### 📄 Documentation
