@@ -243,7 +243,6 @@ void SettingsWidget::refresh() {
   ui->themeComboBox->setCurrentText(
       utils::toCamelCase(settings.value("windowTheme", "light").toString()));
 
-  ui->cacheSize->setText(utils::refreshCacheSize(cachePath()));
   ui->cookieSize->setText(utils::refreshCacheSize(persistentStoragePath()));
 
   // update dict settings at runtime
@@ -279,43 +278,21 @@ QString SettingsWidget::persistentStoragePath() {
   return enginePersistentStoragePath;
 }
 
-void SettingsWidget::on_deleteCache_clicked() {
-  QMessageBox msgBox;
-  msgBox.setText("This will delete the cache! Cache makes "
-                 "application load faster.");
-  msgBox.setIconPixmap(
-      QPixmap(":/icons/information-line.png")
-          .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-
-  msgBox.setInformativeText("Delete cache?");
-  msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
-  msgBox.setDefaultButton(QMessageBox::No);
-  int ret = msgBox.exec();
-  switch (ret) {
-  case QMessageBox::Yes: {
-    utils::delete_cache(this->cachePath());
-    refresh();
-    break;
-  }
-  case QMessageBox::No:
-    break;
-  }
-}
-
 void SettingsWidget::on_deletePersistentData_clicked() {
   QMessageBox msgBox;
   msgBox.setText("This will delete Persistent Data ! Persistent data includes "
-                 "persistent cookies, HTML5 local storage, and visited links.");
+                 "persistent cookies and Cache, and Quit the application.");
   msgBox.setIconPixmap(
       QPixmap(":/icons/information-line.png")
           .scaled(42, 42, Qt::KeepAspectRatio, Qt::SmoothTransformation));
-  msgBox.setInformativeText("Delete Cookies?");
+  msgBox.setInformativeText("Delete Cookies and Quit Application?");
   msgBox.setStandardButtons(QMessageBox::Yes | QMessageBox::No);
   msgBox.setDefaultButton(QMessageBox::No);
   int ret = msgBox.exec();
   switch (ret) {
   case QMessageBox::Yes: {
     clearAllData();
+    qApp->quit();
     break;
   }
   case QMessageBox::No:
@@ -772,4 +749,12 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
 void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked) {
   settings.setValue("fullWidthView", checked);
   emit updateFullWidthView(checked);
+}
+
+void SettingsWidget::keyPressEvent(QKeyEvent *e)
+{
+   if (e->key() == Qt::Key_Escape)
+      this->close();
+
+   QWidget::keyPressEvent(e);
 }

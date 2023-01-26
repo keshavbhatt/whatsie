@@ -32,7 +32,7 @@ signals:
   void updateFullWidthView(bool checked);
 
 public:
-  explicit SettingsWidget(QWidget *parent = nullptr,int screenNumber = 0,
+  explicit SettingsWidget(QWidget *parent = nullptr, int screenNumber = 0,
                           QString engineCachePath = "",
                           QString enginePersistentStoragePath = "");
   ~SettingsWidget();
@@ -51,7 +51,7 @@ public slots:
 protected slots:
   bool eventFilter(QObject *obj, QEvent *event);
   void closeEvent(QCloseEvent *event);
-
+  void keyPressEvent(QKeyEvent *e);
 private slots:
   QString cachePath();
   QString persistentStoragePath();
@@ -67,8 +67,6 @@ private slots:
   void on_chnageCurrentPasswordPushButton_clicked();
   void on_closeButtonActionComboBox_currentIndexChanged(int index);
   void on_defaultUserAgentButton_clicked();
-  void on_deleteCache_clicked();
-  void on_deletePersistentData_clicked();
   void on_dictComboBox_currentIndexChanged(const QString &arg1);
   void on_enableSpellCheck_toggled(bool checked);
   void on_minimizeOnTrayIconClick_toggled(bool checked);
@@ -98,6 +96,8 @@ private slots:
   void updateAutomaticTheme();
 
   void on_fullWidthViewCheckbox_toggled(bool checked);
+
+  void on_deletePersistentData_clicked();
 
 private:
   Ui::SettingsWidget *ui;

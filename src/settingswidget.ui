@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>693</width>
-    <height>867</height>
+    <width>651</width>
+    <height>841</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -38,8 +38,7 @@
       </sizepolicy>
      </property>
      <property name="styleSheet">
-      <string notr="true">
-</string>
+      <string notr="true"/>
      </property>
      <layout class="QHBoxLayout" name="horizontalLayout_7">
       <item>
@@ -96,8 +95,8 @@ background:transparent;
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>677</width>
-        <height>791</height>
+        <width>635</width>
+        <height>760</height>
        </rect>
       </property>
       <layout class="QVBoxLayout" name="verticalLayout_5">
@@ -917,39 +916,11 @@ background:transparent;
        <item>
         <widget class="QGroupBox" name="groupBox_7">
          <property name="title">
-          <string>Storage and Other Settings</string>
+          <string>Storage </string>
          </property>
          <layout class="QVBoxLayout" name="verticalLayout_3">
           <item>
            <layout class="QGridLayout" name="gridLayout_2">
-            <item row="1" column="2">
-             <widget class="QPushButton" name="deleteCache">
-              <property name="text">
-               <string>  Clear</string>
-              </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/delete-bin-3-line.png</normaloff>:/icons/delete-bin-3-line.png</iconset>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="0">
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Cache</string>
-              </property>
-             </widget>
-            </item>
-            <item row="1" column="1">
-             <widget class="QLabel" name="cacheSize">
-              <property name="text">
-               <string>-</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
             <item row="0" column="0">
              <widget class="QLabel" name="label_11">
               <property name="sizePolicy">
@@ -969,22 +940,31 @@ background:transparent;
               </property>
              </widget>
             </item>
-            <item row="0" column="2">
-             <widget class="QLabel" name="label_13">
-              <property name="sizePolicy">
-               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
-                <horstretch>0</horstretch>
-                <verstretch>0</verstretch>
-               </sizepolicy>
+            <item row="1" column="2">
+             <widget class="QPushButton" name="deletePersistentData">
+              <property name="text">
+               <string>  Clear (requires restart)</string>
               </property>
-              <property name="font">
-               <font>
-                <pointsize>10</pointsize>
-                <italic>false</italic>
-               </font>
+              <property name="icon">
+               <iconset resource="icons.qrc">
+                <normaloff>:/icons/delete-bin-3-line.png</normaloff>:/icons/delete-bin-3-line.png</iconset>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="0">
+             <widget class="QLabel" name="label_5">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Persistent data includes persistent cookies, HTML5 local storage, and visited links.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
               </property>
               <property name="text">
-               <string>Action</string>
+               <string>Persistent data</string>
+              </property>
+             </widget>
+            </item>
+            <item row="1" column="1">
+             <widget class="QLabel" name="cookieSize">
+              <property name="text">
+               <string>-</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
@@ -1013,34 +993,25 @@ background:transparent;
               </property>
              </widget>
             </item>
-            <item row="2" column="0">
-             <widget class="QLabel" name="label_5">
-              <property name="toolTip">
-               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Persistent data includes persistent cookies, HTML5 local storage, and visited links.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+            <item row="0" column="2">
+             <widget class="QLabel" name="label_13">
+              <property name="sizePolicy">
+               <sizepolicy hsizetype="Preferred" vsizetype="Maximum">
+                <horstretch>0</horstretch>
+                <verstretch>0</verstretch>
+               </sizepolicy>
+              </property>
+              <property name="font">
+               <font>
+                <pointsize>10</pointsize>
+                <italic>false</italic>
+               </font>
               </property>
               <property name="text">
-               <string>Persistent data</string>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="1">
-             <widget class="QLabel" name="cookieSize">
-              <property name="text">
-               <string>-</string>
+               <string>Action</string>
               </property>
               <property name="alignment">
                <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item row="2" column="2">
-             <widget class="QPushButton" name="deletePersistentData">
-              <property name="text">
-               <string>  Clear</string>
-              </property>
-              <property name="icon">
-               <iconset resource="icons.qrc">
-                <normaloff>:/icons/delete-bin-3-line.png</normaloff>:/icons/delete-bin-3-line.png</iconset>
               </property>
              </widget>
             </item>
