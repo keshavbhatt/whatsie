@@ -54,6 +54,7 @@ apps:
         - hardware-observe # to assist geoclue & qtpositioning
         - network-observe  # to assist geoclue & qtpositioning
         - network-bind  # to assist geoclue & qtpositioning
+        - mount-observe
 
 plugs:
   gsettings:
