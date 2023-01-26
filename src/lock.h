@@ -46,7 +46,7 @@ protected slots:
 
 private:
   Ui::Lock *ui;
-  bool isLocked = true;
+  bool isLocked = false;
   QSettings settings;
   QAction *passcodeLoginAction;
 };

@@ -1,10 +1,10 @@
 #include "lock.h"
+#include "moreapps.h"
 #include "ui_lock.h"
 #include <QDebug>
 #include <QGraphicsOpacityEffect>
 #include <QKeyEvent>
 #include <QPropertyAnimation>
-#include "moreapps.h"
 
 #include "X11/XKBlib.h" // keep this header at bottom
 
@@ -222,8 +222,8 @@ void Lock::lock_app() {
   ui->wrong->hide();
   ui->signup->hide();
   ui->login->show();
-  isLocked = true;
   this->show();
+  isLocked = ui->login->isVisible();
   animateIn();
   ui->passcodeLogin->setFocus();
 }
