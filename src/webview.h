@@ -3,6 +3,7 @@
 
 #include <QSettings>
 #include <QWebEngineView>
+#include <QKeyEvent>
 
 class WebView : public QWebEngineView {
   Q_OBJECT
@@ -12,6 +13,9 @@ public:
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
+
+protected slots:
+  void wheelEvent(QWheelEvent *event);
 
 private:
   QStringList m_dictionaries;

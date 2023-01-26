@@ -48,6 +48,16 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
           });
 }
 
+void WebView::wheelEvent(QWheelEvent *event) {
+  if (event->modifiers().testFlag(Qt::ControlModifier)) {
+    qDebug() << "skipped ctrl + m_wheel event on webengineview";
+    // do nothing
+  } else {
+    qDebug() << "wheel event on webengine view";
+    QWebEngineView::wheelEvent(event);
+  }
+}
+
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
   QMenu *menu = page()->createStandardContextMenu();

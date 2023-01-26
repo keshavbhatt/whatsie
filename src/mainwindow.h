@@ -135,6 +135,7 @@ private slots:
   void injectFullWidthJavaScript();
   void injectMutationObserver();
   void injectClassChangeObserver();
+  void injectPreventScrollWheelZoomHelper();
 };
 
 #endif // MAINWINDOW_H

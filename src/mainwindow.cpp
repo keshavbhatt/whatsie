@@ -965,6 +965,7 @@ void MainWindow::handleLoadFinished(bool loaded) {
     updatePageTheme();
     handleZoom();
     injectMutationObserver();
+    injectPreventScrollWheelZoomHelper();
     injectFullWidthJavaScript();
     injectClassChangeObserver();
     injectNewChatJavaScript();
@@ -972,6 +973,28 @@ void MainWindow::handleLoadFinished(bool loaded) {
       settingsWidget->refresh();
     }
   }
+}
+
+void MainWindow::injectPreventScrollWheelZoomHelper() {
+  QString js = R"(
+                    (function () {
+                        const SSWZ = function () {
+                            this.keyScrollHandler = function (e) {
+                                if (e.ctrlKey) {
+                                    e.preventDefault();
+                                    return false;
+                                }
+                            }
+                        };
+                        if (window === top) {
+                            const sswz = new SSWZ();
+                            window.addEventListener('wheel', sswz.keyScrollHandler, {
+                                passive: false
+                            });
+                        }
+                    })();
+                )";
+  webEngine->page()->runJavaScript(js);
 }
 
 void MainWindow::injectClassChangeObserver() {
