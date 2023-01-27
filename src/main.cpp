@@ -25,6 +25,7 @@ int main(int argc, char *argv[]) {
   instance.setQuitOnLastWindowClosed(false);
   instance.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
   QApplication::setApplicationName("WhatSie");
+  QApplication::setDesktopFileName("com.ktechpit.whatsie");
   QApplication::setOrganizationDomain("com.ktechpit");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
