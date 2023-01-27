@@ -91,11 +91,11 @@ private:
   QSystemTrayIcon *trayIcon;
   QWebEngineView *webEngine;
   SettingsWidget *settingsWidget = nullptr;
-  DownloadManagerWidget m_downloadManagerWidget;
-  QScopedPointer<QWebEngineProfile> m_otrProfile;
+  DownloadManagerWidget downloadManagerWidget;
+  QScopedPointer<QWebEngineProfile> otrProfile;
   Lock *lockWidget = nullptr;
   int correctlyLoaderRetries = 4;
-  QStringList m_dictionaries;
+  QStringList dictionaries;
   AutoLockEventFilter *autoLockEventFilter = nullptr;
 
 private slots:
@@ -121,7 +121,7 @@ private slots:
   void quitApp();
   void initRateWidget();
   void initThemes();
-  void handleZoomOnWindowStateChange(QWindowStateChangeEvent *ev);
+  void handleZoomOnWindowStateChange(const QWindowStateChangeEvent *ev);
   void handleZoom();
   void changeLockPassword();
   void forceLogOut();

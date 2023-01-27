@@ -18,7 +18,7 @@ protected slots:
   void wheelEvent(QWheelEvent *event);
 
 private:
-  QStringList m_dictionaries;
+  QStringList dictionaries;
   QSettings settings;
 };
 

@@ -133,12 +133,12 @@ void WebEnginePage::handleLoadFinished(bool ok) {
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
   }
 
-  if(ok){
-      injectMutationObserver();
-      injectPreventScrollWheelZoomHelper();
-      injectFullWidthJavaScript();
-      injectClassChangeObserver();
-      injectNewChatJavaScript();
+  if (ok) {
+    injectMutationObserver();
+    injectPreventScrollWheelZoomHelper();
+    injectFullWidthJavaScript();
+    injectClassChangeObserver();
+    injectNewChatJavaScript();
   }
 }
 

@@ -39,7 +39,8 @@ void MainWindow::restoreMainWindow() {
   if (settings.value("geometry").isValid()) {
     restoreGeometry(settings.value("geometry").toByteArray());
     QPoint pos = QCursor::pos();
-    for (QScreen *screen : QGuiApplication::screens()) {
+    auto localScreens = QGuiApplication::screens();
+    for (auto screen : qAsConst(localScreens)) {
       QRect screenRect = screen->geometry();
       if (screenRect.contains(pos)) {
         this->move(screenRect.center() - this->rect().center());
@@ -356,9 +357,8 @@ void MainWindow::initSettingWidget() {
             });
 
     connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
-            settingsWidget, [=]() {
-              setNotificationPresenter(webEngine->page()->profile());
-            });
+            settingsWidget,
+            [=]() { setNotificationPresenter(webEngine->page()->profile()); });
 
     connect(settingsWidget, &SettingsWidget::notify, settingsWidget,
             [=](QString message) { notify("", message); });
@@ -381,7 +381,7 @@ void MainWindow::initSettingWidget() {
         settings.value("lockscreen", false).toBool());
 
     // spell checker
-    settingsWidget->loadDictionaries(m_dictionaries);
+    settingsWidget->loadDictionaries(dictionaries);
   }
 }
 
@@ -392,7 +392,8 @@ void MainWindow::changeEvent(QEvent *e) {
   QMainWindow::changeEvent(e);
 }
 
-void MainWindow::handleZoomOnWindowStateChange(QWindowStateChangeEvent *ev) {
+void MainWindow::handleZoomOnWindowStateChange(
+    const QWindowStateChangeEvent *ev) {
   if (settingsWidget != nullptr) {
     if (ev->oldState().testFlag(Qt::WindowMaximized) &&
         windowState().testFlag(Qt::WindowNoState)) {
@@ -743,17 +744,18 @@ void MainWindow::appAutoLockChanged() {
 void MainWindow::checkWindowState() {
   QObject *tray_icon_menu = this->findChild<QObject *>("trayIconMenu");
   if (tray_icon_menu != nullptr) {
+    QMenu *menu = qobject_cast<QMenu *>(tray_icon_menu);
     if (this->isVisible()) {
-      ((QMenu *)(tray_icon_menu))->actions().at(0)->setDisabled(false);
-      ((QMenu *)(tray_icon_menu))->actions().at(1)->setDisabled(true);
+      menu->actions().at(0)->setDisabled(false);
+      menu->actions().at(1)->setDisabled(true);
     } else {
-      ((QMenu *)(tray_icon_menu))->actions().at(0)->setDisabled(true);
-      ((QMenu *)(tray_icon_menu))->actions().at(1)->setDisabled(false);
+      menu->actions().at(0)->setDisabled(true);
+      menu->actions().at(1)->setDisabled(false);
     }
     if (lockWidget && lockWidget->getIsLocked()) {
-      ((QMenu *)(tray_icon_menu))->actions().at(4)->setDisabled(true);
+      menu->actions().at(4)->setDisabled(true);
     } else {
-      ((QMenu *)(tray_icon_menu))->actions().at(4)->setDisabled(false);
+      menu->actions().at(4)->setDisabled(false);
     }
   }
 }
@@ -804,9 +806,9 @@ void MainWindow::createWebEngine() {
   widgetSize.setHorizontalStretch(1);
   widgetSize.setVerticalStretch(1);
 
-  m_dictionaries = Dictionaries::GetDictionaries();
+  dictionaries = Dictionaries::GetDictionaries();
 
-  WebView *webEngineView = new WebView(this, m_dictionaries);
+  WebView *webEngineView = new WebView(this, dictionaries);
   setCentralWidget(webEngineView);
   webEngineView->setSizePolicy(widgetSize);
   webEngineView->show();
@@ -832,11 +834,11 @@ const QIcon MainWindow::getTrayIcon(const int &notificationCount) const {
 }
 
 void MainWindow::createWebPage(bool offTheRecord) {
-  if (offTheRecord && !m_otrProfile) {
-    m_otrProfile.reset(new QWebEngineProfile);
+  if (offTheRecord && !otrProfile) {
+    otrProfile.reset(new QWebEngineProfile);
   }
   auto profile =
-      offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
+      offTheRecord ? otrProfile.get() : QWebEngineProfile::defaultProfile();
 
   QStringList dict_names;
   dict_names.append(settings.value("sc_dict", "en-US").toString());
@@ -864,7 +866,7 @@ void MainWindow::createWebPage(bool offTheRecord) {
       QUrl("https://web.whatsapp.com?v=" + QString::number(randomValue)));
 
   connect(profile, &QWebEngineProfile::downloadRequested,
-          &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
+          &downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 
   connect(page, SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this,
           SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
@@ -970,8 +972,6 @@ void MainWindow::handleLoadFinished(bool loaded) {
     }
   }
 }
-
-
 
 void MainWindow::checkLoadedCorrectly() {
   if (webEngine && webEngine->page()) {
@@ -1108,7 +1108,7 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                           bool byLoadingQuirk) {
   if (byLoadingQuirk) {
     webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                       byPassCache);
+                                 byPassCache);
   } else {
     if (lockWidget && !lockWidget->getIsLocked()) {
       this->notify(QApplication::applicationName(),
@@ -1125,7 +1125,7 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
       return;
     }
     webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                       byPassCache);
+                                 byPassCache);
   }
 }
 

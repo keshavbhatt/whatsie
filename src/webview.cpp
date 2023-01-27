@@ -8,7 +8,7 @@
 
 WebView::WebView(QWidget *parent, QStringList dictionaries)
     : QWebEngineView(parent) {
-  m_dictionaries = dictionaries;
+  dictionaries = dictionaries;
 
   QObject *parentMainWindow = this->parent();
   while (!parentMainWindow->objectName().contains("MainWindow")) {
@@ -49,18 +49,23 @@ WebView::WebView(QWidget *parent, QStringList dictionaries)
 }
 
 void WebView::wheelEvent(QWheelEvent *event) {
-  if (event->modifiers().testFlag(Qt::ControlModifier)) {
+  bool controlKeyIsHeld =
+      QGuiApplication::keyboardModifiers().testFlag(Qt::ControlModifier);
+  // this doesn't work, (even after checking the global QApplication keyboard
+  // modifiers) as expected, the Ctrl+wheel is managed by Chromium
+  // WebenginePage directly. So, we manage it by injecting js to page using
+  // WebEnginePage::injectPreventScrollWheelZoomHelper
+  if ((event->modifiers() & Qt::ControlModifier) != 0 || controlKeyIsHeld) {
     qDebug() << "skipped ctrl + m_wheel event on webengineview";
-    // do nothing
+    event->ignore();
   } else {
-    qDebug() << "wheel event on webengine view";
     QWebEngineView::wheelEvent(event);
   }
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
-  QMenu *menu = page()->createStandardContextMenu();
+  auto menu = page()->createStandardContextMenu();
   menu->setAttribute(Qt::WA_DeleteOnClose, true);
   // hide reload, back, forward, savepage, copyimagelink menus
   foreach (auto *action, menu->actions()) {
@@ -87,29 +92,27 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     return;
   }
 
-  QWebEngineProfile *profile = page()->profile();
-  const QStringList &languages = profile->spellCheckLanguages();
-
+  auto pageWebengineProfile = page()->profile();
+  const QStringList &languages = pageWebengineProfile->spellCheckLanguages();
   menu->addSeparator();
-
-  QAction *spellcheckAction = new QAction(tr("Check Spelling"), menu);
+  auto *spellcheckAction = new QAction(tr("Check Spelling"), menu);
   spellcheckAction->setCheckable(true);
-  spellcheckAction->setChecked(profile->isSpellCheckEnabled());
+  spellcheckAction->setChecked(pageWebengineProfile->isSpellCheckEnabled());
   connect(spellcheckAction, &QAction::toggled, this,
-          [profile, this](bool toogled) {
-            profile->setSpellCheckEnabled(toogled);
+          [pageWebengineProfile, this](bool toogled) {
+            pageWebengineProfile->setSpellCheckEnabled(toogled);
             settings.setValue("sc_enabled", toogled);
           });
   menu->addAction(spellcheckAction);
 
-  if (profile->isSpellCheckEnabled()) {
-    QMenu *subMenu = menu->addMenu(tr("Select Language"));
-    for (const QString &dict : qAsConst(m_dictionaries)) {
-      QAction *action = subMenu->addAction(dict);
+  if (pageWebengineProfile->isSpellCheckEnabled()) {
+    auto subMenu = menu->addMenu(tr("Select Language"));
+    for (const QString &dict : qAsConst(dictionaries)) {
+      auto action = subMenu->addAction(dict);
       action->setCheckable(true);
       action->setChecked(languages.contains(dict));
-      connect(action, &QAction::triggered, this, [profile, dict, this]() {
-        profile->setSpellCheckLanguages(QStringList() << dict);
+      connect(action, &QAction::triggered, this, [pageWebengineProfile, dict, this]() {
+        pageWebengineProfile->setSpellCheckLanguages(QStringList() << dict);
         settings.setValue("sc_dict", dict);
       });
     }
