@@ -1,3 +1,20 @@
+## 4.12.1 (2023-01-27)
+
+#### 🐞 Bug Fixes
+
+* icon on Plasma Wayland (#100) (7fc4ce38)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (4417eced)
+
+#### 🚧 Chores
+
+* code cleanup (085205eb)
+* cleanup (011db449)
+* escape key to close child windows (56c55a94)
+
+
 ## 4.12.0 (2023-01-26)
 
 #### 🎁 Feature
