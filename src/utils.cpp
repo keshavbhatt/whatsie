@@ -62,40 +62,35 @@ QString utils::toCamelCase(const QString &s) {
 }
 
 QString utils::generateRandomId(int length) {
-
-  QString str = QUuid::createUuid().toString();
-  str.remove(QRegularExpression("{|}|-"));
-  if (str.length() < length) {
-    while (str.length() != length) {
-      int required_char = length - str.length();
-      str = str + str.append(genRand(required_char));
-    }
-  }
-  if (str.length() > length) {
-    while (str.length() != length) {
-      str = str.remove(str.length() - 1, 1);
-    }
-  }
-  return str;
+  return genRand(length, false, true, false);
 }
 
-QString utils::genRand(int length) {
-  QDateTime cd = QDateTime::currentDateTime();
-  const QString possibleCharacters(
-      "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789" +
-      QString::number(cd.currentMSecsSinceEpoch())
-          .remove(QRegExp("[^a-zA-Z\\d\\s]")));
-
-  const int randomStringLength = length;
-  QString randomString;
-  int rand = QRandomGenerator::global()->generate();
-  for (int i = 0; i < randomStringLength; ++i) {
-    int index = rand % possibleCharacters.length();
-    QChar nextChar = possibleCharacters.at(index);
-    randomString.append(nextChar);
+QString utils::genRand(int length, bool useUpper, bool useLower,
+                       bool useDigits) {
+  QString possibleCharacters;
+  if (useUpper) {
+    possibleCharacters += "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
   }
-  randomString = randomString.trimmed().simplified().remove(" ");
-  return randomString;
+  if (useLower) {
+    possibleCharacters += "abcdefghijklmnopqrstuvwxyz";
+  }
+  if (useDigits) {
+    possibleCharacters += "0123456789";
+  }
+
+  if (possibleCharacters.isEmpty()) {
+    return genRand(length, true, true, true);
+  }
+
+  QByteArray randomBytes;
+  randomBytes.resize(length);
+  for (int i = 0; i < length; ++i) {
+    randomBytes[i] =
+        possibleCharacters[QRandomGenerator::securelySeeded().generate() %
+                           possibleCharacters.length()]
+            .toLatin1();
+  }
+  return QString::fromLatin1(randomBytes);
 }
 
 QString utils::convertSectoDay(qint64 secs) {
@@ -117,11 +112,13 @@ QString utils::convertSectoDay(qint64 secs) {
 }
 
 // static on demand path maker
-QString utils::returnPath(QString pathname,QString standardLocation = QStandardPaths::writableLocation(
-            QStandardPaths::DataLocation)) {
-    QChar sepe = QDir::separator();
-    QDir d(standardLocation + sepe + pathname);
-    d.mkpath(standardLocation + sepe + pathname);
+QString
+utils::returnPath(QString pathname,
+                  QString standardLocation = QStandardPaths::writableLocation(
+                      QStandardPaths::DataLocation)) {
+  QChar sepe = QDir::separator();
+  QDir d(standardLocation + sepe + pathname);
+  d.mkpath(standardLocation + sepe + pathname);
   return standardLocation + sepe + pathname + sepe;
 }
 

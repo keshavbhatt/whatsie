@@ -28,7 +28,6 @@ public slots:
   static bool delete_cache(const QString cache_dir);
   static QString toCamelCase(const QString &s);
   static QString generateRandomId(int length);
-  static QString genRand(int length);
   static QString convertSectoDay(qint64 secs);
   static QString returnPath(QString pathname, QString standardLocation);
   static QString EncodeXML(const QString &encodeMe);
@@ -40,6 +39,8 @@ public slots:
   static QString appDebugInfo();
   static void desktopOpenUrl(const QString &str);
   static bool isPhoneNumber(const QString &phoneNumber);
+  static QString genRand(int length, bool useUpper = true, bool useLower = true,
+                         bool useDigits = true);
 private slots:
   // use refreshCacheSize
   static quint64 dir_size(const QString &directory);
