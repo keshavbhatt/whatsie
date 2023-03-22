@@ -292,7 +292,8 @@ void WebEnginePage::handleSelectClientCertificate(
   selection.select(selection.certificates().at(0));
 
   qDebug() << __FUNCTION__;
-  for (const QSslCertificate &cert : selection.certificates()) {
+  auto certificates = selection.certificates();
+  for (const QSslCertificate &cert : qAsConst(certificates)) {
     qDebug() << cert;
     selection.select(cert); // select the first available cert
     break;
@@ -333,52 +334,55 @@ void WebEnginePage::injectPreventScrollWheelZoomHelper() {
 }
 
 void WebEnginePage::injectClassChangeObserver() {
-  QString js = R"(
-            const observer = new MutationObserver(() => {
-                var haveFullView = document.body.classList.contains('whatsie-full-view');
-                var container = document.querySelector('#app > .app-wrapper-web > div');
-                if(container){
-                    if(haveFullView){
-                        container.style.width = '100%';
-                        container.style.height = '100%';
-                        container.style.top = '0';
-                        container.style.maxWidth = 'unset';
-                    }else{
-                        container.style.width = null;
-                        container.style.height = null;
-                        container.style.top = null;
-                        container.style.maxWidth = null;
-                    }
+  QString js =
+      R"(
+        const observer = new MutationObserver(() => {
+            var haveFullView = document.body.classList.contains('whatsie-full-view');
+            var container = document.querySelector('#app > .app-wrapper-web > div');
+            if(container){
+                if(haveFullView){
+                    container.style.width = '100%';
+                    container.style.height = '100%';
+                    container.style.top = '0';
+                    container.style.maxWidth = 'unset';
+                }else{
+                    container.style.width = null;
+                    container.style.height = null;
+                    container.style.top = null;
+                    container.style.maxWidth = null;
                 }
-            });
-            observer.observe(document.body, {
-            attributes: true,
-            attributeFilter: ['class'],
-            childList: false,
-            characterData: false
-        });)";
+            }
+        });
+        observer.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class'],
+        childList: false,
+        characterData: false
+        });
+       )";
   this->runJavaScript(js);
 }
 
 void WebEnginePage::injectMutationObserver() {
   QString js =
-      R"(function waitForElement(selector) {
-                return new Promise(resolve => {
-                    if (document.querySelector(selector)) {
-                        return resolve(document.querySelector(selector));
-                    }
-                    const observer = new MutationObserver(mutations => {
-                        if (document.querySelector(selector)) {
-                            resolve(document.querySelector(selector));
-                            observer.disconnect();
-                        }
-                    });
-                    observer.observe(document.body, {
-                        childList: true,
-                        subtree: true
-                    });
-                });
-            };)";
+      R"(function waitForElement(selector, action) {
+          const element = document.querySelector(selector);
+          if (element) {
+            action(element);
+            return Promise.resolve(element);
+          }
+          return new Promise(resolve => {
+            const observer = new MutationObserver(mutations => {
+              const element = document.querySelector(selector);
+              if (element) {
+                action(element);
+                observer.disconnect();
+                resolve(element);
+              }
+            });
+            observer.observe(document.documentElement, { childList: true, subtree: true });
+          });
+        })";
   this->runJavaScript(js);
 }
 
@@ -386,14 +390,15 @@ void WebEnginePage::injectFullWidthJavaScript() {
   if (!settings.value("fullWidthView", true).toBool())
     return;
   QString js =
-      R"(waitForElement('#pane-side').then( () => {
+      R"(function updateFullWidthView(element) {
             var container = document.querySelector('#app > .app-wrapper-web > div');
             container.style.width = '100%';
             container.style.height = '100%';
             container.style.top = '0';
             container.style.maxWidth = 'unset';
-         });
-        )";
+        }
+        waitForElement('#pane-side', element => updateFullWidthView({ selector: '#pane-side', element }));
+       )";
   this->runJavaScript(js);
 }
 
