@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>450</width>
-    <height>250</height>
+    <width>589</width>
+    <height>363</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -25,18 +25,6 @@
   <layout class="QVBoxLayout" name="m_topLevelLayout">
    <property name="sizeConstraint">
     <enum>QLayout::SetNoConstraint</enum>
-   </property>
-   <property name="leftMargin">
-    <number>0</number>
-   </property>
-   <property name="topMargin">
-    <number>0</number>
-   </property>
-   <property name="rightMargin">
-    <number>0</number>
-   </property>
-   <property name="bottomMargin">
-    <number>0</number>
    </property>
    <item>
     <widget class="QScrollArea" name="m_scrollArea">
@@ -57,8 +45,8 @@
        <rect>
         <x>0</x>
         <y>0</y>
-        <width>448</width>
-        <height>248</height>
+        <width>569</width>
+        <height>310</height>
        </rect>
       </property>
       <property name="styleSheet">
@@ -109,19 +97,62 @@
          </property>
         </spacer>
        </item>
-       <item>
-        <widget class="QPushButton" name="open_download_dir">
-         <property name="text">
-          <string>Open Download directory</string>
-         </property>
-        </widget>
-       </item>
       </layout>
      </widget>
     </widget>
    </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout">
+     <property name="topMargin">
+      <number>0</number>
+     </property>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+     <item>
+      <widget class="QPushButton" name="clear_all_downlads">
+       <property name="toolTip">
+        <string>Clear download list</string>
+       </property>
+       <property name="text">
+        <string>Clear all</string>
+       </property>
+       <property name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/close-fill.png</normaloff>:/icons/close-fill.png</iconset>
+       </property>
+      </widget>
+     </item>
+     <item>
+      <widget class="QPushButton" name="open_download_dir">
+       <property name="toolTip">
+        <string>Open download directory in file manager</string>
+       </property>
+       <property name="text">
+        <string>Open Download directory</string>
+       </property>
+       <property name="icon">
+        <iconset resource="icons.qrc">
+         <normaloff>:/icons/folder-open-line.png</normaloff>:/icons/folder-open-line.png</iconset>
+       </property>
+      </widget>
+     </item>
+    </layout>
+   </item>
   </layout>
  </widget>
- <resources/>
+ <resources>
+  <include location="icons.qrc"/>
+ </resources>
  <connections/>
 </ui>

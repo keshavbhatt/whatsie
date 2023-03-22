@@ -11,6 +11,12 @@ DownloadManagerWidget::DownloadManagerWidget(QWidget *parent)
   setupUi(this);
 }
 
+void DownloadManagerWidget::acceptDownload(QWebEngineDownloadItem *download) {
+  download->accept();
+  add(new DownloadWidget(download));
+  show();
+}
+
 void DownloadManagerWidget::downloadRequested(
     QWebEngineDownloadItem *download) {
   Q_ASSERT(download &&
@@ -22,14 +28,39 @@ void DownloadManagerWidget::downloadRequested(
                      QStandardPaths::DownloadLocation) +
                      QDir::separator() + QApplication::applicationName())
           .toString();
-  QDir d;
-  d.mkpath(path);
 
-  download->setDownloadFileName(path + QDir::separator() +
-                                download->downloadFileName());
-  download->accept();
-  add(new DownloadWidget(download));
-  show();
+  QDir().mkpath(path);
+
+  auto proposed_file_name =
+      path + QDir::separator() + download->downloadFileName();
+
+  QFileInfo p_file_info(proposed_file_name);
+
+  if (p_file_info.exists()) {
+
+    QMessageBox msgBox;
+    msgBox.setText("File with same name already exist!");
+    msgBox.setInformativeText("Save file with a new name?");
+    msgBox.setStandardButtons(QMessageBox::Save | QMessageBox::Cancel);
+    msgBox.setDefaultButton(QMessageBox::Save);
+    switch (msgBox.exec()) {
+    case QMessageBox::Save: {
+      QString n_proposed_file_name = path + QDir::separator() +
+                                     utils::generateRandomId(5) + "_" +
+                                     download->downloadFileName();
+      download->setDownloadFileName(n_proposed_file_name);
+      acceptDownload(download);
+      break;
+    }
+    case QMessageBox::Cancel:
+      break;
+    default:
+      break;
+    }
+  } else {
+    download->setDownloadFileName(proposed_file_name);
+    acceptDownload(download);
+  }
 }
 
 void DownloadManagerWidget::add(DownloadWidget *downloadWidget) {
@@ -41,8 +72,10 @@ void DownloadManagerWidget::add(DownloadWidget *downloadWidget) {
 }
 
 void DownloadManagerWidget::remove(DownloadWidget *downloadWidget) {
-  m_itemsLayout->removeWidget(downloadWidget);
-  downloadWidget->deleteLater();
+  if (downloadWidget != nullptr) {
+    m_itemsLayout->removeWidget(downloadWidget);
+    downloadWidget->deleteLater();
+  }
   if (--m_numDownloads == 0)
     m_zeroItemsLabel->show();
 }
@@ -57,10 +90,17 @@ void DownloadManagerWidget::on_open_download_dir_clicked() {
                             .toString());
 }
 
-void DownloadManagerWidget::keyPressEvent(QKeyEvent *e)
-{
-   if (e->key() == Qt::Key_Escape)
-      this->close();
+void DownloadManagerWidget::keyPressEvent(QKeyEvent *e) {
+  if (e->key() == Qt::Key_Escape)
+    this->close();
 
-   QWidget::keyPressEvent(e);
+  QWidget::keyPressEvent(e);
+}
+
+void DownloadManagerWidget::on_clear_all_downlads_clicked() {
+  foreach (auto downloadItem, this->findChildren<DownloadWidget *>()) {
+    if (downloadItem != nullptr) {
+      downloadItem->remove();
+    }
+  }
 }
