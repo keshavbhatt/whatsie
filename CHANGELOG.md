@@ -1,3 +1,25 @@
+## 4.13.0 (2023-03-22)
+
+#### 🎁 Feature
+
+* add open file option in download item (7b64cf51)
+
+#### 🐞 Bug Fixes
+
+* prevent overwrite if file exists (dd687dc9)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (fa5add01)
+
+#### 🚧 Chores
+
+* bump version 4.13 (3484bccc)
+* update js to improve perf (1b030ca7)
+* code cleanup (c2bd1a32)
+* update utils (8f983031)
+
+
 ## 4.12.1 (2023-01-27)
 
 #### 🐞 Bug Fixes
