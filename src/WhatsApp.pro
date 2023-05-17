@@ -8,6 +8,10 @@ QT += core gui webengine webenginewidgets positioning
 
 CONFIG += c++17
 
+#CONFIG += sanitizer
+#CONFIG += sanitize_address
+#CONFIG += sanitize_memory
+
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 !qtConfig(webengine-spellchecker) {
@@ -50,7 +54,7 @@ BUILD_TIMESTAMP="\\\"$$system(date -u +\""%Y-%m-%dT%H:%M:%SUTC\"")\\\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 # Set program version
-VERSION = 4.13
+VERSION = 4.14
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 # You can also make your code fail to compile if you use deprecated APIs.
@@ -71,6 +75,7 @@ SOURCES += \
         rateapp.cpp \
         settingswidget.cpp \
         sunclock.cpp \
+        theme.cpp \
         utils.cpp \
         webenginepage.cpp \
         webview.cpp \
@@ -94,8 +99,10 @@ HEADERS += \
     permissiondialog.h \
     rateapp.h \
     requestinterceptor.h \
+    settingsmanager.h \
     settingswidget.h \
     sunclock.hpp \
+    theme.h \
     utils.h \
     webenginepage.h \
     webview.h \
