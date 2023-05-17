@@ -1,3 +1,18 @@
+## 4.14.0 (2023-05-17)
+
+#### 🎁 Feature
+
+* minor fixes + code cleanup (5f10a0f9)
+
+#### 📄 Documentation
+
+* **changelog:** update cl & ver after release (b4b5dc33)
+
+#### 🚧 Chores
+
+* bump version to 4.14 (c235b8ae)
+
+
 ## 4.13.0 (2023-03-22)
 
 #### 🎁 Feature

@@ -10,7 +10,7 @@ jobs:
       contents: write
     steps:
       - name: Checkout source
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
       - name: Go Semantic Release
         uses: go-semantic-release/action@v1.17.0
         id: semrel
@@ -21,7 +21,7 @@ jobs:
           force-bump-patch-version: true
           prepend: true
       - name: Git Commit Changelog
-        uses: stefanzweifel/git-auto-commit-action@v4.14.1
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
           commit_message: "docs(changelog): update cl & ver after release"
           file_pattern: CHANGELOG.md
