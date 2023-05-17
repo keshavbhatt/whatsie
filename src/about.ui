@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>522</width>
-    <height>486</height>
+    <height>487</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -169,13 +169,6 @@ p, li { white-space: pre-wrap; }
             <widget class="QPushButton" name="donate">
              <property name="text">
               <string>Donate PayPal</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QPushButton" name="donate_2">
-             <property name="text">
-              <string>Donate OpenCollective</string>
              </property>
             </widget>
            </item>

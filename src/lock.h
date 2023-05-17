@@ -2,8 +2,14 @@
 #define LOCK_H
 
 #include <QAction>
-#include <QSettings>
+#include <QDebug>
+#include <QGraphicsOpacityEffect>
+#include <QKeyEvent>
+#include <QPropertyAnimation>
 #include <QWidget>
+
+#include "moreapps.h"
+#include "settingsmanager.h"
 
 namespace Ui {
 class Lock;
@@ -47,7 +53,6 @@ protected slots:
 private:
   Ui::Lock *ui;
   bool isLocked = false;
-  QSettings settings;
   QAction *passcodeLoginAction;
 };
 

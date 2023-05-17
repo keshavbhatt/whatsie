@@ -17,7 +17,7 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
   appAuthorEmail = "keshavnrj@gmail.com";
   appAuthorLink = "http://ktechpit.com";
   donateLink = "https://paypal.me/keshavnrj/5";
-  moreAppsLink = "https://snapcraft.io/search?q=keshavnrj";
+  moreAppsLink = "https://snapcraft.io/publisher/keshavnrj";
 
   appSourceCodeLink = "https://github.com/keshavbhatt/whatsie";
   appRateLink = "snap://whatsie";
@@ -42,7 +42,7 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
 
   ui->version->setText("Version: " + QApplication::applicationVersion());
 
-  ui->debugInfoText->setHtml(utils::appDebugInfo());
+  ui->debugInfoText->setHtml(Utils::appDebugInfo());
 
   ui->debugInfoText->hide();
 
@@ -92,14 +92,9 @@ void About::on_debugInfoButton_clicked() {
   }
 }
 
-void About::keyPressEvent(QKeyEvent *e)
-{
-   if (e->key() == Qt::Key_Escape)
-      this->close();
+void About::keyPressEvent(QKeyEvent *e) {
+  if (e->key() == Qt::Key_Escape)
+    this->close();
 
-   QWidget::keyPressEvent(e);
-}
-
-void About::on_donate_2_clicked() {
-  QDesktopServices::openUrl(QUrl("https://opencollective.com/whatsie"));
+  QWidget::keyPressEvent(e);
 }

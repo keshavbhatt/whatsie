@@ -51,10 +51,13 @@
 #ifndef DOWNLOADMANAGERWIDGET_H
 #define DOWNLOADMANAGERWIDGET_H
 
+#include "settingsmanager.h"
 #include "ui_downloadmanagerwidget.h"
-
 #include "utils.h"
-#include <QSettings>
+
+#include <QFileDialog>
+#include <QStandardPaths>
+#include <QWebEngineDownloadItem>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
@@ -89,7 +92,6 @@ private:
   void remove(DownloadWidget *downloadWidget);
 
   int m_numDownloads;
-  QSettings settings;
 };
 
 #endif // DOWNLOADMANAGERWIDGET_H

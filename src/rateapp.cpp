@@ -22,7 +22,7 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count,
 
   showTimer = new QTimer(this);
   showTimer->setInterval(this->present_delay);
-  connect(showTimer, &QTimer::timeout, [=]() {
+  connect(showTimer, &QTimer::timeout, this, [=]() {
     qDebug() << "Rate timer timeout";
     emit showRateDialog();
     if (this->isVisible())
@@ -30,15 +30,26 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count,
   });
 
   // increase the app_launched_count by one
-  int app_launched = settings.value("app_launched_count", 0).toInt();
-  settings.setValue("app_launched_count", app_launched + 1);
+  int app_launched = SettingsManager::instance()
+                         .settings()
+                         .value("app_launched_count", 0)
+                         .toInt();
+  SettingsManager::instance().settings().setValue("app_launched_count",
+                                                  app_launched + 1);
 
   // check if app install time is set in settings
-  if (settings.value("app_install_time").isNull()) {
-    settings.setValue("app_install_time", QDateTime::currentSecsSinceEpoch());
+  if (SettingsManager::instance()
+          .settings()
+          .value("app_install_time")
+          .isNull()) {
+    SettingsManager::instance().settings().setValue(
+        "app_install_time", QDateTime::currentSecsSinceEpoch());
 
-  } else if (settings.value("app_install_time").isValid()) {
-    //qDebug() << "RATEAPP should show:" << shouldShow();
+  } else if (SettingsManager::instance()
+                 .settings()
+                 .value("app_install_time")
+                 .isValid()) {
+    // qDebug() << "RATEAPP should show:" << shouldShow();
     if (shouldShow()) {
       showTimer->start();
     } else {
@@ -49,7 +60,10 @@ RateApp::RateApp(QWidget *parent, QString app_rating_url, int app_launch_count,
   }
 
   // if already reated delete this obj to free resources
-  if (settings.value("rated_already", false).toBool()) {
+  if (SettingsManager::instance()
+          .settings()
+          .value("rated_already", false)
+          .toBool()) {
     this->deleteLater();
   }
 }
@@ -70,10 +84,19 @@ void RateApp::delayShowEvent() {
  */
 bool RateApp::shouldShow() {
   bool shouldShow = false;
-  int app_launched_count = settings.value("app_launched_count", 0).toInt();
+  int app_launched_count = SettingsManager::instance()
+                               .settings()
+                               .value("app_launched_count", 0)
+                               .toInt();
   qint64 currentDateTime = QDateTime::currentSecsSinceEpoch();
-  qint64 installed_date_time = settings.value("app_install_time").toLongLong();
-  bool ratedAlready = settings.value("rated_already", false).toBool();
+  qint64 installed_date_time = SettingsManager::instance()
+                                   .settings()
+                                   .value("app_install_time")
+                                   .toLongLong();
+  bool ratedAlready = SettingsManager::instance()
+                          .settings()
+                          .value("rated_already", false)
+                          .toBool();
 
   if (ratedAlready) // return false if already reated;
     return false;
@@ -99,7 +122,7 @@ void RateApp::on_rateNowBtn_clicked() {
 }
 
 void RateApp::on_alreadyDoneBtn_clicked() {
-  settings.setValue("rated_already", true);
+  SettingsManager::instance().settings().setValue("rated_already", true);
   this->close();
 }
 
@@ -109,9 +132,10 @@ void RateApp::on_laterBtn_clicked() {
 }
 
 void RateApp::reset() {
-  settings.setValue("rated_already", false);
-  settings.setValue("app_launched_count", 0);
-  settings.setValue("app_install_time", QDateTime::currentSecsSinceEpoch());
+  SettingsManager::instance().settings().setValue("rated_already", false);
+  SettingsManager::instance().settings().setValue("app_launched_count", 0);
+  SettingsManager::instance().settings().setValue(
+      "app_install_time", QDateTime::currentSecsSinceEpoch());
 }
 
 void RateApp::on_rateOnGithub_clicked() {

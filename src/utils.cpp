@@ -2,12 +2,12 @@
 #include "def.h"
 #include <time.h>
 
-utils::utils(QObject *parent) : QObject(parent) { setParent(parent); }
+Utils::Utils(QObject *parent) : QObject(parent) { setParent(parent); }
 
-utils::~utils() { this->deleteLater(); }
+Utils::~Utils() { this->deleteLater(); }
 
 // calculate dir size
-quint64 utils::dir_size(const QString &directory) {
+quint64 Utils::dir_size(const QString &directory) {
   quint64 sizex = 0;
   QFileInfo str_info(directory);
   if (str_info.isDir()) {
@@ -28,7 +28,7 @@ quint64 utils::dir_size(const QString &directory) {
 }
 
 // get the size of cache folder in human readble format
-QString utils::refreshCacheSize(const QString cache_dir) {
+QString Utils::refreshCacheSize(const QString cache_dir) {
   qint64 cache_size = dir_size(cache_dir);
   QString cache_unit;
   if (cache_size > 1024 * 1024 * 1024) {
@@ -47,25 +47,25 @@ QString utils::refreshCacheSize(const QString cache_dir) {
   return QString::number(cache_size) + cache_unit;
 }
 
-bool utils::delete_cache(const QString cache_dir) {
+bool Utils::delete_cache(const QString cache_dir) {
   bool deleted = QDir(cache_dir).removeRecursively();
   QDir(cache_dir).mkpath(cache_dir);
   return deleted;
 }
 
 // returns string with first letter capitalized
-QString utils::toCamelCase(const QString &s) {
+QString Utils::toCamelCase(const QString &s) {
   QStringList parts = s.split(' ', Qt::SkipEmptyParts);
   for (int i = 0; i < parts.size(); ++i)
     parts[i].replace(0, 1, parts[i][0].toUpper());
   return parts.join(" ");
 }
 
-QString utils::generateRandomId(int length) {
+QString Utils::generateRandomId(int length) {
   return genRand(length, false, true, false);
 }
 
-QString utils::genRand(int length, bool useUpper, bool useLower,
+QString Utils::genRand(int length, bool useUpper, bool useLower,
                        bool useDigits) {
   QString possibleCharacters;
   if (useUpper) {
@@ -93,7 +93,7 @@ QString utils::genRand(int length, bool useUpper, bool useLower,
   return QString::fromLatin1(randomBytes);
 }
 
-QString utils::convertSectoDay(qint64 secs) {
+QString Utils::convertSectoDay(qint64 secs) {
   int day = secs / (24 * 3600);
 
   secs = secs % (24 * 3600);
@@ -111,9 +111,28 @@ QString utils::convertSectoDay(qint64 secs) {
   return days;
 }
 
-// static on demand path maker
+/**
+ * @brief Returns the full path for a given file or directory name within a
+ * specified location.
+ *
+ * The method constructs the full path by concatenating the specified `pathname`
+ * with the provided `standardLocation`. If `standardLocation` is not provided,
+ * the default value is obtained from
+ * `QStandardPaths::writableLocation(QStandardPaths::DataLocation)`.
+ *
+ * @param pathname The name of the file or directory within the specified
+ * location.
+ * @param standardLocation (optional) The base directory to prepend to
+ * `pathname`. Default value:
+ * QStandardPaths::writableLocation(QStandardPaths::DataLocation).
+ *
+ * @return The full path, including the `pathname` and the `standardLocation`,
+ * separated by the appropriate directory separator. If the specified location
+ * does not exist, the method creates it using QDir::mkpath. The returned path
+ * ends with a directory separator.
+ */
 QString
-utils::returnPath(QString pathname,
+Utils::returnPath(QString pathname,
                   QString standardLocation = QStandardPaths::writableLocation(
                       QStandardPaths::DataLocation)) {
   QChar sepe = QDir::separator();
@@ -122,10 +141,24 @@ utils::returnPath(QString pathname,
   return standardLocation + sepe + pathname + sepe;
 }
 
-QString utils::EncodeXML(const QString &encodeMe) {
-
+/**
+ * @brief Encodes XML special characters in a given string and returns the
+ * encoded version.
+ *
+ * The method iterates over each character in the input `encodeMe` string and
+ * replaces XML special characters
+ * ('&', '\'', '"', '<', and '>') with their corresponding XML entities
+ * ('&amp;', '&apos;', '&quot;', '&lt;', and '&gt;'). The encoded string is then
+ * returned.
+ *
+ * @param encodeMe The string to be encoded.
+ * @return The encoded version of the input string, where XML special characters
+ * are replaced with their corresponding entities.
+ */
+QString Utils::encodeXML(const QString &encodeMe) {
   QString temp;
   int length = encodeMe.size();
+
   for (int index = 0; index < length; index++) {
     QChar character(encodeMe.at(index));
 
@@ -159,8 +192,20 @@ QString utils::EncodeXML(const QString &encodeMe) {
   return temp;
 }
 
-QString utils::DecodeXML(const QString &decodeMe) {
-
+/**
+ * @brief Decodes XML entities in a given string and returns the decoded
+ * version.
+ *
+ * The method creates a copy of the input `decodeMe` string and replaces XML
+ * entities
+ * ('&amp;', '&apos;', '&quot;', '&lt;', and '&gt;') with their corresponding
+ * characters. The decoded string is then returned.
+ *
+ * @param decodeMe The string to be decoded.
+ * @return The decoded version of the input string, where XML entities are
+ * replaced with their corresponding characters.
+ */
+QString Utils::decodeXML(const QString &decodeMe) {
   QString temp(decodeMe);
 
   temp.replace("&amp;", "&");
@@ -172,45 +217,96 @@ QString utils::DecodeXML(const QString &decodeMe) {
   return temp;
 }
 
-QString utils::htmlToPlainText(const QString &str) {
-  QString out;
-  QTextDocument text;
-  text.setHtml(str);
-  out = text.toPlainText();
-  text.deleteLater();
-  return out.replace("\\\"", "'")
-      .replace("&amp;", "&")
-      .replace("&gt;", ">")
-      .replace("&lt;", "<")
-      .replace("&#39;", "'");
+/**
+ * @brief Retrieves the installation type based on the environment variables and
+ * heuristics.
+ *
+ * The method retrieves the value of the "INSTALL_TYPE" environment variable
+ * using QProcessEnvironment. If the "INSTALL_TYPE" variable is empty, the
+ * method performs heuristics to determine the installation type. It checks if
+ * the "SNAP" environment variable is set, in which case the installation type
+ * is considered as "snap". If the "SNAP" variable is not set, it checks if the
+ * "FLATPAK_ID" environment variable is not empty, in which case the
+ * installation type is considered as "flatpak".
+ *
+ * @return The installation type as a QString. It can be "snap", "flatpak", or
+ * an empty string if the installation type could not be determined.
+ */
+QString Utils::getInstallType() {
+  QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+
+  // Retrieve the value of "INSTALL_TYPE" environment variable
+  QString installType = env.value("INSTALL_TYPE");
+
+  // Try guessing if it is empty
+  if (installType.isEmpty()) {
+    if (env.contains("SNAP")) {
+      installType = "snap";
+    } else if (env.value("FLATPAK_ID").trimmed().isEmpty() == false) {
+      installType = "flatpak";
+    }
+  }
+
+  return installType.trimmed();
 }
 
-QString utils::appDebugInfo() {
+/**
+ * @brief Retrieves debug information about the application.
+ *
+ * The method generates a formatted string containing various debug information
+ * about the application. It includes information such as the application name,
+ * version, source branch, commit hash, build datetime, Qt runtime version, Qt
+ * compiled version, system information, and installation mode.
+ *
+ * @return A QString containing the debug information about the application.
+ */
+QString Utils::appDebugInfo() {
+  QString installType = Utils::getInstallType();
+  installType =
+      "<li><b>" + QObject::tr("Install mode") + ":</b>        " +
+      QString(installType.trimmed().isEmpty() ? "Unknown" : installType) +
+      "</li>";
+
+  QString applicationName = QApplication::applicationName();
+  QString version = QString(VERSIONSTR);
+  QString sourceBranch = QString(GIT_BRANCH);
+  QString commitHash = QString(GIT_HASH);
+  QString buildDatetime = QString::fromLatin1(BUILD_TIMESTAMP);
+  QString qtRuntimeVersion = QString(qVersion());
+  QString qtCompiledVersion = QString(QT_VERSION_STR);
+  QString systemInfo = QSysInfo::prettyProductName();
+  QString architecture = QSysInfo::currentCpuArchitecture();
+  QString installMode = Utils::getInstallType();
 
   QStringList debugInfo;
-  debugInfo << "<h3>" + QApplication::applicationName() + "</h3>"
+  debugInfo << "<h3>" + applicationName + "</h3>"
             << "<ul>"
             << "<li><b>" + QObject::tr("Version") + ":</b>             " +
-                   QString(VERSIONSTR) + "</li>"
+                   version + "</li>"
             << "<li><b>" + QObject::tr("Source Branch") + ":</b>             " +
-                   QString(GIT_BRANCH) + "</li>"
+                   sourceBranch + "</li>"
             << "<li><b>" + QObject::tr("Commit Hash") + ":</b>             " +
-                   QString(GIT_HASH) + "</li>"
+                   commitHash + "</li>"
             << "<li><b>" + QObject::tr("Build Datetime") + ":</b>          " +
-                   QString::fromLatin1(BUILD_TIMESTAMP) + "</li>"
+                   buildDatetime + "</li>"
             << "<li><b>" + QObject::tr("Qt Runtime Version") + ":</b>   " +
-                   QString(qVersion()) + "</li>"
+                   qtRuntimeVersion + "</li>"
             << "<li><b>" + QObject::tr("Qt Compiled Version") + ":</b> " +
-                   QString(QT_VERSION_STR) + "</li>"
+                   qtCompiledVersion + "</li>"
             << "<li><b>" + QObject::tr("System") + ":</b>              " +
-                   QSysInfo::prettyProductName() + "</li>"
+                   systemInfo + "</li>"
             << "<li><b>" + QObject::tr("Architecture") + ":</b>        " +
-                   QSysInfo::currentCpuArchitecture() + "</li>";
-  debugInfo << "</ul>";
+                   architecture + "</li>"
+            << "<li><b>" + QObject::tr("Install mode") + ":</b>        " +
+                   QString(installMode.trimmed().isEmpty() ? "Unknown"
+                                                           : installMode) +
+                   "</li>"
+            << "</ul>";
+
   return debugInfo.join("\n");
 }
 
-void utils::DisplayExceptionErrorDialog(const QString &error_info) {
+void Utils::DisplayExceptionErrorDialog(const QString &error_info) {
   QMessageBox message_box(QApplication::activeWindow());
   message_box.setAttribute(Qt::WA_DeleteOnClose, true);
   message_box.setWindowFlags(Qt::Window | Qt::WindowStaysOnTopHint);
@@ -235,19 +331,31 @@ void utils::DisplayExceptionErrorDialog(const QString &error_info) {
                 << "\nQt Runtime Version: " + QString(qVersion())
                 << "\nQt Compiled Version: " + QString(QT_VERSION_STR)
                 << "\nSystem: " + QSysInfo::prettyProductName()
-                << "\nArchitecture: " + QSysInfo::currentCpuArchitecture();
+                << "\nArchitecture: " + QSysInfo::currentCpuArchitecture()
+                << "\nInstall type: " + Utils::getInstallType();
   message_box.setDetailedText(detailed_text.join("\n"));
   message_box.exec();
 }
 
-// Returns the same number, but rounded to one decimal place
-float utils::RoundToOneDecimal(float number) {
+/**
+ * Returns the same number, but rounded to one decimal place
+ *
+ * @brief Utils::RoundToOneDecimal
+ * @param number
+ * @return
+ */
+float Utils::RoundToOneDecimal(float number) {
   return QString::number(number, 'f', 1).toFloat();
 }
 
-// Returns a value for the environment variable name passed;
-// if the env var isn't set, it returns an empty string
-QString utils::GetEnvironmentVar(const QString &variable_name) {
+/**
+ * Returns a value for the environment variable name passed;
+ * if the env var isn't set, it returns an empty string
+ * @brief Utils::GetEnvironmentVar
+ * @param variable_name
+ * @return
+ */
+QString Utils::GetEnvironmentVar(const QString &variable_name) {
 #if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
   // The only time this might fall down is on Linux when an
   // environment variable holds bytedata. Don't use this
@@ -261,14 +369,24 @@ QString utils::GetEnvironmentVar(const QString &variable_name) {
 #endif
 }
 
-void utils::desktopOpenUrl(const QString &str) {
+/**
+ * @brief Opens the specified URL in the default desktop application.
+ *
+ * The method attempts to open the URL using the `xdg-open` command-line tool.
+ * If the `xdg-open` process fails to start within 1 second, it falls back to
+ * using `QDesktopServices` to open the URL. If both methods fail, a warning
+ * message is printed to the console.
+ *
+ * @param str The URL to be opened.
+ */
+void Utils::desktopOpenUrl(const QString &str) {
   QProcess *xdg_open = new QProcess(0);
   xdg_open->start("xdg-open", QStringList() << str);
   if (xdg_open->waitForStarted(1000) == false) {
-    // try using QdesktopServices
+    // Try using QDesktopServices
     bool opened = QDesktopServices::openUrl(QUrl(str));
     if (opened == false) {
-      qWarning() << "failed to open url" << str;
+      qWarning() << "Failed to open URL:" << str;
     }
   }
   connect(xdg_open,
@@ -282,7 +400,7 @@ void utils::desktopOpenUrl(const QString &str) {
           });
 }
 
-bool utils::isPhoneNumber(const QString &phoneNumber) {
+bool Utils::isPhoneNumber(const QString &phoneNumber) {
   const QString phone = "^\\+(((\\d{2}))\\s?)?((\\d{2})|(\\((\\d{2})\\))\\s?)?("
                         "\\d{3,15})(\\-(\\d{3,15}))?$";
   static QRegularExpression reg(phone);

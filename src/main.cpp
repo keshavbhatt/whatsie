@@ -1,6 +1,5 @@
 #include <QApplication>
 #include <QDebug>
-#include <QSettings>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
 #include <QtWebEngine>
@@ -9,6 +8,7 @@
 #include "common.h"
 #include "def.h"
 #include "mainwindow.h"
+#include "settingsmanager.h"
 #include <singleapplication.h>
 
 int main(int argc, char *argv[]) {
@@ -16,14 +16,18 @@ int main(int argc, char *argv[]) {
   QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
 
 #ifdef QT_DEBUG
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox");
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
+          "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox "
+          "--single-process --disable-extensions");
 #else
-  qputenv("QTWEBENGINE_CHROMIUM_FLAGS", "--disable-logging --ignore-gpu-blocklist --no-sandbox"); //--single-process
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
+          "--disable-logging --ignore-gpu-blocklist --no-sandbox "
+          "--single-process --disable-extensions");
 #endif
 
   SingleApplication instance(argc, argv, true);
   instance.setQuitOnLastWindowClosed(false);
-  instance.setWindowIcon(QIcon(":/icons/app/icon-128.png"));
+  instance.setWindowIcon(QIcon(":/icons/app/icon-64.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setDesktopFileName("com.ktechpit.whatsie");
   QApplication::setOrganizationDomain("com.ktechpit");
@@ -87,16 +91,16 @@ int main(int argc, char *argv[]) {
       QObject::tr("Show main window of running instance of ") +
           QApplication::applicationName());
 
-  parser.addOption(showCLIHelpOption);   // [x]
-  parser.addVersionOption();             // [x]
-  parser.addOption(buildInfoOption);     // [x]
-  parser.addOption(showAppWindowOption); // [x]
-  parser.addOption(openSettingsOption);  // [x]
-  parser.addOption(lockAppOption);       // [x]
-  parser.addOption(openAboutOption);     // [x]
-  parser.addOption(toggleThemeOption);   // [x]
-  parser.addOption(reloadAppOption);     // [x]
-  parser.addOption(newChatOption);       // [-]
+  parser.addOption(showCLIHelpOption);
+  parser.addVersionOption();
+  parser.addOption(buildInfoOption);
+  parser.addOption(showAppWindowOption);
+  parser.addOption(openSettingsOption);
+  parser.addOption(lockAppOption);
+  parser.addOption(openAboutOption);
+  parser.addOption(toggleThemeOption);
+  parser.addOption(reloadAppOption);
+  parser.addOption(newChatOption);
 
   secondaryInstanceCLIOptions << showAppWindowOption << openSettingsOption
                               << lockAppOption << openAboutOption
@@ -165,7 +169,10 @@ int main(int argc, char *argv[]) {
                   << "LockApp";
           whatsie.alreadyRunning();
           QSettings settings;
-          if (!settings.value("asdfg").isValid()) {
+          if (!SettingsManager::instance()
+                   .settings()
+                   .value("asdfg")
+                   .isValid()) {
             whatsie.notify(
                 QApplication::applicationName(),
                 QObject::tr("App lock is not configured, \n"
@@ -205,7 +212,7 @@ int main(int argc, char *argv[]) {
           qInfo() << "cmd:"
                   << "OpenNewChatPrompt";
           whatsie.alreadyRunning();
-          whatsie.newChat(); //TODO: invetigate the crash
+          whatsie.newChat(); // TODO: invetigate the crash
           return;
         }
 
@@ -238,7 +245,10 @@ int main(int argc, char *argv[]) {
 
   QSettings settings;
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
-      settings.value("startMinimized", false).toBool()) {
+      SettingsManager::instance()
+          .settings()
+          .value("startMinimized", false)
+          .toBool()) {
     whatsie.runMinimized();
   } else {
     whatsie.show();

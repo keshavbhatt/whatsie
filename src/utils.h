@@ -17,22 +17,21 @@
 #include <QTextDocument>
 #include <QUuid>
 
-class utils : public QObject {
+class Utils : public QObject {
   Q_OBJECT
 
 public:
-  utils(QObject *parent = 0);
-  virtual ~utils();
-public slots:
+  Utils(QObject *parent = 0);
+  virtual ~Utils();
+  static QString getInstallType();
   static QString refreshCacheSize(const QString cache_dir);
   static bool delete_cache(const QString cache_dir);
   static QString toCamelCase(const QString &s);
   static QString generateRandomId(int length);
   static QString convertSectoDay(qint64 secs);
   static QString returnPath(QString pathname, QString standardLocation);
-  static QString EncodeXML(const QString &encodeMe);
-  static QString DecodeXML(const QString &decodeMe);
-  static QString htmlToPlainText(const QString &str);
+  static QString encodeXML(const QString &encodeMe);
+  static QString decodeXML(const QString &decodeMe);
   static QString GetEnvironmentVar(const QString &variable_name);
   static float RoundToOneDecimal(float number);
   static void DisplayExceptionErrorDialog(const QString &error_info);

@@ -1,10 +1,5 @@
 #include "downloadmanagerwidget.h"
-
 #include "downloadwidget.h"
-
-#include <QFileDialog>
-#include <QStandardPaths>
-#include <QWebEngineDownloadItem>
 
 DownloadManagerWidget::DownloadManagerWidget(QWidget *parent)
     : QWidget(parent), m_numDownloads(0) {
@@ -22,8 +17,7 @@ void DownloadManagerWidget::downloadRequested(
   Q_ASSERT(download &&
            download->state() == QWebEngineDownloadItem::DownloadRequested);
   QString path =
-      settings
-          .value("defaultDownloadLocation",
+      SettingsManager::instance().settings().value("defaultDownloadLocation",
                  QStandardPaths::writableLocation(
                      QStandardPaths::DownloadLocation) +
                      QDir::separator() + QApplication::applicationName())
@@ -46,7 +40,7 @@ void DownloadManagerWidget::downloadRequested(
     switch (msgBox.exec()) {
     case QMessageBox::Save: {
       QString n_proposed_file_name = path + QDir::separator() +
-                                     utils::generateRandomId(5) + "_" +
+                                     Utils::generateRandomId(5) + "_" +
                                      download->downloadFileName();
       download->setDownloadFileName(n_proposed_file_name);
       acceptDownload(download);
@@ -81,8 +75,7 @@ void DownloadManagerWidget::remove(DownloadWidget *downloadWidget) {
 }
 
 void DownloadManagerWidget::on_open_download_dir_clicked() {
-  utils::desktopOpenUrl(settings
-                            .value("defaultDownloadLocation",
+  Utils::desktopOpenUrl(SettingsManager::instance().settings().value("defaultDownloadLocation",
                                    QStandardPaths::writableLocation(
                                        QStandardPaths::DownloadLocation) +
                                        QDir::separator() +

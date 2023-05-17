@@ -1,9 +1,5 @@
 #include "webenginepage.h"
 
-#include <QIcon>
-#include <QStyle>
-#include <QWebEngineSettings>
-
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
 
@@ -75,8 +71,11 @@ inline QString questionForFeature(QWebEnginePage::Feature feature) {
 void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
                                                      Feature feature) {
   bool autoPlay = true;
-  if (settings.value("autoPlayMedia").isValid())
-    autoPlay = settings.value("autoPlayMedia", false).toBool();
+  if (SettingsManager::instance().settings().value("autoPlayMedia").isValid())
+    autoPlay = SettingsManager::instance()
+                   .settings()
+                   .value("autoPlayMedia", false)
+                   .toBool();
   if (autoPlay && (feature == QWebEnginePage::MediaVideoCapture ||
                    feature == QWebEnginePage::MediaAudioVideoCapture)) {
     QWebEngineProfile *defProfile = QWebEngineProfile::defaultProfile();
@@ -92,8 +91,11 @@ void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
   QString question = questionForFeature(feature).arg(securityOrigin.host());
 
   QString featureStr = QVariant::fromValue(feature).toString();
-  settings.beginGroup("permissions");
-  if (settings.value(featureStr, false).toBool()) {
+  SettingsManager::instance().settings().beginGroup("permissions");
+  if (SettingsManager::instance()
+          .settings()
+          .value(featureStr, false)
+          .toBool()) {
     setFeaturePermission(
         securityOrigin, feature,
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
@@ -104,29 +106,35 @@ void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
       setFeaturePermission(
           securityOrigin, feature,
           QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-      settings.setValue(featureStr, true);
+      SettingsManager::instance().settings().setValue(featureStr, true);
     } else {
       setFeaturePermission(
           securityOrigin, feature,
           QWebEnginePage::PermissionPolicy::PermissionDeniedByUser);
-      settings.setValue(featureStr, false);
+      SettingsManager::instance().settings().setValue(featureStr, false);
     }
   }
-  settings.endGroup();
+  SettingsManager::instance().settings().endGroup();
 }
 
 void WebEnginePage::handleLoadFinished(bool ok) {
 
   // turn on Notification settings by default
-  if (settings.value("permissions/Notifications").isValid() == false) {
-    settings.beginGroup("permissions");
-    settings.setValue("Notifications", true);
+  if (SettingsManager::instance()
+          .settings()
+          .value("permissions/Notifications")
+          .isValid() == false) {
+    SettingsManager::instance().settings().beginGroup("permissions");
+    SettingsManager::instance().settings().setValue("Notifications", true);
     setFeaturePermission(
         QUrl("https://web.whatsapp.com/"),
         QWebEnginePage::Feature::Notifications,
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-    settings.endGroup();
-  } else if (settings.value("permissions/Notifications", true).toBool()) {
+    SettingsManager::instance().settings().endGroup();
+  } else if (SettingsManager::instance()
+                 .settings()
+                 .value("permissions/Notifications", true)
+                 .toBool()) {
     setFeaturePermission(
         QUrl("https://web.whatsapp.com/"),
         QWebEnginePage::Feature::Notifications,
@@ -159,8 +167,10 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   }
 
   QFileDialog *dialog = new QFileDialog();
-  bool usenativeFileDialog =
-      settings.value("useNativeFileDialog", false).toBool();
+  bool usenativeFileDialog = SettingsManager::instance()
+                                 .settings()
+                                 .value("useNativeFileDialog", false)
+                                 .toBool();
 
   if (usenativeFileDialog == false) {
     dialog->setOption(QFileDialog::DontUseNativeDialog, true);
@@ -387,7 +397,10 @@ void WebEnginePage::injectMutationObserver() {
 }
 
 void WebEnginePage::injectFullWidthJavaScript() {
-  if (!settings.value("fullWidthView", true).toBool())
+  if (!SettingsManager::instance()
+           .settings()
+           .value("fullWidthView", true)
+           .toBool())
     return;
   QString js =
       R"(function updateFullWidthView(element) {

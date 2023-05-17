@@ -14,9 +14,10 @@ extern int defaultAppAutoLockDuration;
 extern bool defaultAppAutoLock;
 
 MainWindow::MainWindow(QWidget *parent)
-    : QMainWindow(parent), notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
-      trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
-      unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
+    : QMainWindow(parent),
+      m_trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
+      m_notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
+      m_unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
 
   setObjectName("MainWindow");
   setWindowTitle(QApplication::applicationName());
@@ -24,7 +25,6 @@ MainWindow::MainWindow(QWidget *parent)
   setMinimumWidth(525);
   setMinimumHeight(448);
   restoreMainWindow();
-  initThemes();
   createActions();
   createTrayIcon();
   createWebEngine();
@@ -36,8 +36,9 @@ MainWindow::MainWindow(QWidget *parent)
 }
 
 void MainWindow::restoreMainWindow() {
-  if (settings.value("geometry").isValid()) {
-    restoreGeometry(settings.value("geometry").toByteArray());
+  if (SettingsManager::instance().settings().value("geometry").isValid()) {
+    restoreGeometry(
+        SettingsManager::instance().settings().value("geometry").toByteArray());
     QPoint pos = QCursor::pos();
     auto localScreens = QGuiApplication::screens();
     for (auto screen : qAsConst(localScreens)) {
@@ -52,78 +53,28 @@ void MainWindow::restoreMainWindow() {
 }
 
 void MainWindow::initAutoLock() {
-  autoLockEventFilter = new AutoLockEventFilter(
-      settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt() *
+  m_autoLockEventFilter = new AutoLockEventFilter(
+      SettingsManager::instance()
+          .settings()
+          .value("autoLockDuration", defaultAppAutoLockDuration)
+          .toInt() *
       1000);
-  connect(autoLockEventFilter, &AutoLockEventFilter::autoLockTimerTimeout, this,
-          [=]() {
-            if ((settingsWidget && !settingsWidget->isVisible()) &&
-                settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
+  connect(m_autoLockEventFilter, &AutoLockEventFilter::autoLockTimerTimeout,
+          this, [=]() {
+            if ((m_settingsWidget && !m_settingsWidget->isVisible()) &&
+                SettingsManager::instance()
+                    .settings()
+                    .value("appAutoLocking", defaultAppAutoLock)
+                    .toBool()) {
               this->lockApp();
             }
           });
-  if (settings.value("appAutoLocking", defaultAppAutoLock).toBool()) {
-    qApp->installEventFilter(autoLockEventFilter);
+  if (SettingsManager::instance()
+          .settings()
+          .value("appAutoLocking", defaultAppAutoLock)
+          .toBool()) {
+    qApp->installEventFilter(m_autoLockEventFilter);
   }
-}
-
-void MainWindow::initThemes() {
-  // Light
-  lightPalette.setColor(QPalette::Window, QColor(240, 240, 240));
-  lightPalette.setColor(QPalette::WindowText, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::Button, QColor(240, 240, 240));
-  lightPalette.setColor(QPalette::Light, QColor(180, 180, 180));
-  lightPalette.setColor(QPalette::Midlight, QColor(200, 200, 200));
-  lightPalette.setColor(QPalette::Dark, QColor(225, 225, 225));
-  lightPalette.setColor(QPalette::Text, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::BrightText, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::ButtonText, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::Base, QColor(237, 237, 237));
-  lightPalette.setColor(QPalette::Shadow, QColor(20, 20, 20));
-  lightPalette.setColor(QPalette::Highlight, QColor(76, 163, 224));
-  lightPalette.setColor(QPalette::HighlightedText, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::Link, QColor(0, 162, 232));
-  lightPalette.setColor(QPalette::AlternateBase, QColor(225, 225, 225));
-  lightPalette.setColor(QPalette::ToolTipBase, QColor(240, 240, 240));
-  lightPalette.setColor(QPalette::ToolTipText, QColor(0, 0, 0));
-  lightPalette.setColor(QPalette::LinkVisited, QColor(222, 222, 222));
-  lightPalette.setColor(QPalette::Disabled, QPalette::WindowText,
-                        QColor(115, 115, 115));
-  lightPalette.setColor(QPalette::Disabled, QPalette::Text,
-                        QColor(115, 115, 115));
-  lightPalette.setColor(QPalette::Disabled, QPalette::ButtonText,
-                        QColor(115, 115, 115));
-  lightPalette.setColor(QPalette::Disabled, QPalette::Highlight,
-                        QColor(190, 190, 190));
-  lightPalette.setColor(QPalette::Disabled, QPalette::HighlightedText,
-                        QColor(115, 115, 115));
-
-  // Dark
-  darkPalette.setColor(QPalette::Window, QColor(17, 27, 33));
-  darkPalette.setColor(QPalette::Text, Qt::white);
-  darkPalette.setColor(QPalette::WindowText, Qt::white);
-  darkPalette.setColor(QPalette::Base, QColor(32, 44, 51));
-  darkPalette.setColor(QPalette::AlternateBase, QColor(95, 108, 115));
-  darkPalette.setColor(QPalette::ToolTipBase, QColor(66, 66, 66));
-  darkPalette.setColor(QPalette::ToolTipText, QColor(192, 192, 192));
-  darkPalette.setColor(QPalette::Dark, QColor(35, 35, 35));
-  darkPalette.setColor(QPalette::Shadow, QColor(20, 20, 20));
-  darkPalette.setColor(QPalette::Button, QColor(17, 27, 33));
-  darkPalette.setColor(QPalette::ButtonText, Qt::white);
-  darkPalette.setColor(QPalette::BrightText, Qt::red);
-  darkPalette.setColor(QPalette::Link, QColor(42, 130, 218));
-  darkPalette.setColor(QPalette::Highlight, QColor(38, 140, 196));
-  darkPalette.setColor(QPalette::HighlightedText, Qt::white);
-  darkPalette.setColor(QPalette::Disabled, QPalette::HighlightedText,
-                       QColor(127, 127, 127));
-  darkPalette.setColor(QPalette::Disabled, QPalette::Window,
-                       QColor(65, 65, 67));
-  darkPalette.setColor(QPalette::Disabled, QPalette::Highlight,
-                       QColor(80, 80, 80));
-  darkPalette.setColor(QPalette::Disabled, QPalette::ButtonText,
-                       QColor(127, 127, 127));
-  darkPalette.setColor(QPalette::Disabled, QPalette::Text,
-                       QColor(127, 127, 127));
 }
 
 void MainWindow::initRateWidget() {
@@ -146,11 +97,11 @@ void MainWindow::initRateWidget() {
 }
 
 void MainWindow::runMinimized() {
-  this->minimizeAction->trigger();
+  this->m_minimizeAction->trigger();
   notify("Whatsie", "Whatsie started minimized in tray. Click to Open.");
 }
 
-MainWindow::~MainWindow() { webEngine->deleteLater(); }
+MainWindow::~MainWindow() { m_webEngine->deleteLater(); }
 
 void MainWindow::loadSchemaUrl(const QString &arg) {
   // https://faq.whatsapp.com/iphone/how-to-link-to-whatsapp-from-a-different-app/?lang=en
@@ -172,45 +123,53 @@ void MainWindow::loadSchemaUrl(const QString &arg) {
 }
 
 void MainWindow::updatePageTheme() {
-  if (webEngine && webEngine->page()) {
+  if (m_webEngine && m_webEngine->page()) {
 
-    QString windowTheme = settings.value("windowTheme", "light").toString();
+    QString windowTheme = SettingsManager::instance()
+                              .settings()
+                              .value("windowTheme", "light")
+                              .toString();
 
     if (windowTheme == "dark") {
-      webEngine->page()->runJavaScript(
+      m_webEngine->page()->runJavaScript(
           "localStorage['system-theme-mode']='false'; "
           "localStorage.theme='\"dark\"'; ");
 
-      webEngine->page()->runJavaScript(
+      m_webEngine->page()->runJavaScript(
           "document.querySelector('body').classList.add('" + windowTheme +
           "');");
     } else {
-      webEngine->page()->runJavaScript(
+      m_webEngine->page()->runJavaScript(
           "localStorage['system-theme-mode']='false'; "
           "localStorage.theme='\"light\"'; ");
 
-      webEngine->page()->runJavaScript(
+      m_webEngine->page()->runJavaScript(
           "document.querySelector('body').classList.remove('dark');");
     }
   }
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-  if (lockWidget != nullptr) {
-    lockWidget->resize(event->size());
+  if (m_lockWidget != nullptr) {
+    m_lockWidget->resize(event->size());
   }
 }
 
 void MainWindow::updateWindowTheme() {
-  qApp->setStyle(QStyleFactory::create(
-      settings.value("widgetStyle", "Fusion").toString()));
-  if (settings.value("windowTheme", "light").toString() == "dark") {
-    qApp->setPalette(darkPalette);
-    webEngine->setStyleSheet(
+  qApp->setStyle(QStyleFactory::create(SettingsManager::instance()
+                                           .settings()
+                                           .value("widgetStyle", "Fusion")
+                                           .toString()));
+  if (SettingsManager::instance()
+          .settings()
+          .value("windowTheme", "light")
+          .toString() == "dark") {
+    qApp->setPalette(Theme::getDarkPalette());
+    m_webEngine->setStyleSheet(
         "QWebEngineView{background:rgb(17, 27, 33);}"); // whatsapp dark color
   } else {
-    qApp->setPalette(lightPalette);
-    webEngine->setStyleSheet(
+    qApp->setPalette(Theme::getLightPalette());
+    m_webEngine->setStyleSheet(
         "QWebEngineView{background:#F0F0F0;}"); // whatsapp light color
   }
 
@@ -218,13 +177,13 @@ void MainWindow::updateWindowTheme() {
   foreach (QWidget *w, widgets) {
     w->setPalette(qApp->palette());
   }
-  setNotificationPresenter(webEngine->page()->profile());
+  setNotificationPresenter(m_webEngine->page()->profile());
 
-  if (lockWidget != nullptr) {
-    lockWidget->setStyleSheet(
+  if (m_lockWidget != nullptr) {
+    m_lockWidget->setStyleSheet(
         "QWidget#login{background-color:palette(window)};"
         "QWidget#signup{background-color:palette(window)};");
-    lockWidget->applyThemeQuirks();
+    m_lockWidget->applyThemeQuirks();
   }
   this->update();
 }
@@ -234,8 +193,8 @@ void MainWindow::handleCookieAdded(const QNetworkCookie &cookie) {
 }
 
 void MainWindow::forceLogOut() {
-  if (webEngine && webEngine->page()) {
-    webEngine->page()->runJavaScript(
+  if (m_webEngine && m_webEngine->page()) {
+    m_webEngine->page()->runJavaScript(
         "window.localStorage.clear();",
         [=](const QVariant &result) { qDebug() << result; });
   }
@@ -243,8 +202,8 @@ void MainWindow::forceLogOut() {
 
 bool MainWindow::isLoggedIn() {
   static bool loggedIn = false;
-  if (webEngine && webEngine->page()) {
-    webEngine->page()->runJavaScript(
+  if (m_webEngine && m_webEngine->page()) {
+    m_webEngine->page()->runJavaScript(
         "window.localStorage.getItem('last-wid-md')",
         [=](const QVariant &result) {
           qDebug() << Q_FUNC_INFO << result;
@@ -261,8 +220,8 @@ bool MainWindow::isLoggedIn() {
 }
 
 void MainWindow::tryLogOut() {
-  if (webEngine && webEngine->page()) {
-    webEngine->page()->runJavaScript(
+  if (m_webEngine && m_webEngine->page()) {
+    m_webEngine->page()->runJavaScript(
         "document.querySelector(\"span[data-testid|='menu']\").click();"
         "document.querySelector(\"#side > header > div > div > span > div > "
         "span > div > ul > li:nth-child(4) > div\").click();"
@@ -280,108 +239,116 @@ void MainWindow::tryLogOut() {
 
 void MainWindow::initSettingWidget() {
   int screenNumber = qApp->desktop()->screenNumber(this);
-  if (settingsWidget == nullptr) {
-    settingsWidget = new SettingsWidget(
-        this, screenNumber, webEngine->page()->profile()->cachePath(),
-        webEngine->page()->profile()->persistentStoragePath());
-    settingsWidget->setWindowTitle(QApplication::applicationName() +
-                                   " | Settings");
-    settingsWidget->setWindowFlags(Qt::Dialog);
+  if (m_settingsWidget == nullptr) {
+    m_settingsWidget = new SettingsWidget(
+        this, screenNumber, m_webEngine->page()->profile()->cachePath(),
+        m_webEngine->page()->profile()->persistentStoragePath());
+    m_settingsWidget->setWindowTitle(QApplication::applicationName() +
+                                     " | Settings");
+    m_settingsWidget->setWindowFlags(Qt::Dialog);
 
-    connect(settingsWidget, SIGNAL(initLock()), this, SLOT(initLock()));
-    connect(settingsWidget, SIGNAL(changeLockPassword()), this,
-            SLOT(changeLockPassword()));
-    connect(settingsWidget, SIGNAL(appAutoLockChanged()), this,
-            SLOT(appAutoLockChanged()));
+    connect(m_settingsWidget, &SettingsWidget::initLock, this,
+            &MainWindow::initLock);
+    connect(m_settingsWidget, &SettingsWidget::changeLockPassword, this,
+            &MainWindow::changeLockPassword);
+    connect(m_settingsWidget, &SettingsWidget::appAutoLockChanged, this,
+            &MainWindow::appAutoLockChanged);
 
-    connect(settingsWidget, SIGNAL(updateWindowTheme()), this,
-            SLOT(updateWindowTheme()));
-    connect(settingsWidget, SIGNAL(updatePageTheme()), this,
-            SLOT(updatePageTheme()));
+    connect(m_settingsWidget, &SettingsWidget::updateWindowTheme, this,
+            &MainWindow::updateWindowTheme);
+    connect(m_settingsWidget, &SettingsWidget::updatePageTheme, this,
+            &MainWindow::updatePageTheme);
 
-    connect(settingsWidget, &SettingsWidget::muteToggled, settingsWidget,
-            [=](const bool checked) { this->toggleMute(checked); });
-    connect(settingsWidget, &SettingsWidget::userAgentChanged, settingsWidget,
-            [=](QString userAgentStr) {
-              if (webEngine->page()->profile()->httpUserAgent() !=
+    connect(m_settingsWidget, &SettingsWidget::muteToggled, this,
+            &MainWindow::toggleMute);
+    connect(m_settingsWidget, &SettingsWidget::userAgentChanged,
+            m_settingsWidget, [=](QString userAgentStr) {
+              if (m_webEngine->page()->profile()->httpUserAgent() !=
                   userAgentStr) {
-                settings.setValue("useragent", userAgentStr);
+                SettingsManager::instance().settings().setValue("useragent",
+                                                                userAgentStr);
                 this->updateSettingsUserAgentWidget();
                 this->askToReloadPage();
               }
             });
-    connect(settingsWidget, &SettingsWidget::autoPlayMediaToggled,
-            settingsWidget, [=](bool checked) {
+    connect(m_settingsWidget, &SettingsWidget::autoPlayMediaToggled,
+            m_settingsWidget, [=](bool checked) {
               QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
               auto *webSettings = profile->settings();
               webSettings->setAttribute(
                   QWebEngineSettings::PlaybackRequiresUserGesture, checked);
 
-              webEngine->page()->profile()->settings()->setAttribute(
+              m_webEngine->page()->profile()->settings()->setAttribute(
                   QWebEngineSettings::PlaybackRequiresUserGesture, checked);
             });
 
-    connect(settingsWidget, &SettingsWidget::dictChanged, settingsWidget,
+    connect(m_settingsWidget, &SettingsWidget::dictChanged, m_settingsWidget,
             [=](QString dictName) {
-              if (webEngine && webEngine->page()) {
-                webEngine->page()->profile()->setSpellCheckLanguages(
+              if (m_webEngine && m_webEngine->page()) {
+                m_webEngine->page()->profile()->setSpellCheckLanguages(
                     QStringList() << dictName);
               }
             });
 
-    connect(settingsWidget, &SettingsWidget::spellCheckChanged, settingsWidget,
-            [=](bool checked) {
-              if (webEngine && webEngine->page()) {
-                webEngine->page()->profile()->setSpellCheckEnabled(checked);
+    connect(m_settingsWidget, &SettingsWidget::spellCheckChanged,
+            m_settingsWidget, [=](bool checked) {
+              if (m_webEngine && m_webEngine->page()) {
+                m_webEngine->page()->profile()->setSpellCheckEnabled(checked);
               }
             });
 
-    connect(
-        settingsWidget, &SettingsWidget::zoomChanged, settingsWidget, [=]() {
-          if (windowState() == Qt::WindowNoState) {
-            double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
-            webEngine->page()->setZoomFactor(currentFactor);
-          }
-        });
+    connect(m_settingsWidget, &SettingsWidget::zoomChanged, m_settingsWidget,
+            [=]() {
+              if (windowState() == Qt::WindowNoState) {
+                double currentFactor = SettingsManager::instance()
+                                           .settings()
+                                           .value("zoomFactor", 1.0)
+                                           .toDouble();
+                m_webEngine->page()->setZoomFactor(currentFactor);
+              }
+            });
 
-    connect(settingsWidget, &SettingsWidget::zoomMaximizedChanged,
-            settingsWidget, [=]() {
+    connect(m_settingsWidget, &SettingsWidget::zoomMaximizedChanged,
+            m_settingsWidget, [=]() {
               if (windowState() == Qt::WindowMaximized ||
                   windowState() == Qt::WindowFullScreen) {
-                double currentFactor = settings
+                double currentFactor = SettingsManager::instance()
+                                           .settings()
                                            .value("zoomFactorMaximized",
                                                   defaultZoomFactorMaximized)
                                            .toDouble();
-                webEngine->page()->setZoomFactor(currentFactor);
+                m_webEngine->page()->setZoomFactor(currentFactor);
               }
             });
 
-    connect(settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
-            settingsWidget,
-            [=]() { setNotificationPresenter(webEngine->page()->profile()); });
+    connect(m_settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
+            m_settingsWidget, [=]() {
+              setNotificationPresenter(m_webEngine->page()->profile());
+            });
 
-    connect(settingsWidget, &SettingsWidget::notify, settingsWidget,
+    connect(m_settingsWidget, &SettingsWidget::notify, m_settingsWidget,
             [=](QString message) { notify("", message); });
 
-    connect(settingsWidget, &SettingsWidget::updateFullWidthView,
-            settingsWidget, [=](bool checked) {
-              if (webEngine && webEngine->page()) {
+    connect(m_settingsWidget, &SettingsWidget::updateFullWidthView,
+            m_settingsWidget, [=](bool checked) {
+              if (m_webEngine && m_webEngine->page()) {
                 if (checked)
-                  webEngine->page()->runJavaScript(
+                  m_webEngine->page()->runJavaScript(
                       "document.querySelector('body').classList.add('whatsie-"
                       "full-view');");
                 else
-                  webEngine->page()->runJavaScript(
+                  m_webEngine->page()->runJavaScript(
                       "document.querySelector('body').classList.remove('"
                       "whatsie-full-view');");
               }
             });
 
-    settingsWidget->appLockSetChecked(
-        settings.value("lockscreen", false).toBool());
+    m_settingsWidget->appLockSetChecked(SettingsManager::instance()
+                                            .settings()
+                                            .value("lockscreen", false)
+                                            .toBool());
 
-    // spell checker
-    settingsWidget->loadDictionaries(dictionaries);
+    m_settingsWidget->loadDictionaries(m_dictionaries);
   }
 }
 
@@ -394,15 +361,15 @@ void MainWindow::changeEvent(QEvent *e) {
 
 void MainWindow::handleZoomOnWindowStateChange(
     const QWindowStateChangeEvent *ev) {
-  if (settingsWidget != nullptr) {
+  if (m_settingsWidget != nullptr) {
     if (ev->oldState().testFlag(Qt::WindowMaximized) &&
         windowState().testFlag(Qt::WindowNoState)) {
-      emit settingsWidget->zoomChanged();
+      emit m_settingsWidget->zoomChanged();
     } else if ((!ev->oldState().testFlag(Qt::WindowMaximized) &&
                 windowState().testFlag(Qt::WindowMaximized)) ||
                (!ev->oldState().testFlag(Qt::WindowMaximized) &&
                 windowState().testFlag(Qt::WindowFullScreen))) {
-      emit settingsWidget->zoomMaximizedChanged();
+      emit m_settingsWidget->zoomMaximizedChanged();
     }
   }
 }
@@ -411,22 +378,27 @@ void MainWindow::handleZoom() {
   if (windowState().testFlag(Qt::WindowMaximized) ||
       windowState().testFlag(Qt::WindowFullScreen)) {
     double currentFactor =
-        settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+        SettingsManager::instance()
+            .settings()
+            .value("zoomFactorMaximized", defaultZoomFactorMaximized)
             .toDouble();
-    webEngine->page()->setZoomFactor(currentFactor);
+    m_webEngine->page()->setZoomFactor(currentFactor);
   } else if (windowState().testFlag(Qt::WindowNoState)) {
-    double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
-    webEngine->page()->setZoomFactor(currentFactor);
+    double currentFactor = SettingsManager::instance()
+                               .settings()
+                               .value("zoomFactor", 1.0)
+                               .toDouble();
+    m_webEngine->page()->setZoomFactor(currentFactor);
   }
 }
 
 void MainWindow::lockApp() {
-  if (lockWidget != nullptr && lockWidget->getIsLocked())
+  if (m_lockWidget != nullptr && m_lockWidget->getIsLocked())
     return;
 
-  if (settings.value("asdfg").isValid()) {
+  if (SettingsManager::instance().settings().value("asdfg").isValid()) {
     initLock();
-    lockWidget->lock_app();
+    m_lockWidget->lock_app();
   } else {
     int ret = QMessageBox::information(
         this, tr(QApplication::applicationName().toUtf8()),
@@ -441,13 +413,13 @@ void MainWindow::lockApp() {
 }
 
 void MainWindow::toggleTheme() {
-  if (settingsWidget != nullptr) {
-    settingsWidget->toggleTheme();
+  if (m_settingsWidget != nullptr) {
+    m_settingsWidget->toggleTheme();
   }
 }
 
 void MainWindow::showSettings(bool isAskedByCLI) {
-  if (lockWidget && lockWidget->getIsLocked()) {
+  if (m_lockWidget && m_lockWidget->getIsLocked()) {
     QString error = tr("Unlock to access Settings.");
     if (isAskedByCLI) {
       this->notify(QApplication::applicationName() + "| Error", error);
@@ -459,28 +431,28 @@ void MainWindow::showSettings(bool isAskedByCLI) {
     return;
   }
 
-  if (webEngine == nullptr) {
+  if (m_webEngine == nullptr) {
     QMessageBox::critical(
         this, QApplication::applicationName() + "| Error",
         "Unable to initialize settings module.\nWebengine is not initialized.");
     return;
   }
-  if (!settingsWidget->isVisible()) {
+  if (!m_settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
-    settingsWidget->refresh();
+    m_settingsWidget->refresh();
     int screenNumber = qApp->desktop()->screenNumber(this);
     QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
-    if (!screenRect.contains(settingsWidget->pos())) {
-      settingsWidget->move(screenRect.center() -
-                           settingsWidget->rect().center());
+    if (!screenRect.contains(m_settingsWidget->pos())) {
+      m_settingsWidget->move(screenRect.center() -
+                             m_settingsWidget->rect().center());
     }
-    settingsWidget->show();
+    m_settingsWidget->show();
   }
 }
 
 void MainWindow::updateSettingsUserAgentWidget() {
-  settingsWidget->updateDefaultUAButton(
-      webEngine->page()->profile()->httpUserAgent());
+  m_settingsWidget->updateDefaultUAButton(
+      m_webEngine->page()->profile()->httpUserAgent());
 }
 
 void MainWindow::askToReloadPage() {
@@ -497,22 +469,29 @@ void MainWindow::showAbout() {
   about->setWindowFlag(Qt::Dialog);
   about->setMinimumSize(about->sizeHint());
   about->adjustSize();
-  about->setAttribute(Qt::WA_DeleteOnClose);
+  about->setAttribute(Qt::WA_DeleteOnClose, true);
   about->show();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event) {
-  settings.setValue("geometry", saveGeometry());
+  SettingsManager::instance().settings().setValue("geometry", saveGeometry());
   getPageTheme();
-  QTimer::singleShot(500, settingsWidget, [=]() { settingsWidget->refresh(); });
+  QTimer::singleShot(500, m_settingsWidget,
+                     [=]() { m_settingsWidget->refresh(); });
 
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
-      settings.value("closeButtonActionCombo", 0).toInt() == 0) {
+      SettingsManager::instance()
+              .settings()
+              .value("closeButtonActionCombo", 0)
+              .toInt() == 0) {
     this->hide();
     event->ignore();
-    if (settings.value("firstrun_tray", true).toBool()) {
+    if (SettingsManager::instance()
+            .settings()
+            .value("firstrun_tray", true)
+            .toBool()) {
       notify(QApplication::applicationName(), "Minimized to system tray.");
-      settings.setValue("firstrun_tray", false);
+      SettingsManager::instance().settings().setValue("firstrun_tray", false);
     }
     return;
   }
@@ -523,28 +502,38 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 
 void MainWindow::notify(QString title, QString message) {
 
-  if (settings.value("disableNotificationPopups", false).toBool() == true) {
+  if (SettingsManager::instance()
+          .settings()
+          .value("disableNotificationPopups", false)
+          .toBool() == true) {
     return;
   }
 
   if (title.isEmpty())
     title = QApplication::applicationName();
 
-  if (settings.value("notificationCombo", 1).toInt() == 0 &&
-      trayIcon != nullptr) {
-    trayIcon->showMessage(title, message,
-                          QIcon(":/icons/app/notification/whatsie-notify.png"),
-                          settings.value("notificationTimeOut", 9000).toInt());
-    trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
-    connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
-      if (windowState().testFlag(Qt::WindowMinimized) ||
-          !windowState().testFlag(Qt::WindowActive)) {
-        activateWindow();
-        this->show();
-      }
-    });
+  if (SettingsManager::instance()
+              .settings()
+              .value("notificationCombo", 1)
+              .toInt() == 0 &&
+      m_systemTrayIcon != nullptr) {
+    m_systemTrayIcon->showMessage(
+        title, message, QIcon(":/icons/app/notification/whatsie-notify.png"),
+        SettingsManager::instance()
+            .settings()
+            .value("notificationTimeOut", 9000)
+            .toInt());
+    m_systemTrayIcon->disconnect(m_systemTrayIcon, SIGNAL(messageClicked()));
+    connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked,
+            m_systemTrayIcon, [=]() {
+              if (windowState().testFlag(Qt::WindowMinimized) ||
+                  !windowState().testFlag(Qt::WindowActive)) {
+                activateWindow();
+                this->show();
+              }
+            });
   } else {
-    auto popup = new NotificationPopup(webEngine);
+    auto popup = new NotificationPopup(m_webEngine);
     connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
       if (windowState().testFlag(Qt::WindowMinimized) ||
           !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
@@ -564,98 +553,102 @@ void MainWindow::notify(QString title, QString message) {
 
 void MainWindow::createActions() {
 
-  openUrlAction = new QAction("New Chat", this);
-  openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_N));
-  connect(openUrlAction, &QAction::triggered, this, &MainWindow::newChat);
-  addAction(openUrlAction);
+  m_openUrlAction = new QAction("New Chat", this);
+  m_openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_N));
+  connect(m_openUrlAction, &QAction::triggered, this, &MainWindow::newChat);
+  addAction(m_openUrlAction);
 
-  fullscreenAction = new QAction(tr("Fullscreen"), this);
-  fullscreenAction->setShortcut(Qt::Key_F11);
-  connect(fullscreenAction, &QAction::triggered, fullscreenAction,
+  m_fullscreenAction = new QAction(tr("Fullscreen"), this);
+  m_fullscreenAction->setShortcut(Qt::Key_F11);
+  connect(m_fullscreenAction, &QAction::triggered, m_fullscreenAction,
           [=]() { setWindowState(windowState() ^ Qt::WindowFullScreen); });
-  addAction(fullscreenAction);
+  addAction(m_fullscreenAction);
 
-  minimizeAction = new QAction(tr("Mi&nimize to tray"), this);
-  connect(minimizeAction, &QAction::triggered, this, &QMainWindow::hide);
-  addAction(minimizeAction);
+  m_minimizeAction = new QAction(tr("Mi&nimize to tray"), this);
+  connect(m_minimizeAction, &QAction::triggered, this, &QMainWindow::hide);
+  addAction(m_minimizeAction);
 
   QShortcut *minimizeShortcut = new QShortcut(
       QKeySequence(Qt::Modifier::CTRL + Qt::Key_W), this, SLOT(hide()));
   minimizeShortcut->setAutoRepeat(false);
 
-  restoreAction = new QAction(tr("&Restore"), this);
-  connect(restoreAction, &QAction::triggered, this, &QMainWindow::show);
-  addAction(restoreAction);
+  m_restoreAction = new QAction(tr("&Restore"), this);
+  connect(m_restoreAction, &QAction::triggered, this, &QMainWindow::show);
+  addAction(m_restoreAction);
 
-  reloadAction = new QAction(tr("Re&load"), this);
-  reloadAction->setShortcut(Qt::Key_F5);
-  connect(reloadAction, &QAction::triggered, this, [=] { this->doReload(); });
-  addAction(reloadAction);
+  m_reloadAction = new QAction(tr("Re&load"), this);
+  m_reloadAction->setShortcut(Qt::Key_F5);
+  connect(m_reloadAction, &QAction::triggered, this,
+          [=]() { this->doReload(); });
+  addAction(m_reloadAction);
 
-  lockAction = new QAction(tr("Loc&k"), this);
-  lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_L));
-  connect(lockAction, &QAction::triggered, this, &MainWindow::lockApp);
-  addAction(lockAction);
+  m_lockAction = new QAction(tr("Loc&k"), this);
+  m_lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_L));
+  connect(m_lockAction, &QAction::triggered, this, &MainWindow::lockApp);
+  addAction(m_lockAction);
 
-  settingsAction = new QAction(tr("&Settings"), this);
-  settingsAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_P));
-  connect(settingsAction, &QAction::triggered, this, &MainWindow::showSettings);
-  addAction(settingsAction);
+  m_settingsAction = new QAction(tr("&Settings"), this);
+  m_settingsAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_P));
+  connect(m_settingsAction, &QAction::triggered, this,
+          &MainWindow::showSettings);
+  addAction(m_settingsAction);
 
-  toggleThemeAction = new QAction(tr("&Toggle theme"), this);
-  toggleThemeAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_T));
-  connect(toggleThemeAction, &QAction::triggered, this,
+  m_toggleThemeAction = new QAction(tr("&Toggle theme"), this);
+  m_toggleThemeAction->setShortcut(
+      QKeySequence(Qt::Modifier::CTRL + Qt::Key_T));
+  connect(m_toggleThemeAction, &QAction::triggered, this,
           &MainWindow::toggleTheme);
-  addAction(toggleThemeAction);
+  addAction(m_toggleThemeAction);
 
-  aboutAction = new QAction(tr("&About"), this);
-  connect(aboutAction, &QAction::triggered, this, &MainWindow::showAbout);
+  m_aboutAction = new QAction(tr("&About"), this);
+  connect(m_aboutAction, &QAction::triggered, this, &MainWindow::showAbout);
 
-  quitAction = new QAction(tr("&Quit"), this);
-  quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
-  connect(quitAction, &QAction::triggered, this, &MainWindow::quitApp);
-  addAction(quitAction);
+  m_quitAction = new QAction(tr("&Quit"), this);
+  m_quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
+  connect(m_quitAction, &QAction::triggered, this, &MainWindow::quitApp);
+  addAction(m_quitAction);
 }
 
 void MainWindow::quitApp() {
-  settings.setValue("geometry", saveGeometry());
+  SettingsManager::instance().settings().setValue("geometry", saveGeometry());
   getPageTheme();
-  QTimer::singleShot(500, &settings, [=]() {
-    settings.setValue("firstrun_tray", true);
+  QTimer::singleShot(500, this, [=]() {
+    SettingsManager::instance().settings().setValue("firstrun_tray", true);
     qApp->quit();
   });
 }
 
 void MainWindow::createTrayIcon() {
-  trayIconMenu = new QMenu(this);
-  trayIconMenu->setObjectName("trayIconMenu");
-  trayIconMenu->addAction(minimizeAction);
-  trayIconMenu->addAction(restoreAction);
-  trayIconMenu->addSeparator();
-  trayIconMenu->addAction(reloadAction);
-  trayIconMenu->addAction(lockAction);
-  trayIconMenu->addSeparator();
-  trayIconMenu->addAction(openUrlAction);
-  trayIconMenu->addAction(toggleThemeAction);
-  trayIconMenu->addAction(settingsAction);
-  trayIconMenu->addAction(aboutAction);
-  trayIconMenu->addSeparator();
-  trayIconMenu->addAction(quitAction);
+  m_trayIconMenu = new QMenu(this);
+  m_trayIconMenu->setObjectName("trayIconMenu");
+  m_trayIconMenu->addAction(m_minimizeAction);
+  m_trayIconMenu->addAction(m_restoreAction);
+  m_trayIconMenu->addSeparator();
+  m_trayIconMenu->addAction(m_reloadAction);
+  m_trayIconMenu->addAction(m_lockAction);
+  m_trayIconMenu->addSeparator();
+  m_trayIconMenu->addAction(m_openUrlAction);
+  m_trayIconMenu->addAction(m_toggleThemeAction);
+  m_trayIconMenu->addAction(m_settingsAction);
+  m_trayIconMenu->addAction(m_aboutAction);
+  m_trayIconMenu->addSeparator();
+  m_trayIconMenu->addAction(m_quitAction);
 
-  trayIcon = new QSystemTrayIcon(trayIconNormal, this);
-  trayIcon->setContextMenu(trayIconMenu);
-  connect(trayIconMenu, SIGNAL(aboutToShow()), this, SLOT(checkWindowState()));
+  m_systemTrayIcon = new QSystemTrayIcon(m_trayIconNormal, this);
+  m_systemTrayIcon->setContextMenu(m_trayIconMenu);
+  connect(m_trayIconMenu, &QMenu::aboutToShow, this,
+          &MainWindow::checkWindowState);
 
-  trayIcon->show();
+  m_systemTrayIcon->show();
 
-  connect(trayIcon, &QSystemTrayIcon::messageClicked, this,
+  connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
           &MainWindow::messageClicked);
-  connect(trayIcon, &QSystemTrayIcon::activated, this,
+  connect(m_systemTrayIcon, &QSystemTrayIcon::activated, this,
           &MainWindow::iconActivated);
 
   // enable show shortcuts in menu
   if (qApp->styleHints()->showShortcutsInContextMenus()) {
-    foreach (QAction *action, trayIconMenu->actions()) {
+    foreach (QAction *action, m_trayIconMenu->actions()) {
       action->setShortcutVisibleInContextMenu(true);
     }
   }
@@ -663,58 +656,64 @@ void MainWindow::createTrayIcon() {
 
 void MainWindow::initLock() {
 
-  if (lockWidget == nullptr) {
-    lockWidget = new Lock(this);
-    lockWidget->setObjectName("lockWidget");
+  if (m_lockWidget == nullptr) {
+    m_lockWidget = new Lock(this);
+    m_lockWidget->setObjectName("lockWidget");
 
-    lockWidget->setWindowFlags(Qt::Widget);
-    lockWidget->setStyleSheet(
+    m_lockWidget->setWindowFlags(Qt::Widget);
+    m_lockWidget->setStyleSheet(
         "QWidget#login{background-color:palette(window)};"
         "QWidget#signup{background-color:palette(window)}");
-    lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+    m_lockWidget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
 
-    connect(lockWidget, &Lock::passwordNotSet, settingsWidget, [=]() {
-      settings.setValue("lockscreen", false);
-      settingsWidget->appLockSetChecked(false);
+    connect(m_lockWidget, &Lock::passwordNotSet, m_settingsWidget, [=]() {
+      SettingsManager::instance().settings().setValue("lockscreen", false);
+      m_settingsWidget->appLockSetChecked(false);
     });
 
-    connect(lockWidget, &Lock::unLocked, [=]() {
+    connect(m_lockWidget, &Lock::unLocked, [=]() {
       // unlock event
     });
 
-    connect(lockWidget, &Lock::passwordSet, settingsWidget, [=]() {
-      if (settings.value("asdfg").isValid()) {
-        settingsWidget->setCurrentPasswordText(QByteArray::fromBase64(
-            settings.value("asdfg").toString().toUtf8()));
+    connect(m_lockWidget, &Lock::passwordSet, m_settingsWidget, [=]() {
+      if (SettingsManager::instance().settings().value("asdfg").isValid()) {
+        m_settingsWidget->setCurrentPasswordText(
+            QByteArray::fromBase64(SettingsManager::instance()
+                                       .settings()
+                                       .value("asdfg")
+                                       .toString()
+                                       .toUtf8()));
       } else {
-        settingsWidget->setCurrentPasswordText("Require setup");
+        m_settingsWidget->setCurrentPasswordText("Require setup");
       }
-      settingsWidget->appLockSetChecked(
-          settings.value("lockscreen", false).toBool());
+      m_settingsWidget->appLockSetChecked(SettingsManager::instance()
+                                              .settings()
+                                              .value("lockscreen", false)
+                                              .toBool());
     });
-    lockWidget->applyThemeQuirks();
+    m_lockWidget->applyThemeQuirks();
   }
 
-  lockWidget->setGeometry(this->rect());
+  m_lockWidget->setGeometry(this->rect());
 
-  if (settings.value("lockscreen").toBool()) {
-    if (settings.value("asdfg").isValid()) {
-      lockWidget->lock_app();
+  if (SettingsManager::instance().settings().value("lockscreen").toBool()) {
+    if (SettingsManager::instance().settings().value("asdfg").isValid()) {
+      m_lockWidget->lock_app();
     } else {
-      lockWidget->signUp();
+      m_lockWidget->signUp();
     }
-    lockWidget->show();
+    m_lockWidget->show();
   } else {
-    lockWidget->hide();
+    m_lockWidget->hide();
   }
   updateWindowTheme();
 }
 
 void MainWindow::changeLockPassword() {
-  settings.remove("asdfg");
-  settingsWidget->appLockSetChecked(false);
-  settingsWidget->autoAppLockSetChecked(false);
-  settingsWidget->updateAppLockPasswordViewer();
+  SettingsManager::instance().settings().remove("asdfg");
+  m_settingsWidget->appLockSetChecked(false);
+  m_settingsWidget->autoAppLockSetChecked(false);
+  m_settingsWidget->updateAppLockPasswordViewer();
   tryLogOut();
   QTimer::singleShot(1000, this, [=]() {
     if (isLoggedIn()) {
@@ -727,16 +726,22 @@ void MainWindow::changeLockPassword() {
 }
 
 void MainWindow::appAutoLockChanged() {
-  bool enabled = settings.value("appAutoLocking", defaultAppAutoLock).toBool();
+  bool enabled = SettingsManager::instance()
+                     .settings()
+                     .value("appAutoLocking", defaultAppAutoLock)
+                     .toBool();
   if (enabled) {
-    autoLockEventFilter->setTimeoutmillis(
-        settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt() *
+    m_autoLockEventFilter->setTimeoutmillis(
+        SettingsManager::instance()
+            .settings()
+            .value("autoLockDuration", defaultAppAutoLockDuration)
+            .toInt() *
         1000);
-    qApp->installEventFilter(autoLockEventFilter);
-    autoLockEventFilter->resetTimer();
+    qApp->installEventFilter(m_autoLockEventFilter);
+    m_autoLockEventFilter->resetTimer();
   } else {
-    autoLockEventFilter->stopTimer();
-    qApp->removeEventFilter(autoLockEventFilter);
+    m_autoLockEventFilter->stopTimer();
+    qApp->removeEventFilter(m_autoLockEventFilter);
   }
 }
 
@@ -752,7 +757,7 @@ void MainWindow::checkWindowState() {
       menu->actions().at(0)->setDisabled(true);
       menu->actions().at(1)->setDisabled(false);
     }
-    if (lockWidget && lockWidget->getIsLocked()) {
+    if (m_lockWidget && m_lockWidget->getIsLocked()) {
       menu->actions().at(4)->setDisabled(true);
     } else {
       menu->actions().at(4)->setDisabled(false);
@@ -763,13 +768,21 @@ void MainWindow::checkWindowState() {
 void MainWindow::initGlobalWebProfile() {
 
   QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
-  profile->setHttpUserAgent(
-      settings.value("useragent", defaultUserAgentStr).toString());
+  profile->setHttpUserAgent(SettingsManager::instance()
+                                .settings()
+                                .value("useragent", defaultUserAgentStr)
+                                .toString());
 
   QStringList dict_names;
-  dict_names.append(settings.value("sc_dict", "en-US").toString());
+  dict_names.append(SettingsManager::instance()
+                        .settings()
+                        .value("sc_dict", "en-US")
+                        .toString());
 
-  profile->setSpellCheckEnabled(settings.value("sc_enabled", true).toBool());
+  profile->setSpellCheckEnabled(SettingsManager::instance()
+                                    .settings()
+                                    .value("sc_enabled", true)
+                                    .toBool());
   profile->setSpellCheckLanguages(dict_names);
 
   auto *webSettings = profile->settings();
@@ -794,7 +807,10 @@ void MainWindow::initGlobalWebProfile() {
   webSettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard,
                             true);
   webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
-                            settings.value("autoPlayMedia", false).toBool());
+                            SettingsManager::instance()
+                                .settings()
+                                .value("autoPlayMedia", false)
+                                .toBool());
 }
 
 void MainWindow::createWebEngine() {
@@ -806,18 +822,18 @@ void MainWindow::createWebEngine() {
   widgetSize.setHorizontalStretch(1);
   widgetSize.setVerticalStretch(1);
 
-  dictionaries = Dictionaries::GetDictionaries();
+  m_dictionaries = Dictionaries::GetDictionaries();
 
-  WebView *webEngineView = new WebView(this, dictionaries);
+  WebView *webEngineView = new WebView(this, m_dictionaries);
   setCentralWidget(webEngineView);
   webEngineView->setSizePolicy(widgetSize);
   webEngineView->show();
 
-  this->webEngine = webEngineView;
+  this->m_webEngine = webEngineView;
 
-  webEngineView->addAction(minimizeAction);
-  webEngineView->addAction(lockAction);
-  webEngineView->addAction(quitAction);
+  webEngineView->addAction(m_minimizeAction);
+  webEngineView->addAction(m_lockAction);
+  webEngineView->addAction(m_quitAction);
 
   createWebPage(false);
 }
@@ -834,55 +850,69 @@ const QIcon MainWindow::getTrayIcon(const int &notificationCount) const {
 }
 
 void MainWindow::createWebPage(bool offTheRecord) {
-  if (offTheRecord && !otrProfile) {
-    otrProfile.reset(new QWebEngineProfile);
+  if (offTheRecord && !m_otrProfile) {
+    m_otrProfile.reset(new QWebEngineProfile);
   }
   auto profile =
-      offTheRecord ? otrProfile.get() : QWebEngineProfile::defaultProfile();
+      offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
 
   QStringList dict_names;
-  dict_names.append(settings.value("sc_dict", "en-US").toString());
+  dict_names.append(SettingsManager::instance()
+                        .settings()
+                        .value("sc_dict", "en-US")
+                        .toString());
 
-  profile->setSpellCheckEnabled(settings.value("sc_enabled", true).toBool());
+  profile->setSpellCheckEnabled(SettingsManager::instance()
+                                    .settings()
+                                    .value("sc_enabled", true)
+                                    .toBool());
   profile->setSpellCheckLanguages(dict_names);
-  profile->setHttpUserAgent(
-      settings.value("useragent", defaultUserAgentStr).toString());
+  profile->setHttpUserAgent(SettingsManager::instance()
+                                .settings()
+                                .value("useragent", defaultUserAgentStr)
+                                .toString());
 
   setNotificationPresenter(profile);
 
-  QWebEnginePage *page = new WebEnginePage(profile, webEngine);
-  if (settings.value("windowTheme", "light").toString() == "dark") {
+  QWebEnginePage *page = new WebEnginePage(profile, m_webEngine);
+  if (SettingsManager::instance()
+          .settings()
+          .value("windowTheme", "light")
+          .toString() == "dark") {
     page->setBackgroundColor(QColor(17, 27, 33)); // whatsapp dark bg color
   } else {
     page->setBackgroundColor(QColor(240, 240, 240)); // whatsapp light bg color
   }
-  webEngine->setPage(page);
+  m_webEngine->setPage(page);
   // page should be set parent of profile to prevent
   // Release of profile requested but WebEnginePage still not deleted. Expect
   // troubles !
   profile->setParent(page);
-  auto randomValue = QRandomGenerator::global()->generateDouble() * 300;
+  auto randomValue = QRandomGenerator::global()->generateDouble() * 300.0;
   page->setUrl(
       QUrl("https://web.whatsapp.com?v=" + QString::number(randomValue)));
 
   connect(profile, &QWebEngineProfile::downloadRequested,
-          &downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
+          &m_downloadManagerWidget, &DownloadManagerWidget::downloadRequested);
 
-  connect(page, SIGNAL(fullScreenRequested(QWebEngineFullScreenRequest)), this,
-          SLOT(fullScreenRequested(QWebEngineFullScreenRequest)));
+  connect(page, &QWebEnginePage::fullScreenRequested, this,
+          &MainWindow::fullScreenRequested);
 
-  double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
-  webEngine->page()->setZoomFactor(currentFactor);
+  double currentFactor = SettingsManager::instance()
+                             .settings()
+                             .value("zoomFactor", 1.0)
+                             .toDouble();
+  m_webEngine->page()->setZoomFactor(currentFactor);
 }
 
 void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
-  auto *op = webEngine->findChild<NotificationPopup *>("engineNotifier");
+  auto *op = m_webEngine->findChild<NotificationPopup *>("engineNotifier");
   if (op != nullptr) {
     op->close();
     op->deleteLater();
   }
 
-  auto popup = new NotificationPopup(webEngine);
+  auto popup = new NotificationPopup(m_webEngine);
   popup->setObjectName("engineNotifier");
   connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
     if (windowState().testFlag(Qt::WindowMinimized) ||
@@ -894,25 +924,36 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
   profile->setNotificationPresenter(
       [=](std::unique_ptr<QWebEngineNotification> notification) {
-        if (settings.value("disableNotificationPopups", false).toBool() ==
-            true) {
+        if (SettingsManager::instance()
+                .settings()
+                .value("disableNotificationPopups", false)
+                .toBool() == true) {
           return;
         }
-        if (settings.value("notificationCombo", 1).toInt() == 0 &&
-            trayIcon != nullptr) {
+        if (SettingsManager::instance()
+                    .settings()
+                    .value("notificationCombo", 1)
+                    .toInt() == 0 &&
+            m_systemTrayIcon != nullptr) {
           QIcon icon(QPixmap::fromImage(notification->icon()));
-          trayIcon->showMessage(
-              notification->title(), notification->message(), icon,
-              settings.value("notificationTimeOut", 9000).toInt());
-          trayIcon->disconnect(trayIcon, SIGNAL(messageClicked()));
-          connect(trayIcon, &QSystemTrayIcon::messageClicked, trayIcon, [=]() {
-            if (windowState().testFlag(Qt::WindowMinimized) ||
-                !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
-              this->show();
-              setWindowState((windowState() & ~Qt::WindowMinimized) |
-                             Qt::WindowActive);
-            }
-          });
+          m_systemTrayIcon->showMessage(notification->title(),
+                                        notification->message(), icon,
+                                        SettingsManager::instance()
+                                            .settings()
+                                            .value("notificationTimeOut", 9000)
+                                            .toInt());
+          m_systemTrayIcon->disconnect(m_systemTrayIcon,
+                                       SIGNAL(messageClicked()));
+          connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked,
+                  m_systemTrayIcon, [=]() {
+                    if (windowState().testFlag(Qt::WindowMinimized) ||
+                        !windowState().testFlag(Qt::WindowActive) ||
+                        this->isHidden()) {
+                      this->show();
+                      setWindowState((windowState() & ~Qt::WindowMinimized) |
+                                     Qt::WindowActive);
+                    }
+                  });
 
         } else {
           popup->setMinimumWidth(300);
@@ -924,39 +965,39 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
 void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
   if (request.toggleOn()) {
-    webEngine->showFullScreen();
+    m_webEngine->showFullScreen();
     this->showFullScreen();
     request.accept();
   } else {
-    webEngine->showNormal();
+    m_webEngine->showNormal();
     this->show();
     request.accept();
   }
 }
 
-void MainWindow::handleWebViewTitleChanged(QString title) {
+void MainWindow::handleWebViewTitleChanged(const QString &title) {
   setWindowTitle(QApplication::applicationName() + ": " + title);
 
-  if (notificationsTitleRegExp.exactMatch(title)) {
-    if (notificationsTitleRegExp.capturedTexts().isEmpty() == false) {
-      QString capturedTitle =
-          notificationsTitleRegExp.capturedTexts().constFirst();
-      unreadMessageCountRegExp.setMinimal(true);
-      if (unreadMessageCountRegExp.indexIn(capturedTitle) != -1) {
-        QString unreadMessageCountStr =
-            unreadMessageCountRegExp.capturedTexts().constLast();
-        int unreadMessageCount = unreadMessageCountStr.toInt();
+  QRegularExpressionMatch match = m_notificationsTitleRegExp.match(title);
+  if (match.hasMatch()) {
+    QString capturedTitle = match.captured(0);
+    m_unreadMessageCountRegExp.setPatternOptions(
+        QRegularExpression::DontCaptureOption);
+    QRegularExpressionMatch countMatch =
+        m_unreadMessageCountRegExp.match(capturedTitle);
+    if (countMatch.hasMatch()) {
+      QString unreadMessageCountStr = countMatch.captured(0);
+      int unreadMessageCount = unreadMessageCountStr.toInt();
 
-        restoreAction->setText(
-            tr("Restore") + " | " + unreadMessageCountStr + " " +
-            (unreadMessageCount > 1 ? tr("messages") : tr("message")));
-        trayIcon->setIcon(getTrayIcon(unreadMessageCount));
-        setWindowIcon(getTrayIcon(unreadMessageCount));
-      }
+      m_restoreAction->setText(
+          tr("Restore") + " | " + unreadMessageCountStr + " " +
+          (unreadMessageCount > 1 ? tr("messages") : tr("message")));
+      m_systemTrayIcon->setIcon(getTrayIcon(unreadMessageCount));
+      setWindowIcon(getTrayIcon(unreadMessageCount));
     }
   } else {
-    trayIcon->setIcon(trayIconNormal);
-    setWindowIcon(trayIconNormal);
+    m_systemTrayIcon->setIcon(m_trayIconNormal);
+    setWindowIcon(m_trayIconNormal);
   }
 }
 
@@ -966,35 +1007,38 @@ void MainWindow::handleLoadFinished(bool loaded) {
     checkLoadedCorrectly();
     updatePageTheme();
     handleZoom();
-
-    if (settingsWidget != nullptr) {
-      settingsWidget->refresh();
+    if (m_settingsWidget != nullptr) {
+      m_settingsWidget->refresh();
     }
   }
 }
 
 void MainWindow::checkLoadedCorrectly() {
-  if (webEngine && webEngine->page()) {
+  if (m_webEngine && m_webEngine->page()) {
     // test 1 based on the class name of body tag of the page
-    webEngine->page()->runJavaScript(
+    m_webEngine->page()->runJavaScript(
         "document.querySelector('body').className",
         [this](const QVariant &result) {
           if (result.toString().contains("page-version", Qt::CaseInsensitive)) {
             qDebug() << "Test 1 found" << result.toString();
-            webEngine->page()->runJavaScript(
+            m_webEngine->page()->runJavaScript(
                 "document.getElementsByTagName('body')[0].innerText = ''");
             loadingQuirk("test1");
-          } else if (webEngine->title().contains("Error",
-                                                 Qt::CaseInsensitive)) {
-            utils::delete_cache(webEngine->page()->profile()->cachePath());
-            utils::delete_cache(
-                webEngine->page()->profile()->persistentStoragePath());
-            settings.setValue("useragent", defaultUserAgentStr);
-            utils::DisplayExceptionErrorDialog(
+          } else if (m_webEngine->title().contains("Error",
+                                                   Qt::CaseInsensitive)) {
+            Utils::delete_cache(m_webEngine->page()->profile()->cachePath());
+            Utils::delete_cache(
+                m_webEngine->page()->profile()->persistentStoragePath());
+            SettingsManager::instance().settings().setValue(
+                "useragent", defaultUserAgentStr);
+            Utils::DisplayExceptionErrorDialog(
                 "test1 handleWebViewTitleChanged(title) title: Error, "
                 "Resetting UA, Quiting!\nUA: " +
-                settings.value("useragent", "DefaultUA").toString());
-            quitAction->trigger();
+                SettingsManager::instance()
+                    .settings()
+                    .value("useragent", "DefaultUA")
+                    .toString());
+            m_quitAction->trigger();
           } else {
             qDebug() << "Test 1 loaded correctly, value:" << result.toString();
           }
@@ -1002,24 +1046,29 @@ void MainWindow::checkLoadedCorrectly() {
   }
 }
 
-void MainWindow::loadingQuirk(QString test) {
+void MainWindow::loadingQuirk(const QString &test) {
   // contains ug message apply quirk
-  if (correctlyLoaderRetries > -1) {
+  if (m_correctlyLoadedRetries > -1) {
     qWarning() << test << "checkLoadedCorrectly()/loadingQuirk()/doReload()"
-               << correctlyLoaderRetries;
+               << m_correctlyLoadedRetries;
     doReload(false, false, true);
-    correctlyLoaderRetries--;
+    m_correctlyLoadedRetries--;
   } else {
-    utils::delete_cache(webEngine->page()->profile()->cachePath());
-    utils::delete_cache(webEngine->page()->profile()->persistentStoragePath());
-    settings.setValue("useragent", defaultUserAgentStr);
-    utils::DisplayExceptionErrorDialog(
+    Utils::delete_cache(m_webEngine->page()->profile()->cachePath());
+    Utils::delete_cache(
+        m_webEngine->page()->profile()->persistentStoragePath());
+    SettingsManager::instance().settings().setValue("useragent",
+                                                    defaultUserAgentStr);
+    Utils::DisplayExceptionErrorDialog(
         test +
         " checkLoadedCorrectly()/loadingQuirk() reload retries 0, Resetting "
         "UA, Quiting!\nUA: " +
-        settings.value("useragent", "DefaultUA").toString());
+        SettingsManager::instance()
+            .settings()
+            .value("useragent", "DefaultUA")
+            .toString());
 
-    quitAction->trigger();
+    m_quitAction->trigger();
   }
 }
 
@@ -1027,8 +1076,10 @@ void MainWindow::loadingQuirk(QString test) {
 // manager
 void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
   QFileDialog dialog(this);
-  bool usenativeFileDialog =
-      settings.value("useNativeFileDialog", false).toBool();
+  bool usenativeFileDialog = SettingsManager::instance()
+                                 .settings()
+                                 .value("useNativeFileDialog", false)
+                                 .toBool();
 
   if (usenativeFileDialog == false) {
     dialog.setOption(QFileDialog::DontUseNativeDialog, true);
@@ -1046,7 +1097,10 @@ void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
-  if (settings.value("minimizeOnTrayIconClick", false).toBool() == false ||
+  if (SettingsManager::instance()
+              .settings()
+              .value("minimizeOnTrayIconClick", false)
+              .toBool() == false ||
       reason == QSystemTrayIcon::Context)
     return;
   if (isVisible()) {
@@ -1066,8 +1120,8 @@ void MainWindow::messageClicked() {
 
 void MainWindow::doAppReload() {
 
-  if (webEngine->page()) {
-    webEngine->page()->disconnect();
+  if (m_webEngine->page()) {
+    m_webEngine->page()->disconnect();
   }
   createWebPage(false);
 }
@@ -1083,13 +1137,13 @@ void MainWindow::newChat() {
   }
 }
 
-void MainWindow::triggerNewChat(QString phone, QString text) {
+void MainWindow::triggerNewChat(const QString &phone, const QString &text) {
   static QString phoneStr, textStr;
-  webEngine->page()->runJavaScript(
+  m_webEngine->page()->runJavaScript(
       "openNewChatWhatsieDefined()",
       [this, phone, text](const QVariant &result) {
         if (result.toString().contains("true")) {
-          webEngine->page()->runJavaScript(
+          m_webEngine->page()->runJavaScript(
               QString("openNewChatWhatsie(\"%1\",\"%2\")").arg(phone, text));
         } else {
           // create send url equivalent
@@ -1097,7 +1151,7 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
           textStr = text.isEmpty() ? "" : "text=" + text;
           QString urlStr =
               "https://web.whatsapp.com/send?" + phoneStr + "&" + textStr;
-          webEngine->page()->load(QUrl(urlStr));
+          m_webEngine->page()->load(QUrl(urlStr));
         }
         this->alreadyRunning();
       });
@@ -1106,10 +1160,10 @@ void MainWindow::triggerNewChat(QString phone, QString text) {
 void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                           bool byLoadingQuirk) {
   if (byLoadingQuirk) {
-    webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                 byPassCache);
+    m_webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+                                   byPassCache);
   } else {
-    if (lockWidget && !lockWidget->getIsLocked()) {
+    if (m_lockWidget && !m_lockWidget->getIsLocked()) {
       this->notify(QApplication::applicationName(),
                    QObject::tr("Reloading..."));
     } else {
@@ -1123,40 +1177,41 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
       this->show();
       return;
     }
-    webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
-                                 byPassCache);
+    m_webEngine->triggerPageAction(QWebEnginePage::ReloadAndBypassCache,
+                                   byPassCache);
   }
 }
 
 void MainWindow::toggleMute(const bool &checked) {
-  webEngine->page()->setAudioMuted(checked);
+  m_webEngine->page()->setAudioMuted(checked);
 }
 
 // get value of page theme when page is loaded
-QString MainWindow::getPageTheme() {
+QString MainWindow::getPageTheme() const {
   static QString theme = "web"; // implies light
-  if (webEngine && webEngine->page()) {
-    webEngine->page()->runJavaScript(
+  if (m_webEngine && m_webEngine->page()) {
+    m_webEngine->page()->runJavaScript(
         "document.querySelector('body').className;",
-        [this](const QVariant &result) {
+        [=](const QVariant &result) {
           theme = result.toString();
           theme.contains("dark") ? theme = "dark" : theme = "light";
-          settings.setValue("windowTheme", theme);
+          SettingsManager::instance().settings().setValue("windowTheme", theme);
         });
   }
   return theme;
 }
 
 void MainWindow::tryLock() {
-  if (settings.value("asdfg").isValid()) {
+  if (SettingsManager::instance().settings().value("asdfg").isValid()) {
     initLock();
     return;
   }
-  if (settings.value("asdfg").isValid() == false) {
-    settings.setValue("lockscreen", false);
-    settings.setValue("appAutoLocking", false);
-    settingsWidget->appAutoLockingSetChecked(false);
-    settingsWidget->appLockSetChecked(false);
+  if (SettingsManager::instance().settings().value("asdfg").isValid() ==
+      false) {
+    SettingsManager::instance().settings().setValue("lockscreen", false);
+    SettingsManager::instance().settings().setValue("appAutoLocking", false);
+    m_settingsWidget->appAutoLockingSetChecked(false);
+    m_settingsWidget->appLockSetChecked(false);
     initLock();
   }
 }

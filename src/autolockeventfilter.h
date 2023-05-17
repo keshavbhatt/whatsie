@@ -19,7 +19,7 @@ public:
 
   ~AutoLockEventFilter() {
     autoLockTimer->stop();
-    autoLockTimer->deleteLater();
+    delete autoLockTimer;
   }
 
 signals:
@@ -39,18 +39,13 @@ public slots:
 
 protected:
   bool eventFilter(QObject *obj, QEvent *ev) {
-    if (ev->type() == QEvent::KeyPress
-            || ev->type() == QEvent::MouseMove
-            || ev->type() == QEvent::Wheel
-            || ev->type() == QEvent::TouchUpdate
-            || ev->type() == QEvent::MouseButtonRelease
-            || ev->type() == QEvent::MouseButtonPress
-            || ev->type() == QEvent::MouseButtonDblClick
-            || ev->type() == QEvent::Gesture
-            || ev->type() == QEvent::FocusIn
-            || ev->type() == QEvent::FocusOut
-            || ev->type() == QEvent::Enter
-            ) {
+    if (ev->type() == QEvent::KeyPress || ev->type() == QEvent::MouseMove ||
+        ev->type() == QEvent::Wheel || ev->type() == QEvent::TouchUpdate ||
+        ev->type() == QEvent::MouseButtonRelease ||
+        ev->type() == QEvent::MouseButtonPress ||
+        ev->type() == QEvent::MouseButtonDblClick ||
+        ev->type() == QEvent::Gesture || ev->type() == QEvent::FocusIn ||
+        ev->type() == QEvent::FocusOut || ev->type() == QEvent::Enter) {
       resetTimer();
     }
     return QObject::eventFilter(obj, ev);

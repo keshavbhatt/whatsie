@@ -19,7 +19,7 @@ QString Dictionaries::GetDictionaryPath() {
 
   // the environment variable takes precedence on all platforms
   if (qEnvironmentVariableIsSet("QTWEBENGINE_DICTIONARIES_PATH")) {
-    dict_path = utils::GetEnvironmentVar("QTWEBENGINE_DICTIONARIES_PATH");
+    dict_path = Utils::GetEnvironmentVar("QTWEBENGINE_DICTIONARIES_PATH");
     return dict_path;
   }
 

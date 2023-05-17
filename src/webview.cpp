@@ -7,8 +7,7 @@
 #include <mainwindow.h>
 
 WebView::WebView(QWidget *parent, QStringList dictionaries)
-    : QWebEngineView(parent) {
-  dictionaries = dictionaries;
+    : QWebEngineView(parent), m_dictionaries(dictionaries) {
 
   QObject *parentMainWindow = this->parent();
   while (!parentMainWindow->objectName().contains("MainWindow")) {
@@ -99,22 +98,24 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
   spellcheckAction->setCheckable(true);
   spellcheckAction->setChecked(pageWebengineProfile->isSpellCheckEnabled());
   connect(spellcheckAction, &QAction::toggled, this,
-          [pageWebengineProfile, this](bool toogled) {
+          [pageWebengineProfile](bool toogled) {
             pageWebengineProfile->setSpellCheckEnabled(toogled);
-            settings.setValue("sc_enabled", toogled);
+            SettingsManager::instance().settings().setValue("sc_enabled",
+                                                            toogled);
           });
   menu->addAction(spellcheckAction);
 
   if (pageWebengineProfile->isSpellCheckEnabled()) {
     auto subMenu = menu->addMenu(tr("Select Language"));
-    for (const QString &dict : qAsConst(dictionaries)) {
+    for (const QString &dict : qAsConst(m_dictionaries)) {
       auto action = subMenu->addAction(dict);
       action->setCheckable(true);
       action->setChecked(languages.contains(dict));
-      connect(action, &QAction::triggered, this, [pageWebengineProfile, dict, this]() {
-        pageWebengineProfile->setSpellCheckLanguages(QStringList() << dict);
-        settings.setValue("sc_dict", dict);
-      });
+      connect(
+          action, &QAction::triggered, this, [pageWebengineProfile, dict]() {
+            pageWebengineProfile->setSpellCheckLanguages(QStringList() << dict);
+            SettingsManager::instance().settings().setValue("sc_dict", dict);
+          });
     }
   }
   connect(menu, &QMenu::aboutToHide, menu, &QObject::deleteLater);

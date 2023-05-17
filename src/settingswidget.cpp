@@ -23,48 +23,91 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   this->enginePersistentStoragePath = enginePersistentStoragePath;
 
   ui->zoomFactorSpinBox->setRange(0.25, 5.0);
-  ui->zoomFactorSpinBox->setValue(settings.value("zoomFactor", 1.0).toDouble());
+  ui->zoomFactorSpinBox->setValue(SettingsManager::instance()
+                                      .settings()
+                                      .value("zoomFactor", 1.0)
+                                      .toDouble());
 
   ui->zoomFactorSpinBoxMaximized->setRange(0.25, 5.0);
   ui->zoomFactorSpinBoxMaximized->setValue(
-      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+      SettingsManager::instance()
+          .settings()
+          .value("zoomFactorMaximized", defaultZoomFactorMaximized)
           .toDouble());
 
   ui->closeButtonActionComboBox->setCurrentIndex(
-      settings.value("closeButtonActionCombo", 0).toInt());
+      SettingsManager::instance()
+          .settings()
+          .value("closeButtonActionCombo", 0)
+          .toInt());
   ui->notificationCheckBox->setChecked(
-      settings.value("disableNotificationPopups", false).toBool());
-  ui->muteAudioCheckBox->setChecked(
-      settings.value("muteAudio", false).toBool());
-  ui->autoPlayMediaCheckBox->setChecked(
-      settings.value("autoPlayMedia", false).toBool());
+      SettingsManager::instance()
+          .settings()
+          .value("disableNotificationPopups", false)
+          .toBool());
+  ui->muteAudioCheckBox->setChecked(SettingsManager::instance()
+                                        .settings()
+                                        .value("muteAudio", false)
+                                        .toBool());
+  ui->autoPlayMediaCheckBox->setChecked(SettingsManager::instance()
+                                            .settings()
+                                            .value("autoPlayMedia", false)
+                                            .toBool());
   ui->themeComboBox->setCurrentText(
-      utils::toCamelCase(settings.value("windowTheme", "light").toString()));
+      Utils::toCamelCase(SettingsManager::instance()
+                             .settings()
+                             .value("windowTheme", "light")
+                             .toString()));
 
-  ui->userAgentLineEdit->setText(
-      settings.value("useragent", defaultUserAgentStr).toString());
+  ui->userAgentLineEdit->setText(SettingsManager::instance()
+                                     .settings()
+                                     .value("useragent", defaultUserAgentStr)
+                                     .toString());
   ui->userAgentLineEdit->home(true);
   ui->userAgentLineEdit->deselect();
 
-  ui->enableSpellCheck->setChecked(settings.value("sc_enabled", true).toBool());
+  ui->enableSpellCheck->setChecked(SettingsManager::instance()
+                                       .settings()
+                                       .value("sc_enabled", true)
+                                       .toBool());
   ui->notificationTimeOutspinBox->setValue(
-      settings.value("notificationTimeOut", 9000).toInt() / 1000);
-  ui->notificationCombo->setCurrentIndex(
-      settings.value("notificationCombo", 1).toInt());
-  ui->useNativeFileDialog->setChecked(
-      settings.value("useNativeFileDialog", false).toBool());
-  ui->startMinimized->setChecked(
-      settings.value("startMinimized", false).toBool());
+      SettingsManager::instance()
+          .settings()
+          .value("notificationTimeOut", 9000)
+          .toInt() /
+      1000);
+  ui->notificationCombo->setCurrentIndex(SettingsManager::instance()
+                                             .settings()
+                                             .value("notificationCombo", 1)
+                                             .toInt());
+  ui->useNativeFileDialog->setChecked(SettingsManager::instance()
+                                          .settings()
+                                          .value("useNativeFileDialog", false)
+                                          .toBool());
+  ui->startMinimized->setChecked(SettingsManager::instance()
+                                     .settings()
+                                     .value("startMinimized", false)
+                                     .toBool());
 
   this->appAutoLockingSetChecked(
-      settings.value("appAutoLocking", defaultAppAutoLock).toBool());
+      SettingsManager::instance()
+          .settings()
+          .value("appAutoLocking", defaultAppAutoLock)
+          .toBool());
 
   ui->autoLockDurationSpinbox->setValue(
-      settings.value("autoLockDuration", defaultAppAutoLockDuration).toInt());
+      SettingsManager::instance()
+          .settings()
+          .value("autoLockDuration", defaultAppAutoLockDuration)
+          .toInt());
   ui->minimizeOnTrayIconClick->setChecked(
-      settings.value("minimizeOnTrayIconClick", false).toBool());
+      SettingsManager::instance()
+          .settings()
+          .value("minimizeOnTrayIconClick", false)
+          .toBool());
   ui->defaultDownloadLocation->setText(
-      settings
+      SettingsManager::instance()
+          .settings()
           .value("defaultDownloadLocation",
                  QStandardPaths::writableLocation(
                      QStandardPaths::DownloadLocation) +
@@ -74,23 +117,29 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->styleComboBox->blockSignals(true);
   ui->styleComboBox->addItems(QStyleFactory::keys());
   ui->styleComboBox->blockSignals(false);
-  ui->styleComboBox->setCurrentText(
-      settings.value("widgetStyle", "Fusion").toString());
+  ui->styleComboBox->setCurrentText(SettingsManager::instance()
+                                        .settings()
+                                        .value("widgetStyle", "Fusion")
+                                        .toString());
 
   ui->fullWidthViewCheckbox->blockSignals(true);
-  ui->fullWidthViewCheckbox->setChecked(
-      settings.value("fullWidthView", true).toBool());
+  ui->fullWidthViewCheckbox->setChecked(SettingsManager::instance()
+                                            .settings()
+                                            .value("fullWidthView", true)
+                                            .toBool());
   ui->fullWidthViewCheckbox->blockSignals(false);
 
   ui->automaticThemeCheckBox->blockSignals(true);
-  bool automaticThemeSwitching =
-      settings.value("automaticTheme", false).toBool();
+  bool automaticThemeSwitching = SettingsManager::instance()
+                                     .settings()
+                                     .value("automaticTheme", false)
+                                     .toBool();
   ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
   ui->automaticThemeCheckBox->blockSignals(false);
 
   themeSwitchTimer = new QTimer(this);
   themeSwitchTimer->setInterval(60000); // 1 min
-  connect(themeSwitchTimer, &QTimer::timeout, &settings,
+  connect(themeSwitchTimer, &QTimer::timeout, this,
           [=]() { themeSwitchTimerTimeout(); });
 
   // instantly call the timeout slot if automatic theme switching enabled
@@ -100,7 +149,11 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   updateAutomaticTheme();
 
   this->setCurrentPasswordText(
-      QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
+      QByteArray::fromBase64(SettingsManager::instance()
+                                 .settings()
+                                 .value("asdfg")
+                                 .toString()
+                                 .toUtf8()));
 
   applyThemeQuirks();
 
@@ -124,8 +177,11 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->scrollArea->setMinimumWidth(
       ui->groupBox_8->sizeHint().width() + ui->scrollArea->sizeHint().width() +
       ui->scrollAreaWidgetContents->layout()->spacing());
-  if (settings.value("settingsGeo").isValid()) {
-    this->restoreGeometry(settings.value("settingsGeo").toByteArray());
+  if (SettingsManager::instance().settings().value("settingsGeo").isValid()) {
+    this->restoreGeometry(SettingsManager::instance()
+                              .settings()
+                              .value("settingsGeo")
+                              .toByteArray());
     QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
     if (!screenRect.contains(this->pos())) {
       this->move(screenRect.center() - this->rect().center());
@@ -144,7 +200,8 @@ bool SettingsWidget::eventFilter(QObject *obj, QEvent *event) {
 }
 
 void SettingsWidget::closeEvent(QCloseEvent *event) {
-  settings.setValue("settingsGeo", this->saveGeometry());
+  SettingsManager::instance().settings().setValue("settingsGeo",
+                                                  this->saveGeometry());
   QWidget::closeEvent(event);
 }
 
@@ -161,13 +218,18 @@ inline bool inRange(unsigned low, unsigned high, unsigned x) {
 }
 
 void SettingsWidget::themeSwitchTimerTimeout() {
-  if (settings.value("automaticTheme", false).toBool()) {
+  if (SettingsManager::instance()
+          .settings()
+          .value("automaticTheme", false)
+          .toBool()) {
     // start time
     QDateTime sunrise;
-    sunrise.setSecsSinceEpoch(settings.value("sunrise").toLongLong());
+    sunrise.setSecsSinceEpoch(
+        SettingsManager::instance().settings().value("sunrise").toLongLong());
     // end time
     QDateTime sunset;
-    sunset.setSecsSinceEpoch(settings.value("sunset").toLongLong());
+    sunset.setSecsSinceEpoch(
+        SettingsManager::instance().settings().value("sunset").toLongLong());
     QDateTime currentTime = QDateTime::currentDateTime();
 
     int sunsetSeconds = QTime(0, 0).secsTo(sunset.time());
@@ -185,8 +247,10 @@ void SettingsWidget::themeSwitchTimerTimeout() {
 }
 
 void SettingsWidget::updateAutomaticTheme() {
-  bool automaticThemeSwitching =
-      settings.value("automaticTheme", false).toBool();
+  bool automaticThemeSwitching = SettingsManager::instance()
+                                     .settings()
+                                     .value("automaticTheme", false)
+                                     .toBool();
   if (automaticThemeSwitching && !themeSwitchTimer->isActive()) {
     themeSwitchTimer->start();
   } else if (!automaticThemeSwitching) {
@@ -228,7 +292,10 @@ void SettingsWidget::loadDictionaries(QStringList dictionaries) {
   ui->dictComboBox->blockSignals(false);
 
   // load settings for spellcheck dictionary
-  QString dictionary_name = settings.value("sc_dict", "en-US").toString();
+  QString dictionary_name = SettingsManager::instance()
+                                .settings()
+                                .value("sc_dict", "en-US")
+                                .toString();
   int pos = ui->dictComboBox->findText(dictionary_name);
   if (pos == -1) {
     pos = ui->dictComboBox->findText("en-US");
@@ -241,13 +308,19 @@ void SettingsWidget::loadDictionaries(QStringList dictionaries) {
 
 void SettingsWidget::refresh() {
   ui->themeComboBox->setCurrentText(
-      utils::toCamelCase(settings.value("windowTheme", "light").toString()));
+      Utils::toCamelCase(SettingsManager::instance()
+                             .settings()
+                             .value("windowTheme", "light")
+                             .toString()));
 
-  ui->cookieSize->setText(utils::refreshCacheSize(persistentStoragePath()));
+  ui->cookieSize->setText(Utils::refreshCacheSize(persistentStoragePath()));
 
   // update dict settings at runtime
   //  load settings for spellcheck dictionary
-  QString dictionary_name = settings.value("sc_dict", "en-US").toString();
+  QString dictionary_name = SettingsManager::instance()
+                                .settings()
+                                .value("sc_dict", "en-US")
+                                .toString();
   int pos = ui->dictComboBox->findText(dictionary_name);
   if (pos == -1) {
     pos = ui->dictComboBox->findText("en-US");
@@ -258,8 +331,14 @@ void SettingsWidget::refresh() {
   ui->dictComboBox->setCurrentIndex(pos);
 
   // enable disable spell check
-  ui->enableSpellCheck->setChecked(settings.value("sc_enabled", true).toBool());
-  emit updateFullWidthView(settings.value("fullWidthView", true).toBool());
+  ui->enableSpellCheck->setChecked(SettingsManager::instance()
+                                       .settings()
+                                       .value("sc_enabled", true)
+                                       .toBool());
+  emit updateFullWidthView(SettingsManager::instance()
+                               .settings()
+                               .value("fullWidthView", true)
+                               .toBool());
 }
 
 void SettingsWidget::updateDefaultUAButton(const QString engineUA) {
@@ -301,18 +380,20 @@ void SettingsWidget::on_deletePersistentData_clicked() {
 }
 
 void SettingsWidget::clearAllData() {
-  utils::delete_cache(this->cachePath());
-  utils::delete_cache(this->persistentStoragePath());
+  Utils::delete_cache(this->cachePath());
+  Utils::delete_cache(this->persistentStoragePath());
   refresh();
 }
 
 void SettingsWidget::on_notificationCheckBox_toggled(bool checked) {
-  settings.setValue("disableNotificationPopups", checked);
+  SettingsManager::instance().settings().setValue("disableNotificationPopups",
+                                                  checked);
 }
 
 void SettingsWidget::on_themeComboBox_currentTextChanged(const QString &arg1) {
   applyThemeQuirks();
-  settings.setValue("windowTheme", QString(arg1).toLower());
+  SettingsManager::instance().settings().setValue("windowTheme",
+                                                  QString(arg1).toLower());
   emit updateWindowTheme();
   emit updatePageTheme();
 }
@@ -344,12 +425,12 @@ void SettingsWidget::applyThemeQuirks() {
 }
 
 void SettingsWidget::on_muteAudioCheckBox_toggled(bool checked) {
-  settings.setValue("muteAudio", checked);
+  SettingsManager::instance().settings().setValue("muteAudio", checked);
   emit muteToggled(checked);
 }
 
 void SettingsWidget::on_autoPlayMediaCheckBox_toggled(bool checked) {
-  settings.setValue("autoPlayMedia", checked);
+  SettingsManager::instance().settings().setValue("autoPlayMedia", checked);
   emit autoPlayMediaToggled(checked);
 }
 
@@ -362,10 +443,12 @@ void SettingsWidget::on_userAgentLineEdit_textChanged(const QString &arg1) {
   bool isDefault = QString::compare(arg1.trimmed(), defaultUserAgentStr,
                                     Qt::CaseInsensitive) == 0;
   bool isPrevious =
-      QString::compare(
-          arg1.trimmed(),
-          settings.value("useragent", defaultUserAgentStr).toString(),
-          Qt::CaseInsensitive) == 0;
+      QString::compare(arg1.trimmed(),
+                       SettingsManager::instance()
+                           .settings()
+                           .value("useragent", defaultUserAgentStr)
+                           .toString(),
+                       Qt::CaseInsensitive) == 0;
 
   if (isDefault == false && arg1.trimmed().isEmpty() == false) {
     ui->defaultUserAgentButton->setEnabled(false);
@@ -392,7 +475,8 @@ void SettingsWidget::on_setUserAgent_clicked() {
 
 void SettingsWidget::on_closeButtonActionComboBox_currentIndexChanged(
     int index) {
-  settings.setValue("closeButtonActionCombo", index);
+  SettingsManager::instance().settings().setValue("closeButtonActionCombo",
+                                                  index);
 }
 
 void SettingsWidget::autoAppLockSetChecked(bool checked) {
@@ -403,7 +487,11 @@ void SettingsWidget::autoAppLockSetChecked(bool checked) {
 
 void SettingsWidget::updateAppLockPasswordViewer() {
   this->setCurrentPasswordText(
-      QByteArray::fromBase64(settings.value("asdfg").toString().toUtf8()));
+      QByteArray::fromBase64(SettingsManager::instance()
+                                 .settings()
+                                 .value("asdfg")
+                                 .toString()
+                                 .toUtf8()));
 }
 
 void SettingsWidget::appLockSetChecked(bool checked) {
@@ -420,7 +508,10 @@ void SettingsWidget::appAutoLockingSetChecked(bool checked) {
 
 void SettingsWidget::toggleTheme() {
   // disable automatic theme first
-  if (settings.value("automaticTheme", false).toBool()) {
+  if (SettingsManager::instance()
+          .settings()
+          .value("automaticTheme", false)
+          .toBool()) {
     emit notify(tr(
         "Automatic theme switching was disabled due to manual theme toggle."));
     ui->automaticThemeCheckBox->setChecked(false);
@@ -444,14 +535,15 @@ void SettingsWidget::setCurrentPasswordText(QString str) {
 }
 
 void SettingsWidget::on_applock_checkbox_toggled(bool checked) {
-  if (settings.value("asdfg").isValid()) {
-    settings.setValue("lockscreen", checked);
-  } else if (checked && !settings.value("asdfg").isValid()) {
-    settings.setValue("lockscreen", true);
+  if (SettingsManager::instance().settings().value("asdfg").isValid()) {
+    SettingsManager::instance().settings().setValue("lockscreen", checked);
+  } else if (checked &&
+             !SettingsManager::instance().settings().value("asdfg").isValid()) {
+    SettingsManager::instance().settings().setValue("lockscreen", true);
     if (checked)
       showSetApplockPasswordDialog();
   } else {
-    settings.setValue("lockscreen", false);
+    SettingsManager::instance().settings().setValue("lockscreen", false);
     if (checked)
       showSetApplockPasswordDialog();
   }
@@ -477,12 +569,12 @@ void SettingsWidget::showSetApplockPasswordDialog() {
 }
 
 void SettingsWidget::on_dictComboBox_currentIndexChanged(const QString &arg1) {
-  settings.setValue("sc_dict", arg1);
+  SettingsManager::instance().settings().setValue("sc_dict", arg1);
   emit dictChanged(arg1);
 }
 
 void SettingsWidget::on_enableSpellCheck_toggled(bool checked) {
-  settings.setValue("sc_enabled", checked);
+  SettingsManager::instance().settings().setValue("sc_enabled", checked);
   emit spellCheckChanged(checked);
 }
 
@@ -534,12 +626,13 @@ void SettingsWidget::on_showPermissionsButton_clicked() {
 }
 
 void SettingsWidget::on_notificationTimeOutspinBox_valueChanged(int arg1) {
-  settings.setValue("notificationTimeOut", arg1 * 1000);
+  SettingsManager::instance().settings().setValue("notificationTimeOut",
+                                                  arg1 * 1000);
   emit notificationPopupTimeOutChanged();
 }
 
 void SettingsWidget::on_notificationCombo_currentIndexChanged(int index) {
-  settings.setValue("notificationCombo", index);
+  SettingsManager::instance().settings().setValue("notificationCombo", index);
 }
 
 void SettingsWidget::on_tryNotification_clicked() {
@@ -555,8 +648,10 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked) {
     automaticTheme->setAttribute(Qt::WA_DeleteOnClose, true);
     connect(automaticTheme, &AutomaticTheme::destroyed,
             ui->automaticThemeCheckBox, [=]() {
-              bool automaticThemeSwitching =
-                  settings.value("automaticTheme", false).toBool();
+              bool automaticThemeSwitching = SettingsManager::instance()
+                                                 .settings()
+                                                 .value("automaticTheme", false)
+                                                 .toBool();
               ui->automaticThemeCheckBox->setChecked(automaticThemeSwitching);
               if (automaticThemeSwitching)
                 themeSwitchTimerTimeout();
@@ -564,28 +659,30 @@ void SettingsWidget::on_automaticThemeCheckBox_toggled(bool checked) {
             });
     automaticTheme->show();
   } else {
-    settings.setValue("automaticTheme", false);
+    SettingsManager::instance().settings().setValue("automaticTheme", false);
     updateAutomaticTheme();
   }
 }
 
 void SettingsWidget::on_useNativeFileDialog_toggled(bool checked) {
-  settings.setValue("useNativeFileDialog", checked);
+  SettingsManager::instance().settings().setValue("useNativeFileDialog",
+                                                  checked);
 }
 
 void SettingsWidget::on_startMinimized_toggled(bool checked) {
-  settings.setValue("startMinimized", checked);
+  SettingsManager::instance().settings().setValue("startMinimized", checked);
 }
 
 void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
-  if (settings.value("asdfg").isValid()) {
-    settings.setValue("appAutoLocking", checked);
+  if (SettingsManager::instance().settings().value("asdfg").isValid()) {
+    SettingsManager::instance().settings().setValue("appAutoLocking", checked);
   } else {
     QMessageBox::information(this, "App Lock Setup",
                              "Please setup the App lock password first.",
                              QMessageBox::Ok);
-    if (settings.value("asdfg").isValid() == false) {
-      settings.setValue("appAutoLocking", false);
+    if (SettingsManager::instance().settings().value("asdfg").isValid() ==
+        false) {
+      SettingsManager::instance().settings().setValue("appAutoLocking", false);
       autoAppLockSetChecked(false);
     }
   }
@@ -593,7 +690,7 @@ void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
 }
 
 void SettingsWidget::on_autoLockDurationSpinbox_valueChanged(int arg1) {
-  settings.setValue("autoLockDuration", arg1);
+  SettingsManager::instance().settings().setValue("autoLockDuration", arg1);
   emit appAutoLockChanged();
 }
 
@@ -603,64 +700,78 @@ void SettingsWidget::on_resetAppAutoLockPushButton_clicked() {
 }
 
 void SettingsWidget::on_minimizeOnTrayIconClick_toggled(bool checked) {
-  settings.setValue("minimizeOnTrayIconClick", checked);
+  SettingsManager::instance().settings().setValue("minimizeOnTrayIconClick",
+                                                  checked);
 }
 
 void SettingsWidget::on_styleComboBox_currentTextChanged(const QString &arg1) {
   applyThemeQuirks();
-  settings.setValue("widgetStyle", arg1);
+  SettingsManager::instance().settings().setValue("widgetStyle", arg1);
   emit updateWindowTheme();
   emit updatePageTheme();
 }
 
 void SettingsWidget::on_zoomPlus_clicked() {
-  double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
+  double currentFactor = SettingsManager::instance()
+                             .settings()
+                             .value("zoomFactor", 1.0)
+                             .toDouble();
   double newFactor = currentFactor + 0.25;
   ui->zoomFactorSpinBox->setValue(newFactor);
-  settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
 
 void SettingsWidget::on_zoomMinus_clicked() {
-  double currentFactor = settings.value("zoomFactor", 1.0).toDouble();
+  double currentFactor = SettingsManager::instance()
+                             .settings()
+                             .value("zoomFactor", 1.0)
+                             .toDouble();
   double newFactor = currentFactor - 0.25;
   ui->zoomFactorSpinBox->setValue(newFactor);
-  settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
 
 void SettingsWidget::on_zoomReset_clicked() {
   ui->zoomFactorSpinBox->setValue(1.0);
-  settings.setValue("zoomFactor", ui->zoomFactorSpinBox->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactor", ui->zoomFactorSpinBox->value());
   emit zoomChanged();
 }
 
 void SettingsWidget::on_zoomResetMaximized_clicked() {
   ui->zoomFactorSpinBoxMaximized->setValue(defaultZoomFactorMaximized);
-  settings.setValue("zoomFactorMaximized",
-                    ui->zoomFactorSpinBoxMaximized->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactorMaximized", ui->zoomFactorSpinBoxMaximized->value());
   emit zoomMaximizedChanged();
 }
 
 void SettingsWidget::on_zoomPlusMaximized_clicked() {
   double currentFactor =
-      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+      SettingsManager::instance()
+          .settings()
+          .value("zoomFactorMaximized", defaultZoomFactorMaximized)
           .toDouble();
   double newFactor = currentFactor + 0.25;
   ui->zoomFactorSpinBoxMaximized->setValue(newFactor);
-  settings.setValue("zoomFactorMaximized",
-                    ui->zoomFactorSpinBoxMaximized->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactorMaximized", ui->zoomFactorSpinBoxMaximized->value());
   emit zoomMaximizedChanged();
 }
 
 void SettingsWidget::on_zoomMinusMaximized_clicked() {
   double currentFactor =
-      settings.value("zoomFactorMaximized", defaultZoomFactorMaximized)
+      SettingsManager::instance()
+          .settings()
+          .value("zoomFactorMaximized", defaultZoomFactorMaximized)
           .toDouble();
   double newFactor = currentFactor - 0.25;
   ui->zoomFactorSpinBoxMaximized->setValue(newFactor);
-  settings.setValue("zoomFactorMaximized",
-                    ui->zoomFactorSpinBoxMaximized->value());
+  SettingsManager::instance().settings().setValue(
+      "zoomFactorMaximized", ui->zoomFactorSpinBoxMaximized->value());
   emit zoomMaximizedChanged();
 }
 
@@ -670,12 +781,15 @@ void SettingsWidget::on_changeDefaultDownloadLocationPb_clicked() {
   dialog.setOption(QFileDialog::ShowDirsOnly);
 
   QString path;
-  bool usenativeFileDialog =
-      settings.value("useNativeFileDialog", false).toBool();
+  bool usenativeFileDialog = SettingsManager::instance()
+                                 .settings()
+                                 .value("useNativeFileDialog", false)
+                                 .toBool();
   if (usenativeFileDialog == false) {
     path = QFileDialog::getExistingDirectory(
         this, tr("Select download directory"),
-        settings
+        SettingsManager::instance()
+            .settings()
             .value("defaultDownloadLocation",
                    QStandardPaths::writableLocation(
                        QStandardPaths::DownloadLocation) +
@@ -685,7 +799,8 @@ void SettingsWidget::on_changeDefaultDownloadLocationPb_clicked() {
   } else {
     path = QFileDialog::getSaveFileName(
         this, tr("Select download directory"),
-        settings
+        SettingsManager::instance()
+            .settings()
             .value("defaultDownloadLocation",
                    QStandardPaths::writableLocation(
                        QStandardPaths::DownloadLocation) +
@@ -695,7 +810,8 @@ void SettingsWidget::on_changeDefaultDownloadLocationPb_clicked() {
 
   if (!path.isNull() && !path.isEmpty()) {
     ui->defaultDownloadLocation->setText(path);
-    settings.setValue("defaultDownloadLocation", path);
+    SettingsManager::instance().settings().setValue("defaultDownloadLocation",
+                                                    path);
   }
 }
 
@@ -720,7 +836,7 @@ void SettingsWidget::on_viewPassword_clicked() {
 }
 
 void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
-  if (settings.value("asdfg").isValid()) {
+  if (SettingsManager::instance().settings().value("asdfg").isValid()) {
     QMessageBox msgBox;
     msgBox.setText("You are about to change your current app lock password!"
                    "\n\nThis will LogOut your current session."
@@ -741,20 +857,19 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     msgBox.exec();
 
   } else {
-    settings.setValue("lockscreen", true);
+    SettingsManager::instance().settings().setValue("lockscreen", true);
     showSetApplockPasswordDialog();
   }
 }
 
 void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked) {
-  settings.setValue("fullWidthView", checked);
+  SettingsManager::instance().settings().setValue("fullWidthView", checked);
   emit updateFullWidthView(checked);
 }
 
-void SettingsWidget::keyPressEvent(QKeyEvent *e)
-{
-   if (e->key() == Qt::Key_Escape)
-      this->close();
+void SettingsWidget::keyPressEvent(QKeyEvent *e) {
+  if (e->key() == Qt::Key_Escape)
+    this->close();
 
-   QWidget::keyPressEvent(e);
+  QWidget::keyPressEvent(e);
 }

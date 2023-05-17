@@ -1,10 +1,13 @@
 #ifndef PERMISSIONDIALOG_H
 #define PERMISSIONDIALOG_H
 
-#include <QSettings>
+#include <QCheckBox>
+#include <QKeyEvent>
+#include <QMetaEnum>
 #include <QWebEnginePage>
 #include <QWidget>
-#include <QKeyEvent>
+
+#include "settingsmanager.h"
 
 namespace Ui {
 class PermissionDialog;
@@ -22,13 +25,13 @@ signals:
 
 protected slots:
   void keyPressEvent(QKeyEvent *e);
+
 private slots:
   void addToFeaturesTable(QWebEnginePage::Feature feature,
                           QString &featureName);
 
 private:
   Ui::PermissionDialog *ui;
-  QSettings settings;
 };
 
 #endif // PERMISSIONDIALOG_H

@@ -1,9 +1,10 @@
 #ifndef WEBVIEW_H
 #define WEBVIEW_H
 
-#include <QSettings>
-#include <QWebEngineView>
 #include <QKeyEvent>
+#include <QWebEngineView>
+
+#include "settingsmanager.h"
 
 class WebView : public QWebEngineView {
   Q_OBJECT
@@ -13,13 +14,10 @@ public:
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
-
-protected slots:
-  void wheelEvent(QWheelEvent *event);
+  void wheelEvent(QWheelEvent *event) override;
 
 private:
-  QStringList dictionaries;
-  QSettings settings;
+  QStringList m_dictionaries;
 };
 
 #endif // WEBVIEW_H

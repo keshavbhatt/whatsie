@@ -1,9 +1,9 @@
 #ifndef NOTIFICATIONPOPUP_H
 #define NOTIFICATIONPOPUP_H
 
-#pragma once
-
+#include "settingsmanager.h"
 #include "widgets/scrolltext/scrolltext.h"
+
 #include <QApplication>
 #include <QDebug>
 #include <QDesktopWidget>
@@ -13,7 +13,6 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QScreen>
-#include <QSettings>
 #include <QSpacerItem>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -27,7 +26,6 @@ class NotificationPopup : public QWidget {
   QLabel m_icon, m_title;
   ScrollText m_message;
   std::unique_ptr<QWebEngineNotification> notification;
-  QSettings settings;
 
 public:
   NotificationPopup(QWidget *parent) : QWidget(parent) {
@@ -62,7 +60,10 @@ public:
         image.scaledToHeight(m_icon.height(), Qt::SmoothTransformation));
     this->adjustSize();
 
-    QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
+    QTimer::singleShot(SettingsManager::instance()
+                           .settings()
+                           .value("notificationTimeOut", 9000)
+                           .toInt(),
                        this, [=]() { onClosed(); });
 
     animateIn(screenNumber);
@@ -87,7 +88,10 @@ public:
 
     connect(notification.get(), &QWebEngineNotification::closed, this,
             &NotificationPopup::onClosed);
-    QTimer::singleShot(settings.value("notificationTimeOut", 9000).toInt(),
+    QTimer::singleShot(SettingsManager::instance()
+                           .settings()
+                           .value("notificationTimeOut", 9000)
+                           .toInt(),
                        notification.get(), [&]() { onClosed(); });
 
     animateIn(screenNumber);

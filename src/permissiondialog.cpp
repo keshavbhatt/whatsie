@@ -1,9 +1,6 @@
 #include "permissiondialog.h"
 #include "ui_permissiondialog.h"
 
-#include <QCheckBox>
-#include <QMetaEnum>
-#include <QWebEnginePage>
 
 PermissionDialog::PermissionDialog(QWidget *parent)
     : QWidget(parent), ui(new Ui::PermissionDialog) {
@@ -41,7 +38,7 @@ void PermissionDialog::addToFeaturesTable(QWebEnginePage::Feature feature,
 
     // insertRow
     ui->featuresTableWidget->insertRow(nextRow);
-    settings.beginGroup("permissions");
+    SettingsManager::instance().settings().beginGroup("permissions");
     // add column
     for (int i = 0; i < columnData.count(); i++) {
 
@@ -50,10 +47,10 @@ void PermissionDialog::addToFeaturesTable(QWebEnginePage::Feature feature,
         featureCheckBox->setStyleSheet(
             "border:0px;margin-left:50%; margin-right:50%;");
         featureCheckBox->setChecked(
-            settings.value(featureName, false).toBool());
+            SettingsManager::instance().settings().value(featureName, false).toBool());
         connect(featureCheckBox, &QCheckBox::toggled, [=](bool checked) {
           // save permission
-          settings.setValue("permissions/" + featureName, checked);
+          SettingsManager::instance().settings().setValue("permissions/" + featureName, checked);
           emit webPageFeatureChanged(feature);
         });
         ui->featuresTableWidget->setCellWidget(nextRow, i, featureCheckBox);
@@ -65,7 +62,7 @@ void PermissionDialog::addToFeaturesTable(QWebEnginePage::Feature feature,
       }
       this->update();
     }
-    settings.endGroup();
+    SettingsManager::instance().settings().endGroup();
   }
 }
 

@@ -1,10 +1,5 @@
 #include "lock.h"
-#include "moreapps.h"
 #include "ui_lock.h"
-#include <QDebug>
-#include <QGraphicsOpacityEffect>
-#include <QKeyEvent>
-#include <QPropertyAnimation>
 
 #include "X11/XKBlib.h" // keep this header at bottom
 
@@ -25,25 +20,28 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   passcodeLoginAction = ui->passcodeLogin->addAction(
       QIcon(":/icons/green_arrow-right-line.png"), QLineEdit::TrailingPosition);
   passcodeLoginAction->setEnabled(false);
-  connect(passcodeLoginAction, &QAction::triggered, passcodeLoginAction,
-          [this]() {
-            QString password =
-                QByteArray::fromBase64(settings.value("asdfg").toByteArray());
-            if (ui->passcodeLogin->text() == password && check_password_set()) {
-              isLocked = false;
-              this->animateOut();
-              emit unLocked();
-            } else {
-              ui->wrong->show();
-            }
-          });
+  connect(
+      passcodeLoginAction, &QAction::triggered, passcodeLoginAction, [this]() {
+        QString password = QByteArray::fromBase64(SettingsManager::instance()
+                                                      .settings()
+                                                      .value("asdfg")
+                                                      .toByteArray());
+        if (ui->passcodeLogin->text() == password && check_password_set()) {
+          isLocked = false;
+          this->animateOut();
+          emit unLocked();
+        } else {
+          ui->wrong->show();
+        }
+      });
 
   QGraphicsOpacityEffect *eff = new QGraphicsOpacityEffect(this);
   ui->centerWidget->setGraphicsEffect(eff);
 
   animateIn();
 
-  if (settings.value("asdfg").isValid() == false) {
+  if (SettingsManager::instance().settings().value("asdfg").isValid() ==
+      false) {
     signUp();
   } else {
     lock_app();
@@ -143,7 +141,10 @@ void Lock::applyThemeQuirks() {
                    "border-bottom-left-radius: 4px;";
   QString lightBg = "background-color: rgb(37, 211, 102);";
   QString darkBg = "background-color: rgb(0, 117, 96);";
-  if (QString::compare(settings.value("windowTheme", "light").toString(),
+  if (QString::compare(SettingsManager::instance()
+                           .settings()
+                           .value("windowTheme", "light")
+                           .toString(),
                        "dark", Qt::CaseInsensitive) == 0) { // light
     ui->bottomLine->setStyleSheet(darkBg + border);
     ui->bottomLine_2->setStyleSheet(darkBg + border);
@@ -194,8 +195,9 @@ void Lock::on_setPass_clicked() {
   pass1 = ui->passcode1->text().trimmed();
   pass2 = ui->passcode2->text().trimmed();
   if (pass1 == pass2) {
-    settings.setValue("asdfg", QByteArray(pass1.toUtf8()).toBase64());
-    settings.setValue("lockscreen", true);
+    SettingsManager::instance().settings().setValue(
+        "asdfg", QByteArray(pass1.toUtf8()).toBase64());
+    SettingsManager::instance().settings().setValue("lockscreen", true);
     ui->passcode1->clear();
     ui->passcode2->clear();
     emit passwordSet();
@@ -207,7 +209,9 @@ void Lock::on_setPass_clicked() {
   }
 }
 
-bool Lock::check_password_set() { return settings.value("asdfg").isValid(); }
+bool Lock::check_password_set() {
+  return SettingsManager::instance().settings().value("asdfg").isValid();
+}
 
 void Lock::on_passcodeLogin_textChanged(const QString &arg1) {
   if (arg1.contains(" ")) {
@@ -231,12 +235,13 @@ void Lock::lock_app() {
 void Lock::on_passcodeLogin_returnPressed() { passcodeLoginAction->trigger(); }
 
 bool Lock::getCapsLockOn() {
-  Display *d = XOpenDisplay((char *)0);
+  Display *d = XOpenDisplay(nullptr);
   bool caps_state = false;
   if (d) {
     unsigned n;
     XkbGetIndicatorState(d, XkbUseCoreKbd, &n);
     caps_state = (n & 0x01) == 1;
+    XCloseDisplay(d);
   }
   return caps_state;
 }

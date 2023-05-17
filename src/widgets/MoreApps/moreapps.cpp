@@ -11,6 +11,7 @@
 #include <algorithm>
 #include <cstdlib>
 #include <ctime>
+#include <random>
 
 MoreApps::MoreApps(QWidget *parent, QNetworkAccessManager *nam,
                    const QString &publisherName, const QUrl &remoteFilterUrl,
@@ -217,7 +218,7 @@ void MoreApps::setRemoteIcon(const QUrl &iconUrl, QLabel *lb) {
         auto replyBytes = reply->readAll();
         QPixmap pixmap;
         pixmap.loadFromData(replyBytes);
-        //qDebug() << "after load" << lb->size();
+        // qDebug() << "after load" << lb->size();
         lb->setPixmap(pixmap.scaled(lb->size(), Qt::KeepAspectRatio,
                                     Qt::SmoothTransformation));
       }
@@ -239,11 +240,10 @@ void MoreApps::showApps() {
 
   qDebug() << "showing apps...";
 
-  std::srand(unsigned(std::time(0)));
-  // rand generator
-  auto rand = [](auto i) { return std::rand() % i; };
-  // shuffle appList before adding
-  std::random_shuffle(mAppList.begin(), mAppList.end(), rand);
+  std::random_device rd;
+  std::mt19937 rng(rd());
+
+  std::shuffle(mAppList.begin(), mAppList.end(), rng);
 
   auto fallbackIconUrl =
       QUrl("https://dashboard.snapcraft.io/site_media/appmedia/"
@@ -254,7 +254,7 @@ void MoreApps::showApps() {
     setRemoteIcon(fallbackIconUrl, nullptr);
     foreach (auto a, mAppList) {
       auto iconUrl = a.getIconUrl();
-      //qDebug() << "pre-caching icon for" << a.getName();
+      // qDebug() << "pre-caching icon for" << a.getName();
       setRemoteIcon(iconUrl, nullptr);
     }
   }

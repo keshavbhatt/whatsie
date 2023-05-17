@@ -1,11 +1,11 @@
 #ifndef SETTINGSWIDGET_H
 #define SETTINGSWIDGET_H
 
-#include "permissiondialog.h"
-#include "utils.h"
-
-#include <QSettings>
 #include <QWidget>
+
+#include "permissiondialog.h"
+#include "settingsmanager.h"
+#include "utils.h"
 
 namespace Ui {
 class SettingsWidget;
@@ -102,7 +102,6 @@ private slots:
 private:
   Ui::SettingsWidget *ui;
   QString engineCachePath, enginePersistentStoragePath;
-  QSettings settings;
   QTimer *themeSwitchTimer;
 };
 

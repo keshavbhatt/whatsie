@@ -1,22 +1,22 @@
 #ifndef WEBENGINEPAGE_H
 #define WEBENGINEPAGE_H
 
-#include <QFileDialog>
-#include <QWebEngineFullScreenRequest>
-#include <QWebEngineNotification>
-#include <QWebEngineProfile>
-
 #include <QAuthenticator>
 #include <QDesktopServices>
+#include <QFileDialog>
+#include <QIcon>
 #include <QImageReader>
 #include <QMessageBox>
+#include <QStyle>
 #include <QWebEngineCertificateError>
-#include <QWebEnginePage>
-
 #include <QWebEngineFullScreenRequest>
+#include <QWebEngineNotification>
+#include <QWebEnginePage>
+#include <QWebEngineProfile>
 #include <QWebEngineRegisterProtocolHandlerRequest>
+#include <QWebEngineSettings>
 
-#include <QSettings>
+#include "settingsmanager.h"
 
 #include "ui_certificateerrordialog.h"
 #include "ui_passworddialog.h"
@@ -26,9 +26,6 @@ class WebEnginePage : public QWebEnginePage {
 public:
   WebEnginePage(QWebEngineProfile *profile, QObject *parent = nullptr);
 
-private:
-  QSettings settings;
-
 protected:
   bool acceptNavigationRequest(const QUrl &url,
                                QWebEnginePage::NavigationType type,
@@ -36,7 +33,7 @@ protected:
   QWebEnginePage *createWindow(QWebEnginePage::WebWindowType type) override;
   bool certificateError(const QWebEngineCertificateError &error) override;
   QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles,
-                          const QStringList &acceptedMimeTypes);
+                          const QStringList &acceptedMimeTypes) override;
 
 public slots:
   void handleFeaturePermissionRequested(const QUrl &securityOrigin,
@@ -47,7 +44,7 @@ protected slots:
   void
   javaScriptConsoleMessage(WebEnginePage::JavaScriptConsoleMessageLevel level,
                            const QString &message, int lineId,
-                           const QString &sourceId);
+                           const QString &sourceId) override;
 private slots:
   void handleAuthenticationRequired(const QUrl &requestUrl,
                                     QAuthenticator *auth);
