@@ -978,25 +978,33 @@ void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
 void MainWindow::handleWebViewTitleChanged(const QString &title) {
   setWindowTitle(QApplication::applicationName() + ": " + title);
 
-  QRegularExpressionMatch match = m_notificationsTitleRegExp.match(title);
-  if (match.hasMatch()) {
-    QString capturedTitle = match.captured(0);
-    m_unreadMessageCountRegExp.setPatternOptions(
-        QRegularExpression::DontCaptureOption);
-    QRegularExpressionMatch countMatch =
+  QRegularExpressionMatch notificationsTitleMatch =
+      m_notificationsTitleRegExp.match(title);
+
+  if (notificationsTitleMatch.hasMatch()) {
+
+    QString capturedTitle = notificationsTitleMatch.captured(0);
+
+    QRegularExpressionMatch unreadMessageCountMatch =
         m_unreadMessageCountRegExp.match(capturedTitle);
-    if (countMatch.hasMatch()) {
-      QString unreadMessageCountStr = countMatch.captured(0);
+
+    if (unreadMessageCountMatch.hasMatch()) {
+
+      QString unreadMessageCountStr = unreadMessageCountMatch.captured(1);
+
       int unreadMessageCount = unreadMessageCountStr.toInt();
 
       m_restoreAction->setText(
           tr("Restore") + " | " + unreadMessageCountStr + " " +
           (unreadMessageCount > 1 ? tr("messages") : tr("message")));
+
       m_systemTrayIcon->setIcon(getTrayIcon(unreadMessageCount));
+
       setWindowIcon(getTrayIcon(unreadMessageCount));
     }
   } else {
     m_systemTrayIcon->setIcon(m_trayIconNormal);
+
     setWindowIcon(m_trayIconNormal);
   }
 }
