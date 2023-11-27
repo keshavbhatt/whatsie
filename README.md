@@ -55,7 +55,6 @@ Options:
                        of WhatSie
   -r, --reload-app     Reload the app in a running instance of WhatSie
   -n, --new-chat       Open new chat prompt in a running instance of WhatSie
-
 ```
 
 ## Build instructions (Linux)
