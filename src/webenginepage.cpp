@@ -348,7 +348,7 @@ void WebEnginePage::injectClassChangeObserver() {
       R"(
         const observer = new MutationObserver(() => {
             var haveFullView = document.body.classList.contains('whatsie-full-view');
-            var container = document.querySelector('#app > .app-wrapper-web > div');
+            var container = document.querySelector('#app > .app-wrapper-web > .two');
             if(container){
                 if(haveFullView){
                     container.style.width = '100%';
@@ -404,7 +404,7 @@ void WebEnginePage::injectFullWidthJavaScript() {
     return;
   QString js =
       R"(function updateFullWidthView(element) {
-            var container = document.querySelector('#app > .app-wrapper-web > div');
+            var container = document.querySelector('#app > .app-wrapper-web > .two');
             container.style.width = '100%';
             container.style.height = '100%';
             container.style.top = '0';
