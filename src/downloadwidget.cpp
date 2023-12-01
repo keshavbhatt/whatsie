@@ -1,4 +1,5 @@
 #include "downloadwidget.h"
+#include "utils.h"
 
 #include <QDesktopServices>
 #include <QFileInfo>
@@ -26,7 +27,7 @@ DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
 
   connect(openButton, &QPushButton::clicked, m_download, [this](bool) {
     if (m_download->state() == QWebEngineDownloadItem::DownloadCompleted) {
-      QDesktopServices::openUrl(QUrl(m_download->downloadFileName()));
+          Utils::desktopOpenUrl(m_download->downloadFileName());
     }
   });
 

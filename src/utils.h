@@ -36,7 +36,7 @@ public:
   static float RoundToOneDecimal(float number);
   static void DisplayExceptionErrorDialog(const QString &error_info);
   static QString appDebugInfo();
-  static void desktopOpenUrl(const QString &str);
+  static void desktopOpenUrl(const QString &filePathStr);
   static bool isPhoneNumber(const QString &phoneNumber);
   static QString genRand(int length, bool useUpper = true, bool useLower = true,
                          bool useDigits = true);

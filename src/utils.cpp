@@ -379,25 +379,34 @@ QString Utils::GetEnvironmentVar(const QString &variable_name) {
  *
  * @param str The URL to be opened.
  */
-void Utils::desktopOpenUrl(const QString &str) {
-  QProcess *xdg_open = new QProcess(0);
-  xdg_open->start("xdg-open", QStringList() << str);
-  if (xdg_open->waitForStarted(1000) == false) {
-    // Try using QDesktopServices
-    bool opened = QDesktopServices::openUrl(QUrl(str));
-    if (opened == false) {
-      qWarning() << "Failed to open URL:" << str;
+void Utils::desktopOpenUrl(const QString &filePathStr) {
+  QUrl url = QUrl::fromLocalFile(filePathStr);
+
+  qDebug() << "Opening file using desktop-services" << url.toString();
+  bool opened = QDesktopServices::openUrl(url);
+
+  if (!opened) {
+    qWarning() << "Failed to open URL using desktop-services";
+
+    qDebug() << "Trying opening file using xdg-open" << filePathStr;
+    QProcess *xdg_open = new QProcess;
+
+    connect(xdg_open,
+            static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
+                &QProcess::finished),
+            [xdg_open](int exitCode, QProcess::ExitStatus exitStatus) {
+              Q_UNUSED(exitCode);
+              Q_UNUSED(exitStatus);
+              xdg_open->close();
+              xdg_open->deleteLater();
+            });
+
+    xdg_open->start("xdg-open", {url.toString()});
+
+    if (!xdg_open->waitForStarted(1000)) {
+      qWarning() << "Failed to open URL using xdg-open";
     }
   }
-  connect(xdg_open,
-          static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
-              &QProcess::finished),
-          [xdg_open](int exitCode, QProcess::ExitStatus exitStatus) {
-            Q_UNUSED(exitCode);
-            Q_UNUSED(exitStatus);
-            xdg_open->close();
-            xdg_open->deleteLater();
-          });
 }
 
 bool Utils::isPhoneNumber(const QString &phoneNumber) {
