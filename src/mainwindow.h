@@ -117,6 +117,7 @@ private:
   SettingsWidget *m_settingsWidget = nullptr;
   Lock *m_lockWidget = nullptr;
   AutoLockEventFilter *m_autoLockEventFilter = nullptr;
+  Qt::WindowStates windowStateBeforeFullScreen;
 
 private slots:
   void iconActivated(QSystemTrayIcon::ActivationReason reason);

@@ -965,14 +965,19 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
 void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
   if (request.toggleOn()) {
+    windowStateBeforeFullScreen = this->windowState();
+    this->hide();
     m_webEngine->showFullScreen();
-    this->showFullScreen();
-    request.accept();
-  } else {
-    m_webEngine->showNormal();
+    m_webEngine->setWindowState(Qt::WindowFullScreen);
+    this->setWindowState(Qt::WindowFullScreen);
     this->show();
-    request.accept();
+  } else {
+    this->hide();
+    m_webEngine->showNormal();
+    this->setWindowState(windowStateBeforeFullScreen);
+    this->show();
   }
+  request.accept();
 }
 
 void MainWindow::handleWebViewTitleChanged(const QString &title) {
