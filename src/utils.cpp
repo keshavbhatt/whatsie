@@ -373,40 +373,38 @@ QString Utils::GetEnvironmentVar(const QString &variable_name) {
  * @brief Opens the specified URL in the default desktop application.
  *
  * The method attempts to open the URL using the `xdg-open` command-line tool.
- * If the `xdg-open` process fails to start within 1 second, it falls back to
+ * If the `xdg-open` process fails to start, it falls back to
  * using `QDesktopServices` to open the URL. If both methods fail, a warning
  * message is printed to the console.
  *
  * @param str The URL to be opened.
  */
 void Utils::desktopOpenUrl(const QString &filePathStr) {
-  QUrl url = QUrl::fromLocalFile(filePathStr);
+  qDebug() << "Trying opening file using xdg-open" << filePathStr;
 
-  qDebug() << "Opening file using desktop-services" << url.toString();
-  bool opened = QDesktopServices::openUrl(url);
+  QProcess *xdg_open = new QProcess;
+  QObject::connect(xdg_open,
+                   static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
+                       &QProcess::finished),
+                   [=](int exitCode, QProcess::ExitStatus exitStatus) {
+                     Q_UNUSED(exitCode);
+                     Q_UNUSED(exitStatus);
+                     xdg_open->close();
+                     xdg_open->deleteLater();
+                     if (exitStatus != QProcess::NormalExit) {
+                       qWarning() << "Failed to open URL using xdg-open";
 
-  if (!opened) {
-    qWarning() << "Failed to open URL using desktop-services";
+                       QUrl url = QUrl::fromLocalFile(filePathStr);
+                       qDebug() << "Opening file using desktop-services"
+                                << url.toString();
+                       if (!QDesktopServices::openUrl(url)) {
+                         qWarning()
+                             << "Failed to open URL using desktop-services";
+                       }
+                     }
+                   });
 
-    qDebug() << "Trying opening file using xdg-open" << filePathStr;
-    QProcess *xdg_open = new QProcess;
-
-    connect(xdg_open,
-            static_cast<void (QProcess::*)(int, QProcess::ExitStatus)>(
-                &QProcess::finished),
-            [xdg_open](int exitCode, QProcess::ExitStatus exitStatus) {
-              Q_UNUSED(exitCode);
-              Q_UNUSED(exitStatus);
-              xdg_open->close();
-              xdg_open->deleteLater();
-            });
-
-    xdg_open->start("xdg-open", {url.toString()});
-
-    if (!xdg_open->waitForStarted(1000)) {
-      qWarning() << "Failed to open URL using xdg-open";
-    }
-  }
+  xdg_open->start("xdg-open", {filePathStr});
 }
 
 bool Utils::isPhoneNumber(const QString &phoneNumber) {
