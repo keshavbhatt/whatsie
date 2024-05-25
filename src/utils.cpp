@@ -388,7 +388,6 @@ void Utils::desktopOpenUrl(const QString &filePathStr) {
                        &QProcess::finished),
                    [=](int exitCode, QProcess::ExitStatus exitStatus) {
                      Q_UNUSED(exitCode);
-                     Q_UNUSED(exitStatus);
                      xdg_open->close();
                      xdg_open->deleteLater();
                      if (exitStatus != QProcess::NormalExit) {
