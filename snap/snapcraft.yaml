@@ -33,6 +33,7 @@ apps:
        XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
        LANG: en_US.UTF-8 # issue 7,21
        QT_QPA_PLATFORMTHEME: gtk3
+       GTK_USE_PORTAL: 1
        NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
     desktop: usr/share/applications/com.ktechpit.whatsie.desktop
     plugs:
