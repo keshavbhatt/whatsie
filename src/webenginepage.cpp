@@ -142,7 +142,6 @@ void WebEnginePage::handleLoadFinished(bool ok) {
   }
 
   if (ok) {
-    injectMutationObserver();
     injectPreventScrollWheelZoomHelper();
     injectFullWidthJavaScript();
     injectClassChangeObserver();
@@ -346,7 +345,7 @@ void WebEnginePage::injectPreventScrollWheelZoomHelper() {
 void WebEnginePage::injectClassChangeObserver() {
   QString js =
       R"(
-        const observer = new MutationObserver(() => {
+        var cc_observer = new MutationObserver(() => {
             var haveFullView = document.body.classList.contains('whatsie-full-view');
             var container = document.querySelector('#app > .app-wrapper-web > .two');
             if(container){
@@ -361,58 +360,44 @@ void WebEnginePage::injectClassChangeObserver() {
                     container.style.top = null;
                     container.style.maxWidth = null;
                 }
+                cc_observer.disconnect();
             }
         });
-        observer.observe(document.body, {
-        attributes: true,
-        attributeFilter: ['class'],
-        childList: false,
-        characterData: false
+        cc_observer.observe(document.body, {
+            attributes: true,
+            attributeFilter: ['class'],
+            childList: false,
+            characterData: false
         });
-       )";
-  this->runJavaScript(js);
-}
-
-void WebEnginePage::injectMutationObserver() {
-  QString js =
-      R"(function waitForElement(selector, action) {
-          const element = document.querySelector(selector);
-          if (element) {
-            action(element);
-            return Promise.resolve(element);
-          }
-          return new Promise(resolve => {
-            const observer = new MutationObserver(mutations => {
-              const element = document.querySelector(selector);
-              if (element) {
-                action(element);
-                observer.disconnect();
-                resolve(element);
-              }
-            });
-            observer.observe(document.documentElement, { childList: true, subtree: true });
-          });
-        })";
-  this->runJavaScript(js);
+        )";
+    this->runJavaScript(js);
 }
 
 void WebEnginePage::injectFullWidthJavaScript() {
-  if (!SettingsManager::instance()
-           .settings()
-           .value("fullWidthView", true)
-           .toBool())
-    return;
-  QString js =
-      R"(function updateFullWidthView(element) {
-            var container = document.querySelector('#app > .app-wrapper-web > .two');
-            container.style.width = '100%';
-            container.style.height = '100%';
-            container.style.top = '0';
-            container.style.maxWidth = 'unset';
-        }
-        waitForElement('#pane-side', element => updateFullWidthView({ selector: '#pane-side', element }));
-       )";
-  this->runJavaScript(js);
+    if (!SettingsManager::instance().settings().value("fullWidthView", true).toBool())
+        return;
+
+    QString js =
+        R"(function updateFullWidthView(element) {
+                var container = document.querySelector('#app > .app-wrapper-web > .two');
+                container.style.width = '100%';
+                container.style.height = '100%';
+                container.style.top = '0';
+                container.style.maxWidth = 'unset';
+                fw_observer.disconnect();
+            }
+            var fw_observer = new MutationObserver(mutations => {
+                const element = document.querySelector('#pane-side');
+                if (element) {
+                    updateFullWidthView({ selector: '#pane-side', element });
+                }
+            });
+            fw_observer.observe(document.documentElement, {
+                childList: true,
+                subtree: true
+            });
+           )";
+    this->runJavaScript(js);
 }
 
 void WebEnginePage::injectNewChatJavaScript() {
