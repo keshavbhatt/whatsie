@@ -1,3 +1,49 @@
+## 4.15.0 (2024-05-25)
+
+#### 🎁 Feature
+
+* efficient use of element mutation observers (e553c00c)
+* add line widget at bottom of cutom notification widget (0d19713d)
+* use xdg-open as fallback to open local files (30921582)
+
+#### 🐞 Bug Fixes
+
+* restore window state video fullscreen toggle (e0483dda)
+* prioritize xdg-open for handling openUrl request (36cd46b7)
+* set correct lock state when app starts minimized (b58d9422)
+
+#### 🚧 Chores
+
+* CI Update Qt version to 5.15.4 for build (e030486b)
+* update UA to latest Chrome (cc2852a7)
+* snap use portal if available (8cef2047)
+* version 4.15 (08fba4cf)
+
+## 4.14.2 (2023-12-01)
+
+#### 🐞 Bug Fixes
+
+* incorrect full width modification (#150) (3d20ebe2)
+
+#### 🚧 Chores
+
+* bump version 4.14.2 (c478a7d6)
+* Use qmake-provided _DATE_ (#146) (fec5644c)
+
+
+
+## 4.14.1 (2023-05-20)
+
+#### 🐞 Bug Fixes
+
+* fix unread message parsing (906ca7eb)
+
+#### 🚧 Chores
+
+* update workflow and changelog (41225b19)
+
+
+
 ## 4.14.0 (2023-05-17)
 
 #### 🎁 Feature
