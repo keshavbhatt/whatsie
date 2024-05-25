@@ -227,7 +227,7 @@ void Lock::lock_app() {
   ui->signup->hide();
   ui->login->show();
   this->show();
-  isLocked = ui->login->isVisible();
+  isLocked = true;
   animateIn();
   ui->passcodeLogin->setFocus();
 }
