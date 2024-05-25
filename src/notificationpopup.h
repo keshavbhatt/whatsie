@@ -31,25 +31,37 @@ public:
   NotificationPopup(QWidget *parent) : QWidget(parent) {
     setWindowFlags(Qt::ToolTip);
 
-    auto rootLayout = new QHBoxLayout(this);
+    auto baseLayout = new QVBoxLayout(this);
+    baseLayout->setContentsMargins(0, 0, 0, 0);
 
+    auto rootLayout = new QHBoxLayout;
+    baseLayout->addLayout(rootLayout);
+
+    m_icon.setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Expanding);
     rootLayout->addWidget(&m_icon);
 
     auto bodyLayout = new QVBoxLayout;
     rootLayout->addLayout(bodyLayout);
 
     auto titleLayout = new QHBoxLayout;
+    titleLayout->setContentsMargins(0, 0, 9, 0);
     bodyLayout->addLayout(titleLayout);
 
     titleLayout->addWidget(&m_title);
     titleLayout->addItem(new QSpacerItem(0, 0, QSizePolicy::Expanding));
 
     auto close = new QPushButton(tr("Close"));
-    titleLayout->addWidget(close);
     connect(close, &QPushButton::clicked, this, &NotificationPopup::onClosed);
+    titleLayout->addWidget(close);
 
     bodyLayout->addWidget(&m_message);
-    adjustSize();
+
+    auto *baseLineWidget = new QWidget(this);
+    baseLineWidget->setFixedHeight(6);
+    baseLineWidget->setStyleSheet("background-color: rgb(6, 207, 156);");
+    baseLayout->addWidget(baseLineWidget);
+
+    this->adjustSize();
   }
 
   void present(int screenNumber, QString title, QString message,
