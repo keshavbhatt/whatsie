@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
 
 env:
-    QT_VERSION: '5.15.2'
+    QT_VERSION: '5.15.4'
 
 jobs:
   Linux-Build:
