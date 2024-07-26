@@ -33,7 +33,7 @@
 	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
 	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
 	<url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
-	<url type="donation">https://www.paypal.me/keshavnrj</url>
+	<url type="donation">https://www.paypal.me/keshavnrj/10</url>
 	<keywords>
 		<keyword translate="no">WhatsApp</keyword>
 		<keyword>social</keyword>
@@ -41,6 +41,25 @@
 		<keyword>messaging</keyword>
 		<keyword xml:lang="de">beurs</keyword>
 		<keyword xml:lang="pt">mensagens</keyword>
+		<keyword>chat</keyword>
+		<keyword>communication</keyword>
+		<keyword>instant messaging</keyword>
+		<keyword>social networking</keyword>
+		<keyword>WhatsApp Web</keyword>
+		<keyword>group chat</keyword>
+		<keyword>brave whatsapp</keyword>
+		<keyword>multimedia messaging</keyword>
+		<keyword>status update</keyword>
+		<keyword>chrome whatsapp</keyword>
+		<keyword>end-to-end encryption</keyword>
+		<keyword>voice call</keyword>
+		<keyword>video call</keyword>
+		<keyword>stickers</keyword>
+		<keyword>discord</keyword>
+		<keyword>media sharing</keyword>
+		<keyword>WhatsApp Business</keyword>
+		<keyword>firefox whatsApp</keyword>
+		<keyword>steam whatsApp</keyword>
 	</keywords>
 	<screenshots>
 		<screenshot type="default">
