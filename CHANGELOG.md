@@ -1,3 +1,18 @@
+## 4.15.1 (2024-08-01)
+
+#### 🚧 Chores
+
+* revert to build action Qt to version 5.15.2 (bbccc551)
+* bump version 4.15.1 (d8746929)
+* update dist icon (d0304ad1)
+* new icon (f54e608c)
+* update notification icons (2718a85d)
+* add new keywords to appdata (4e803bfa)
+* update appstream metadata for 4.15.0 release (a535ee1b)
+* do not mark statusCode unused in desktopOpenUrl util method (51e28237)
+* udapte CHANGELOG (5940b6ec)
+
+
 ## 4.15.0 (2024-05-25)
 
 #### 🎁 Feature
