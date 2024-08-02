@@ -4,6 +4,10 @@
 #
 #-------------------------------------------------
 
+QMAKE_CXXFLAGS = $$QMAKE_CXXFLAGS $$(CXXFLAGS)
+QMAKE_CFLAGS = $$QMAKE_CFLAGS $$(CFLAGS)
+QMAKE_LFLAGS = $$QMAKE_LDFLAGS $$(LDFLAGS)
+
 QT += core gui webengine webenginewidgets positioning
 
 CONFIG += c++17
