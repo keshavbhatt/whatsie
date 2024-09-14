@@ -83,7 +83,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
-		<release version="4.15.2" date="2024-08-02" />
+		<release version="4.15.3" date="2024-08-02" />
 	    <release version="4.15.0" date="2024-05-25" />
 	    <release version="4.14.2" date="2023-12-01" />
 		<release version="4.14" date="2023-05-17" />
