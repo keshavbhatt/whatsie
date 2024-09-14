@@ -6,6 +6,10 @@
 	<name>Whatsie</name>
 	<summary>Qt Whatsapp Web Client for Linux Desktop</summary>
 	<developer_name>Keshav Bhatt</developer_name>
+	<branding>
+		<color type="primary" scheme_preference="light">#77a27d</color>
+		<color type="primary" scheme_preference="dark">#16461d</color>
+	</branding>
 	<description>
 		<p>Feature rich WhatsApp web client based on Qt WebEngine.</p>
 		<p>Key features of Whatsie:</p>
@@ -63,18 +67,23 @@
 	</keywords>
 	<screenshots>
 		<screenshot type="default">
+			<caption>Whatsie main screen, Light theme</caption>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
 		</screenshot>
 		<screenshot>
+			<caption>Whatsie main screen, Dark Theme</caption>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/2.jpg</image>
 		</screenshot>
 		<screenshot>
+			<caption>Whatsie App Settings</caption>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/3.jpg</image>
 		</screenshot>
 		<screenshot>
+			<caption>Whatsie Lock Screen</caption>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/4.jpg</image>
 		</screenshot>
 		<screenshot>
+			<caption>Whatsie Hardware Access Control and Shortcuts</caption>
 			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/5.jpg</image>
 		</screenshot>
 	</screenshots>
@@ -83,6 +92,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
+		<release version="4.15.5" date="2024-09-14" />
 		<release version="4.15.3" date="2024-08-02" />
 	    <release version="4.15.0" date="2024-05-25" />
 	    <release version="4.14.2" date="2023-12-01" />
