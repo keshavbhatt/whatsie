@@ -34,6 +34,8 @@ int main(int argc, char *argv[]) {
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
 
+ qputenv("QTWEBENGINE_DICTIONARIES_PATH",Dictionaries::GetDictionaryPath().toUtf8().constData());  
+
   QCommandLineParser parser;
   parser.setApplicationDescription(
       QObject::tr("Feature rich WhatsApp web client based on Qt WebEngine"));
