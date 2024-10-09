@@ -1,3 +1,14 @@
+## 4.16.0 (2024-10-09)
+
+#### 🎁 Feature
+
+* Add secure compilation flags (4720ffeb)
+
+#### 🐞 Bug Fixes
+
+* change zoom factor when app starts minimized in systray (be47a73d)
+* set QTWEBENGINE_DICTIONARIES_PATH to fix spell checker (#199) (40da519b)
+
 ## 4.15.1 (2024-08-01)
 
 #### 🚧 Chores

@@ -49,21 +49,18 @@
 		<keyword>communication</keyword>
 		<keyword>instant messaging</keyword>
 		<keyword>social networking</keyword>
-		<keyword>WhatsApp Web</keyword>
+		<keyword>whatsApp web</keyword>
 		<keyword>group chat</keyword>
 		<keyword>brave whatsapp</keyword>
 		<keyword>multimedia messaging</keyword>
 		<keyword>status update</keyword>
 		<keyword>chrome whatsapp</keyword>
-		<keyword>end-to-end encryption</keyword>
-		<keyword>voice call</keyword>
-		<keyword>video call</keyword>
-		<keyword>stickers</keyword>
 		<keyword>discord</keyword>
-		<keyword>media sharing</keyword>
-		<keyword>WhatsApp Business</keyword>
+		<keyword>whatsie whatsapp</keyword>
+		<keyword>messanger</keyword>
+		<keyword>whatsApp business</keyword>
 		<keyword>firefox whatsApp</keyword>
-		<keyword>steam whatsApp</keyword>
+		<keyword>google whatsApp</keyword>
 	</keywords>
 	<screenshots>
 		<screenshot type="default">
@@ -92,6 +89,7 @@
 	</provides>
 	<content_rating type="oars-1.0" />
 	<releases>
+		<release version="4.16.0" date="2024-10-09" />
 		<release version="4.15.5" date="2024-09-14" />
 		<release version="4.15.3" date="2024-08-02" />
 	    <release version="4.15.0" date="2024-05-25" />
