@@ -299,7 +299,8 @@ void MainWindow::initSettingWidget() {
 
     connect(m_settingsWidget, &SettingsWidget::zoomChanged, m_settingsWidget,
             [=]() {
-              if (windowState() == Qt::WindowNoState) {
+              if (windowState() == Qt::WindowNoState ||
+                  !(windowState() & Qt::WindowMaximized)) {
                 double currentFactor = SettingsManager::instance()
                                            .settings()
                                            .value("zoomFactor", 1.0)
@@ -310,8 +311,8 @@ void MainWindow::initSettingWidget() {
 
     connect(m_settingsWidget, &SettingsWidget::zoomMaximizedChanged,
             m_settingsWidget, [=]() {
-              if (windowState() == Qt::WindowMaximized ||
-                  windowState() == Qt::WindowFullScreen) {
+              if (windowState() & Qt::WindowMaximized ||
+                  windowState() & Qt::WindowFullScreen) {
                 double currentFactor = SettingsManager::instance()
                                            .settings()
                                            .value("zoomFactorMaximized",
@@ -332,7 +333,8 @@ void MainWindow::initSettingWidget() {
     connect(m_settingsWidget, &SettingsWidget::updateFullWidthView,
             m_settingsWidget, [=](bool checked) {
               if (m_webEngine && m_webEngine->page()) {
-                WebEnginePage *wp = qobject_cast<WebEnginePage*>(m_webEngine->page());
+                WebEnginePage *wp =
+                    qobject_cast<WebEnginePage *>(m_webEngine->page());
                 wp->injectClassChangeObserver();
                 if (checked)
                   m_webEngine->page()->runJavaScript(
