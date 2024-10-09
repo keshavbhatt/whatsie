@@ -4,6 +4,25 @@
 #
 #-------------------------------------------------
 
+# Common security flags for all architectures
+QMAKE_CFLAGS += -fstack-protector-strong -fstack-clash-protection -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS
+QMAKE_CXXFLAGS = $$QMAKE_CFLAGS
+
+# Optimization flags
+QMAKE_CFLAGS_RELEASE += -O2
+QMAKE_CXXFLAGS_RELEASE += -O2
+
+QMAKE_CFLAGS_DEBUG += -O1
+QMAKE_CXXFLAGS_DEBUG += -O1
+
+# Architecture-specific flags
+equals(QMAKE_HOST.arch, aarch64) {
+    QMAKE_CFLAGS += -mbranch-protection=standard
+}
+
+# Uncomment if you need specific linker flags as well
+#QMAKE_LFLAGS += $$QMAKE_LDFLAGS
+
 QT += core gui webengine webenginewidgets positioning
 
 CONFIG += c++17
