@@ -4,6 +4,10 @@
 #
 #-------------------------------------------------
 
+QMAKE_CFLAGS = $$QMAKE_CFLAGS -fstack-protector-strong -fstack-clash-protection -mbranch-protection=standard -D_FORTIFY_SOURCE=3 -D_GLIBCXX_ASSERTIONS
+QMAKE_CXXFLAGS = $$QMAKE_CFLAGS
+#QMAKE_LFLAGS = $$QMAKE_LDFLAGS $$(LDFLAGS)
+
 QT += core gui webengine webenginewidgets positioning
 
 CONFIG += c++17
