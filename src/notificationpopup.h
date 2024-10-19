@@ -13,6 +13,7 @@
 #include <QPropertyAnimation>
 #include <QPushButton>
 #include <QScreen>
+#include <QScreen>
 #include <QSpacerItem>
 #include <QTimer>
 #include <QVBoxLayout>
@@ -64,7 +65,7 @@ public:
     this->adjustSize();
   }
 
-  void present(int screenNumber, QString title, QString message,
+  void present(QScreen *screen, QString title, QString message,
                const QPixmap image) {
     m_title.setText("<b>" + title + "</b>");
     m_message.setText(message);
@@ -78,10 +79,10 @@ public:
                            .toInt(),
                        this, [=]() { onClosed(); });
 
-    animateIn(screenNumber);
+    animateIn(screen);
   }
 
-  void present(int screenNumber,
+  void present(QScreen *screen,
                std::unique_ptr<QWebEngineNotification> &newNotification) {
     if (notification) {
       notification->close();
@@ -106,23 +107,27 @@ public:
                            .toInt(),
                        notification.get(), [&]() { onClosed(); });
 
-    animateIn(screenNumber);
+    animateIn(screen);
   }
 
 protected slots:
+  void animateIn(QScreen *screen) {
+      if (!screen) {
+          return;
+      }
 
-  void animateIn(int screenNumber) {
-    QRect screenRect =
-        QGuiApplication::screens().at(screenNumber)->availableGeometry();
-    int x = (screenRect.x() + screenRect.width() - 20) - this->width();
-    int y = 40;
-    QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
-    a->setDuration(200);
-    a->setStartValue(QApplication::desktop()->mapToGlobal(QPoint(x - 10, y)));
-    a->setEndValue(QApplication::desktop()->mapToGlobal(QPoint(x, y)));
-    a->setEasingCurve(QEasingCurve::InCubic);
-    a->start(QPropertyAnimation::DeleteWhenStopped);
-    this->show();
+      QRect screenRect = screen->availableGeometry();
+      int x = (screenRect.x() + screenRect.width() - 20) - this->width();
+      int y = 40;
+
+      QPropertyAnimation *a = new QPropertyAnimation(this, "pos");
+      a->setDuration(200);
+      a->setStartValue(QPoint(x - 10, y));
+      a->setEndValue(QPoint(x, y));
+      a->setEasingCurve(QEasingCurve::InCubic);
+      a->start(QPropertyAnimation::DeleteWhenStopped);
+
+      this->show();
   }
 
   void onClosed() {

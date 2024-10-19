@@ -412,3 +412,24 @@ bool Utils::isPhoneNumber(const QString &phoneNumber) {
   static QRegularExpression reg(phone);
   return reg.match(phoneNumber).hasMatch();
 }
+
+QString Utils::detectDesktopEnvironment() {
+    QString desktopEnv = qgetenv("XDG_CURRENT_DESKTOP");
+
+    if (!desktopEnv.isEmpty()) {
+        return desktopEnv;
+    }
+
+    QString wm = qgetenv("WINDOWMANAGER");
+    QString session = qgetenv("DESKTOP_SESSION");
+
+    if (!wm.isEmpty()) {
+        return wm;
+    }
+
+    if (!session.isEmpty()) {
+        return session;
+    }
+
+    return "Unknown Desktop Environment";
+}

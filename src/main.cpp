@@ -34,7 +34,8 @@ int main(int argc, char *argv[]) {
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
 
- qputenv("QTWEBENGINE_DICTIONARIES_PATH",Dictionaries::GetDictionaryPath().toUtf8().constData());  
+  qputenv("QTWEBENGINE_DICTIONARIES_PATH",
+          Dictionaries::GetDictionaryPath().toUtf8().constData());
 
   QCommandLineParser parser;
   parser.setApplicationDescription(
@@ -170,12 +171,11 @@ int main(int argc, char *argv[]) {
           qInfo() << "cmd:"
                   << "LockApp";
           whatsie.alreadyRunning();
-          QSettings settings;
           if (!SettingsManager::instance()
                    .settings()
                    .value("asdfg")
                    .isValid()) {
-            whatsie.notify(
+            whatsie.showNotification(
                 QApplication::applicationName(),
                 QObject::tr("App lock is not configured, \n"
                             "Please setup the password in the Settings "
@@ -245,7 +245,6 @@ int main(int argc, char *argv[]) {
     }
   }
 
-  QSettings settings;
   if (QSystemTrayIcon::isSystemTrayAvailable() &&
       SettingsManager::instance()
           .settings()

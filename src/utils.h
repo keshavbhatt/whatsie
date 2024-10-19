@@ -40,6 +40,7 @@ public:
   static bool isPhoneNumber(const QString &phoneNumber);
   static QString genRand(int length, bool useUpper = true, bool useLower = true,
                          bool useDigits = true);
+  static QString detectDesktopEnvironment();
 private slots:
   // use refreshCacheSize
   static quint64 dir_size(const QString &directory);
