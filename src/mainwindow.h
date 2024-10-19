@@ -44,7 +44,7 @@ public:
   void loadSchemaUrl(const QString &arg);
   void alreadyRunning(bool notify = false);
   void runMinimized();
-  void notify(QString title, QString message);
+  void showNotification(QString title, QString message);
   void doReload(bool byPassCache = false, bool isAskedByCLI = false,
                 bool byLoadingQuirk = false);
 
@@ -119,9 +119,11 @@ private:
   AutoLockEventFilter *m_autoLockEventFilter = nullptr;
   Qt::WindowStates windowStateBeforeFullScreen;
 
+  QString userDesktopEnvironment =  Utils::detectDesktopEnvironment();
+
+  void notificationClicked();
 private slots:
   void iconActivated(QSystemTrayIcon::ActivationReason reason);
-  void messageClicked();
   void toggleMute(const bool &checked);
   void fullScreenRequested(QWebEngineFullScreenRequest request);
   void checkWindowState();

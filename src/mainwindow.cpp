@@ -3,6 +3,7 @@
 #include <QInputDialog>
 #include <QRandomGenerator>
 #include <QRegularExpression>
+#include <QScreen>
 #include <QShortcut>
 #include <QStyleHints>
 #include <QUrlQuery>
@@ -98,7 +99,8 @@ void MainWindow::initRateWidget() {
 
 void MainWindow::runMinimized() {
   this->m_minimizeAction->trigger();
-  notify("Whatsie", "Whatsie started minimized in tray. Click to Open.");
+  showNotification("Whatsie",
+                   "Whatsie started minimized in system tray. Click to Open.");
 }
 
 MainWindow::~MainWindow() { m_webEngine->deleteLater(); }
@@ -328,7 +330,7 @@ void MainWindow::initSettingWidget() {
             });
 
     connect(m_settingsWidget, &SettingsWidget::notify, m_settingsWidget,
-            [=](QString message) { notify("", message); });
+            [=](QString message) { showNotification("", message); });
 
     connect(m_settingsWidget, &SettingsWidget::updateFullWidthView,
             m_settingsWidget, [=](bool checked) {
@@ -426,7 +428,8 @@ void MainWindow::showSettings(bool isAskedByCLI) {
   if (m_lockWidget && m_lockWidget->getIsLocked()) {
     QString error = tr("Unlock to access Settings.");
     if (isAskedByCLI) {
-      this->notify(QApplication::applicationName() + "| Error", error);
+      this->showNotification(QApplication::applicationName() + "| Error",
+                             error);
     } else {
       QMessageBox::critical(this, QApplication::applicationName() + "| Error",
                             error);
@@ -494,7 +497,8 @@ void MainWindow::closeEvent(QCloseEvent *event) {
             .settings()
             .value("firstrun_tray", true)
             .toBool()) {
-      notify(QApplication::applicationName(), "Minimized to system tray.");
+      showNotification(QApplication::applicationName(),
+                       "Minimized to system tray.");
       SettingsManager::instance().settings().setValue("firstrun_tray", false);
     }
     return;
@@ -504,7 +508,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   QMainWindow::closeEvent(event);
 }
 
-void MainWindow::notify(QString title, QString message) {
+void MainWindow::showNotification(QString title, QString message) {
 
   if (SettingsManager::instance()
           .settings()
@@ -521,38 +525,51 @@ void MainWindow::notify(QString title, QString message) {
               .value("notificationCombo", 1)
               .toInt() == 0 &&
       m_systemTrayIcon != nullptr) {
-    m_systemTrayIcon->showMessage(
-        title, message, QIcon(":/icons/app/notification/whatsie-notify.png"),
-        SettingsManager::instance()
-            .settings()
-            .value("notificationTimeOut", 9000)
-            .toInt());
-    m_systemTrayIcon->disconnect(m_systemTrayIcon, SIGNAL(messageClicked()));
-    connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked,
-            m_systemTrayIcon, [=]() {
-              if (windowState().testFlag(Qt::WindowMinimized) ||
-                  !windowState().testFlag(Qt::WindowActive)) {
-                activateWindow();
-                this->show();
-              }
-            });
+    auto timeout = SettingsManager::instance()
+                       .settings()
+                       .value("notificationTimeOut", 9000)
+                       .toInt();
+
+    if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
+      // cannot show notification normally on gnome shell when using custom
+      // icon.
+      m_systemTrayIcon->showMessage(title, message, QSystemTrayIcon::Critical,
+                                    0);
+    } else {
+      m_systemTrayIcon->showMessage(
+          title, message, QIcon(":/icons/app/notification/whatsie-notify.png"),
+          timeout);
+    }
   } else {
     auto popup = new NotificationPopup(m_webEngine);
-    connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
-      if (windowState().testFlag(Qt::WindowMinimized) ||
-          !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
-        this->show();
-        setWindowState((windowState() & ~Qt::WindowMinimized) |
-                       Qt::WindowActive);
-      }
-    });
+    connect(popup, &NotificationPopup::notification_clicked, this,
+            [=]() { notificationClicked(); });
+
     popup->style()->polish(qApp);
     popup->setMinimumWidth(300);
     popup->adjustSize();
-    int screenNumber = qApp->desktop()->screenNumber(this);
-    popup->present(screenNumber < 0 ? 0 : screenNumber, title, message,
-                   QPixmap(":/icons/app/notification/whatsie-notify.png"));
+
+    QScreen *screen = QGuiApplication::primaryScreen();
+    if (screen) {
+      popup->present(screen, title, message,
+                     QPixmap(":/icons/app/notification/whatsie-notify.png"));
+    } else {
+      qWarning() << "showNotification"
+                 << "unable to get primary screen";
+    }
   }
+}
+
+void MainWindow::notificationClicked() {
+  show();
+  QCoreApplication::processEvents();
+
+  if (windowState().testFlag(Qt::WindowMinimized)) {
+    setWindowState(windowState() & ~Qt::WindowMinimized);
+  }
+
+  raise();
+  activateWindow();
 }
 
 void MainWindow::createActions() {
@@ -642,13 +659,13 @@ void MainWindow::createTrayIcon() {
   m_systemTrayIcon->setContextMenu(m_trayIconMenu);
   connect(m_trayIconMenu, &QMenu::aboutToShow, this,
           &MainWindow::checkWindowState);
-
-  m_systemTrayIcon->show();
-
   connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-          &MainWindow::messageClicked);
+          [this]() { notificationClicked(); });
+
   connect(m_systemTrayIcon, &QSystemTrayIcon::activated, this,
           &MainWindow::iconActivated);
+
+  m_systemTrayIcon->show();
 
   // enable show shortcuts in menu
   if (qApp->styleHints()->showShortcutsInContextMenus()) {
@@ -918,13 +935,9 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
   auto popup = new NotificationPopup(m_webEngine);
   popup->setObjectName("engineNotifier");
-  connect(popup, &NotificationPopup::notification_clicked, popup, [=]() {
-    if (windowState().testFlag(Qt::WindowMinimized) ||
-        !windowState().testFlag(Qt::WindowActive) || this->isHidden()) {
-      this->show();
-      setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-    }
-  });
+
+  connect(popup, &NotificationPopup::notification_clicked, this,
+          [this]() { notificationClicked(); });
 
   profile->setNotificationPresenter(
       [=](std::unique_ptr<QWebEngineNotification> notification) {
@@ -939,30 +952,31 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
                     .value("notificationCombo", 1)
                     .toInt() == 0 &&
             m_systemTrayIcon != nullptr) {
+          auto timeout = SettingsManager::instance()
+                             .settings()
+                             .value("notificationTimeOut", 9000)
+                             .toInt();
           QIcon icon(QPixmap::fromImage(notification->icon()));
-          m_systemTrayIcon->showMessage(notification->title(),
-                                        notification->message(), icon,
-                                        SettingsManager::instance()
-                                            .settings()
-                                            .value("notificationTimeOut", 9000)
-                                            .toInt());
-          m_systemTrayIcon->disconnect(m_systemTrayIcon,
-                                       SIGNAL(messageClicked()));
-          connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked,
-                  m_systemTrayIcon, [=]() {
-                    if (windowState().testFlag(Qt::WindowMinimized) ||
-                        !windowState().testFlag(Qt::WindowActive) ||
-                        this->isHidden()) {
-                      this->show();
-                      setWindowState((windowState() & ~Qt::WindowMinimized) |
-                                     Qt::WindowActive);
-                    }
-                  });
-
+          if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
+            // cannot show notification normally on gnome shell when using
+            // custom icon.
+            m_systemTrayIcon->showMessage(notification->title(),
+                                          notification->message(),
+                                          QSystemTrayIcon::Critical, 0);
+          } else {
+            m_systemTrayIcon->showMessage(
+                notification->title(), notification->message(), icon, timeout);
+          }
         } else {
           popup->setMinimumWidth(300);
-          int screenNumber = qApp->desktop()->screenNumber(this);
-          popup->present(screenNumber, notification);
+
+          QScreen *screen = QGuiApplication::primaryScreen();
+          if (screen) {
+            popup->present(screen, notification);
+          } else {
+            qWarning() << "showNotification"
+                       << "unable to get primary screen";
+          }
         }
       });
 }
@@ -1127,14 +1141,6 @@ void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
   }
 }
 
-void MainWindow::messageClicked() {
-  if (isVisible()) {
-    hide();
-  } else {
-    this->show();
-  }
-}
-
 void MainWindow::doAppReload() {
 
   if (m_webEngine->page()) {
@@ -1181,12 +1187,13 @@ void MainWindow::doReload(bool byPassCache, bool isAskedByCLI,
                                    byPassCache);
   } else {
     if (m_lockWidget && !m_lockWidget->getIsLocked()) {
-      this->notify(QApplication::applicationName(),
-                   QObject::tr("Reloading..."));
+      this->showNotification(QApplication::applicationName(),
+                             QObject::tr("Reloading..."));
     } else {
       QString error = tr("Unlock to Reload the App.");
       if (isAskedByCLI) {
-        this->notify(QApplication::applicationName() + "| Error", error);
+        this->showNotification(QApplication::applicationName() + "| Error",
+                               error);
       } else {
         QMessageBox::critical(this, QApplication::applicationName() + "| Error",
                               error);
@@ -1236,7 +1243,7 @@ void MainWindow::tryLock() {
 void MainWindow::alreadyRunning(bool notify) {
   if (notify) {
     QString appname = QApplication::applicationName();
-    this->notify(appname, "Restored an already running instance.");
+    this->showNotification(appname, "Restored an already running instance.");
   }
   this->setWindowState((this->windowState() & ~Qt::WindowMinimized) |
                        Qt::WindowActive);
