@@ -73,7 +73,7 @@ BUILD_TIMESTAMP="\"\\\"$${_DATE_}\\\"\""
 DEFINES += GIT_HASH=$$GIT_HASH GIT_BRANCH=$$GIT_BRANCH BUILD_TIMESTAMP=$$BUILD_TIMESTAMP
 
 # Set program version
-VERSION = 4.16.0
+VERSION = 4.16.1
 DEFINES += VERSIONSTR=\\\"$${VERSION}\\\"
 
 # You can also make your code fail to compile if you use deprecated APIs.
