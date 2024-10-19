@@ -956,7 +956,14 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
                              .settings()
                              .value("notificationTimeOut", 9000)
                              .toInt();
-          QIcon icon(QPixmap::fromImage(notification->icon()));
+          auto notificationPtr = notification.get();
+          connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
+                  [this, notificationPtr]() {
+                    if (notificationPtr) {
+                      notificationPtr->click();
+                    }
+                  });
+
           if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
             // cannot show notification normally on gnome shell when using
             // custom icon.
@@ -964,6 +971,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
                                           notification->message(),
                                           QSystemTrayIcon::Critical, 0);
           } else {
+            QIcon icon(QPixmap::fromImage(notification->icon()));
             m_systemTrayIcon->showMessage(
                 notification->title(), notification->message(), icon, timeout);
           }
