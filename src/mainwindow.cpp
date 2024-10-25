@@ -31,6 +31,7 @@ MainWindow::MainWindow(QWidget *parent)
   createWebEngine();
   initSettingWidget();
   initRateWidget();
+  QApplication::processEvents();
   tryLock();
   updateWindowTheme();
   initAutoLock();
@@ -152,9 +153,12 @@ void MainWindow::updatePageTheme() {
 }
 
 void MainWindow::resizeEvent(QResizeEvent *event) {
-  if (m_lockWidget != nullptr) {
-    m_lockWidget->resize(event->size());
+  QMainWindow::resizeEvent(event);
+
+  if (!m_lockWidget || event->size() == event->oldSize()) {
+    return;
   }
+  m_lockWidget->resize(size());
 }
 
 void MainWindow::updateWindowTheme() {
@@ -716,6 +720,7 @@ void MainWindow::initLock() {
   }
 
   m_lockWidget->setGeometry(this->rect());
+  QApplication::processEvents();
 
   if (SettingsManager::instance().settings().value("lockscreen").toBool()) {
     if (SettingsManager::instance().settings().value("asdfg").isValid()) {
@@ -940,33 +945,38 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           [this]() { notificationClicked(); });
 
   profile->setNotificationPresenter(
-      [=](std::unique_ptr<QWebEngineNotification> notification) {
-        if (SettingsManager::instance()
-                .settings()
-                .value("disableNotificationPopups", false)
-                .toBool() == true) {
+      [&](std::unique_ptr<QWebEngineNotification> notification) {
+        QSettings &settings = SettingsManager::instance().settings();
+        bool disableNotificationPopups =
+            settings.value("disableNotificationPopups", false).toBool();
+        int notificationCombo = settings.value("notificationCombo", 1).toInt();
+        int timeout = settings.value("notificationTimeOut", 9000).toInt();
+
+        if (disableNotificationPopups) {
           return;
         }
-        if (SettingsManager::instance()
-                    .settings()
-                    .value("notificationCombo", 1)
-                    .toInt() == 0 &&
-            m_systemTrayIcon != nullptr) {
-          auto timeout = SettingsManager::instance()
-                             .settings()
-                             .value("notificationTimeOut", 9000)
-                             .toInt();
-          auto notificationPtr = notification.get();
-          connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-                  [this, notificationPtr]() {
-                    if (notificationPtr) {
-                      notificationPtr->click();
-                    }
-                  });
 
+        if (notificationCombo == 0 && m_systemTrayIcon) {
+          QPointer<QWebEngineNotification> notificationPtr = notification.get();
+          if (notificationPtr) {
+            connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
+                    [this, notificationPtr]() {
+                      QMetaObject::invokeMethod(
+                          this,
+                          [notificationPtr]() {
+                            if (notificationPtr) {
+                              qWarning() << "notificationPtr clciked";
+                              notificationPtr->click();
+                            }
+                            qWarning() << "notificationPtr clciked Ok";
+                          },
+                          Qt::QueuedConnection);
+                    });
+          }
+
+          // cannot show notification normally on gnome shell when using
+          // custom icon.
           if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
-            // cannot show notification normally on gnome shell when using
-            // custom icon.
             m_systemTrayIcon->showMessage(notification->title(),
                                           notification->message(),
                                           QSystemTrayIcon::Critical, 0);
@@ -975,17 +985,21 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
             m_systemTrayIcon->showMessage(
                 notification->title(), notification->message(), icon, timeout);
           }
-        } else {
-          popup->setMinimumWidth(300);
+          return;
+        }
 
-          QScreen *screen = QGuiApplication::primaryScreen();
-          if (screen) {
-            popup->present(screen, notification);
+        popup->setMinimumWidth(300);
+        QScreen *screen = QGuiApplication::primaryScreen();
+        if (!screen) {
+          const auto screens = QGuiApplication::screens();
+          if (!screens.isEmpty()) {
+            screen = screens.first();
           } else {
-            qWarning() << "showNotification"
-                       << "unable to get primary screen";
+            qWarning() << "showNotification: unable to get any screen";
+            return;
           }
         }
+        popup->present(screen, notification);
       });
 }
 
