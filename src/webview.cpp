@@ -2,9 +2,15 @@
 
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QWebEngineContextMenuData>
 #include <QWebEngineProfile>
 #include <mainwindow.h>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QWebEngineContextMenuRequest>
+using QWebEngineContextMenuData = QWebEngineContextMenuRequest;
+#else
+#include <QWebEngineContextMenuData>
+#endif
 
 WebView::WebView(QWidget *parent, QStringList dictionaries)
     : QWebEngineView(parent), m_dictionaries(dictionaries) {
@@ -63,8 +69,11 @@ void WebView::wheelEvent(QWheelEvent *event) {
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
-
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  auto menu = createStandardContextMenu();
+#else
   auto menu = page()->createStandardContextMenu();
+#endif
   menu->setAttribute(Qt::WA_DeleteOnClose, true);
   // hide reload, back, forward, savepage, copyimagelink menus
   foreach (auto *action, menu->actions()) {
@@ -77,8 +86,12 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  const QWebEngineContextMenuRequest &data = *lastContextMenuRequest();
+#else
   const QWebEngineContextMenuData &data = page()->contextMenuData();
   Q_ASSERT(data.isValid());
+#endif
 
   // allow context menu on image
   if (data.mediaType() == QWebEngineContextMenuData::MediaTypeImage) {
