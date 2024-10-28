@@ -244,7 +244,7 @@ void MainWindow::tryLogOut() {
 }
 
 void MainWindow::initSettingWidget() {
-  int screenNumber = qApp->desktop()->screenNumber(this);
+  int screenNumber = qApp->screens().indexOf(screen());
   if (m_settingsWidget == nullptr) {
     m_settingsWidget = new SettingsWidget(
         this, screenNumber, m_webEngine->page()->profile()->cachePath(),
@@ -451,8 +451,7 @@ void MainWindow::showSettings(bool isAskedByCLI) {
   if (!m_settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
     m_settingsWidget->refresh();
-    int screenNumber = qApp->desktop()->screenNumber(this);
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    QRect screenRect = screen()->geometry();
     if (!screenRect.contains(m_settingsWidget->pos())) {
       m_settingsWidget->move(screenRect.center() -
                              m_settingsWidget->rect().center());
