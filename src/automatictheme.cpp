@@ -47,7 +47,11 @@ AutomaticTheme::AutomaticTheme(QWidget *parent)
                 ui->refresh->setEnabled(false);
               }
             });
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    connect(m_gPosInfoSrc, &QGeoPositionInfoSource::errorOccurred, this, [=]() {
+#else
     connect(m_gPosInfoSrc, &QGeoPositionInfoSource::updateTimeout, this, [=]() {
+#endif
       if (!SettingsManager::instance().settings().value("sunrise").isValid() ||
           !SettingsManager::instance().settings().value("sunset").isValid()) {
         if (ui->refresh->isEnabled())
