@@ -23,7 +23,9 @@ equals(QMAKE_HOST.arch, aarch64) {
 # Uncomment if you need specific linker flags as well
 #QMAKE_LFLAGS += $$QMAKE_LDFLAGS
 
-QT += core gui webengine webenginewidgets positioning
+QT += core gui webenginewidgets positioning
+
+lessThan(QT_MAJOR_VERSION, 6): QT += webengine
 
 CONFIG += c++17
 
