@@ -156,7 +156,7 @@ int main(int argc, char *argv[]) {
         qInfo().noquote() << "Another instance with PID: " +
                                  QString::number(instanceId) +
                                  ", sent argument: " + message;
-        QString messageStr = QTextCodec::codecForMib(106)->toUnicode(message);
+        QString messageStr = QString::fromUtf8(message);
 
         QCommandLineParser p;
         p.addOptions(secondaryInstanceCLIOptions);
