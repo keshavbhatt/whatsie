@@ -120,7 +120,7 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
   if (pageWebengineProfile->isSpellCheckEnabled()) {
     auto subMenu = menu->addMenu(tr("Select Language"));
-    for (const QString &dict : qAsConst(m_dictionaries)) {
+    for (const QString &dict : std::as_const(m_dictionaries)) {
       auto action = subMenu->addAction(dict);
       action->setCheckable(true);
       action->setChecked(languages.contains(dict));
