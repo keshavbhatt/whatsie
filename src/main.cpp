@@ -2,8 +2,13 @@
 #include <QDebug>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
-#include <QtWebEngine>
 #include <QtWidgets>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QtWebEngineCore>
+#else
+#include <QtWebEngine>
+#endif
 
 #include "common.h"
 #include "def.h"
@@ -136,12 +141,10 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::DnsPrefetchEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::FullScreenSupportEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::JavascriptCanAccessClipboard, true);
+  QWebEngineSettings *websettings = QWebEngineProfile::defaultProfile()->settings();
+  websettings->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
+  websettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
+  websettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
 
   MainWindow whatsie;
 
