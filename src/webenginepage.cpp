@@ -26,6 +26,11 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
   connect(this, &QWebEnginePage::selectClientCertificate, this,
           &WebEnginePage::handleSelectClientCertificate);
 #endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  connect(this, &QWebEnginePage::certificateError, this,
+          &WebEnginePage::handleCertificateError);
+#endif
 }
 
 bool WebEnginePage::acceptNavigationRequest(const QUrl &url,
@@ -196,7 +201,13 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   return selectedFiles;
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+void WebEnginePage::handleCertificateError(const QWebEngineCertificateError &error) {
+  QString description = error.description();
+#else
 bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
+  QString description = error.errorDescription();
+#endif
   QWidget *mainWindow = view()->window();
   if (error.isOverridable()) {
     QDialog dialog(mainWindow);
@@ -209,14 +220,26 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
     QIcon icon(mainWindow->style()->standardIcon(QStyle::SP_MessageBoxWarning,
                                                  nullptr, mainWindow));
     certificateDialog.m_iconLabel->setPixmap(icon.pixmap(32, 32));
-    certificateDialog.m_errorLabel->setText(error.errorDescription());
+    certificateDialog.m_errorLabel->setText(description);
     dialog.setWindowTitle(tr("Certificate Error"));
-    return dialog.exec() == QDialog::Accepted;
+    bool accepted = dialog.exec() == QDialog::Accepted;
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    auto handler = const_cast<QWebEngineCertificateError&>(error);
+    if (accepted)
+        handler.acceptCertificate();
+    else
+        handler.rejectCertificate();
+#else
+    return accepted;
+#endif
   }
 
   QMessageBox::critical(mainWindow, tr("Certificate Error"),
-                        error.errorDescription());
+                        description);
+
+#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   return false;
+#endif
 }
 
 void WebEnginePage::handleAuthenticationRequired(const QUrl &requestUrl,
