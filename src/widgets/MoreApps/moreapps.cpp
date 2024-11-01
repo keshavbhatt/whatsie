@@ -104,7 +104,7 @@ QList<AppItem> MoreApps::prepareAppsToShow(const QByteArray &bytes) {
   }
 
   QJsonArray jsonArray = jsonResponse.object().value("results").toArray();
-  foreach (const QJsonValue &val, jsonArray) {
+  for (const QJsonValue &val : jsonArray) {
     QJsonObject object = val.toObject();
 
     // publisher
@@ -127,7 +127,7 @@ QList<AppItem> MoreApps::prepareAppsToShow(const QByteArray &bytes) {
     QJsonArray mediaArr =
         object.value("snap").toObject().value("media").toArray();
     QString iconUrl;
-    foreach (const QJsonValue &mediaItem, mediaArr) {
+    for (const QJsonValue &mediaItem : mediaArr) {
       if (mediaItem.toObject().value("type") == "icon")
         iconUrl = mediaItem.toObject().value("url").toString();
     }
@@ -252,7 +252,7 @@ void MoreApps::showApps() {
   if (mRemoteIconPreCaching) {
     // cache fallback icon
     setRemoteIcon(fallbackIconUrl, nullptr);
-    foreach (auto a, mAppList) {
+    for (auto &a : mAppList) {
       auto iconUrl = a.getIconUrl();
       // qDebug() << "pre-caching icon for" << a.getName();
       setRemoteIcon(iconUrl, nullptr);

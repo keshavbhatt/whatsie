@@ -43,7 +43,7 @@ void MainWindow::restoreMainWindow() {
         SettingsManager::instance().settings().value("geometry").toByteArray());
     QPoint pos = QCursor::pos();
     auto localScreens = QGuiApplication::screens();
-    for (auto screen : qAsConst(localScreens)) {
+    for (auto screen : std::as_const(localScreens)) {
       QRect screenRect = screen->geometry();
       if (screenRect.contains(pos)) {
         this->move(screenRect.center() - this->rect().center());
@@ -244,7 +244,7 @@ void MainWindow::tryLogOut() {
 }
 
 void MainWindow::initSettingWidget() {
-  int screenNumber = qApp->desktop()->screenNumber(this);
+  int screenNumber = qApp->screens().indexOf(screen());
   if (m_settingsWidget == nullptr) {
     m_settingsWidget = new SettingsWidget(
         this, screenNumber, m_webEngine->page()->profile()->cachePath(),
@@ -451,8 +451,7 @@ void MainWindow::showSettings(bool isAskedByCLI) {
   if (!m_settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
     m_settingsWidget->refresh();
-    int screenNumber = qApp->desktop()->screenNumber(this);
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    QRect screenRect = screen()->geometry();
     if (!screenRect.contains(m_settingsWidget->pos())) {
       m_settingsWidget->move(screenRect.center() -
                              m_settingsWidget->rect().center());
@@ -579,7 +578,7 @@ void MainWindow::notificationClicked() {
 void MainWindow::createActions() {
 
   m_openUrlAction = new QAction("New Chat", this);
-  m_openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_N));
+  m_openUrlAction->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key_N));
   connect(m_openUrlAction, &QAction::triggered, this, &MainWindow::newChat);
   addAction(m_openUrlAction);
 
@@ -594,7 +593,7 @@ void MainWindow::createActions() {
   addAction(m_minimizeAction);
 
   QShortcut *minimizeShortcut = new QShortcut(
-      QKeySequence(Qt::Modifier::CTRL + Qt::Key_W), this, SLOT(hide()));
+      QKeySequence(Qt::Modifier::CTRL | Qt::Key_W), this, SLOT(hide()));
   minimizeShortcut->setAutoRepeat(false);
 
   m_restoreAction = new QAction(tr("&Restore"), this);
@@ -608,19 +607,19 @@ void MainWindow::createActions() {
   addAction(m_reloadAction);
 
   m_lockAction = new QAction(tr("Loc&k"), this);
-  m_lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_L));
+  m_lockAction->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key_L));
   connect(m_lockAction, &QAction::triggered, this, &MainWindow::lockApp);
   addAction(m_lockAction);
 
   m_settingsAction = new QAction(tr("&Settings"), this);
-  m_settingsAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_P));
+  m_settingsAction->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key_P));
   connect(m_settingsAction, &QAction::triggered, this,
           &MainWindow::showSettings);
   addAction(m_settingsAction);
 
   m_toggleThemeAction = new QAction(tr("&Toggle theme"), this);
   m_toggleThemeAction->setShortcut(
-      QKeySequence(Qt::Modifier::CTRL + Qt::Key_T));
+      QKeySequence(Qt::Modifier::CTRL | Qt::Key_T));
   connect(m_toggleThemeAction, &QAction::triggered, this,
           &MainWindow::toggleTheme);
   addAction(m_toggleThemeAction);
@@ -629,7 +628,7 @@ void MainWindow::createActions() {
   connect(m_aboutAction, &QAction::triggered, this, &MainWindow::showAbout);
 
   m_quitAction = new QAction(tr("&Quit"), this);
-  m_quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL + Qt::Key_Q));
+  m_quitAction->setShortcut(QKeySequence(Qt::Modifier::CTRL | Qt::Key_Q));
   connect(m_quitAction, &QAction::triggered, this, &MainWindow::quitApp);
   addAction(m_quitAction);
 }

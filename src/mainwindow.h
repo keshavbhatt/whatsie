@@ -15,7 +15,6 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QSystemTrayIcon>
-#include <QWebEngineContextMenuData>
 #include <QWebEngineCookieStore>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineProfile>

@@ -134,7 +134,7 @@ QString Utils::convertSectoDay(qint64 secs) {
 QString
 Utils::returnPath(QString pathname,
                   QString standardLocation = QStandardPaths::writableLocation(
-                      QStandardPaths::DataLocation)) {
+                      QStandardPaths::AppLocalDataLocation)) {
   QChar sepe = QDir::separator();
   QDir d(standardLocation + sepe + pathname);
   d.mkpath(standardLocation + sepe + pathname);

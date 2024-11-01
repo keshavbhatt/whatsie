@@ -16,6 +16,10 @@
 #include <QWebEngineRegisterProtocolHandlerRequest>
 #include <QWebEngineSettings>
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QWebEngineView>
+#endif
+
 #include "settingsmanager.h"
 
 #include "ui_certificateerrordialog.h"
@@ -32,9 +36,20 @@ protected:
                                QWebEnginePage::NavigationType type,
                                bool isMainFrame) override;
   QWebEnginePage *createWindow(QWebEnginePage::WebWindowType type) override;
-  bool certificateError(const QWebEngineCertificateError &error) override;
   QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles,
                           const QStringList &acceptedMimeTypes) override;
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  void handleCertificateError(const QWebEngineCertificateError &error);
+#else
+  bool certificateError(const QWebEngineCertificateError &error) override;
+#endif
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+  inline QWidget *view() {
+      return QWebEngineView::forPage(this);
+  }
+#endif
 
 public slots:
   void handleFeaturePermissionRequested(const QUrl &securityOrigin,
