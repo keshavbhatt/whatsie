@@ -118,9 +118,10 @@ private:
   AutoLockEventFilter *m_autoLockEventFilter = nullptr;
   Qt::WindowStates windowStateBeforeFullScreen;
 
-  QString userDesktopEnvironment =  Utils::detectDesktopEnvironment();
+  QString userDesktopEnvironment = Utils::detectDesktopEnvironment();
 
   void notificationClicked();
+  NotificationPopup *m_webengine_notifier_popup = nullptr;
 private slots:
   void iconActivated(QSystemTrayIcon::ActivationReason reason);
   void toggleMute(const bool &checked);
