@@ -932,17 +932,16 @@ void MainWindow::createWebPage(bool offTheRecord) {
 }
 
 void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
-  auto *op = m_webEngine->findChild<NotificationPopup *>("engineNotifier");
-  if (op != nullptr) {
-    op->close();
-    op->deleteLater();
+
+  if (m_webengine_notifier_popup != nullptr) {
+    m_webengine_notifier_popup->close();
+    m_webengine_notifier_popup->deleteLater();
   }
 
-  auto popup = new NotificationPopup(m_webEngine);
-  popup->setObjectName("engineNotifier");
+  m_webengine_notifier_popup = new NotificationPopup(m_webEngine);
 
-  connect(popup, &NotificationPopup::notification_clicked, this,
-          [this]() { notificationClicked(); });
+  connect(m_webengine_notifier_popup, &NotificationPopup::notification_clicked,
+          this, [this]() { notificationClicked(); });
 
   profile->setNotificationPresenter(
       [&](std::unique_ptr<QWebEngineNotification> notification) {
@@ -988,7 +987,12 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           return;
         }
 
-        popup->setMinimumWidth(300);
+        if (!m_webengine_notifier_popup) {
+          qWarning() << "Popup is not available!";
+          return;
+        }
+
+        m_webengine_notifier_popup->setMinimumWidth(300);
         QScreen *screen = QGuiApplication::primaryScreen();
         if (!screen) {
           const auto screens = QGuiApplication::screens();
@@ -999,7 +1003,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
             return;
           }
         }
-        popup->present(screen, notification);
+        m_webengine_notifier_popup->present(screen, notification);
       });
 }
 
