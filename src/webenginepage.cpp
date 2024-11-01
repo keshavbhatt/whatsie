@@ -202,7 +202,8 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
 }
 
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-void WebEnginePage::handleCertificateError(const QWebEngineCertificateError &error) {
+void WebEnginePage::handleCertificateError(
+    const QWebEngineCertificateError &error) {
   QString description = error.description();
 #else
 bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
@@ -224,18 +225,17 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
     dialog.setWindowTitle(tr("Certificate Error"));
     bool accepted = dialog.exec() == QDialog::Accepted;
 #if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    auto handler = const_cast<QWebEngineCertificateError&>(error);
+    auto handler = const_cast<QWebEngineCertificateError &>(error);
     if (accepted)
-        handler.acceptCertificate();
+      handler.acceptCertificate();
     else
-        handler.rejectCertificate();
+      handler.rejectCertificate();
 #else
     return accepted;
 #endif
   }
 
-  QMessageBox::critical(mainWindow, tr("Certificate Error"),
-                        description);
+  QMessageBox::critical(mainWindow, tr("Certificate Error"), description);
 
 #if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
   return false;
@@ -325,7 +325,7 @@ void WebEnginePage::handleSelectClientCertificate(
 
   qDebug() << __FUNCTION__;
   auto certificates = selection.certificates();
-  for (const QSslCertificate &cert : qAsConst(certificates)) {
+  for (const QSslCertificate &cert : std::as_const(certificates)) {
     qDebug() << cert;
     selection.select(cert); // select the first available cert
     break;
@@ -393,15 +393,18 @@ void WebEnginePage::injectClassChangeObserver() {
             characterData: false
         });
         )";
-    this->runJavaScript(js);
+  this->runJavaScript(js);
 }
 
 void WebEnginePage::injectFullWidthJavaScript() {
-    if (!SettingsManager::instance().settings().value("fullWidthView", true).toBool())
-        return;
+  if (!SettingsManager::instance()
+           .settings()
+           .value("fullWidthView", true)
+           .toBool())
+    return;
 
-    QString js =
-        R"(function updateFullWidthView(element) {
+  QString js =
+      R"(function updateFullWidthView(element) {
                 var container = document.querySelector('#app > .app-wrapper-web > .two');
                 container.style.width = '100%';
                 container.style.height = '100%';
@@ -420,7 +423,7 @@ void WebEnginePage::injectFullWidthJavaScript() {
                 subtree: true
             });
            )";
-    this->runJavaScript(js);
+  this->runJavaScript(js);
 }
 
 void WebEnginePage::injectNewChatJavaScript() {

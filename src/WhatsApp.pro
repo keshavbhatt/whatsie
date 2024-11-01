@@ -157,29 +157,36 @@ DATADIR = $$PREFIX/share
 
 target.path = $$BINDIR
 
-CONFIG(FLATPAK){
-    message("This is a flatpak build, assuming dicts are not required.")
-}else{
-    qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
+CONFIG(FLATPAK) {
+    message("This is a Flatpak build, assuming dictionaries are not required.")
+} else {
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        QMAKE_PATH_QWEBENGINE_CONVERT_DICT = $$PWD/tools/find_qwebengine_convert_dict.sh
+    } else {
+        qtPrepareTool(CONVERT_TOOL, qwebengine_convert_dict)
+    }
 
     DICTIONARIES_DIR = qtwebengine_dictionaries
-
     dict.files = $$files($$PWD/dictionaries/*.dic, true)
 
     dictoolbuild.input = dict.files
     dictoolbuild.output = $${DICTIONARIES_DIR}/${QMAKE_FILE_BASE}.bdic
     dictoolbuild.depends = ${QMAKE_FILE_PATH}/${QMAKE_FILE_BASE}.aff
-    dictoolbuild.commands = $${CONVERT_TOOL} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
     dictoolbuild.name = Build ${QMAKE_FILE_IN_BASE}
     dictoolbuild.CONFIG = no_link target_predeps
+
+    greaterThan(QT_MAJOR_VERSION, 5) {
+        dictoolbuild.commands = $${QMAKE_PATH_QWEBENGINE_CONVERT_DICT} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+    } else {
+        dictoolbuild.commands = $${CONVERT_TOOL} ${QMAKE_FILE_IN} ${QMAKE_FILE_OUT}
+    }
+
     QMAKE_EXTRA_COMPILERS += dictoolbuild
-    
+
     dictionaries.files = $${DICTIONARIES_DIR}/
-    dictionaries.path  = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
-    
+    dictionaries.path = $$DATADIR/org.keshavnrj.ubuntu/WhatSie/
     unix:INSTALLS += dictionaries
 }
-
 
 icon16.path = $$PREFIX/share/icons/hicolor/16x16/apps/
 icon16.files = ../dist/linux/hicolor/16x16/apps/com.ktechpit.whatsie.png
