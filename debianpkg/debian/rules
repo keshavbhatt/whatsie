@@ -35,7 +35,7 @@ install: build
 	install -m 644 data/com.ktechpit.whatsie-symbolic.svg $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/
 	install -d $(DESTDIR)/usr/share/applications
 	install -m 644 data/com.ktechpit.whatsie.desktop $(DESTDIR)/usr/share/applications/
-	cp -r whatsie/* $(DESTDIR)/usr/bin/whatsie/
+	cp -r src/* $(DESTDIR)/usr/bin/whatsie/
 
 # Build architecture-independent files here.
 binary-indep: build install
