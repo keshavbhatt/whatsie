@@ -6,7 +6,7 @@ Uploaders:
   krafairus <krafairuspc@gmail.com>
 Build-Depends:
   debhelper-compat (= 13)
-Standards-Version: 4.16.0
+Standards-Version: 4.16.3
 Homepage: https://github.com/keshavbhatt/whatsie
 
 Package: whatsie
