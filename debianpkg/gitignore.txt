@@ -1,0 +1,16 @@
+__pycache__
+venv
+virtualenv
+.venv
+.virtualenv
+*.pyc
+db.sqlite3
+.idea
+.vscode
+build
+dist
+.tar.gz
+*.deb
+.asc
+debian/whatsie
+debian/files
