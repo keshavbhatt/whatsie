@@ -1,4 +1,4 @@
-# WhatSie
+# WhatSie -  Package for Debian or Deepin 23
 
 Feature rich WhatsApp web client based on Qt WebEngine for Linux Desktop
 
