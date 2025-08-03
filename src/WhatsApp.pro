@@ -49,6 +49,7 @@ include(singleapplication/singleapplication.pri)
 DEFINES += QAPPLICATION_CLASS=QApplication
 
 include(widgets/MoreApps/MoreApps.pri)
+include(libnotify-qt/notify-qt.pri)
 
 # The following define makes your compiler emit warnings if you use
 # any Qt feature that has been marked deprecated (the exact warnings
@@ -127,6 +128,7 @@ HEADERS += \
     webview.h \
     widgets/elidedlabel/elidedlabel.h \
     widgets/scrolltext/scrolltext.h
+
 FORMS += \
     about.ui \
     automatictheme.ui \
