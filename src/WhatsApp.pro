@@ -91,6 +91,7 @@ SOURCES += \
         dictionaries.cpp \
         downloadmanagerwidget.cpp \
         downloadwidget.cpp \
+        identicons.cpp \
         lock.cpp \
         main.cpp \
         mainwindow.cpp \
@@ -116,6 +117,7 @@ HEADERS += \
     dictionaries.h \
     downloadmanagerwidget.h \
     downloadwidget.h \
+    identicons.h \
     lock.h \
     mainwindow.h \
     notificationpopup.h \

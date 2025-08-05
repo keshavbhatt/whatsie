@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "identicons.h"
 
 #include <QInputDialog>
 #include <QRandomGenerator>
@@ -18,7 +19,7 @@ extern bool defaultAppAutoLock;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_Notifier("WhatSie", this),
-      m_trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
+      m_trayIconNormal(QIcon::fromTheme("whatsie", QIcon(":/icons/app/notification/whatsie-notify.png"))),
       m_notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
       m_unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
 
@@ -972,7 +973,15 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
         if (notificationCombo == 0) {
           auto ntf = notify(notification->title(), notification->message(), timeout);
-          ntf->setIconFromImage(notification->icon());
+          // Use locally generated identicon when
+          // QWebEngine (or whatsapp) passes blank
+          // image
+          QPixmap pix;
+          if (Identicons::colorCount(notification->icon()) > 2)
+              pix = QPixmap::fromImage(notification->icon());
+          else
+              pix = Identicons::letterTile(notification->title(), QSize(96, 96));
+          ntf->setIconFromPixmap(Identicons::clipRRect(pix) /* for eyecandy */ );
           connect(ntf.get(), &Notification::Event::actionInvoked, this,
               [this, n = std::move(notification)](const QString & action) {
                 if (action != "open") return;
