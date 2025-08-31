@@ -100,8 +100,6 @@ void MainWindow::initRateWidget() {
 
 void MainWindow::runMinimized() {
   this->m_minimizeAction->trigger();
-  showNotification("Whatsie",
-                   "Whatsie started minimized in system tray. Click to Open.");
 }
 
 MainWindow::~MainWindow() { m_webEngine->deleteLater(); }
