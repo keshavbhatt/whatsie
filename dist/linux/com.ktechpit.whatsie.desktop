@@ -2,8 +2,8 @@
 Name=WhatSie
 GenericName[it]=Client Qt per WhatsApp Web
 GenericName=Qt WhatsApp Web Client
-Comment[it]=Un Client per WhatsApp Web basato su QT
-Comment=A WhatsApp Web Client using the QT framework
+Comment[it]=Un Client per WhatsApp Web basato su Qt
+Comment=A WhatsApp Web Client using the Qt framework
 Icon=com.ktechpit.whatsie
 Exec=whatsie %u
 Terminal=false
