@@ -1,4 +1,5 @@
 #include "mainwindow.h"
+#include "identicons.h"
 
 #include <QInputDialog>
 #include <QRandomGenerator>
@@ -8,6 +9,7 @@
 #include <QStyleHints>
 #include <QUrlQuery>
 #include <QWebEngineNotification>
+#include <libnotify-qt.h>
 
 extern QString defaultUserAgentStr;
 extern double defaultZoomFactorMaximized;
@@ -16,7 +18,8 @@ extern bool defaultAppAutoLock;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
-      m_trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
+      m_Notifier("WhatSie", this),
+      m_trayIconNormal(QIcon::fromTheme("whatsie", QIcon(":/icons/app/notification/whatsie-notify.png"))),
       m_notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
       m_unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
 
@@ -534,16 +537,20 @@ void MainWindow::showNotification(QString title, QString message) {
                        .value("notificationTimeOut", 9000)
                        .toInt();
 
-    if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
-      // cannot show notification normally on gnome shell when using custom
-      // icon.
-      m_systemTrayIcon->showMessage(title, message, QSystemTrayIcon::Critical,
-                                    0);
-    } else {
-      m_systemTrayIcon->showMessage(
-          title, message, QIcon(":/icons/app/notification/whatsie-notify.png"),
-          timeout);
-    }
+    auto ntf = notify(title, message, timeout);
+    QObject::connect(ntf.get(), &Notification::Event::actionInvoked, this,
+                     [this] (const QString & action) {
+                       qInfo() << "Action: " << action;
+                       if (action == "open")
+                         this->notificationClicked();
+                     });
+
+    ntf->setIconFromPixmap(m_trayIconNormal
+                                .pixmap(m_trayIconNormal
+                                            .availableSizes(QIcon::Normal, QIcon::Off)
+                                            .constFirst(),
+                                        QIcon::Normal, QIcon::On));
+    ntf->show();
   } else {
     auto popup = new NotificationPopup(m_webEngine);
     connect(popup, &NotificationPopup::notification_clicked, this,
@@ -663,8 +670,6 @@ void MainWindow::createTrayIcon() {
   m_systemTrayIcon->setContextMenu(m_trayIconMenu);
   connect(m_trayIconMenu, &QMenu::aboutToShow, this,
           &MainWindow::checkWindowState);
-  connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-          [this]() { notificationClicked(); });
 
   connect(m_systemTrayIcon, &QSystemTrayIcon::activated, this,
           &MainWindow::iconActivated);
@@ -931,6 +936,17 @@ void MainWindow::createWebPage(bool offTheRecord) {
   m_webEngine->page()->setZoomFactor(currentFactor);
 }
 
+Notification::EventPtr MainWindow::notify(const QString& title, const QString& body, quint32 timeout) {
+  Notification::EventPtr ntf = m_Notifier.createNotification(title, body, "whatsie");
+
+  ntf->setTimeout(timeout);
+  ntf->setCategory("im.received");
+  ntf->addAction("open", "Open");
+  ntf->setHint("action-icons", false);
+  ntf->setHintString("image-path", "whatsie");
+  return ntf;
+}
+
 void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
 
   if (m_webengine_notifier_popup != nullptr) {
@@ -955,35 +971,28 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           return;
         }
 
-        if (notificationCombo == 0 && m_systemTrayIcon) {
-          QPointer<QWebEngineNotification> notificationPtr = notification.get();
-          if (notificationPtr) {
-            connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-                    [this, notificationPtr]() {
-                      QMetaObject::invokeMethod(
-                          this,
-                          [notificationPtr]() {
-                            if (notificationPtr) {
-                              qWarning() << "notificationPtr clciked";
-                              notificationPtr->click();
-                            }
-                            qWarning() << "notificationPtr clciked Ok";
-                          },
-                          Qt::QueuedConnection);
-                    });
-          }
-
-          // cannot show notification normally on gnome shell when using
-          // custom icon.
-          if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
-            m_systemTrayIcon->showMessage(notification->title(),
-                                          notification->message(),
-                                          QSystemTrayIcon::Critical, 0);
-          } else {
-            QIcon icon(QPixmap::fromImage(notification->icon()));
-            m_systemTrayIcon->showMessage(
-                notification->title(), notification->message(), icon, timeout);
-          }
+        if (notificationCombo == 0) {
+          auto ntf = notify(notification->title(), notification->message(), timeout);
+          // Use locally generated identicon when
+          // QWebEngine (or whatsapp) passes blank
+          // image
+          QPixmap pix;
+          if (Identicons::colorCount(notification->icon()) > 2)
+              pix = QPixmap::fromImage(notification->icon());
+          else
+              pix = Identicons::letterTile(notification->title(), QSize(96, 96));
+          ntf->setIconFromPixmap(Identicons::clipRRect(pix) /* for eyecandy */ );
+          connect(ntf.get(), &Notification::Event::actionInvoked, this,
+              [this, n = std::move(notification)](const QString & action) {
+                if (action != "open") return;
+                this->notificationClicked();
+                if(n->thread() == this->thread()) {
+                  n->click();
+                  qWarning() << "notify clicked, direct.";
+                } else if(QMetaObject::invokeMethod(n.get(), "click", Qt::QueuedConnection))
+                  qWarning() << "notify clicked, event.";
+              });
+          ntf->show();
           return;
         }
 
