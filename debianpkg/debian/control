@@ -1,0 +1,21 @@
+Source: whatsie
+Section: utils
+Priority: optional
+Maintainer: krafairus <krafairuspc@gmail.com>
+Uploaders:
+  krafairus <krafairuspc@gmail.com>
+Build-Depends:
+  debhelper-compat (= 13)
+Standards-Version: 4.16.3
+Homepage: https://github.com/keshavbhatt/whatsie
+
+Package: whatsie
+Architecture: all
+Depends:
+  qtwebengine5-dev-tools,
+  libqt5webenginewidgets5,
+  libqt5webengine5,
+  libqt5webengine-data,
+  ${misc:Depends},
+  ${shlibs:Depends},
+Description: A WhatsApp Web Client using the QT framework

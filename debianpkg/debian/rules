@@ -1,0 +1,59 @@
+#!/usr/bin/make -f
+# -*- makefile -*-
+
+# Uncomment this to turn on verbose mode.
+#export DH_VERBOSE=1
+
+build: build-arch build-indep
+build-arch: build-stamp
+build-indep: build-stamp
+build-stamp:
+	dh_testdir
+	# Add here commands to compile the package.
+	touch $@
+
+clean:
+	dh_testdir
+	dh_testroot
+	rm -f build-stamp
+	dh_clean
+
+DESTDIR = $(CURDIR)/debian/whatsie
+
+install: build
+	dh_testdir
+	dh_testroot
+	dh_prep
+	dh_installdirs
+
+	# Add here commands to install the package into whatsie.
+	install -d $(DESTDIR)/usr/bin/whatsie
+	install -m 755 data/whatsie $(DESTDIR)/usr/bin/whatsie
+	install -d $(DESTDIR)/usr/share/icons/hicolor/256x256/apps
+	install -m 644 data/com.ktechpit.whatsie.png $(DESTDIR)/usr/share/icons/hicolor/256x256/apps/
+	install -d $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps
+	install -m 644 data/com.ktechpit.whatsie-symbolic.svg $(DESTDIR)/usr/share/icons/hicolor/symbolic/apps/
+	install -d $(DESTDIR)/usr/share/applications
+	install -m 644 data/com.ktechpit.whatsie.desktop $(DESTDIR)/usr/share/applications/
+	cp -r src/* $(DESTDIR)/usr/bin/whatsie/
+
+# Build architecture-independent files here.
+binary-indep: build install
+# We have nothing to do by default.
+
+# Build architecture-dependent files here.
+binary-arch: build install
+	dh_testdir
+	dh_testroot
+	dh_installdocs
+	dh_installchangelogs
+	dh_lintian
+	dh_compress
+#	dh_fixperms
+	dh_installdeb
+	dh_gencontrol
+	dh_md5sums
+	dh_builddeb
+
+binary: binary-indep binary-arch
+.PHONY: build clean binary-indep binary-arch binary install 
