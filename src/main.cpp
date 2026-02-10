@@ -3,7 +3,12 @@
 #include <QtWidgets>
 #include <QtWebEngineCore>
 #include <QStandardPaths>
+#include <QWebEngineProfile>
+#include <QWebEngineSettings>
 
+#include "common.h"
+#include "def.h"
+#include "dictionaries.h"
 #include "mainwindow.h"
 #include "settingsmanager.h"
 #include <singleapplication.h>

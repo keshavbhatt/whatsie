@@ -77,6 +77,7 @@ set(DATADIR ${CMAKE_INSTALL_PREFIX}/share)
 set(SOURCES
     src/about.cpp
     src/automatictheme.cpp
+    src/common.cpp
     src/dictionaries.cpp
     src/downloadmanagerwidget.cpp
     src/downloadwidget.cpp
