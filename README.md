@@ -57,42 +57,73 @@ Options:
   -n, --new-chat       Open new chat prompt in a running instance of WhatSie
 ```
 
-## Build instructions (Linux)
-The source code can be built using the regular Qt application development procedure. Whatsie Project makes use of Qt's QMake build system, which simplifies the build process. To build Whatsie locally on your system, follow the steps below.
+## Build from Source (Linux)
 
-### Build requirements
- - git (to clone repo)
- - libx11-dev libx11-xcb-dev (required for x11 XKB module support at build time)
- - Qt => 5.9 (5.15 recommended) with the following modules installed with development headers (lib*-dev packages on Ubuntu)
-	+ webengine
-	+ webenginewidgets
-	+ positioning
-	
-### Build steps
- 
- 1. **Clone** source code
+### Requirements
+ - git, cmake >= 3.24, ninja-build
+ - Qt6 >= 6.0 (qt6-base-dev, qt6-webengine-dev, qt6-positioning-dev)
+ - C++17 compiler (GCC 7+, Clang 5+)
+ - libx11-dev
 
- 	`git clone https://github.com/keshavbhatt/whatsie.git`
+### Install Dependencies
 
- 2. Enter into source directory  
-	
-	`cd whatsie/src`  
-	
- 3. Run **qmake**
-	
-	`qmake`
-	
- 4. Run **make** (with optional **-j** option that specify jobs or commands to run simultaneously while building)
- 
-	`make -j4`  
-	
- 5. **Run built whatsie** executable (if build finished with no errors)
- 
-	`./whatsie`
-	
- 5. Run **make install** if you want to install (if build finished with no errors)
- 
-	`sudo make install`
+**Ubuntu/Debian:**
+```bash
+sudo apt-get install cmake ninja-build qt6-base-dev qt6-webengine-dev \
+    qt6-positioning-dev libx11-dev build-essential
+```
+
+**Fedora:**
+```bash
+sudo dnf install cmake ninja-build qt6-qtbase-devel qt6-qtwebengine-devel \
+    qt6-qttools-devel libx11-devel gcc-c++
+```
+
+**Arch Linux:**
+```bash
+sudo pacman -S cmake ninja qt6-base qt6-webengine qt6-positioning
+```
+
+### Build & Run
+
+```bash
+git clone https://github.com/keshavbhatt/whatsie.git
+cd whatsie
+make build-release
+./build/whatsie
+```
+
+### Install (Optional)
+
+```bash
+# Install to /usr/local
+make install
+
+# OR install system-wide to /usr
+sudo make install INSTALL_PREFIX=/usr
+```
+
+### Common Build Commands
+
+```bash
+make build-release    # Build in Release mode
+make build-debug      # Build in Debug mode
+make install          # Install to /usr/local
+make run              # Run the built executable
+make clean            # Clean build artifacts
+make help             # Show all available targets
+```
+
+### Troubleshooting
+
+| Problem | Solution |
+|---------|----------|
+| CMake not found | `sudo apt install cmake` |
+| Qt6 not found | `sudo apt install qt6-base-dev qt6-webengine-dev` |
+| Ninja not found | `sudo apt install ninja-build` |
+| Permission denied | `make install INSTALL_PREFIX=~/.local` |
+
+For detailed build instructions, see `BUILD_QUICK_REFERENCE.md`
 
 
 
