@@ -15,8 +15,15 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
           &WebEnginePage::handleLoadFinished);
   connect(this, &QWebEnginePage::authenticationRequired, this,
           &WebEnginePage::handleAuthenticationRequired);
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+  // Use new Qt 6.4+ permission API
+  connect(this, &QWebEnginePage::permissionRequested, this,
+          &WebEnginePage::handlePermissionRequested);
+#else
+  // Use deprecated API for older Qt6 versions
   connect(this, &QWebEnginePage::featurePermissionRequested, this,
           &WebEnginePage::handleFeaturePermissionRequested);
+#endif
   connect(this, &QWebEnginePage::proxyAuthenticationRequired, this,
           &WebEnginePage::handleProxyAuthenticationRequired);
   connect(this, &QWebEnginePage::registerProtocolHandlerRequested, this,
@@ -50,6 +57,36 @@ WebEnginePage::createWindow(QWebEnginePage::WebWindowType type) {
   return new WebEnginePage(this->profile());
 }
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+// New Qt 6.4+ permission API
+inline QString questionForPermission(const QWebEnginePermission &permission) {
+  switch (permission.permissionType()) {
+  case QWebEnginePermission::PermissionType::Geolocation:
+    return WebEnginePage::tr("Allow %1 to access your location information?");
+  case QWebEnginePermission::PermissionType::MediaAudioCapture:
+    return WebEnginePage::tr("Allow %1 to access your microphone?");
+  case QWebEnginePermission::PermissionType::MediaVideoCapture:
+    return WebEnginePage::tr("Allow %1 to access your webcam?");
+  case QWebEnginePermission::PermissionType::MediaAudioVideoCapture:
+    return WebEnginePage::tr("Allow %1 to access your microphone and webcam?");
+  case QWebEnginePermission::PermissionType::MouseLock:
+    return WebEnginePage::tr("Allow %1 to lock your mouse cursor?");
+  case QWebEnginePermission::PermissionType::DesktopVideoCapture:
+    return WebEnginePage::tr("Allow %1 to capture video of your desktop?");
+  case QWebEnginePermission::PermissionType::DesktopAudioVideoCapture:
+    return WebEnginePage::tr(
+        "Allow %1 to capture audio and video of your desktop?");
+  case QWebEnginePermission::PermissionType::Notifications:
+    return WebEnginePage::tr("Allow %1 to show notification on your desktop?");
+  default:
+    return QString();
+  }
+}
+#endif
+
+// This function must always be defined for the deprecated API
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 inline QString questionForFeature(QWebEnginePage::Feature feature) {
   switch (feature) {
   case QWebEnginePage::Geolocation:
@@ -72,7 +109,51 @@ inline QString questionForFeature(QWebEnginePage::Feature feature) {
   }
   return QString();
 }
+#pragma GCC diagnostic pop
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+// New Qt 6.4+ permission API handler
+void WebEnginePage::handlePermissionRequested(QWebEnginePermission permission) {
+  bool autoPlay = true;
+  if (SettingsManager::instance().settings().value("autoPlayMedia").isValid())
+    autoPlay = SettingsManager::instance()
+                   .settings()
+                   .value("autoPlayMedia", false)
+                   .toBool();
+
+  if (autoPlay && (permission.permissionType() == QWebEnginePermission::PermissionType::MediaVideoCapture ||
+                   permission.permissionType() == QWebEnginePermission::PermissionType::MediaAudioVideoCapture)) {
+    QWebEngineProfile *defProfile = QWebEngineProfile::defaultProfile();
+    auto *webSettings = defProfile->settings();
+    webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
+    profile()->settings()->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
+  }
+
+  QString title = tr("Permission Request");
+  QString question = questionForPermission(permission).arg(permission.origin().host());
+
+  QString permissionTypeStr = QString::number(static_cast<int>(permission.permissionType()));
+  SettingsManager::instance().settings().beginGroup("permissions");
+
+  if (SettingsManager::instance().settings().value(permissionTypeStr, false).toBool()) {
+    permission.grant();
+  } else {
+    if (!question.isEmpty() &&
+        QMessageBox::question(view()->window(), title, question) == QMessageBox::Yes) {
+      permission.grant();
+      SettingsManager::instance().settings().setValue(permissionTypeStr, true);
+    } else {
+      permission.deny();
+      SettingsManager::instance().settings().setValue(permissionTypeStr, false);
+    }
+  }
+  SettingsManager::instance().settings().endGroup();
+}
+#endif
+
+// This handler must always be defined because MOC generates code for it
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
 void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
                                                      Feature feature) {
   bool autoPlay = true;
@@ -121,10 +202,26 @@ void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
   }
   SettingsManager::instance().settings().endGroup();
 }
+#pragma GCC diagnostic pop
 
 void WebEnginePage::handleLoadFinished(bool ok) {
 
   // turn on Notification settings by default
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+  // For Qt 6.4+, permissions are handled through permissionRequested signal
+  // Settings are stored but actual permission granting happens in handlePermissionRequested
+  if (SettingsManager::instance()
+          .settings()
+          .value("permissions/Notifications")
+          .isValid() == false) {
+    SettingsManager::instance().settings().beginGroup("permissions");
+    SettingsManager::instance().settings().setValue("Notifications", true);
+    SettingsManager::instance().settings().endGroup();
+  }
+#else
+  // Use deprecated API for older Qt6 versions
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
   if (SettingsManager::instance()
           .settings()
           .value("permissions/Notifications")
@@ -145,6 +242,8 @@ void WebEnginePage::handleLoadFinished(bool ok) {
         QWebEnginePage::Feature::Notifications,
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
   }
+#pragma GCC diagnostic pop
+#endif
 
   if (ok) {
     injectPreventScrollWheelZoomHelper();

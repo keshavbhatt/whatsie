@@ -20,6 +20,10 @@
 #include <QWebEngineView>
 #endif
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+#include <QWebEnginePermission>
+#endif
+
 #include "settingsmanager.h"
 
 #include "ui_certificateerrordialog.h"
@@ -52,6 +56,9 @@ protected:
 #endif
 
 public slots:
+#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
+  void handlePermissionRequested(QWebEnginePermission permission);
+#endif
   void handleFeaturePermissionRequested(const QUrl &securityOrigin,
                                         QWebEnginePage::Feature feature);
   void handleLoadFinished(bool ok);
