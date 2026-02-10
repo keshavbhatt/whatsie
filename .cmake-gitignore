@@ -1,0 +1,49 @@
+# CMake specific
+CMakeUserPresets.json
+CMakePresets.json.user
+
+# Build directory
+build/
+cmake-build-*/
+_build/
+out/
+
+# CMake cache
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+
+# Compilation database
+compile_commands.json
+
+# Qt Creator
+.qtcreator/
+CMakeLists.txt.user*
+
+# IDEs
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+
+# Build artifacts
+*.o
+*.a
+*.so
+*.dylib
+*.dll
+*.exe
+*.app
+moc_*.cpp
+ui_*.h
+qrc_*.cpp
+
+# Dictionary files (compiled)
+qtwebengine_dictionaries/
+*.bdic
+
+# Translations
+*.qm
+
