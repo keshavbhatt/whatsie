@@ -28,9 +28,9 @@ execute_process(
 
 string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 
-# Set Qt version
+# Set Qt version - Require Qt 6.4 minimum for modern permission API
 set(QT_VERSION_MAJOR 6)
-set(QT_VERSION_MINOR 0)
+set(QT_VERSION_MINOR 4)
 
 # Set CMake policies
 set(CMAKE_AUTOMOC ON)

@@ -356,17 +356,10 @@ float Utils::RoundToOneDecimal(float number) {
  * @return
  */
 QString Utils::GetEnvironmentVar(const QString &variable_name) {
-#if QT_VERSION >= QT_VERSION_CHECK(5, 10, 0)
   // The only time this might fall down is on Linux when an
   // environment variable holds bytedata. Don't use this
   // utility function for retrieval if that's the case.
   return qEnvironmentVariable(variable_name.toUtf8().constData(), "").trimmed();
-#else
-  // This will typically only be used on older Qts on Linux
-  return QProcessEnvironment::systemEnvironment()
-      .value(variable_name, "")
-      .trimmed();
-#endif
 }
 
 /**

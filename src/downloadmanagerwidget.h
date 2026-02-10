@@ -58,13 +58,9 @@
 #include <QFileDialog>
 #include <QStandardPaths>
 #include <QWidget>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QWebEngineDownloadRequest>
+
 using QWebEngineDownloadItem = QWebEngineDownloadRequest;
-#else
-#include <QWebEngineDownloadItem>
-#endif
 
 class DownloadWidget;
 

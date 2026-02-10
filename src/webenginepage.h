@@ -15,14 +15,8 @@
 #include <QWebEngineProfile>
 #include <QWebEngineRegisterProtocolHandlerRequest>
 #include <QWebEngineSettings>
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 #include <QWebEngineView>
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
 #include <QWebEnginePermission>
-#endif
 
 #include "settingsmanager.h"
 
@@ -43,24 +37,14 @@ protected:
   QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles,
                           const QStringList &acceptedMimeTypes) override;
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   void handleCertificateError(const QWebEngineCertificateError &error);
-#else
-  bool certificateError(const QWebEngineCertificateError &error) override;
-#endif
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   inline QWidget *view() {
       return QWebEngineView::forPage(this);
   }
-#endif
 
 public slots:
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
   void handlePermissionRequested(QWebEnginePermission permission);
-#endif
-  void handleFeaturePermissionRequested(const QUrl &securityOrigin,
-                                        QWebEnginePage::Feature feature);
   void handleLoadFinished(bool ok);
 
 protected slots:
@@ -76,10 +60,8 @@ private slots:
                                          const QString &proxyHost);
   void handleRegisterProtocolHandlerRequested(
       QWebEngineRegisterProtocolHandlerRequest request);
-#if !defined(QT_NO_SSL) || QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
   void handleSelectClientCertificate(
       QWebEngineClientCertificateSelection clientCertSelection);
-#endif
   void fullScreenRequestedByPage(QWebEngineFullScreenRequest request);
   void injectPreventScrollWheelZoomHelper();
   void injectFullWidthJavaScript();

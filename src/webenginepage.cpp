@@ -15,29 +15,16 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
           &WebEnginePage::handleLoadFinished);
   connect(this, &QWebEnginePage::authenticationRequired, this,
           &WebEnginePage::handleAuthenticationRequired);
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-  // Use new Qt 6.4+ permission API
   connect(this, &QWebEnginePage::permissionRequested, this,
           &WebEnginePage::handlePermissionRequested);
-#else
-  // Use deprecated API for older Qt6 versions
-  connect(this, &QWebEnginePage::featurePermissionRequested, this,
-          &WebEnginePage::handleFeaturePermissionRequested);
-#endif
   connect(this, &QWebEnginePage::proxyAuthenticationRequired, this,
           &WebEnginePage::handleProxyAuthenticationRequired);
   connect(this, &QWebEnginePage::registerProtocolHandlerRequested, this,
           &WebEnginePage::handleRegisterProtocolHandlerRequested);
-
-#if !defined(QT_NO_SSL) || QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
   connect(this, &QWebEnginePage::selectClientCertificate, this,
           &WebEnginePage::handleSelectClientCertificate);
-#endif
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
   connect(this, &QWebEnginePage::certificateError, this,
           &WebEnginePage::handleCertificateError);
-#endif
 }
 
 bool WebEnginePage::acceptNavigationRequest(const QUrl &url,
@@ -57,8 +44,6 @@ WebEnginePage::createWindow(QWebEnginePage::WebWindowType type) {
   return new WebEnginePage(this->profile());
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-// New Qt 6.4+ permission API
 inline QString questionForPermission(const QWebEnginePermission &permission) {
   switch (permission.permissionType()) {
   case QWebEnginePermission::PermissionType::Geolocation:
@@ -82,37 +67,7 @@ inline QString questionForPermission(const QWebEnginePermission &permission) {
     return QString();
   }
 }
-#endif
 
-// This function must always be defined for the deprecated API
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-inline QString questionForFeature(QWebEnginePage::Feature feature) {
-  switch (feature) {
-  case QWebEnginePage::Geolocation:
-    return WebEnginePage::tr("Allow %1 to access your location information?");
-  case QWebEnginePage::MediaAudioCapture:
-    return WebEnginePage::tr("Allow %1 to access your microphone?");
-  case QWebEnginePage::MediaVideoCapture:
-    return WebEnginePage::tr("Allow %1 to access your webcam?");
-  case QWebEnginePage::MediaAudioVideoCapture:
-    return WebEnginePage::tr("Allow %1 to access your microphone and webcam?");
-  case QWebEnginePage::MouseLock:
-    return WebEnginePage::tr("Allow %1 to lock your mouse cursor?");
-  case QWebEnginePage::DesktopVideoCapture:
-    return WebEnginePage::tr("Allow %1 to capture video of your desktop?");
-  case QWebEnginePage::DesktopAudioVideoCapture:
-    return WebEnginePage::tr(
-        "Allow %1 to capture audio and video of your desktop?");
-  case QWebEnginePage::Notifications:
-    return WebEnginePage::tr("Allow %1 to show notification on your desktop?");
-  }
-  return QString();
-}
-#pragma GCC diagnostic pop
-
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-// New Qt 6.4+ permission API handler
 void WebEnginePage::handlePermissionRequested(QWebEnginePermission permission) {
   bool autoPlay = true;
   if (SettingsManager::instance().settings().value("autoPlayMedia").isValid())
@@ -149,67 +104,10 @@ void WebEnginePage::handlePermissionRequested(QWebEnginePermission permission) {
   }
   SettingsManager::instance().settings().endGroup();
 }
-#endif
-
-// This handler must always be defined because MOC generates code for it
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
-                                                     Feature feature) {
-  bool autoPlay = true;
-  if (SettingsManager::instance().settings().value("autoPlayMedia").isValid())
-    autoPlay = SettingsManager::instance()
-                   .settings()
-                   .value("autoPlayMedia", false)
-                   .toBool();
-  if (autoPlay && (feature == QWebEnginePage::MediaVideoCapture ||
-                   feature == QWebEnginePage::MediaAudioVideoCapture)) {
-    QWebEngineProfile *defProfile = QWebEngineProfile::defaultProfile();
-    auto *webSettings = defProfile->settings();
-    webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
-                              false);
-
-    profile()->settings()->setAttribute(
-        QWebEngineSettings::PlaybackRequiresUserGesture, false);
-  }
-
-  QString title = tr("Permission Request");
-  QString question = questionForFeature(feature).arg(securityOrigin.host());
-
-  QString featureStr = QVariant::fromValue(feature).toString();
-  SettingsManager::instance().settings().beginGroup("permissions");
-  if (SettingsManager::instance()
-          .settings()
-          .value(featureStr, false)
-          .toBool()) {
-    setFeaturePermission(
-        securityOrigin, feature,
-        QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-  } else {
-    if (!question.isEmpty() &&
-        QMessageBox::question(view()->window(), title, question) ==
-            QMessageBox::Yes) {
-      setFeaturePermission(
-          securityOrigin, feature,
-          QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-      SettingsManager::instance().settings().setValue(featureStr, true);
-    } else {
-      setFeaturePermission(
-          securityOrigin, feature,
-          QWebEnginePage::PermissionPolicy::PermissionDeniedByUser);
-      SettingsManager::instance().settings().setValue(featureStr, false);
-    }
-  }
-  SettingsManager::instance().settings().endGroup();
-}
-#pragma GCC diagnostic pop
 
 void WebEnginePage::handleLoadFinished(bool ok) {
 
   // turn on Notification settings by default
-#if QT_VERSION >= QT_VERSION_CHECK(6, 4, 0)
-  // For Qt 6.4+, permissions are handled through permissionRequested signal
-  // Settings are stored but actual permission granting happens in handlePermissionRequested
   if (SettingsManager::instance()
           .settings()
           .value("permissions/Notifications")
@@ -218,32 +116,6 @@ void WebEnginePage::handleLoadFinished(bool ok) {
     SettingsManager::instance().settings().setValue("Notifications", true);
     SettingsManager::instance().settings().endGroup();
   }
-#else
-  // Use deprecated API for older Qt6 versions
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wdeprecated-declarations"
-  if (SettingsManager::instance()
-          .settings()
-          .value("permissions/Notifications")
-          .isValid() == false) {
-    SettingsManager::instance().settings().beginGroup("permissions");
-    SettingsManager::instance().settings().setValue("Notifications", true);
-    setFeaturePermission(
-        QUrl("https://web.whatsapp.com/"),
-        QWebEnginePage::Feature::Notifications,
-        QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-    SettingsManager::instance().settings().endGroup();
-  } else if (SettingsManager::instance()
-                 .settings()
-                 .value("permissions/Notifications", true)
-                 .toBool()) {
-    setFeaturePermission(
-        QUrl("https://web.whatsapp.com/"),
-        QWebEnginePage::Feature::Notifications,
-        QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
-  }
-#pragma GCC diagnostic pop
-#endif
 
   if (ok) {
     injectPreventScrollWheelZoomHelper();
@@ -300,14 +172,9 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   return selectedFiles;
 }
 
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
 void WebEnginePage::handleCertificateError(
     const QWebEngineCertificateError &error) {
   QString description = error.description();
-#else
-bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
-  QString description = error.errorDescription();
-#endif
   QWidget *mainWindow = view()->window();
   if (error.isOverridable()) {
     QDialog dialog(mainWindow);
@@ -323,22 +190,14 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
     certificateDialog.m_errorLabel->setText(description);
     dialog.setWindowTitle(tr("Certificate Error"));
     bool accepted = dialog.exec() == QDialog::Accepted;
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     auto handler = const_cast<QWebEngineCertificateError &>(error);
     if (accepted)
       handler.acceptCertificate();
     else
       handler.rejectCertificate();
-#else
-    return accepted;
-#endif
   }
 
   QMessageBox::critical(mainWindow, tr("Certificate Error"), description);
-
-#if QT_VERSION < QT_VERSION_CHECK(6, 0, 0)
-  return false;
-#endif
 }
 
 void WebEnginePage::handleAuthenticationRequired(const QUrl &requestUrl,
@@ -416,7 +275,6 @@ void WebEnginePage::handleRegisterProtocolHandlerRequested(
 }
 //! [registerProtocolHandlerRequested]
 
-#if !defined(QT_NO_SSL) || QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
 void WebEnginePage::handleSelectClientCertificate(
     QWebEngineClientCertificateSelection selection) {
   // Just select one.
@@ -431,7 +289,6 @@ void WebEnginePage::handleSelectClientCertificate(
   }
   qDebug() << selection.host();
 }
-#endif
 
 void WebEnginePage::javaScriptConsoleMessage(
     WebEnginePage::JavaScriptConsoleMessageLevel level, const QString &message,
