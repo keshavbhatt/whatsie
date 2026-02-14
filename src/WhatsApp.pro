@@ -23,7 +23,7 @@ equals(QMAKE_HOST.arch, aarch64) {
 # Uncomment if you need specific linker flags as well
 #QMAKE_LFLAGS += $$QMAKE_LDFLAGS
 
-QT += core gui webengine webenginewidgets positioning
+QT += core gui webenginewidgets positioning
 
 CONFIG += c++17
 
@@ -33,13 +33,8 @@ CONFIG += c++17
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-!qtConfig(webengine-spellchecker) {
-    error("Qt WebEngine compiled without spellchecker support, this example will not work.")
-}
-
-qtConfig(webengine-native-spellchecker) {
-    error("Spellcheck example can not be built when using native OS dictionaries.")
-}
+# Spellchecker feature checks removed — Qt 6.8+ includes spellchecker by default
+# and no longer exposes the webengine-spellchecker feature flag.
 
 TARGET = whatsie
 TEMPLATE = app

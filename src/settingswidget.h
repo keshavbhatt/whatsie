@@ -67,7 +67,7 @@ private slots:
   void on_chnageCurrentPasswordPushButton_clicked();
   void on_closeButtonActionComboBox_currentIndexChanged(int index);
   void on_defaultUserAgentButton_clicked();
-  void on_dictComboBox_currentIndexChanged(const QString &arg1);
+  void on_dictComboBox_currentIndexChanged(int index);
   void on_enableSpellCheck_toggled(bool checked);
   void on_minimizeOnTrayIconClick_toggled(bool checked);
   void on_muteAudioCheckBox_toggled(bool checked);

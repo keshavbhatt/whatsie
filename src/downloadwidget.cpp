@@ -4,9 +4,9 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QUrl>
-#include <QWebEngineDownloadItem>
+#include <QWebEngineDownloadRequest>
 
-DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
+DownloadWidget::DownloadWidget(QWebEngineDownloadRequest *download,
                                QWidget *parent)
     : QFrame(parent), m_download(download) {
   setupUi(this);
@@ -26,22 +26,24 @@ DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
   }
 
   connect(openButton, &QPushButton::clicked, m_download, [this](bool) {
-    if (m_download->state() == QWebEngineDownloadItem::DownloadCompleted) {
+    if (m_download->state() == QWebEngineDownloadRequest::DownloadCompleted) {
           Utils::desktopOpenUrl(m_download->downloadFileName());
     }
   });
 
   connect(cancelButton, &QPushButton::clicked, m_download, [this](bool) {
-    if (m_download->state() == QWebEngineDownloadItem::DownloadInProgress)
+    if (m_download->state() == QWebEngineDownloadRequest::DownloadInProgress)
       m_download->cancel();
     else
       emit removeClicked(this);
   });
 
-  connect(m_download, &QWebEngineDownloadItem::downloadProgress, this,
+  connect(m_download, &QWebEngineDownloadRequest::receivedBytesChanged, this,
+          &DownloadWidget::updateWidget);
+  connect(m_download, &QWebEngineDownloadRequest::totalBytesChanged, this,
           &DownloadWidget::updateWidget);
 
-  connect(m_download, &QWebEngineDownloadItem::stateChanged, this,
+  connect(m_download, &QWebEngineDownloadRequest::stateChanged, this,
           &DownloadWidget::updateWidget);
 
   updateWidget();
@@ -65,7 +67,7 @@ inline QString DownloadWidget::withUnit(qreal bytes) {
 
 bool DownloadWidget::isDownloading() {
 
-  return m_download->state() == QWebEngineDownloadItem::DownloadInProgress;
+  return m_download->state() == QWebEngineDownloadRequest::DownloadInProgress;
 }
 
 void DownloadWidget::updateWidget() {
@@ -75,10 +77,10 @@ void DownloadWidget::updateWidget() {
 
   auto state = m_download->state();
   switch (state) {
-  case QWebEngineDownloadItem::DownloadRequested:
+  case QWebEngineDownloadRequest::DownloadRequested:
     Q_UNREACHABLE();
     break;
-  case QWebEngineDownloadItem::DownloadInProgress:
+  case QWebEngineDownloadRequest::DownloadInProgress:
     if (totalBytes >= 0) {
       progressBar->setValue(qRound(100 * receivedBytes / totalBytes));
       progressBar->setDisabled(false);
@@ -95,7 +97,7 @@ void DownloadWidget::updateWidget() {
     }
     openButton->setEnabled(false);
     break;
-  case QWebEngineDownloadItem::DownloadCompleted:
+  case QWebEngineDownloadRequest::DownloadCompleted:
     progressBar->setValue(100);
     progressBar->setDisabled(true);
     progressBar->setFormat(
@@ -103,7 +105,7 @@ void DownloadWidget::updateWidget() {
             .arg(withUnit(receivedBytes), withUnit(bytesPerSecond)));
     openButton->setEnabled(true);
     break;
-  case QWebEngineDownloadItem::DownloadCancelled:
+  case QWebEngineDownloadRequest::DownloadCancelled:
     progressBar->setValue(0);
     progressBar->setDisabled(true);
     progressBar->setFormat(
@@ -111,7 +113,7 @@ void DownloadWidget::updateWidget() {
             .arg(withUnit(receivedBytes), withUnit(bytesPerSecond)));
     openButton->setEnabled(false);
     break;
-  case QWebEngineDownloadItem::DownloadInterrupted:
+  case QWebEngineDownloadRequest::DownloadInterrupted:
     progressBar->setValue(0);
     progressBar->setDisabled(true);
     progressBar->setFormat(
@@ -120,7 +122,7 @@ void DownloadWidget::updateWidget() {
     break;
   }
 
-  if (state == QWebEngineDownloadItem::DownloadInProgress) {
+  if (state == QWebEngineDownloadRequest::DownloadInProgress) {
     static QIcon cancelIcon(":/icons/stop-line.png");
     cancelButton->setIcon(cancelIcon);
     cancelButton->setToolTip(tr("Stop downloading"));

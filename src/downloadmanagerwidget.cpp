@@ -6,16 +6,16 @@ DownloadManagerWidget::DownloadManagerWidget(QWidget *parent)
   setupUi(this);
 }
 
-void DownloadManagerWidget::acceptDownload(QWebEngineDownloadItem *download) {
+void DownloadManagerWidget::acceptDownload(QWebEngineDownloadRequest *download) {
   download->accept();
   add(new DownloadWidget(download));
   show();
 }
 
 void DownloadManagerWidget::downloadRequested(
-    QWebEngineDownloadItem *download) {
+    QWebEngineDownloadRequest *download) {
   Q_ASSERT(download &&
-           download->state() == QWebEngineDownloadItem::DownloadRequested);
+           download->state() == QWebEngineDownloadRequest::DownloadRequested);
   QString path =
       SettingsManager::instance().settings().value("defaultDownloadLocation",
                  QStandardPaths::writableLocation(

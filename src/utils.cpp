@@ -118,13 +118,13 @@ QString Utils::convertSectoDay(qint64 secs) {
  * The method constructs the full path by concatenating the specified `pathname`
  * with the provided `standardLocation`. If `standardLocation` is not provided,
  * the default value is obtained from
- * `QStandardPaths::writableLocation(QStandardPaths::DataLocation)`.
+ * `QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)`.
  *
  * @param pathname The name of the file or directory within the specified
  * location.
  * @param standardLocation (optional) The base directory to prepend to
  * `pathname`. Default value:
- * QStandardPaths::writableLocation(QStandardPaths::DataLocation).
+ * QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).
  *
  * @return The full path, including the `pathname` and the `standardLocation`,
  * separated by the appropriate directory separator. If the specified location
@@ -134,7 +134,7 @@ QString Utils::convertSectoDay(qint64 secs) {
 QString
 Utils::returnPath(QString pathname,
                   QString standardLocation = QStandardPaths::writableLocation(
-                      QStandardPaths::DataLocation)) {
+                      QStandardPaths::AppDataLocation)) {
   QChar sepe = QDir::separator();
   QDir d(standardLocation + sepe + pathname);
   d.mkpath(standardLocation + sepe + pathname);

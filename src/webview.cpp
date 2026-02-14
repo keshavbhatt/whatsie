@@ -2,7 +2,7 @@
 
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QWebEngineContextMenuData>
+#include <QWebEngineContextMenuRequest>
 #include <QWebEngineProfile>
 #include <mainwindow.h>
 
@@ -64,7 +64,7 @@ void WebView::wheelEvent(QWheelEvent *event) {
 
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
 
-  auto menu = page()->createStandardContextMenu();
+  auto menu = createStandardContextMenu();
   menu->setAttribute(Qt::WA_DeleteOnClose, true);
   // hide reload, back, forward, savepage, copyimagelink menus
   foreach (auto *action, menu->actions()) {
@@ -77,16 +77,16 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
-  const QWebEngineContextMenuData &data = page()->contextMenuData();
-  Q_ASSERT(data.isValid());
+  const QWebEngineContextMenuRequest *data = lastContextMenuRequest();
+  Q_ASSERT(data);
 
   // allow context menu on image
-  if (data.mediaType() == QWebEngineContextMenuData::MediaTypeImage) {
+  if (data->mediaType() == QWebEngineContextMenuRequest::MediaTypeImage) {
     QWebEngineView::contextMenuEvent(event);
     return;
   }
   // if content is not editable
-  if (data.selectedText().isEmpty() && !data.isContentEditable()) {
+  if (data->selectedText().isEmpty() && !data->isContentEditable()) {
     event->ignore();
     return;
   }

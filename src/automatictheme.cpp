@@ -47,7 +47,7 @@ AutomaticTheme::AutomaticTheme(QWidget *parent)
                 ui->refresh->setEnabled(false);
               }
             });
-    connect(m_gPosInfoSrc, &QGeoPositionInfoSource::updateTimeout, this, [=]() {
+    connect(m_gPosInfoSrc, &QGeoPositionInfoSource::errorOccurred, this, [=]() {
       if (!SettingsManager::instance().settings().value("sunrise").isValid() ||
           !SettingsManager::instance().settings().value("sunset").isValid()) {
         if (ui->refresh->isEnabled())
@@ -77,9 +77,9 @@ void AutomaticTheme::on_refresh_clicked() {
   if (geoCor.isValid()) {
     Sunclock sun(this->m_latitube, this->m_longitude, this->m_hourOffset);
     m_sunrise.setSecsSinceEpoch(
-        sun.sunrise(QDateTime::currentDateTimeUtc().toTime_t()));
+        sun.sunrise(QDateTime::currentDateTimeUtc().toSecsSinceEpoch()));
     m_sunset.setSecsSinceEpoch(
-        sun.sunset(QDateTime::currentDateTimeUtc().toTime_t()));
+        sun.sunset(QDateTime::currentDateTimeUtc().toSecsSinceEpoch()));
 
     ui->sunrise->setTime(m_sunrise.time());
     ui->sunset->setTime(m_sunset.time());

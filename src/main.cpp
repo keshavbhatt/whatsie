@@ -2,7 +2,6 @@
 #include <QDebug>
 #include <QWebEngineProfile>
 #include <QWebEngineSettings>
-#include <QtWebEngine>
 #include <QtWidgets>
 
 #include "common.h"
@@ -13,16 +12,14 @@
 
 int main(int argc, char *argv[]) {
 
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
           "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+          "--disable-extensions");
 #else
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
           "--disable-logging --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+          "--disable-extensions");
 #endif
 
   SingleApplication instance(argc, argv, true);
@@ -136,11 +133,11 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  QWebEngineSettings::defaultSettings()->setAttribute(
+  QWebEngineProfile::defaultProfile()->settings()->setAttribute(
       QWebEngineSettings::DnsPrefetchEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
+  QWebEngineProfile::defaultProfile()->settings()->setAttribute(
       QWebEngineSettings::FullScreenSupportEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
+  QWebEngineProfile::defaultProfile()->settings()->setAttribute(
       QWebEngineSettings::JavascriptCanAccessClipboard, true);
 
   MainWindow whatsie;
@@ -153,7 +150,7 @@ int main(int argc, char *argv[]) {
         qInfo().noquote() << "Another instance with PID: " +
                                  QString::number(instanceId) +
                                  ", sent argument: " + message;
-        QString messageStr = QTextCodec::codecForMib(106)->toUnicode(message);
+        QString messageStr = QString::fromUtf8(message);
 
         QCommandLineParser p;
         p.addOptions(secondaryInstanceCLIOptions);

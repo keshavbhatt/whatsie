@@ -568,9 +568,10 @@ void SettingsWidget::showSetApplockPasswordDialog() {
   }
 }
 
-void SettingsWidget::on_dictComboBox_currentIndexChanged(const QString &arg1) {
-  SettingsManager::instance().settings().setValue("sc_dict", arg1);
-  emit dictChanged(arg1);
+void SettingsWidget::on_dictComboBox_currentIndexChanged(int index) {
+  QString text = ui->dictComboBox->itemText(index);
+  SettingsManager::instance().settings().setValue("sc_dict", text);
+  emit dictChanged(text);
 }
 
 void SettingsWidget::on_enableSpellCheck_toggled(bool checked) {

@@ -21,6 +21,8 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
           &WebEnginePage::handleProxyAuthenticationRequired);
   connect(this, &QWebEnginePage::registerProtocolHandlerRequested, this,
           &WebEnginePage::handleRegisterProtocolHandlerRequested);
+  connect(this, &QWebEnginePage::certificateError, this,
+          &WebEnginePage::handleCertificateError);
 
 #if !defined(QT_NO_SSL) || QT_VERSION >= QT_VERSION_CHECK(5, 12, 0)
   connect(this, &QWebEnginePage::selectClientCertificate, this,
@@ -101,7 +103,7 @@ void WebEnginePage::handleFeaturePermissionRequested(const QUrl &securityOrigin,
         QWebEnginePage::PermissionPolicy::PermissionGrantedByUser);
   } else {
     if (!question.isEmpty() &&
-        QMessageBox::question(view()->window(), title, question) ==
+        QMessageBox::question(QApplication::activeWindow(), title, question) ==
             QMessageBox::Yes) {
       setFeaturePermission(
           securityOrigin, feature,
@@ -196,9 +198,10 @@ QStringList WebEnginePage::chooseFiles(QWebEnginePage::FileSelectionMode mode,
   return selectedFiles;
 }
 
-bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
-  QWidget *mainWindow = view()->window();
+void WebEnginePage::handleCertificateError(QWebEngineCertificateError error) {
+  QWidget *mainWindow = QApplication::activeWindow();
   if (error.isOverridable()) {
+    error.defer();
     QDialog dialog(mainWindow);
     dialog.setModal(true);
     dialog.setWindowFlags(dialog.windowFlags() &
@@ -209,19 +212,23 @@ bool WebEnginePage::certificateError(const QWebEngineCertificateError &error) {
     QIcon icon(mainWindow->style()->standardIcon(QStyle::SP_MessageBoxWarning,
                                                  nullptr, mainWindow));
     certificateDialog.m_iconLabel->setPixmap(icon.pixmap(32, 32));
-    certificateDialog.m_errorLabel->setText(error.errorDescription());
+    certificateDialog.m_errorLabel->setText(error.description());
     dialog.setWindowTitle(tr("Certificate Error"));
-    return dialog.exec() == QDialog::Accepted;
+    if (dialog.exec() == QDialog::Accepted)
+      error.acceptCertificate();
+    else
+      error.rejectCertificate();
+    return;
   }
 
   QMessageBox::critical(mainWindow, tr("Certificate Error"),
-                        error.errorDescription());
-  return false;
+                        error.description());
+  error.rejectCertificate();
 }
 
 void WebEnginePage::handleAuthenticationRequired(const QUrl &requestUrl,
                                                  QAuthenticator *auth) {
-  QWidget *mainWindow = view()->window();
+  QWidget *mainWindow = QApplication::activeWindow();
   QDialog dialog(mainWindow);
   dialog.setModal(true);
   dialog.setWindowFlags(dialog.windowFlags() &
@@ -252,7 +259,7 @@ void WebEnginePage::handleAuthenticationRequired(const QUrl &requestUrl,
 
 void WebEnginePage::handleProxyAuthenticationRequired(
     const QUrl &, QAuthenticator *auth, const QString &proxyHost) {
-  QWidget *mainWindow = view()->window();
+  QWidget *mainWindow = QApplication::activeWindow();
   QDialog dialog(mainWindow);
   dialog.setModal(true);
   dialog.setWindowFlags(dialog.windowFlags() &
@@ -284,7 +291,7 @@ void WebEnginePage::handleProxyAuthenticationRequired(
 void WebEnginePage::handleRegisterProtocolHandlerRequested(
     QWebEngineRegisterProtocolHandlerRequest request) {
   auto answer = QMessageBox::question(
-      view()->window(), tr("Permission Request"),
+      QApplication::activeWindow(), tr("Permission Request"),
       tr("Allow %1 to open all %2 links?")
           .arg(request.origin().host(), request.scheme()));
   if (answer == QMessageBox::Yes)

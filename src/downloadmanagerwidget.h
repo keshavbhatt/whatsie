@@ -57,11 +57,11 @@
 
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QWebEngineDownloadItem>
+#include <QWebEngineDownloadRequest>
 #include <QWidget>
 
 QT_BEGIN_NAMESPACE
-class QWebEngineDownloadItem;
+class QWebEngineDownloadRequest;
 QT_END_NAMESPACE
 
 class DownloadWidget;
@@ -74,16 +74,16 @@ public:
   explicit DownloadManagerWidget(QWidget *parent = nullptr);
 
   // Prompts user with a "Save As" dialog. If the user doesn't cancel it, then
-  // the QWebEngineDownloadItem will be accepted and the DownloadManagerWidget
+  // the QWebEngineDownloadRequest will be accepted and the DownloadManagerWidget
   // will be shown on the screen.
-  void downloadRequested(QWebEngineDownloadItem *webItem);
+  void downloadRequested(QWebEngineDownloadRequest *webItem);
 
 protected slots:
   void keyPressEvent(QKeyEvent *e);
 private slots:
   void on_open_download_dir_clicked();
 
-  void acceptDownload(QWebEngineDownloadItem *download);
+  void acceptDownload(QWebEngineDownloadRequest *download);
 
   void on_clear_all_downlads_clicked();
 

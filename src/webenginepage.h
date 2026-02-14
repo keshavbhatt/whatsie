@@ -32,7 +32,7 @@ protected:
                                QWebEnginePage::NavigationType type,
                                bool isMainFrame) override;
   QWebEnginePage *createWindow(QWebEnginePage::WebWindowType type) override;
-  bool certificateError(const QWebEngineCertificateError &error) override;
+  void handleCertificateError(QWebEngineCertificateError error);
   QStringList chooseFiles(FileSelectionMode mode, const QStringList &oldFiles,
                           const QStringList &acceptedMimeTypes) override;
 

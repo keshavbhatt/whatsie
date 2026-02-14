@@ -244,7 +244,7 @@ void MainWindow::tryLogOut() {
 }
 
 void MainWindow::initSettingWidget() {
-  int screenNumber = qApp->desktop()->screenNumber(this);
+  int screenNumber = QGuiApplication::screens().indexOf(this->screen());
   if (m_settingsWidget == nullptr) {
     m_settingsWidget = new SettingsWidget(
         this, screenNumber, m_webEngine->page()->profile()->cachePath(),
@@ -451,8 +451,7 @@ void MainWindow::showSettings(bool isAskedByCLI) {
   if (!m_settingsWidget->isVisible()) {
     this->updateSettingsUserAgentWidget();
     m_settingsWidget->refresh();
-    int screenNumber = qApp->desktop()->screenNumber(this);
-    QRect screenRect = QGuiApplication::screens().at(screenNumber)->geometry();
+    QRect screenRect = this->screen()->geometry();
     if (!screenRect.contains(m_settingsWidget->pos())) {
       m_settingsWidget->move(screenRect.center() -
                              m_settingsWidget->rect().center());
@@ -1131,7 +1130,7 @@ void MainWindow::loadingQuirk(const QString &test) {
 
 // unused direct method to download file without having entry in download
 // manager
-void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
+void MainWindow::handleDownloadRequested(QWebEngineDownloadRequest *download) {
   QFileDialog dialog(this);
   bool usenativeFileDialog = SettingsManager::instance()
                                  .settings()

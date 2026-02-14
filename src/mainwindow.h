@@ -15,7 +15,7 @@
 #include <QStyle>
 #include <QStyleFactory>
 #include <QSystemTrayIcon>
-#include <QWebEngineContextMenuData>
+#include <QWebEngineContextMenuRequest>
 #include <QWebEngineCookieStore>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineProfile>
@@ -53,7 +53,7 @@ public slots:
   void updatePageTheme();
   void handleWebViewTitleChanged(const QString &title);
   void handleLoadFinished(bool loaded);
-  void handleDownloadRequested(QWebEngineDownloadItem *download);
+  void handleDownloadRequested(QWebEngineDownloadRequest *download);
   void showSettings(bool isAskedByCLI = false);
   void showAbout();
   void lockApp();
