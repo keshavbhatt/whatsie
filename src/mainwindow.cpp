@@ -119,17 +119,21 @@ void MainWindow::updateWindowTheme() {
                                            .settings()
                                            .value("widgetStyle", "Fusion")
                                            .toString()));
-  if (SettingsManager::instance()
-          .settings()
-          .value("windowTheme", "light")
-          .toString() == "dark") {
+  const bool dark = SettingsManager::instance()
+                        .settings()
+                        .value("windowTheme", "light")
+                        .toString() == "dark";
+  if (dark) {
     qApp->setPalette(Theme::getDarkPalette());
-    m_webEngine->setStyleSheet(
-        "QWebEngineView{background:rgb(17, 27, 33);}");
+    m_webEngine->setStyleSheet("QWebEngineView{background:rgb(17, 27, 33);}");
   } else {
     qApp->setPalette(Theme::getLightPalette());
-    m_webEngine->setStyleSheet(
-        "QWebEngineView{background:#F0F0F0;}");
+    m_webEngine->setStyleSheet("QWebEngineView{background:#F0F0F0;}");
+  }
+
+  if (m_webEngine->page()) {
+    m_webEngine->page()->setBackgroundColor(
+        dark ? QColor(17, 27, 33) : QColor(240, 240, 240));
   }
 
   for (QWidget *w : findChildren<QWidget *>())
