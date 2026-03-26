@@ -38,6 +38,14 @@ static void setChromiumFlags() {
 }
 
 int main(int argc, char *argv[]) {
+  // Qt6 on Linux routes qDebug/qWarning to journald when the process is not
+  // attached to a TTY (e.g. when launched from an IDE).  Force stderr output
+  // so the IDE Run console always captures debug logs.
+#ifdef QT_DEBUG
+  qputenv("QT_FORCE_STDERR_LOGGING", "1");
+#endif
+
+  setChromiumFlags();
 
   SingleApplication instance(argc, argv, true);
   instance.setQuitOnLastWindowClosed(false);
