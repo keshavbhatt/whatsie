@@ -1,122 +1,75 @@
 name: whatsie
 adopt-info: whatsie-build-src
-summary: Qt Based WhatsApp Client
-description: |
-  Fast Light weight WhatsApp Client based on Qt's WebEngine, With lots of settings and packed goodies.
 
 grade: stable
 confinement: strict
-icon: snap/gui/icon.svg
-base: core20
+base: core24
 compression: lzo
 
-architectures:
-  - build-on: amd64
-    run-on: amd64
+icon: snap/gui/icon.svg
 
-environment:
-  SNAP_DESKTOP_RUNTIME: $SNAP/qt515-core20
-
-package-repositories:
-  - type: apt
-    formats: [deb]
-    components: [main]
-    suites: [focal]
-    key-id: C65D51784EDC19A871DBDBB710C56D0DE9977759
-    url: https://ppa.launchpadcontent.net/beineri/opt-qt-5.15.4-focal/ubuntu
+platforms:
+  amd64:
+  arm64:
 
 apps:
   whatsie:
-    command: bin/desktop-launch $SNAP/usr/bin/whatsie
-    environment:
-       IS_SNAP: 1
-       XDG_CURRENT_DESKTOP: $XDG_CURRENT_DESKTOP:Unity:Unity7
-       LANG: en_US.UTF-8 # issue 7,21
-       QT_QPA_PLATFORMTHEME: gtk3
-       GTK_USE_PORTAL: 1
-       NO_AT_BRIDGE: 1 #delay ATK Bridge initialization
+    command: usr/bin/whatsie
     desktop: usr/share/applications/com.ktechpit.whatsie.desktop
+    common-id: com.ktechpit.whatsie
+    extensions:
+      - kde-neon-6
     plugs:
-        - browser-support
-        - camera
-        - desktop
-        - desktop-legacy
-        - gsettings
         - home
+        - network
         - opengl
+        - browser-support
+        - network-status
+        - camera
         - audio-playback
         - audio-record
         - removable-media
         - screen-inhibit-control
-        - unity7
-        - x11
-        - network
-        - wayland
         - hardware-observe # to assist geoclue & qtpositioning
         - network-observe  # to assist geoclue & qtpositioning
         - network-bind  # to assist geoclue & qtpositioning
         - mount-observe
 
-plugs:
-  gsettings:
-  gtk-3-themes:
-    interface: content
-    target: $SNAP/data-dir/themes
-    default-provider: gtk-common-themes
-  icon-themes:
-    interface: content
-    target: $SNAP/data-dir/icons
-    default-provider: gtk-common-themes
-  sound-themes:
-    interface: content
-    target: $SNAP/data-dir/sounds
-    default-provider: gtk-common-themes
-  qt515-core20:
-    interface: content
-    target: $SNAP/qt515-core20
-    default-provider: qt515-core20
-
 parts:
    whatsie-build-src:
-     plugin: nil
-     source: https://github.com/keshavbhatt/whatsie.git
-     source-subdir: src/
+     plugin: cmake
+     source: .
+     parse-info:
+       - dist/linux/com.ktechpit.whatsie.appdata.xml
+     build-packages:
+       - libxkbcommon-dev
+       - libdrm-dev
+
+     stage-packages:
+       - libdrm2
+
+     cmake-parameters:
+       - -DCMAKE_BUILD_TYPE=Release
+       - -DCMAKE_INSTALL_PREFIX=/usr
+
      override-build: |
-            snapcraftctl build
+            craftctl build
+       
+           # Copy icon to meta/gui for snap icon
+           mkdir -p ${CRAFT_PART_INSTALL}/meta/gui
+           cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/com.ktechpit.whatsie.png \
+           ${CRAFT_PART_INSTALL}/meta/gui/icon.png
+           
+           # Fix desktop icon path for snapped environment
+           sed -i \
+           "s|^Icon=.*|Icon=\${SNAP}/meta/gui/icon.png|" \
+           ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
 
-            version="$(printf %s.%s $(git describe --tags --abbrev=0) $(git rev-parse --short HEAD))"
-
-            snapcraftctl set-version "$version"
-
-            apt install -y build-essential qt515base qt515tools qt515webengine qt515location qt515xmlpatterns libgl1-mesa-dev
-
-            QT_BASE_DIR=/opt/qt515
-            export QTDIR=$QT_BASE_DIR
-            export PATH=$QT_BASE_DIR/bin:$PATH
-            export LD_LIBRARY_PATH=$QT_BASE_DIR/lib/$SNAPCRAFT_ARCH_TRIPLET:$QT_BASE_DIR/lib:${LD_LIBRARY_PATH:+:$LD_LIBRARY_PATH}
-            export PKG_CONFIG_PATH=$QT_BASE_DIR/lib/pkgconfig:${PKG_CONFIG_PATH:+:$PKG_CONFIG_PATH}
-
-            PQMAKE=$(which qmake);
-
-            echo "Using" $PQMAKE;
-
-            echo $(${PQMAKE} --version)
-
-            qmake PREFIX=${SNAPCRAFT_PART_INSTALL}/usr src
-
-            make -j4
-
-            make install
-
-            sed -i 's|Icon=.*|Icon=${SNAP}/meta/gui/icon.svg|g' ${SNAPCRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
-
-   desktop-launch:
-     plugin: nil
-     source: https://github.com/keshavbhatt/qt515-core20.git
-     after: [whatsie-build-src]
-     override-build: |
-            snapcraftctl build
-            
-            mkdir -p ${SNAPCRAFT_PART_INSTALL}/bin/
-            
-            cp -rf ${SNAPCRAFT_PART_SRC}/snap_launcher/bin/desktop-launch ${SNAPCRAFT_PART_INSTALL}/bin/
+     prime:
+       - -usr/bug
+       - -usr/doc
+       - -usr/include
+       - -usr/lib/*/cmake
+       - -usr/share/ECM
+       - -usr/share/man
+       - -usr/share/lintian
