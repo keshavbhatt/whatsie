@@ -84,6 +84,9 @@ set(SOURCES
     src/lock.cpp
     src/main.cpp
     src/mainwindow.cpp
+    src/mainwindow_lock.cpp
+    src/mainwindow_tray.cpp
+    src/mainwindow_webengine.cpp
     src/permissiondialog.cpp
     src/rateapp.cpp
     src/settingswidget.cpp
