@@ -4,6 +4,7 @@
 
 #include <QDebug>
 #include <QStandardPaths>
+#include <QWebEngineScriptCollection>
 
 WebEngineProfileManager &WebEngineProfileManager::instance() {
     static WebEngineProfileManager inst;
@@ -41,6 +42,33 @@ WebEngineProfileManager::WebEngineProfileManager() {
     s->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard,      true);
 
     applyUserSettings();
+
+    // WhatsApp Web calls navigator.storage.persist() at startup and logs a
+    // non-fatal error when it returns false (QtWebEngine never auto-grants it).
+    // Intercept the call at document-creation time — before any page JS runs —
+    // so the promise always resolves true.  This also suppresses the follow-on
+    // "[storage] storage bucket persistence denied" console spam.
+    QWebEngineScript persistScript;
+    persistScript.setName(QStringLiteral("grant-storage-persistence"));
+    persistScript.setSourceCode(QStringLiteral(
+        "(function(){"
+        "  if(navigator.storage&&navigator.storage.persist){"
+        "    Object.defineProperty(navigator.storage,'persist',{"
+        "      value:function(){return Promise.resolve(true);},"
+        "      writable:true,configurable:true"
+        "    });"
+        "  }"
+        "  if(navigator.storage&&navigator.storage.persisted){"
+        "    Object.defineProperty(navigator.storage,'persisted',{"
+        "      value:function(){return Promise.resolve(true);},"
+        "      writable:true,configurable:true"
+        "    });"
+        "  }"
+        "})();"));
+    persistScript.setInjectionPoint(QWebEngineScript::DocumentCreation);
+    persistScript.setWorldId(QWebEngineScript::MainWorld);
+    persistScript.setRunsOnSubFrames(false);
+    m_profile->scripts()->insert(persistScript);
 }
 
 WebEngineProfileManager::~WebEngineProfileManager() {
