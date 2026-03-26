@@ -118,7 +118,6 @@ void WebEnginePage::handleLoadFinished(bool ok) {
 
   if (ok) {
     injectPreventScrollWheelZoomHelper();
-    injectFullWidthJavaScript();
     injectClassChangeObserver();
     injectNewChatJavaScript();
   }
@@ -348,36 +347,6 @@ void WebEnginePage::injectClassChangeObserver() {
             characterData: false
         });
         )";
-  this->runJavaScript(js);
-}
-
-void WebEnginePage::injectFullWidthJavaScript() {
-  if (!SettingsManager::instance()
-           .settings()
-           .value("fullWidthView", true)
-           .toBool())
-    return;
-
-  QString js =
-      R"(function updateFullWidthView(element) {
-                var container = document.querySelector('#app > .app-wrapper-web > .two');
-                container.style.width = '100%';
-                container.style.height = '100%';
-                container.style.top = '0';
-                container.style.maxWidth = 'unset';
-                fw_observer.disconnect();
-            }
-            var fw_observer = new MutationObserver(mutations => {
-                const element = document.querySelector('#pane-side');
-                if (element) {
-                    updateFullWidthView({ selector: '#pane-side', element });
-                }
-            });
-            fw_observer.observe(document.documentElement, {
-                childList: true,
-                subtree: true
-            });
-           )";
   this->runJavaScript(js);
 }
 
