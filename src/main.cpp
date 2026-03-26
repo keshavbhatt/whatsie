@@ -2,15 +2,13 @@
 #include <QDebug>
 #include <QtWidgets>
 #include <QtWebEngineCore>
-#include <QStandardPaths>
-#include <QWebEngineProfile>
-#include <QWebEngineSettings>
 
 #include "common.h"
 #include "def.h"
 #include "dictionaries.h"
 #include "mainwindow.h"
 #include "settingsmanager.h"
+#include "webengineprofilemanager.h"
 #include <singleapplication.h>
 
 int main(int argc, char *argv[]) {
@@ -137,23 +135,8 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  // Configure persistent storage for the default profile
-  QWebEngineProfile *defaultProfile = QWebEngineProfile::defaultProfile();
-
-  // Set up persistent storage paths
-  QString dataPath = QStandardPaths::writableLocation(QStandardPaths::AppLocalDataLocation);
-  QString cachePath = QStandardPaths::writableLocation(QStandardPaths::CacheLocation);
-
-  defaultProfile->setPersistentStoragePath(dataPath + "/QtWebEngine");
-  defaultProfile->setCachePath(cachePath + "/QtWebEngine");
-
-  qDebug() << "Persistent storage path:" << defaultProfile->persistentStoragePath();
-  qDebug() << "Cache path:" << defaultProfile->cachePath();
-
-  QWebEngineSettings *websettings = defaultProfile->settings();
-  websettings->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-  websettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
-  websettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard, true);
+  // Initialise the single persistent WebEngine profile before any page is created.
+  WebEngineProfileManager::instance();
 
   MainWindow whatsie;
 

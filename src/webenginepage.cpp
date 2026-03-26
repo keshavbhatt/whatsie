@@ -1,4 +1,5 @@
 #include "webenginepage.h"
+#include "webengineprofilemanager.h"
 
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
@@ -78,10 +79,8 @@ void WebEnginePage::handlePermissionRequested(QWebEnginePermission permission) {
 
   if (autoPlay && (permission.permissionType() == QWebEnginePermission::PermissionType::MediaVideoCapture ||
                    permission.permissionType() == QWebEnginePermission::PermissionType::MediaAudioVideoCapture)) {
-    QWebEngineProfile *defProfile = QWebEngineProfile::defaultProfile();
-    auto *webSettings = defProfile->settings();
-    webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
-    profile()->settings()->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
+    WebEngineProfileManager::instance().profile()->settings()
+        ->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
   }
 
   QString title = tr("Permission Request");

@@ -5,9 +5,17 @@
 #include <QRegularExpression>
 #include <QScreen>
 #include <QShortcut>
+#include <QStyleFactory>
 #include <QStyleHints>
 #include <QUrlQuery>
 #include <QWebEngineNotification>
+
+#include "about.h"
+#include "dictionaries.h"
+#include "rateapp.h"
+#include "theme.h"
+#include "webengineprofilemanager.h"
+#include "webview.h"
 
 extern QString defaultUserAgentStr;
 extern double defaultZoomFactorMaximized;
@@ -279,13 +287,9 @@ void MainWindow::initSettingWidget() {
             });
     connect(m_settingsWidget, &SettingsWidget::autoPlayMediaToggled,
             m_settingsWidget, [=](bool checked) {
-              QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
-              auto *webSettings = profile->settings();
-              webSettings->setAttribute(
-                  QWebEngineSettings::PlaybackRequiresUserGesture, checked);
-
-              m_webEngine->page()->profile()->settings()->setAttribute(
-                  QWebEngineSettings::PlaybackRequiresUserGesture, checked);
+              WebEngineProfileManager::instance().profile()->settings()
+                  ->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
+                                 checked);
             });
 
     connect(m_settingsWidget, &SettingsWidget::dictChanged, m_settingsWidget,
@@ -790,52 +794,11 @@ void MainWindow::checkWindowState() {
   }
 }
 
+// Profile configuration is now centralised in WebEngineProfileManager.
+// Re-apply user-configurable settings (UA, spell-check, autoplay) in case
+// they have changed since the profile was first created.
 void MainWindow::initGlobalWebProfile() {
-
-  QWebEngineProfile *profile = QWebEngineProfile::defaultProfile();
-  profile->setHttpUserAgent(SettingsManager::instance()
-                                .settings()
-                                .value("useragent", defaultUserAgentStr)
-                                .toString());
-
-  QStringList dict_names;
-  dict_names.append(SettingsManager::instance()
-                        .settings()
-                        .value("sc_dict", "en-US")
-                        .toString());
-
-  profile->setSpellCheckEnabled(SettingsManager::instance()
-                                    .settings()
-                                    .value("sc_enabled", true)
-                                    .toBool());
-  profile->setSpellCheckLanguages(dict_names);
-
-  auto *webSettings = profile->settings();
-  webSettings->setAttribute(QWebEngineSettings::AutoLoadImages, true);
-  webSettings->setAttribute(QWebEngineSettings::JavascriptEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::JavascriptCanOpenWindows, true);
-  webSettings->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessRemoteUrls,
-                            true);
-  webSettings->setAttribute(QWebEngineSettings::XSSAuditingEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::LocalContentCanAccessFileUrls,
-                            true);
-  webSettings->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, false);
-  webSettings->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::FullScreenSupportEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::LinksIncludedInFocusChain,
-                            false);
-  webSettings->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled,
-                            false);
-  webSettings->setAttribute(QWebEngineSettings::SpatialNavigationEnabled, true);
-  webSettings->setAttribute(QWebEngineSettings::JavascriptCanPaste, true);
-  webSettings->setAttribute(QWebEngineSettings::JavascriptCanAccessClipboard,
-                            true);
-  webSettings->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture,
-                            SettingsManager::instance()
-                                .settings()
-                                .value("autoPlayMedia", false)
-                                .toBool());
+  WebEngineProfileManager::instance().applyUserSettings();
 }
 
 void MainWindow::createWebEngine() {
@@ -875,27 +838,17 @@ const QIcon MainWindow::getTrayIcon(const int &notificationCount) const {
 }
 
 void MainWindow::createWebPage(bool offTheRecord) {
-  if (offTheRecord && !m_otrProfile) {
-    m_otrProfile.reset(new QWebEngineProfile);
+  QWebEngineProfile *profile = nullptr;
+
+  if (offTheRecord) {
+    if (!m_otrProfile)
+      m_otrProfile.reset(new QWebEngineProfile);
+    profile = m_otrProfile.get();
+  } else {
+    profile = WebEngineProfileManager::instance().profile();
+    // Re-apply any user settings that may have changed.
+    WebEngineProfileManager::instance().applyUserSettings();
   }
-  auto profile =
-      offTheRecord ? m_otrProfile.get() : QWebEngineProfile::defaultProfile();
-
-  QStringList dict_names;
-  dict_names.append(SettingsManager::instance()
-                        .settings()
-                        .value("sc_dict", "en-US")
-                        .toString());
-
-  profile->setSpellCheckEnabled(SettingsManager::instance()
-                                    .settings()
-                                    .value("sc_enabled", true)
-                                    .toBool());
-  profile->setSpellCheckLanguages(dict_names);
-  profile->setHttpUserAgent(SettingsManager::instance()
-                                .settings()
-                                .value("useragent", defaultUserAgentStr)
-                                .toString());
 
   setNotificationPresenter(profile);
 
@@ -909,10 +862,14 @@ void MainWindow::createWebPage(bool offTheRecord) {
     page->setBackgroundColor(QColor(240, 240, 240)); // whatsapp light bg color
   }
   m_webEngine->setPage(page);
-  // page should be set parent of profile to prevent
-  // Release of profile requested but WebEnginePage still not deleted. Expect
-  // troubles !
-  profile->setParent(page);
+
+  if (offTheRecord) {
+    // Transfer ownership of the OTR profile to the page so it is cleaned up
+    // automatically when the page is destroyed.
+    profile->setParent(page);
+  }
+  // The main profile is owned by WebEngineProfileManager; never re-parent it.
+
   auto randomValue = QRandomGenerator::global()->generateDouble() * 300.0;
   page->setUrl(
       QUrl("https://web.whatsapp.com?v=" + QString::number(randomValue)));

@@ -1,38 +1,17 @@
 #ifndef MAINWINDOW_H
 #define MAINWINDOW_H
 
-#include <QAction>
-#include <QApplication>
-#include <QFileDialog>
-#include <QGraphicsOpacityEffect>
-#include <QIcon>
 #include <QMainWindow>
 #include <QMenu>
-#include <QMessageBox>
-#include <QProgressBar>
-#include <QRadioButton>
-#include <QStatusBar>
-#include <QStyle>
-#include <QStyleFactory>
 #include <QSystemTrayIcon>
 #include <QWebEngineCookieStore>
-#include <QWebEngineFullScreenRequest>
-#include <QWebEngineProfile>
-#include <QWebEngineSettings>
-#include <QWebEngineView>
 
-#include "about.h"
 #include "autolockeventfilter.h"
-#include "dictionaries.h"
 #include "downloadmanagerwidget.h"
 #include "lock.h"
 #include "notificationpopup.h"
-#include "rateapp.h"
-#include "requestinterceptor.h"
 #include "settingswidget.h"
-#include "theme.h"
 #include "webenginepage.h"
-#include "webview.h"
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -76,7 +55,6 @@ private:
   void updateSettingsUserAgentWidget();
   void createWebPage(bool offTheRecord = false);
   void initSettingWidget();
-  void initGlobalWebProfile();
   void tryLock();
   void checkLoadedCorrectly();
   void loadingQuirk(const QString &test);
@@ -127,6 +105,7 @@ private slots:
   void toggleMute(const bool &checked);
   void fullScreenRequested(QWebEngineFullScreenRequest request);
   void checkWindowState();
+  void initGlobalWebProfile();
   void initLock();
   void quitApp();
   void changeLockPassword();
