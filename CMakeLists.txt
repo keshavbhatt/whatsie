@@ -28,9 +28,9 @@ execute_process(
 
 string(TIMESTAMP BUILD_TIMESTAMP "%Y-%m-%d %H:%M:%S")
 
-# Set Qt version - Require Qt 6.4 minimum for modern permission API
+# Set Qt version - Require Qt 6.10 minimum
 set(QT_VERSION_MAJOR 6)
-set(QT_VERSION_MINOR 4)
+set(QT_VERSION_MINOR 10)
 
 # Set CMake policies
 set(CMAKE_AUTOMOC ON)
@@ -91,6 +91,7 @@ set(SOURCES
     src/theme.cpp
     src/utils.cpp
     src/webenginepage.cpp
+    src/webengineprofilemanager.cpp
     src/webview.cpp
     src/widgets/elidedlabel/elidedlabel.cpp
     src/widgets/scrolltext/scrolltext.cpp
@@ -118,6 +119,7 @@ set(HEADERS
     src/theme.h
     src/utils.h
     src/webenginepage.h
+    src/webengineprofilemanager.h
     src/webview.h
     src/widgets/elidedlabel/elidedlabel.h
     src/widgets/scrolltext/scrolltext.h

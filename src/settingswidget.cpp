@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QStyle>
+#include <QStyleFactory>
 
 #include "automatictheme.h"
 
