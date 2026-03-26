@@ -123,13 +123,6 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
                                         .value("widgetStyle", "Fusion")
                                         .toString());
 
-  ui->fullWidthViewCheckbox->blockSignals(true);
-  ui->fullWidthViewCheckbox->setChecked(SettingsManager::instance()
-                                            .settings()
-                                            .value("fullWidthView", true)
-                                            .toBool());
-  ui->fullWidthViewCheckbox->blockSignals(false);
-
   ui->automaticThemeCheckBox->blockSignals(true);
   bool automaticThemeSwitching = SettingsManager::instance()
                                      .settings()
@@ -861,11 +854,6 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     SettingsManager::instance().settings().setValue("lockscreen", true);
     showSetApplockPasswordDialog();
   }
-}
-
-void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked) {
-  SettingsManager::instance().settings().setValue("fullWidthView", checked);
-  emit updateFullWidthView(checked);
 }
 
 void SettingsWidget::keyPressEvent(QKeyEvent *e) {

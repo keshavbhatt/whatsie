@@ -95,8 +95,6 @@ private slots:
   void themeSwitchTimerTimeout();
   void updateAutomaticTheme();
 
-  void on_fullWidthViewCheckbox_toggled(bool checked);
-
   void on_deletePersistentData_clicked();
 
 private:

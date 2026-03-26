@@ -64,7 +64,6 @@ private slots:
       QWebEngineClientCertificateSelection clientCertSelection);
   void fullScreenRequestedByPage(QWebEngineFullScreenRequest request);
   void injectPreventScrollWheelZoomHelper();
-  void injectFullWidthJavaScript();
   void injectNewChatJavaScript();
 };
 
