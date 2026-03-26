@@ -11,18 +11,33 @@
 #include "webengineprofilemanager.h"
 #include <singleapplication.h>
 
-int main(int argc, char *argv[]) {
-
-
+// Must run before QApplication is created so Qt WebEngine picks these up.
+static void setChromiumFlags() {
+  if (!qEnvironmentVariableIsEmpty("QTWEBENGINE_CHROMIUM_FLAGS"))
+    return;
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
-          "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+    "--remote-debugging-port=9421 "
+          "--disable-gpu "
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps "
+          "--no-sandbox");
 #else
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
-          "--disable-logging --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+          "--disable-gpu "
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps "
+          "--no-sandbox");
 #endif
+}
+
+int main(int argc, char *argv[]) {
 
   SingleApplication instance(argc, argv, true);
   instance.setQuitOnLastWindowClosed(false);
