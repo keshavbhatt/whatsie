@@ -3,14 +3,13 @@
 
 #include <QRandomGenerator>
 #include <QScreen>
-#include <QWebEngineNotification>
 
 #include "common.h"
+#include "webenginenotifproxy.h"
 #include "webengineprofilemanager.h"
 #include "webview.h"
 
 // ── WebEngine view & page ─────────────────────────────────────────────────────
-
 void MainWindow::createWebEngine() {
   WebEngineProfileManager::instance().applyUserSettings();
 
@@ -98,34 +97,25 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
         int notificationCombo = settings.value("notificationCombo", 1).toInt();
         int timeout = settings.value("notificationTimeOut", 9000).toInt();
 
-        if (notificationCombo == 0 && m_systemTrayIcon) {
-          QPointer<QWebEngineNotification> notificationPtr = notification.get();
-          if (notificationPtr) {
-            connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-                    [this, notificationPtr]() {
-                      QMetaObject::invokeMethod(
-                          this,
-                          [notificationPtr]() {
-                            if (notificationPtr) {
-                              qWarning() << "notificationPtr clciked";
-                              notificationPtr->click();
-                            }
-                            qWarning() << "notificationPtr clciked Ok";
-                          },
-                          Qt::QueuedConnection);
-                    });
-          }
+        if (notificationCombo == 0) {
+          // Use Proxy to manage lifecycle of QWebEngineNotification safely
+          auto proxy = WebEngineNotifProxy::create(std::move(notification));
+          auto ntf = notify(proxy->notif->title(), proxy->notif->message(), timeout);
+          ntf->setIconFromImage(proxy->notif->icon());
+          connect(ntf.get(), &Notification::Event::actionInvoked, this,
+              [this, proxy](const QString & action) {
+                if (action != "open") return;
+                proxy->invoke(&QWebEngineNotification::click);
+                this->notificationClicked();
+              });
 
-          // Custom icons cause issues on GNOME Shell.
-          if (userDesktopEnvironment.contains("gnome", Qt::CaseInsensitive)) {
-            m_systemTrayIcon->showMessage(notification->title(),
-                                          notification->message(),
-                                          QSystemTrayIcon::Critical, 0);
-          } else {
-            QIcon icon(QPixmap::fromImage(notification->icon()));
-            m_systemTrayIcon->showMessage(
-                notification->title(), notification->message(), icon, timeout);
-          }
+          connect(ntf.get(), &Notification::Event::closed, this,
+              [this, proxy](Notification::ClosingReason reason) {
+                proxy->invoke(&QWebEngineNotification::close);
+              });
+
+          ntf->show();
+          proxy->invoke(&QWebEngineNotification::show);
           return;
         }
 

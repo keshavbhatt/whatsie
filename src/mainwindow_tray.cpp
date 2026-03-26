@@ -85,8 +85,6 @@ void MainWindow::createTrayIcon() {
   m_systemTrayIcon->setContextMenu(m_trayIconMenu);
   connect(m_trayIconMenu, &QMenu::aboutToShow, this,
           &MainWindow::checkWindowState);
-  connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
-          [this]() { notificationClicked(); });
   connect(m_systemTrayIcon, &QSystemTrayIcon::activated, this,
           &MainWindow::iconActivated);
 

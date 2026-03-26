@@ -1,0 +1,3 @@
+[submodule "src/libnotify-qt"]
+	path = src/libnotify-qt
+	url = https://github.com/ahm-forks/libnotify-qt
