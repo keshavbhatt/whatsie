@@ -4,7 +4,6 @@
 #include <QMainWindow>
 #include <QMenu>
 #include <QSystemTrayIcon>
-#include <QWebEngineCookieStore>
 
 #include "autolockeventfilter.h"
 #include "downloadmanagerwidget.h"
@@ -31,7 +30,6 @@ public slots:
   void updatePageTheme();
   void handleWebViewTitleChanged(const QString &title);
   void handleLoadFinished(bool loaded);
-  void handleDownloadRequested(QWebEngineDownloadItem *download);
   void showSettings(bool isAskedByCLI = false);
   void showAbout();
   void lockApp();
@@ -49,7 +47,6 @@ private:
   void createTrayIcon();
   void createWebEngine();
   QString getPageTheme() const;
-  void handleCookieAdded(const QNetworkCookie &cookie);
   void doAppReload();
   void askToReloadPage();
   void updateSettingsUserAgentWidget();
@@ -105,7 +102,6 @@ private slots:
   void toggleMute(const bool &checked);
   void fullScreenRequested(QWebEngineFullScreenRequest request);
   void checkWindowState();
-  void initGlobalWebProfile();
   void initLock();
   void quitApp();
   void changeLockPassword();

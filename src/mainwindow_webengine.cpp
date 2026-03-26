@@ -10,18 +10,10 @@
 #include "webengineprofilemanager.h"
 #include "webview.h"
 
-// ── Profile ───────────────────────────────────────────────────────────────────
-
-void MainWindow::initGlobalWebProfile() {
-  // Profile configuration is centralised in WebEngineProfileManager.
-  // Re-apply user-configurable settings in case they changed.
-  WebEngineProfileManager::instance().applyUserSettings();
-}
-
 // ── WebEngine view & page ─────────────────────────────────────────────────────
 
 void MainWindow::createWebEngine() {
-  initGlobalWebProfile();
+  WebEngineProfileManager::instance().applyUserSettings();
 
   QSizePolicy widgetSize;
   widgetSize.setHorizontalPolicy(QSizePolicy::Expanding);
@@ -269,34 +261,118 @@ void MainWindow::updatePageTheme() {
   if (!m_webEngine || !m_webEngine->page())
     return;
 
-  QString windowTheme = SettingsManager::instance()
-                            .settings()
-                            .value("windowTheme", "light")
-                            .toString();
+  const bool dark = SettingsManager::instance()
+                        .settings()
+                        .value("windowTheme", "light")
+                        .toString() == "dark";
 
-  if (windowTheme == "dark") {
-    m_webEngine->page()->runJavaScript(
-        "localStorage['system-theme-mode']='false'; "
-        "localStorage.theme='\"dark\"'; ");
-    m_webEngine->page()->runJavaScript(
-        "document.querySelector('body').classList.add('" + windowTheme + "');");
-  } else {
-    m_webEngine->page()->runJavaScript(
-        "localStorage['system-theme-mode']='false'; "
-        "localStorage.theme='\"light\"'; ");
-    m_webEngine->page()->runJavaScript(
-        "document.querySelector('body').classList.remove('dark');");
-  }
+  // Sequence reverse-engineered from WhatsApp Web's own theme-toggle logic:
+  //
+  // 1. WA module calls via global require():
+  //      WAWebUserPrefsGeneral.setSystemThemeMode(false)  -- disable "follow OS"
+  //      WAWebUserPrefsGeneral.setTheme(theme)            -- persist preference
+  //      WAWebThemeContext.applyThemeToUI(theme)          -- repaint UI
+  //      WAWebSystemTheme.theme = theme                   -- update system ref
+  //
+  // 2. React class component setState -- walk fiber ancestors of .app-wrapper-web
+  //    upward via .return until we find the component whose state has both
+  //    .theme and .systemThemeMode, then setState({theme, systemThemeMode:false}).
+  //    Fall back to forceUpdate() on ancestors if that component is not found.
+  //
+  // 3. DOM attributes + localStorage -- persists across reloads, covers
+  //    any CSS-only observers.
+  const QString js = QString(R"js(
+    (function(theme) {
+      var isDark = theme === 'dark';
+
+      // ── 1. WA module calls via global require() ───────────────────────────
+      if (typeof require === 'function') {
+        try {
+          var up = require('WAWebUserPrefsGeneral');
+          if (up) {
+            if (typeof up.setSystemThemeMode === 'function') up.setSystemThemeMode(false);
+            if (typeof up.setTheme          === 'function') up.setTheme(theme);
+          }
+        } catch (e) {}
+        try {
+          var tc = require('WAWebThemeContext');
+          if (tc && typeof tc.applyThemeToUI === 'function') tc.applyThemeToUI(theme);
+        } catch (e) {}
+        try {
+          var st = require('WAWebSystemTheme');
+          if (st) st.theme = theme;
+        } catch (e) {}
+      }
+
+      // ── 2. React class component setState (upward fiber walk) ─────────────
+      try {
+        var wrapper = document.querySelector('.app-wrapper-web');
+        var rk = wrapper && Object.keys(wrapper).find(function(k) {
+          return k.startsWith('__reactFiber') || k.startsWith('__reactInternalInstance');
+        });
+        if (rk) {
+          var fiber = wrapper[rk];
+          var found = false;
+          while (fiber) {
+            var sn = fiber.stateNode;
+            if (sn && sn.state &&
+                sn.state.theme !== undefined &&
+                sn.state.systemThemeMode !== undefined &&
+                typeof sn.setState === 'function') {
+              sn.setState({theme: theme, systemThemeMode: false});
+              found = true;
+              break;
+            }
+            fiber = fiber.return;
+          }
+          if (!found) {
+            fiber = wrapper[rk];
+            var count = 0;
+            while (fiber && count < 10) {
+              if (fiber.stateNode && typeof fiber.stateNode.forceUpdate === 'function') {
+                try { fiber.stateNode.forceUpdate(); } catch (e) {}
+                count++;
+              }
+              fiber = fiber.return;
+            }
+          }
+        }
+      } catch (e) {}
+
+      // ── 3. DOM attributes + localStorage ─────────────────────────────────
+      var root = document.documentElement;
+      root.setAttribute('data-theme',      theme);
+      root.setAttribute('data-color-mode', theme);
+      root.style.colorScheme = theme;
+      document.body.classList.toggle('dark', isDark);
+
+      localStorage.setItem('theme', theme);
+      localStorage.removeItem('system-theme-mode');
+      try {
+        window.dispatchEvent(new StorageEvent('storage', {
+          key: 'theme', newValue: theme,
+          storageArea: localStorage, url: location.href
+        }));
+      } catch (e) {}
+    })('%1');
+  )js").arg(dark ? "dark" : "light");
+
+  m_webEngine->page()->runJavaScript(js);
 }
 
 QString MainWindow::getPageTheme() const {
   static QString theme = "web"; // implies light
   if (m_webEngine && m_webEngine->page()) {
+    // Read back from the same localStorage key WhatsApp writes to, so we
+    // always get the authoritative value regardless of DOM structure changes.
     m_webEngine->page()->runJavaScript(
-        "document.querySelector('body').className;",
+        "(function(){"
+        "  var v = localStorage.getItem('theme');"
+        "  try { v = JSON.parse(v); } catch(e) {}"  // handle both 'dark' and '"dark"'
+        "  return v === 'dark' ? 'dark' : 'light';"
+        "})();",
         [=](const QVariant &result) {
-          theme = result.toString();
-          theme.contains("dark") ? theme = "dark" : theme = "light";
+          theme = result.toString() == "dark" ? "dark" : "light";
           SettingsManager::instance().settings().setValue("windowTheme", theme);
         });
   }
@@ -326,29 +402,4 @@ void MainWindow::fullScreenRequested(QWebEngineFullScreenRequest request) {
 
 void MainWindow::toggleMute(const bool &checked) {
   m_webEngine->page()->setAudioMuted(checked);
-}
-
-void MainWindow::handleCookieAdded(const QNetworkCookie &cookie) {
-  qDebug() << cookie.toRawForm() << "\n\n\n";
-}
-
-// unused direct download handler (kept for API compatibility)
-void MainWindow::handleDownloadRequested(QWebEngineDownloadItem *download) {
-  QFileDialog dialog(this);
-  bool usenativeFileDialog = SettingsManager::instance()
-                                 .settings()
-                                 .value("useNativeFileDialog", false)
-                                 .toBool();
-  if (!usenativeFileDialog)
-    dialog.setOption(QFileDialog::DontUseNativeDialog, true);
-
-  dialog.setAcceptMode(QFileDialog::AcceptMode::AcceptSave);
-  dialog.setFileMode(QFileDialog::FileMode::AnyFile);
-  QString suggestedFileName = QUrl(download->downloadDirectory()).fileName();
-  dialog.selectFile(suggestedFileName);
-
-  if (dialog.exec() && dialog.selectedFiles().size() > 0) {
-    download->setDownloadDirectory(dialog.selectedFiles().at(0));
-    download->accept();
-  }
 }
