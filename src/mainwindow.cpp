@@ -24,13 +24,13 @@ extern bool   defaultAppAutoLock;
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
       m_notifier("WhatSie", this),
-      m_trayIconNormal(":/icons/app/notification/whatsie-notify.png"),
+      m_trayIconNormal(themeIcon("whatsie-tray", ":/icons/app/notification/whatsie-notify.png")),
       m_notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
       m_unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
 
   setObjectName("MainWindow");
   setWindowTitle(QApplication::applicationName());
-  setWindowIcon(QIcon(":/icons/app/icon-64.png"));
+  setWindowIcon(themeIcon("whatsie", ":/icons/app/icon-64.png"));
   setMinimumWidth(525);
   setMinimumHeight(448);
   restoreMainWindow();
@@ -306,10 +306,10 @@ void MainWindow::showNotification(QString title, QString message) {
                          this->notificationClicked();
                      });
 
-    ntf->setIconFromPixmap(m_trayIconNormal
-                                .pixmap(m_trayIconNormal
-                                            .actualSize(QSize(32,32), QIcon::Normal),
-                                        QIcon::Normal, QIcon::On));
+    ntf->setIconFromPixmap(windowIcon()
+                             .pixmap(windowIcon()
+                                       .actualSize(QSize(32,32), QIcon::Normal),
+                                       QIcon::Normal, QIcon::On));
     ntf->show();
   } else {
     auto popup = new NotificationPopup(m_webEngine);

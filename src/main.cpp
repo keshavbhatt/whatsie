@@ -48,7 +48,7 @@ int main(int argc, char *argv[]) {
 
   SingleApplication instance(argc, argv, true);
   instance.setQuitOnLastWindowClosed(false);
-  instance.setWindowIcon(QIcon(":/icons/app/icon-64.png"));
+  instance.setWindowIcon(themeIcon("whatsie", ":/icons/app/icon-64.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setDesktopFileName("com.ktechpit.whatsie");
   QApplication::setOrganizationDomain("com.ktechpit");
