@@ -16,7 +16,7 @@ sudo apt-get install cmake ninja-build qt6-base-dev qt6-webengine-dev qt6-positi
 
 ### Install build dependencies on Fedora:
 ```bash
-sudo dnf install cmake ninja-build qt6-qtbase-devel qt6-qtwebengine-devel libxkbcommon-devel libx11-devel
+sudo dnf install cmake ninja-build qt6-qtbase-devel qt6-qtwebengine-devel libxkbcommon-devel libX11-devel
 ```
 
 ### Install build dependencies on Arch:
