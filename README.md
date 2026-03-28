@@ -76,7 +76,7 @@ sudo apt-get install cmake ninja-build qt6-base-dev qt6-webengine-dev \
 **Fedora:**
 ```bash
 sudo dnf install cmake ninja-build qt6-qtbase-devel qt6-qtwebengine-devel \
-    qt6-qttools-devel libx11-devel gcc-c++
+    qt6-qttools-devel libX11-devel gcc-c++
 ```
 
 **Arch Linux:**
