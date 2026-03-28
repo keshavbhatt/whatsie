@@ -95,6 +95,7 @@ set(SOURCES
     src/downloadwidget.cpp
     src/lock.cpp
     src/main.cpp
+    src/identicons.cpp
     src/mainwindow.cpp
     src/mainwindow_lock.cpp
     src/mainwindow_tray.cpp
@@ -123,6 +124,7 @@ set(HEADERS
     src/downloadmanagerwidget.h
     src/downloadwidget.h
     src/lock.h
+    src/identicons.h
     src/mainwindow.h
     src/notificationpopup.h
     src/permissiondialog.h

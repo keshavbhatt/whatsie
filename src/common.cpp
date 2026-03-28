@@ -8,5 +8,5 @@ bool defaultAppAutoLock = false;
 double defaultZoomFactorMaximized = 1.00;
 
 QIcon themeIcon(const QString& name, const QString& fallback) {
-	return QIcon::fromTheme(name, QIcon(fallback));
+  return QIcon::fromTheme(name, QIcon(fallback));
 }

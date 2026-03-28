@@ -8,6 +8,7 @@
 #include "webenginenotifproxy.h"
 #include "webengineprofilemanager.h"
 #include "webview.h"
+#include "identicons.h"
 
 // ── WebEngine view & page ─────────────────────────────────────────────────────
 void MainWindow::createWebEngine() {
@@ -101,7 +102,15 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           // Use Proxy to manage lifecycle of QWebEngineNotification safely
           auto proxy = WebEngineNotifProxy::create(std::move(notification));
           auto ntf = notify(proxy->notif->title(), proxy->notif->message(), timeout);
-          ntf->setIconFromImage(proxy->notif->icon());
+          // Use locally generated identicon when
+          // QWebEngine (or whatsapp) passes blank
+          // image
+          QPixmap pix = [proxy](auto img) {
+            return Identicons::colorCount(img) > 2
+                ? QPixmap::fromImage(img)
+                : Identicons::letterTile(proxy->notif->title(), QSize(96, 96));
+          } (proxy->notif->icon());
+          ntf->setIconFromPixmap(Identicons::clipRRect(pix) /* for eyecandy */ );
           connect(ntf.get(), &Notification::Event::actionInvoked, this,
               [this, proxy](const QString & action) {
                 if (action != "open") return;
