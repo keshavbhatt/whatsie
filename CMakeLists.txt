@@ -47,17 +47,21 @@ find_package(Qt${QT_VERSION_MAJOR} ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR} REQUI
     Network
 )
 
+include(FetchContent)
 find_package(notify-qt${QT_VERSION_MAJOR} QUIET CONFIG)
 if (notify-qt${QT_VERSION_MAJOR}_FOUND)
     add_library(notify-qt ALIAS notify-qt${QT_VERSION_MAJOR})
 elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/libnotify-qt/CMakeLists.txt")
     add_subdirectory(src/libnotify-qt)
 else()
-    message(FATAL_ERROR
-        "notify-qt${QT_VERSION_MAJOR} package not found and the src/libnotify-qt submodule "
-        "is missing.\n"
-        "Please either install notify-qt${QT_VERSION_MAJOR} "
-        "or initialize/update the src/libnotify-qt git submodule.")
+    message(STATUS "Fetching libnotify-qt...")
+    FetchContent_Declare(
+        notify-qt
+        GIT_REPOSITORY https://github.com/ahm-forks/libnotify-qt.git
+        GIT_TAG        1.0.0  # or a release tag
+    )
+
+    FetchContent_MakeAvailable(notify-qt)
 endif()
 
 # Compiler flags
@@ -277,4 +281,4 @@ message(STATUS "Build Timestamp:          ${BUILD_TIMESTAMP}")
 message(STATUS "Flatpak Build:            ${FLATPAK_BUILD}")
 message(STATUS "================================================")
 message(STATUS "")
-
+# vim: ts=4:et:
