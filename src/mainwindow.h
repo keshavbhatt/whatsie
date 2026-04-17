@@ -20,7 +20,7 @@ public:
   ~MainWindow();
 
   void loadSchemaUrl(const QString &arg);
-  void alreadyRunning(bool notify = false);
+  void alreadyRunning();
   void runMinimized();
   void showNotification(QString title, QString message);
   void doReload(bool byPassCache = false, bool isAskedByCLI = false,

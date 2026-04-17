@@ -248,7 +248,7 @@ int main(int argc, char *argv[]) {
                   << "x-schema-handler";
           whatsie.loadSchemaUrl(urlStr);
         } else {
-          whatsie.alreadyRunning(true);
+          whatsie.alreadyRunning();
         }
       });
 
