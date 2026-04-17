@@ -8,14 +8,14 @@ Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->setPass->setEnabled(false);
   ui->wrong->hide();
 
-  MoreApps *moreApps =
+  m_moreApps =
       new MoreApps(this, nullptr, "keshavnrj",
                    QUrl("https://raw.githubusercontent.com/keshavbhatt/appdata/"
                         "main/moreapps.txt"),
                    false);
-  moreApps->setWindowTitle("More Applications by developer");
-  moreApps->setFixedHeight(98);
-  ui->moreAppsLayout->addWidget(moreApps);
+  m_moreApps->setWindowTitle("More Applications by developer");
+  m_moreApps->setFixedHeight(104);
+  ui->moreAppsLayout->addWidget(m_moreApps);
 
   passcodeLoginAction = ui->passcodeLogin->addAction(
       QIcon(":/icons/green_arrow-right-line.png"), QLineEdit::TrailingPosition);
@@ -229,6 +229,8 @@ void Lock::lock_app() {
   this->show();
   isLocked = true;
   animateIn();
+  if (m_moreApps)
+    m_moreApps->rotateApps();
   ui->passcodeLogin->setFocus();
 }
 

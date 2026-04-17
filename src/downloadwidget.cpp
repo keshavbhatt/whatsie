@@ -4,7 +4,6 @@
 #include <QDesktopServices>
 #include <QFileInfo>
 #include <QUrl>
-#include <QWebEngineDownloadItem>
 
 DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
                                QWidget *parent)
@@ -38,7 +37,9 @@ DownloadWidget::DownloadWidget(QWebEngineDownloadItem *download,
       emit removeClicked(this);
   });
 
-  connect(m_download, &QWebEngineDownloadItem::downloadProgress, this,
+  connect(m_download, &QWebEngineDownloadItem::receivedBytesChanged, this,
+          &DownloadWidget::updateWidget);
+  connect(m_download, &QWebEngineDownloadItem::totalBytesChanged, this,
           &DownloadWidget::updateWidget);
 
   connect(m_download, &QWebEngineDownloadItem::stateChanged, this,

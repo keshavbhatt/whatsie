@@ -2,12 +2,13 @@
 
 #include <QContextMenuEvent>
 #include <QMenu>
-#include <QWebEngineContextMenuData>
-#include <QWebEngineProfile>
 #include <mainwindow.h>
+#include <QWebEngineContextMenuRequest>
 
-WebView::WebView(QWidget *parent, QStringList dictionaries)
-    : QWebEngineView(parent), m_dictionaries(dictionaries) {
+using QWebEngineContextMenuData = QWebEngineContextMenuRequest;
+
+WebView::WebView(QWidget *parent)
+    : QWebEngineView(parent) {
 
   QObject *parentMainWindow = this->parent();
   while (!parentMainWindow->objectName().contains("MainWindow")) {
@@ -63,8 +64,7 @@ void WebView::wheelEvent(QWheelEvent *event) {
 }
 
 void WebView::contextMenuEvent(QContextMenuEvent *event) {
-
-  auto menu = page()->createStandardContextMenu();
+  auto menu = createStandardContextMenu();
   menu->setAttribute(Qt::WA_DeleteOnClose, true);
   // hide reload, back, forward, savepage, copyimagelink menus
   foreach (auto *action, menu->actions()) {
@@ -77,8 +77,7 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     }
   }
 
-  const QWebEngineContextMenuData &data = page()->contextMenuData();
-  Q_ASSERT(data.isValid());
+  const QWebEngineContextMenuRequest &data = *lastContextMenuRequest();
 
   // allow context menu on image
   if (data.mediaType() == QWebEngineContextMenuData::MediaTypeImage) {
@@ -91,33 +90,6 @@ void WebView::contextMenuEvent(QContextMenuEvent *event) {
     return;
   }
 
-  auto pageWebengineProfile = page()->profile();
-  const QStringList &languages = pageWebengineProfile->spellCheckLanguages();
-  menu->addSeparator();
-  auto *spellcheckAction = new QAction(tr("Check Spelling"), menu);
-  spellcheckAction->setCheckable(true);
-  spellcheckAction->setChecked(pageWebengineProfile->isSpellCheckEnabled());
-  connect(spellcheckAction, &QAction::toggled, this,
-          [pageWebengineProfile](bool toogled) {
-            pageWebengineProfile->setSpellCheckEnabled(toogled);
-            SettingsManager::instance().settings().setValue("sc_enabled",
-                                                            toogled);
-          });
-  menu->addAction(spellcheckAction);
-
-  if (pageWebengineProfile->isSpellCheckEnabled()) {
-    auto subMenu = menu->addMenu(tr("Select Language"));
-    for (const QString &dict : qAsConst(m_dictionaries)) {
-      auto action = subMenu->addAction(dict);
-      action->setCheckable(true);
-      action->setChecked(languages.contains(dict));
-      connect(
-          action, &QAction::triggered, this, [pageWebengineProfile, dict]() {
-            pageWebengineProfile->setSpellCheckLanguages(QStringList() << dict);
-            SettingsManager::instance().settings().setValue("sc_dict", dict);
-          });
-    }
-  }
   connect(menu, &QMenu::aboutToHide, menu, &QObject::deleteLater);
   menu->popup(event->globalPos());
 }

@@ -57,12 +57,10 @@
 
 #include <QFileDialog>
 #include <QStandardPaths>
-#include <QWebEngineDownloadItem>
 #include <QWidget>
+#include <QWebEngineDownloadRequest>
 
-QT_BEGIN_NAMESPACE
-class QWebEngineDownloadItem;
-QT_END_NAMESPACE
+using QWebEngineDownloadItem = QWebEngineDownloadRequest;
 
 class DownloadWidget;
 

@@ -57,10 +57,9 @@
 #include <QElapsedTimer>
 #include <QFrame>
 #include <QTime>
+#include <QWebEngineDownloadRequest>
 
-QT_BEGIN_NAMESPACE
-class QWebEngineDownloadItem;
-QT_END_NAMESPACE
+using QWebEngineDownloadItem = QWebEngineDownloadRequest;
 
 // Displays one ongoing or finished download (QWebEngineDownloadItem).
 class DownloadWidget final : public QFrame, public Ui::DownloadWidget {

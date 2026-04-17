@@ -18,7 +18,6 @@ jobs:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           changelog-file: "CHANGELOG.md"
           changelog-generator-opt: "emojis=true"
-          force-bump-patch-version: true
           prepend: true
       - name: Git Commit Changelog
         uses: stefanzweifel/git-auto-commit-action@v4

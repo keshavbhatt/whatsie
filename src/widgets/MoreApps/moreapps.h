@@ -56,6 +56,9 @@ public:
            bool remoteIconPreCaching = true);
   ~MoreApps();
 
+public slots:
+  void rotateApps();
+
 private slots:
   void getAppsMeta();
 

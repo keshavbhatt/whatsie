@@ -1,3 +1,19 @@
+## 5.1.0 (2026-04-03)
+
+#### 🎁 Feature
+
+* migrate build system workflow to CMake + Ninja for Qt 6 builds
+
+#### 🐞 Bug Fixes
+
+* improve WebEngine profile/session persistence handling on Qt 6
+* update in-app theme application logic for current WhatsApp Web changes
+* show notifications through org.freedesktop.Notifications directly on Qt 6
+
+#### 🚧 Chores
+
+* align release metadata for minor version bump to 5.1.0
+
 ## 4.16.0 (2024-10-09)
 
 #### 🎁 Feature

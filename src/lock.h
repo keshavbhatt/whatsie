@@ -54,6 +54,7 @@ private:
   Ui::Lock *ui;
   bool isLocked = false;
   QAction *passcodeLoginAction;
+  MoreApps *m_moreApps = nullptr;
 };
 
 #endif // LOCK_H

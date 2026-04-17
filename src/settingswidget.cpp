@@ -5,6 +5,7 @@
 #include <QDateTime>
 #include <QMessageBox>
 #include <QStyle>
+#include <QStyleFactory>
 
 #include "automatictheme.h"
 
@@ -66,10 +67,6 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
   ui->userAgentLineEdit->home(true);
   ui->userAgentLineEdit->deselect();
 
-  ui->enableSpellCheck->setChecked(SettingsManager::instance()
-                                       .settings()
-                                       .value("sc_enabled", true)
-                                       .toBool());
   ui->notificationTimeOutspinBox->setValue(
       SettingsManager::instance()
           .settings()
@@ -121,13 +118,6 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
                                         .settings()
                                         .value("widgetStyle", "Fusion")
                                         .toString());
-
-  ui->fullWidthViewCheckbox->blockSignals(true);
-  ui->fullWidthViewCheckbox->setChecked(SettingsManager::instance()
-                                            .settings()
-                                            .value("fullWidthView", true)
-                                            .toBool());
-  ui->fullWidthViewCheckbox->blockSignals(false);
 
   ui->automaticThemeCheckBox->blockSignals(true);
   bool automaticThemeSwitching = SettingsManager::instance()
@@ -264,48 +254,6 @@ SettingsWidget::~SettingsWidget() {
   delete ui;
 }
 
-void SettingsWidget::loadDictionaries(QStringList dictionaries) {
-  // set up supported spellcheck dictionaries
-  QStringList ui_dictionary_names;
-  foreach (QString dictionary_name, dictionaries) {
-    ui_dictionary_names.append(dictionary_name);
-  }
-
-  ui_dictionary_names.removeDuplicates();
-  ui_dictionary_names.sort();
-
-  // add to ui
-  ui->dictComboBox->blockSignals(true);
-  foreach (const QString dict_name, ui_dictionary_names) {
-    QString short_name = QString(dict_name).split("_").last();
-    short_name = (short_name.isEmpty() || short_name.contains("-"))
-                     ? QString(dict_name).split("-").last()
-                     : short_name;
-    short_name = short_name.isEmpty() ? "XX" : short_name;
-    short_name = short_name.length() > 2 ? short_name.left(2) : short_name;
-    QIcon icon(QString(":/icons/flags/%1.png").arg(short_name.toLower()));
-    if (icon.isNull() == false)
-      ui->dictComboBox->addItem(icon, dict_name);
-    else
-      ui->dictComboBox->addItem(QIcon(":/icons/flags/xx.png"), dict_name);
-  }
-  ui->dictComboBox->blockSignals(false);
-
-  // load settings for spellcheck dictionary
-  QString dictionary_name = SettingsManager::instance()
-                                .settings()
-                                .value("sc_dict", "en-US")
-                                .toString();
-  int pos = ui->dictComboBox->findText(dictionary_name);
-  if (pos == -1) {
-    pos = ui->dictComboBox->findText("en-US");
-    if (pos == -1) {
-      pos = 0;
-    }
-  }
-  ui->dictComboBox->setCurrentIndex(pos);
-}
-
 void SettingsWidget::refresh() {
   ui->themeComboBox->setCurrentText(
       Utils::toCamelCase(SettingsManager::instance()
@@ -314,31 +262,6 @@ void SettingsWidget::refresh() {
                              .toString()));
 
   ui->cookieSize->setText(Utils::refreshCacheSize(persistentStoragePath()));
-
-  // update dict settings at runtime
-  //  load settings for spellcheck dictionary
-  QString dictionary_name = SettingsManager::instance()
-                                .settings()
-                                .value("sc_dict", "en-US")
-                                .toString();
-  int pos = ui->dictComboBox->findText(dictionary_name);
-  if (pos == -1) {
-    pos = ui->dictComboBox->findText("en-US");
-    if (pos == -1) {
-      pos = 0;
-    }
-  }
-  ui->dictComboBox->setCurrentIndex(pos);
-
-  // enable disable spell check
-  ui->enableSpellCheck->setChecked(SettingsManager::instance()
-                                       .settings()
-                                       .value("sc_enabled", true)
-                                       .toBool());
-  emit updateFullWidthView(SettingsManager::instance()
-                               .settings()
-                               .value("fullWidthView", true)
-                               .toBool());
 }
 
 void SettingsWidget::updateDefaultUAButton(const QString engineUA) {
@@ -566,16 +489,6 @@ void SettingsWidget::showSetApplockPasswordDialog() {
     ui->applock_checkbox->setChecked(false);
     ui->applock_checkbox->blockSignals(false);
   }
-}
-
-void SettingsWidget::on_dictComboBox_currentIndexChanged(const QString &arg1) {
-  SettingsManager::instance().settings().setValue("sc_dict", arg1);
-  emit dictChanged(arg1);
-}
-
-void SettingsWidget::on_enableSpellCheck_toggled(bool checked) {
-  SettingsManager::instance().settings().setValue("sc_enabled", checked);
-  emit spellCheckChanged(checked);
 }
 
 void SettingsWidget::on_showShortcutsButton_clicked() {
@@ -860,11 +773,6 @@ void SettingsWidget::on_chnageCurrentPasswordPushButton_clicked() {
     SettingsManager::instance().settings().setValue("lockscreen", true);
     showSetApplockPasswordDialog();
   }
-}
-
-void SettingsWidget::on_fullWidthViewCheckbox_toggled(bool checked) {
-  SettingsManager::instance().settings().setValue("fullWidthView", checked);
-  emit updateFullWidthView(checked);
 }
 
 void SettingsWidget::keyPressEvent(QKeyEvent *e) {

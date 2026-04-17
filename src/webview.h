@@ -10,14 +10,11 @@ class WebView : public QWebEngineView {
   Q_OBJECT
 
 public:
-  WebView(QWidget *parent = nullptr, QStringList dictionaries = {});
+  WebView(QWidget *parent = nullptr);
 
 protected:
   void contextMenuEvent(QContextMenuEvent *event) override;
   void wheelEvent(QWheelEvent *event) override;
-
-private:
-  QStringList m_dictionaries;
 };
 
 #endif // WEBVIEW_H

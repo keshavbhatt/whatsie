@@ -323,13 +323,6 @@ background:transparent;
           </item>
           <item row="1" column="0">
            <layout class="QGridLayout" name="gridLayout">
-            <item row="1" column="1">
-             <widget class="QComboBox" name="dictComboBox">
-              <property name="toolTip">
-               <string>Spell checker Language</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="0">
              <widget class="QCheckBox" name="useNativeFileDialog">
               <property name="text">
@@ -351,13 +344,6 @@ background:transparent;
               </property>
              </widget>
             </item>
-            <item row="1" column="0">
-             <widget class="QCheckBox" name="enableSpellCheck">
-              <property name="text">
-               <string>Enable Spell Checker</string>
-              </property>
-             </widget>
-            </item>
             <item row="3" column="1">
              <widget class="QCheckBox" name="startMinimized">
               <property name="text">
@@ -369,16 +355,6 @@ background:transparent;
              <widget class="QCheckBox" name="minimizeOnTrayIconClick">
               <property name="text">
                <string>Show/Hide on clicking tray Icon (if supported)</string>
-              </property>
-             </widget>
-            </item>
-            <item row="4" column="1">
-             <widget class="QCheckBox" name="fullWidthViewCheckbox">
-              <property name="toolTip">
-               <string>Expand the view to full width of window</string>
-              </property>
-              <property name="text">
-               <string>Full width view</string>
               </property>
              </widget>
             </item>

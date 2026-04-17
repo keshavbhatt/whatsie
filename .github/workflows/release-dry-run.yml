@@ -17,5 +17,4 @@ jobs:
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           changelog-generator-opt: "emojis=true"
-          force-bump-patch-version: true
           dry: true

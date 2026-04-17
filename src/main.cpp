@@ -1,41 +1,60 @@
 #include <QApplication>
 #include <QDebug>
-#include <QWebEngineProfile>
-#include <QWebEngineSettings>
-#include <QtWebEngine>
 #include <QtWidgets>
+#include <QtWebEngineCore>
 
 #include "common.h"
 #include "def.h"
 #include "mainwindow.h"
 #include "settingsmanager.h"
+#include "webengineprofilemanager.h"
 #include <singleapplication.h>
 
-int main(int argc, char *argv[]) {
-
-  QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-
+// Must run before QApplication is created so Qt WebEngine picks these up.
+static void setChromiumFlags() {
+  if (!qEnvironmentVariableIsEmpty("QTWEBENGINE_CHROMIUM_FLAGS"))
+    return;
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
-          "--remote-debugging-port=9421 --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+    "--remote-debugging-port=9421 "
+          "--disable-gpu "
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps "
+          "--no-sandbox");
 #else
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
-          "--disable-logging --ignore-gpu-blocklist --no-sandbox "
-          "--single-process --disable-extensions");
+          "--disable-gpu "
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps "
+          "--no-sandbox");
 #endif
+}
+
+int main(int argc, char *argv[]) {
+  // Qt6 on Linux routes qDebug/qWarning to journald when the process is not
+  // attached to a TTY (e.g. when launched from an IDE).  Force stderr output
+  // so the IDE Run console always captures debug logs.
+#ifdef QT_DEBUG
+  qputenv("QT_FORCE_STDERR_LOGGING", "1");
+#endif
+
+  setChromiumFlags();
 
   SingleApplication instance(argc, argv, true);
   instance.setQuitOnLastWindowClosed(false);
-  instance.setWindowIcon(QIcon(":/icons/app/icon-64.png"));
+  instance.setWindowIcon(themeIcon("whatsie", ":/icons/app/icon-64.png"));
   QApplication::setApplicationName("WhatSie");
   QApplication::setDesktopFileName("com.ktechpit.whatsie");
   QApplication::setOrganizationDomain("com.ktechpit");
   QApplication::setOrganizationName("org.keshavnrj.ubuntu");
   QApplication::setApplicationVersion(VERSIONSTR);
 
-  qputenv("QTWEBENGINE_DICTIONARIES_PATH",
-          Dictionaries::GetDictionaryPath().toUtf8().constData());
 
   QCommandLineParser parser;
   parser.setApplicationDescription(
@@ -136,12 +155,8 @@ int main(int argc, char *argv[]) {
     return 0;
   }
 
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::DnsPrefetchEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::FullScreenSupportEnabled, true);
-  QWebEngineSettings::defaultSettings()->setAttribute(
-      QWebEngineSettings::JavascriptCanAccessClipboard, true);
+  // Initialise the single persistent WebEngine profile before any page is created.
+  WebEngineProfileManager::instance();
 
   MainWindow whatsie;
 
@@ -153,7 +168,7 @@ int main(int argc, char *argv[]) {
         qInfo().noquote() << "Another instance with PID: " +
                                  QString::number(instanceId) +
                                  ", sent argument: " + message;
-        QString messageStr = QTextCodec::codecForMib(106)->toUnicode(message);
+        QString messageStr = QString::fromUtf8(message);
 
         QCommandLineParser p;
         p.addOptions(secondaryInstanceCLIOptions);

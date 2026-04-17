@@ -3,17 +3,9 @@
 
 #include <QString>
 #include <QStringList>
-#include <QObject>
 
-
-class Dictionaries : public QObject
-{
-    Q_OBJECT
-
+class Dictionaries {
 public:
-    Dictionaries(QObject* parent=0);
-    virtual ~Dictionaries();
-public slots:
     static QString GetDictionaryPath();
     static QStringList GetDictionaries();
 };

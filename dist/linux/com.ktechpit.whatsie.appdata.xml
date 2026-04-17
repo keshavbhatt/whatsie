@@ -1,97 +1,119 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>com.ktechpit.whatsie</id>
-	<metadata_license>CC0-1.0</metadata_license>
-	<project_license>MIT</project_license>
-	<name>Whatsie</name>
-	<summary>Qt Whatsapp Web Client for Linux Desktop</summary>
-	<developer_name>Keshav Bhatt</developer_name>
-	<branding>
-		<color type="primary" scheme_preference="light">#77a27d</color>
-		<color type="primary" scheme_preference="dark">#16461d</color>
-	</branding>
-	<description>
-		<p>Feature rich WhatsApp web client based on Qt WebEngine.</p>
-		<p>Key features of Whatsie:</p>
-		<ul>
-		   <li>Light and Dark Themes with automatic switching</li>
-		   <li>Customized Notifications &amp; Native Notifications</li>
-		   <li>Global App shortcuts</li>
-		   <li>BuiltIn download manager</li>
-		   <li>Mute Audio, Disable Notifications</li>
-		   <li>App Lock feature</li>
-		   <li>Built in Spell Checker (with support for 31 Major languages)</li>
-		</ul>
-		<p>Other settings that let you control every aspect of WebApp like:</p>
-		<ul>
-		   <li>Do not disturb mode</li>
-		   <li>Full view mode, lets you expand the main view to the full width of the window</li>
-		   <li>Ability to switch between Native &amp; Custom notification</li>
-		   <li>Configurable notification popup timeout</li>
-		   <li>Mute all audio from Whatapp</li>
-		   <li>Minimize to tray on application start</li>
-		   <li>Enable disable app lock on application start</li>
-		   <li>Auto-locking after a certain interval of time</li>
-		</ul>
-	</description>
-	<launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
-	<url type="homepage">https://github.com/keshavbhatt/whatsie</url>
-	<url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
-	<url type="donation">https://www.paypal.me/keshavnrj/10</url>
-	<keywords>
-		<keyword translate="no">WhatsApp</keyword>
-		<keyword>social</keyword>
-		<keyword>social-media</keyword>
-		<keyword>messaging</keyword>
-		<keyword xml:lang="de">beurs</keyword>
-		<keyword xml:lang="pt">mensagens</keyword>
-		<keyword>chat</keyword>
-		<keyword>communication</keyword>
-		<keyword>instant messaging</keyword>
-		<keyword>social networking</keyword>
-		<keyword>whatsApp web</keyword>
-		<keyword>group chat</keyword>
-		<keyword>brave whatsapp</keyword>
-		<keyword>multimedia messaging</keyword>
-		<keyword>status update</keyword>
-		<keyword>chrome whatsapp</keyword>
-		<keyword>discord</keyword>
-		<keyword>whatsie whatsapp</keyword>
-		<keyword>messanger</keyword>
-		<keyword>whatsApp business</keyword>
-		<keyword>firefox whatsApp</keyword>
-		<keyword>google whatsApp</keyword>
-	</keywords>
-	<screenshots>
-		<screenshot type="default">
-			<caption>Whatsie main screen, Light theme</caption>
-			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
-		</screenshot>
-		<screenshot>
-			<caption>Whatsie main screen, Dark Theme</caption>
-			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/2.jpg</image>
-		</screenshot>
-		<screenshot>
-			<caption>Whatsie App Settings</caption>
-			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/3.jpg</image>
-		</screenshot>
-		<screenshot>
-			<caption>Whatsie Lock Screen</caption>
-			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/4.jpg</image>
-		</screenshot>
-		<screenshot>
-			<caption>Whatsie Hardware Access Control and Shortcuts</caption>
-			<image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/5.jpg</image>
-		</screenshot>
-	</screenshots>
-	<provides>
-		<binary>whatsie</binary>
-	</provides>
-	<content_rating type="oars-1.0" />
-	<releases>
-		<release version="4.16.3" date="2024-11-01" />
-		<release version="4.16.2" date="2024-10-26" />
-		<release version="4.16.1" date="2024-10-20" />
-		<release version="4.16.0" date="2024-10-09" />
-	</releases>
+  <id>com.ktechpit.whatsie</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Whatsie</name>
+  <summary>Feature-rich WhatsApp Web client for the Linux desktop</summary>
+
+  <developer id="com.ktechpit">
+    <name>Keshav Bhatt</name>
+  </developer>
+
+  <branding>
+    <color type="primary" scheme_preference="light">#77a27d</color>
+    <color type="primary" scheme_preference="dark">#16461d</color>
+  </branding>
+
+  <description>
+    <p>
+      Whatsie is a native Linux desktop wrapper for WhatsApp Web, built on Qt
+      and QtWebEngine.  It brings WhatsApp out of the browser tab and into a
+      proper desktop application with system integration, privacy controls, and
+      customization options unavailable in a plain browser.
+    </p>
+    <p>Core features:</p>
+    <ul>
+      <li>Light and Dark themes with automatic OS-level switching</li>
+      <li>Custom in-app notification popups and native system notifications</li>
+      <li>Built-in download manager</li>
+      <li>Spell checker with support for 31 languages</li>
+      <li>App lock with PIN protection and configurable auto-lock timeout</li>
+      <li>Global keyboard shortcuts</li>
+      <li>Per-session audio mute and notification suppression</li>
+    </ul>
+    <p>Additional settings:</p>
+    <ul>
+      <li>Do-not-disturb mode</li>
+      <li>Configurable notification popup timeout</li>
+      <li>Minimize to system tray on start or window close</li>
+      <li>Custom user-agent string and zoom control</li>
+    </ul>
+  </description>
+
+  <launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
+
+  <url type="homepage">https://github.com/keshavbhatt/whatsie</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
+  <url type="vcs-browser">https://github.com/keshavbhatt/whatsie</url>
+  <url type="donation">https://www.paypal.me/keshavnrj/10</url>
+
+  <keywords>
+    <keyword translate="no">WhatsApp</keyword>
+    <keyword>messaging</keyword>
+    <keyword>chat</keyword>
+    <keyword>communication</keyword>
+    <keyword>instant-messaging</keyword>
+    <keyword>social</keyword>
+  </keywords>
+
+  <screenshots>
+    <screenshot type="default">
+      <caption>Main window — Light theme</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/1.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Main window — Dark theme</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/2.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Settings</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/3.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>App lock screen</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/4.jpg</image>
+    </screenshot>
+    <screenshot>
+      <caption>Hardware access controls and keyboard shortcuts</caption>
+      <image>https://raw.githubusercontent.com/keshavbhatt/whatsie/main/screenshots/5.jpg</image>
+    </screenshot>
+  </screenshots>
+
+  <provides>
+    <binary>whatsie</binary>
+  </provides>
+
+  <content_rating type="oars-1.0" />
+
+  <releases>
+    <release version="5.1.0" date="2026-04-03">
+      <description>
+        <p>Minor release focused on build-system and runtime stability improvements:</p>
+        <ul>
+          <li>Migrated primary build workflow to CMake + Ninja for Qt 6 development</li>
+          <li>Refined Qt 6 WebEngine integration and permission handling paths</li>
+          <li>Improved desktop notification delivery by using org.freedesktop.Notifications directly on Qt 6</li>
+          <li>Improved session persistence behavior via consistent profile handling</li>
+          <li>Updated in-app theme application logic for current WhatsApp Web changes</li>
+        </ul>
+      </description>
+    </release>
+    <release version="5.0.0" date="2026-03-26">
+      <description>
+        <p>Major release — Qt 6 port with significant improvements:</p>
+        <ul>
+          <li>Ported to Qt 6 and QtWebEngine 6 for better performance and long-term support</li>
+          <li>Reliable light/dark theme toggle without requiring a page reload</li>
+          <li>Persistent named WebEngine profile with proper cookie and storage handling</li>
+          <li>Improved permission handling for camera, microphone, and notifications</li>
+          <li>Centralised profile management and refactored codebase</li>
+        </ul>
+      </description>
+    </release>
+    <release version="4.16.3" date="2024-11-01" />
+    <release version="4.16.2" date="2024-10-26" />
+    <release version="4.16.1" date="2024-10-20" />
+    <release version="4.16.0" date="2024-10-09" />
+  </releases>
 </component>

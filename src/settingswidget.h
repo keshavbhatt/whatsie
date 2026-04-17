@@ -22,14 +22,11 @@ signals:
   void userAgentChanged(QString userAgentStr);
   void initLock();
   void changeLockPassword();
-  void dictChanged(QString dict);
-  void spellCheckChanged(bool checked);
   void notificationPopupTimeOutChanged();
   void notify(QString message);
   void zoomChanged();
   void zoomMaximizedChanged();
   void appAutoLockChanged();
-  void updateFullWidthView(bool checked);
 
 public:
   explicit SettingsWidget(QWidget *parent = nullptr, int screenNumber = 0,
@@ -42,7 +39,6 @@ public slots:
   void updateDefaultUAButton(const QString engineUA);
   void appLockSetChecked(bool checked);
   void setCurrentPasswordText(QString str);
-  void loadDictionaries(QStringList dictionaries);
   void clearAllData();
   void autoAppLockSetChecked(bool checked);
   void updateAppLockPasswordViewer();
@@ -67,8 +63,6 @@ private slots:
   void on_chnageCurrentPasswordPushButton_clicked();
   void on_closeButtonActionComboBox_currentIndexChanged(int index);
   void on_defaultUserAgentButton_clicked();
-  void on_dictComboBox_currentIndexChanged(const QString &arg1);
-  void on_enableSpellCheck_toggled(bool checked);
   void on_minimizeOnTrayIconClick_toggled(bool checked);
   void on_muteAudioCheckBox_toggled(bool checked);
   void on_notificationCheckBox_toggled(bool checked);
@@ -94,8 +88,6 @@ private slots:
   void on_zoomReset_clicked();
   void themeSwitchTimerTimeout();
   void updateAutomaticTheme();
-
-  void on_fullWidthViewCheckbox_toggled(bool checked);
 
   void on_deletePersistentData_clicked();
 
