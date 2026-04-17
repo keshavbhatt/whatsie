@@ -352,14 +352,6 @@ void MainWindow::closeEvent(QCloseEvent *event) {
               .toInt() == 0) {
     hide();
     event->ignore();
-    if (SettingsManager::instance()
-            .settings()
-            .value("firstrun_tray", true)
-            .toBool()) {
-      showNotification(QApplication::applicationName(),
-                       "Minimized to system tray.");
-      SettingsManager::instance().settings().setValue("firstrun_tray", false);
-    }
     return;
   }
   event->accept();
@@ -371,7 +363,7 @@ void MainWindow::quitApp() {
   SettingsManager::instance().settings().setValue("geometry", saveGeometry());
   getPageTheme();
   QTimer::singleShot(500, this, [=]() {
-    SettingsManager::instance().settings().setValue("firstrun_tray", true);
+    // Not sure if still need the timer now
     qApp->quit();
   });
 }
