@@ -1,5 +1,6 @@
 #include "webengineprofilemanager.h"
 #include "common.h"
+#include "linkeddevicename.h"
 #include "settingsmanager.h"
 
 #include <QDebug>
@@ -88,4 +89,6 @@ void WebEngineProfileManager::applyUserSettings() {
     m_profile->settings()->setAttribute(
         QWebEngineSettings::PlaybackRequiresUserGesture,
         s.value(QStringLiteral("autoPlayMedia"), false).toBool());
+
+    LinkedDeviceName::install(m_profile);
 }

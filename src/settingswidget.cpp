@@ -85,6 +85,11 @@ SettingsWidget::SettingsWidget(QWidget *parent, int screenNumber,
                                      .settings()
                                      .value("startMinimized", false)
                                      .toBool());
+  ui->identifyInLinkedDevicesCheckBox->setChecked(
+      SettingsManager::instance()
+          .settings()
+          .value("identifyInLinkedDevices", true)
+          .toBool());
 
   this->appAutoLockingSetChecked(
       SettingsManager::instance()
@@ -584,6 +589,12 @@ void SettingsWidget::on_useNativeFileDialog_toggled(bool checked) {
 
 void SettingsWidget::on_startMinimized_toggled(bool checked) {
   SettingsManager::instance().settings().setValue("startMinimized", checked);
+}
+
+void SettingsWidget::on_identifyInLinkedDevicesCheckBox_toggled(bool checked) {
+  SettingsManager::instance().settings().setValue("identifyInLinkedDevices",
+                                                  checked);
+  emit linkedDeviceNameChanged();
 }
 
 void SettingsWidget::on_appAutoLockcheckBox_toggled(bool checked) {
