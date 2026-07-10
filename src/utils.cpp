@@ -373,6 +373,7 @@ QString Utils::GetEnvironmentVar(const QString &variable_name) {
  * @param str The URL to be opened.
  */
 void Utils::desktopOpenUrl(const QString &filePathStr) {
+#ifdef Q_OS_LINUX
   qDebug() << "Trying opening file using xdg-open" << filePathStr;
 
   QProcess *xdg_open = new QProcess;
@@ -397,6 +398,14 @@ void Utils::desktopOpenUrl(const QString &filePathStr) {
                    });
 
   xdg_open->start("xdg-open", {filePathStr});
+#else
+  // xdg-open is Linux-only; use QDesktopServices directly elsewhere.
+  QUrl url = QUrl::fromLocalFile(filePathStr);
+  qDebug() << "Opening file using desktop-services" << url.toString();
+  if (!QDesktopServices::openUrl(url)) {
+    qWarning() << "Failed to open URL using desktop-services";
+  }
+#endif
 }
 
 bool Utils::isPhoneNumber(const QString &phoneNumber) {

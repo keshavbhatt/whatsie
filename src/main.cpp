@@ -14,6 +14,29 @@
 static void setChromiumFlags() {
   if (!qEnvironmentVariableIsEmpty("QTWEBENGINE_CHROMIUM_FLAGS"))
     return;
+#ifdef Q_OS_WIN
+  // On Windows the GPU stays enabled (software rendering is visibly slow),
+  // but compositing is kept in software: GPU compositing exhibits
+  // stale-frame flicker with Qt WebEngine on Windows (same workaround as
+  // e.g. ankitects/anki#4470). Chromium's sandbox works fine on Windows,
+  // so it is not disabled here.
+#ifdef QT_DEBUG
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
+    "--remote-debugging-port=9421 "
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps");
+#else
+  qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
+          "--disable-gpu-compositing "
+          "--disable-translate "
+          "--disable-extensions "
+          "--disable-component-update "
+          "--disable-default-apps");
+#endif
+#else
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
     "--remote-debugging-port=9421 "
@@ -33,6 +56,7 @@ static void setChromiumFlags() {
           "--disable-component-update "
           "--disable-default-apps "
           "--no-sandbox");
+#endif
 #endif
 }
 

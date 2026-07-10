@@ -99,6 +99,7 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
         int timeout = settings.value("notificationTimeOut", 9000).toInt();
 
         if (notificationCombo == 0) {
+#ifdef Q_OS_LINUX
           // Use Proxy to manage lifecycle of QWebEngineNotification safely
           auto proxy = WebEngineNotifProxy::create(std::move(notification));
           auto ntf = notify(proxy->notif->title(), proxy->notif->message(), timeout);
@@ -126,6 +127,37 @@ void MainWindow::setNotificationPresenter(QWebEngineProfile *profile) {
           ntf->show();
           proxy->invoke(&QWebEngineNotification::show);
           return;
+#else
+          // Native notifications via the system tray (toast notifications on
+          // Windows 10+); falls back to the popup below when no tray is
+          // available.
+          if (m_systemTrayIcon && QSystemTrayIcon::supportsMessages()) {
+            // Use Proxy to manage lifecycle of QWebEngineNotification safely
+            auto proxy = WebEngineNotifProxy::create(std::move(notification));
+            // Use locally generated identicon when
+            // QWebEngine (or whatsapp) passes blank
+            // image
+            QPixmap pix = [proxy](auto img) {
+              return Identicons::colorCount(img) > 2
+                  ? QPixmap::fromImage(img)
+                  : Identicons::letterTile(proxy->notif->title(), QSize(96, 96));
+            } (proxy->notif->icon());
+            // A new toast replaces the visible one, so route messageClicked
+            // to the handler of the most recent notification only.
+            disconnect(m_trayNotificationClickConnection);
+            m_trayNotificationClickConnection = connect(
+                m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
+                [this, proxy]() {
+                  proxy->invoke(&QWebEngineNotification::click);
+                  this->notificationClicked();
+                });
+            m_systemTrayIcon->showMessage(
+                proxy->notif->title(), proxy->notif->message(),
+                QIcon(Identicons::clipRRect(pix) /* for eyecandy */), timeout);
+            proxy->invoke(&QWebEngineNotification::show);
+            return;
+          }
+#endif
         }
 
         if (!m_webengine_notifier_popup) {

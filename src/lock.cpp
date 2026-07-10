@@ -1,7 +1,13 @@
 #include "lock.h"
 #include "ui_lock.h"
 
+#ifdef Q_OS_WIN
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#else
 #include "X11/XKBlib.h" // keep this header at bottom
+#endif
 
 Lock::Lock(QWidget *parent) : QWidget(parent), ui(new Ui::Lock) {
   ui->setupUi(this);
@@ -237,6 +243,9 @@ void Lock::lock_app() {
 void Lock::on_passcodeLogin_returnPressed() { passcodeLoginAction->trigger(); }
 
 bool Lock::getCapsLockOn() {
+#ifdef Q_OS_WIN
+  return (GetKeyState(VK_CAPITAL) & 0x0001) != 0;
+#else
   Display *d = XOpenDisplay(nullptr);
   bool caps_state = false;
   if (d) {
@@ -246,6 +255,7 @@ bool Lock::getCapsLockOn() {
     XCloseDisplay(d);
   }
   return caps_state;
+#endif
 }
 
 void Lock::on_cancelSetting_clicked() {

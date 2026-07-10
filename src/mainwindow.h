@@ -11,7 +11,9 @@
 #include "notificationpopup.h"
 #include "settingswidget.h"
 #include "webenginepage.h"
+#ifdef Q_OS_LINUX
 #include <libnotify-qt.h>
+#endif
 
 class MainWindow : public QMainWindow {
   Q_OBJECT
@@ -57,7 +59,9 @@ private:
   void checkLoadedCorrectly();
   void loadingQuirk(const QString &test);
   void setNotificationPresenter(QWebEngineProfile *profile);
+#ifdef Q_OS_LINUX
   Notification::EventPtr notify(const QString& title, const QString& body, qint32 timeout);
+#endif
   void initRateWidget();
   void handleZoomOnWindowStateChange(const QWindowStateChangeEvent *ev);
   void handleZoom();
@@ -68,7 +72,12 @@ private:
   void triggerNewChat(const QString &phone, const QString &text);
   void restoreMainWindow();
 
+#ifdef Q_OS_LINUX
   Notification::Manager m_notifier;
+#else
+  // Routes QSystemTrayIcon::messageClicked to the most recent notification
+  QMetaObject::Connection m_trayNotificationClickConnection;
+#endif
   QIcon m_trayIconNormal;
   QRegularExpression m_notificationsTitleRegExp;
   QRegularExpression m_unreadMessageCountRegExp;

@@ -23,7 +23,9 @@ extern bool   defaultAppAutoLock;
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent),
+#ifdef Q_OS_LINUX
       m_notifier("WhatSie", this),
+#endif
       m_trayIconNormal(themeIcon("whatsie-tray", ":/icons/app/notification/whatsie-notify.png")),
       m_notificationsTitleRegExp("^\\([1-9]\\d*\\).*"),
       m_unreadMessageCountRegExp("\\([^\\d]*(\\d+)[^\\d]*\\)") {
@@ -298,6 +300,7 @@ void MainWindow::showNotification(QString title, QString message) {
                        .value("notificationTimeOut", 9000)
                        .toInt();
 
+#ifdef Q_OS_LINUX
     auto ntf = notify(title, message, timeout);
     QObject::connect(ntf.get(), &Notification::Event::actionInvoked, this,
                      [this] (const QString & action) {
@@ -311,20 +314,35 @@ void MainWindow::showNotification(QString title, QString message) {
                                        .actualSize(QSize(32,32), QIcon::Normal),
                                        QIcon::Normal, QIcon::On));
     ntf->show();
-  } else {
-    auto popup = new NotificationPopup(m_webEngine);
-    connect(popup, &NotificationPopup::notification_clicked, this,
-            [=]() { notificationClicked(); });
-    popup->style()->polish(qApp);
-    popup->setMinimumWidth(300);
-    popup->adjustSize();
-    QScreen *scr = QGuiApplication::primaryScreen();
-    if (scr) {
-      popup->present(scr, title, message,
-                     QPixmap(":/icons/app/notification/whatsie-notify.png"));
-    } else {
-      qWarning() << "showNotification: unable to get primary screen";
+    return;
+#else
+    // Native notifications via the system tray (toast notifications on
+    // Windows 10+); falls back to the popup below when no tray is available.
+    if (m_systemTrayIcon && QSystemTrayIcon::supportsMessages()) {
+      // A new toast replaces the visible one, so route messageClicked to
+      // the handler of the most recent notification only.
+      disconnect(m_trayNotificationClickConnection);
+      m_trayNotificationClickConnection =
+          connect(m_systemTrayIcon, &QSystemTrayIcon::messageClicked, this,
+                  &MainWindow::notificationClicked);
+      m_systemTrayIcon->showMessage(title, message, windowIcon(), timeout);
+      return;
     }
+#endif
+  }
+
+  auto popup = new NotificationPopup(m_webEngine);
+  connect(popup, &NotificationPopup::notification_clicked, this,
+          [=]() { notificationClicked(); });
+  popup->style()->polish(qApp);
+  popup->setMinimumWidth(300);
+  popup->adjustSize();
+  QScreen *scr = QGuiApplication::primaryScreen();
+  if (scr) {
+    popup->present(scr, title, message,
+                   QPixmap(":/icons/app/notification/whatsie-notify.png"));
+  } else {
+    qWarning() << "showNotification: unable to get primary screen";
   }
 }
 
@@ -419,6 +437,7 @@ void MainWindow::loadSchemaUrl(const QString &arg) {
   }
 }
 
+#ifdef Q_OS_LINUX
 Notification::EventPtr MainWindow::notify(const QString& title, const QString& body, qint32 timeout) {
   Notification::EventPtr ntf = m_notifier.createNotification(title, body, "whatsie");
 
@@ -429,6 +448,7 @@ Notification::EventPtr MainWindow::notify(const QString& title, const QString& b
   ntf->setHintString("image-path", "whatsie");
   return ntf;
 }
+#endif
 
 void MainWindow::newChat() {
   bool ok;

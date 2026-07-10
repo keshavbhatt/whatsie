@@ -11,7 +11,13 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
 
   // init
   appName = QApplication::applicationName();
+#ifdef Q_OS_WIN
+  appDescription = "WhatsApp Web client for Windows Desktop"
+                   "<br><span style=' font-size:8pt;'>Windows port — follows "
+                   "the updates of the upstream project</span>";
+#else
   appDescription = "WhatsApp Web client for Linux Desktop";
+#endif
   isOpenSource = true;
   appAuthorName = "Keshav Bhatt";
   appAuthorEmail = "keshavnrj@gmail.com";
@@ -51,6 +57,10 @@ About::About(QWidget *parent) : QWidget(parent), ui(new Ui::About) {
   if (isOpenSource == false) {
     ui->source_code->hide();
   }
+
+#ifdef Q_OS_WIN
+  ui->rate->hide(); // rate link points to the snap store, which is Linux-only
+#endif
 
   connect(ui->donate, &QPushButton::clicked,
           [=]() { QDesktopServices::openUrl(QUrl(donateLink)); });
