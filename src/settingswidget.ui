@@ -358,6 +358,16 @@ background:transparent;
               </property>
              </widget>
             </item>
+            <item row="4" column="1">
+             <widget class="QCheckBox" name="dismissEmojiPanelCheckBox">
+              <property name="toolTip">
+               <string>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;Close the emoji, GIF &amp;amp; sticker panel when you click elsewhere. WhatsApp Web otherwise keeps it open until the button is pressed again.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</string>
+              </property>
+              <property name="text">
+               <string>Close emoji/sticker panel when clicking outside</string>
+              </property>
+             </widget>
+            </item>
            </layout>
           </item>
           <item row="15" column="0">
