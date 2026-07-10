@@ -345,7 +345,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
   QTimer::singleShot(500, m_settingsWidget,
                      [=]() { m_settingsWidget->refresh(); });
 
-  if (QSystemTrayIcon::isSystemTrayAvailable() &&
+  if (!m_isQuitting && QSystemTrayIcon::isSystemTrayAvailable() &&
       SettingsManager::instance()
               .settings()
               .value("closeButtonActionCombo", 0)
@@ -368,6 +368,7 @@ void MainWindow::closeEvent(QCloseEvent *event) {
 }
 
 void MainWindow::quitApp() {
+  m_isQuitting = true;
   SettingsManager::instance().settings().setValue("geometry", saveGeometry());
   getPageTheme();
   QTimer::singleShot(500, this, [=]() {

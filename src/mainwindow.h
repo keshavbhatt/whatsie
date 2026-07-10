@@ -75,6 +75,10 @@ private:
   DownloadManagerWidget m_downloadManagerWidget;
   QScopedPointer<QWebEngineProfile> m_otrProfile;
   int m_correctlyLoadedRetries = 4;
+  // Set while quitApp() runs so closeEvent() does not turn an intentional
+  // quit into minimize-to-tray (Qt 6.3+ quit() closes windows first and a
+  // vetoed close cancels the quit).
+  bool m_isQuitting = false;
 
   QAction *m_reloadAction = nullptr;
   QAction *m_minimizeAction = nullptr;
