@@ -31,7 +31,12 @@ WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
 bool WebEnginePage::acceptNavigationRequest(const QUrl &url,
                                             QWebEnginePage::NavigationType type,
                                             bool isMainFrame) {
-  if (QWebEnginePage::NavigationType::NavigationTypeLinkClicked == type) {
+  // Open link clicks in the default browser — but only when they leave
+  // WhatsApp. The logout flow ends with a click-triggered navigation back to
+  // web.whatsapp.com; hijacking it opened a browser tab and left the app
+  // stuck on the "Logging out" overlay forever.
+  if (QWebEnginePage::NavigationType::NavigationTypeLinkClicked == type &&
+      url.host() != QLatin1String("web.whatsapp.com")) {
     QDesktopServices::openUrl(url);
     return false;
   }
