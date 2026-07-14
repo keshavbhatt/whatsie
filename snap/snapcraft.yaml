@@ -65,6 +65,7 @@ parts:
 
     stage-packages:
       - libdrm2
+      - libxcb-shape0
 
     cmake-parameters:
       - -DCMAKE_BUILD_TYPE=Release
