@@ -47,36 +47,46 @@ find_package(Qt${QT_VERSION_MAJOR} ${QT_VERSION_MAJOR}.${QT_VERSION_MINOR} REQUI
     Network
 )
 
-find_package(notify-qt${QT_VERSION_MAJOR} QUIET CONFIG)
-if (notify-qt${QT_VERSION_MAJOR}_FOUND)
-    add_library(notify-qt ALIAS notify-qt${QT_VERSION_MAJOR})
-elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/libnotify-qt/CMakeLists.txt")
-    add_subdirectory(src/libnotify-qt)
-else()
-    message(FATAL_ERROR
-        "notify-qt${QT_VERSION_MAJOR} package not found and the src/libnotify-qt submodule "
-        "is missing.\n"
-        "Please either install notify-qt${QT_VERSION_MAJOR} "
-        "or initialize/update the src/libnotify-qt git submodule.")
+# libnotify-qt is a D-Bus (org.freedesktop.Notifications) client and is only
+# used on Linux; other platforms fall back to QSystemTrayIcon notifications.
+if (UNIX AND NOT APPLE)
+    find_package(notify-qt${QT_VERSION_MAJOR} QUIET CONFIG)
+    if (notify-qt${QT_VERSION_MAJOR}_FOUND)
+        add_library(notify-qt ALIAS notify-qt${QT_VERSION_MAJOR})
+    elseif (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/src/libnotify-qt/CMakeLists.txt")
+        add_subdirectory(src/libnotify-qt)
+    else()
+        message(FATAL_ERROR
+            "notify-qt${QT_VERSION_MAJOR} package not found and the src/libnotify-qt submodule "
+            "is missing.\n"
+            "Please either install notify-qt${QT_VERSION_MAJOR} "
+            "or initialize/update the src/libnotify-qt git submodule.")
+    endif()
 endif()
 
 # Compiler flags
-add_compile_options(
-    -fstack-protector-strong
-    -fstack-clash-protection
-    -D_FORTIFY_SOURCE=3
-    -D_GLIBCXX_ASSERTIONS
-)
+if(MSVC)
+    # Source files contain UTF-8 characters; MSVC needs to be told explicitly.
+    add_compile_options(/utf-8)
+else()
+    add_compile_options(
+        -fstack-protector-strong
+        -fstack-clash-protection
+        -D_FORTIFY_SOURCE=3
+        -D_GLIBCXX_ASSERTIONS
+    )
 
-# Architecture-specific flags
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-    add_compile_options(-mbranch-protection=standard)
+    # Architecture-specific flags
+    if(CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+        add_compile_options(-mbranch-protection=standard)
+    endif()
+
+    # Release and Debug specific flags
+    add_compile_options($<$<CONFIG:Release>:-O2>)
+    add_compile_options($<$<CONFIG:Debug>:-O1>)
 endif()
 
-# Release and Debug specific flags
-add_compile_options($<$<CONFIG:Release>:-O2>)
 add_compile_options($<$<CONFIG:Release>:-DQT_NO_DEBUG_OUTPUT>)
-add_compile_options($<$<CONFIG:Debug>:-O1>)
 
 # Installation prefix
 if(NOT CMAKE_INSTALL_PREFIX)
@@ -202,9 +212,23 @@ target_link_libraries(whatsie PRIVATE
     Qt${QT_VERSION_MAJOR}::WebEngineWidgets
     Qt${QT_VERSION_MAJOR}::Positioning
     Qt${QT_VERSION_MAJOR}::Network
-    notify-qt
-    X11
 )
+
+# Linux-only libraries: D-Bus notifications and X11 (Caps Lock detection)
+if(UNIX AND NOT APPLE)
+    target_link_libraries(whatsie PRIVATE
+        notify-qt
+        X11
+    )
+endif()
+
+# Windows executable setup: GUI subsystem (no console) and icon/version resource
+if(WIN32)
+    string(REPLACE "." "," PROJECT_VERSION_RC ${PROJECT_VERSION})
+    configure_file(dist/windows/whatsie.rc.in ${CMAKE_CURRENT_BINARY_DIR}/whatsie.rc @ONLY)
+    target_sources(whatsie PRIVATE ${CMAKE_CURRENT_BINARY_DIR}/whatsie.rc)
+    set_target_properties(whatsie PROPERTIES WIN32_EXECUTABLE TRUE)
+endif()
 
 # Define compiler definitions
 target_compile_definitions(whatsie PRIVATE
@@ -222,6 +246,9 @@ message(STATUS "Qt6 WebEngine spellchecker support: enabled (required)")
 
 # Install the executable
 install(TARGETS whatsie DESTINATION ${BINDIR})
+
+# Linux-only installation files (freedesktop.org conventions)
+if(UNIX AND NOT APPLE)
 
 # Install desktop file
 install(FILES dist/linux/com.ktechpit.whatsie.desktop
@@ -260,6 +287,8 @@ install(FILES dist/linux/hicolor/scalable/apps/com.ktechpit.whatsie.svg
 install(FILES dist/linux/hicolor/symbolic/apps/com.ktechpit.whatsie-symbolic.svg
     DESTINATION ${DATADIR}/icons/hicolor/symbolic/apps
 )
+
+endif()
 
 # Spell-check dictionaries are provided at runtime by the system hunspell
 # package (or the hunspell-dictionaries content snap in the snap build).

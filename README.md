@@ -1,6 +1,6 @@
 # WhatSie
 
-Feature rich WhatsApp web client based on Qt WebEngine for Linux Desktop
+Feature rich WhatsApp web client based on Qt WebEngine for Linux and Windows Desktop
 
 ## Whatsie Key features
 
@@ -125,7 +125,31 @@ make help             # Show all available targets
 
 For detailed build instructions, see `BUILD_QUICK_REFERENCE.md`
 
+## Build from Source (Windows)
 
+### Requirements
+ - Windows 10 or later
+ - Visual Studio 2022 with the "Desktop development with C++" workload
+   (MSVC is required — Qt WebEngine does not support MinGW)
+ - Qt 6.10+ for MSVC 64-bit, with the Qt WebEngine, Qt WebChannel and
+   Qt Positioning modules
+ - git, cmake >= 3.24
+
+### Build & Run
+
+```bat
+git clone https://github.com/keshavbhatt/whatsie.git
+cd whatsie
+cmake -G "Visual Studio 17 2022" -A x64 -B build -DCMAKE_PREFIX_PATH=C:\Qt\6.10.0\msvc2022_64
+cmake --build build --config Release
+C:\Qt\6.10.0\msvc2022_64\bin\windeployqt.exe build\Release\whatsie.exe
+build\Release\whatsie.exe
+```
+
+For detailed instructions, see [DOCS/WINDOWS_BUILD.md](DOCS/WINDOWS_BUILD.md).
+
+Every push is also compile-checked on Windows by the `Windows Build` GitHub
+Actions workflow, which uploads a ready-to-run build as a workflow artifact.
 
 ## Install Whatsie on Linux Desktop
 
@@ -140,8 +164,8 @@ Using Arch User Repository (AUR), [AUR package for Whatsie](https://aur.archlinu
 
 ## Screenshots (could be old)
 
-![WhatSie for Linux Desktop Light Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/1.jpg?raw=true)
-![WhatSie for Linux Desktop Dark Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/2.jpg?raw=true)
-![WhatSie for Linux Desktop Setting module](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/4.jpg?raw=true)
-![WhatSie for Linux Desktop App Lock screen](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/3.jpg?raw=true)
-![WhatSie for Linux Desktop Shortcuts & Permissions](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/5.jpg?raw=true)
+![WhatSie Light Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/1.jpg?raw=true)
+![WhatSie Dark Theme](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/2.jpg?raw=true)
+![WhatSie Setting module](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/4.jpg?raw=true)
+![WhatSie App Lock screen](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/3.jpg?raw=true)
+![WhatSie Shortcuts & Permissions](https://github.com/keshavbhatt/whatsie/blob/main/screenshots/5.jpg?raw=true)
