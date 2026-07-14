@@ -23,6 +23,7 @@ signals:
   void initLock();
   void changeLockPassword();
   void notificationPopupTimeOutChanged();
+  void webTweaksChanged();
   void notify(QString message);
   void zoomChanged();
   void zoomMaximizedChanged();
@@ -65,6 +66,7 @@ private slots:
   void on_defaultUserAgentButton_clicked();
   void on_minimizeOnTrayIconClick_toggled(bool checked);
   void on_muteAudioCheckBox_toggled(bool checked);
+  void on_dismissEmojiPanelCheckBox_toggled(bool checked);
   void on_notificationCheckBox_toggled(bool checked);
   void on_notificationCombo_currentIndexChanged(int index);
   void on_notificationTimeOutspinBox_valueChanged(int arg1);

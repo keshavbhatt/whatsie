@@ -14,6 +14,7 @@
 #include "rateapp.h"
 #include "theme.h"
 #include "webengineprofilemanager.h"
+#include "webtweaks.h"
 
 extern double defaultZoomFactorMaximized;
 extern int    defaultAppAutoLockDuration;
@@ -224,6 +225,16 @@ void MainWindow::initSettingWidget() {
   connect(m_settingsWidget, &SettingsWidget::notificationPopupTimeOutChanged,
           m_settingsWidget, [=]() {
             setNotificationPresenter(m_webEngine->page()->profile());
+          });
+
+  connect(m_settingsWidget, &SettingsWidget::webTweaksChanged, m_settingsWidget,
+          [=]() {
+            // Update the profile scripts for future page loads, and apply the
+            // change to the already-loaded page (Qt does not propagate profile
+            // script changes to an existing page).
+            WebTweaks::install(WebEngineProfileManager::instance().profile());
+            if (m_webEngine && m_webEngine->page())
+              m_webEngine->page()->runJavaScript(WebTweaks::scriptSource());
           });
 
   connect(m_settingsWidget, &SettingsWidget::notify, m_settingsWidget,

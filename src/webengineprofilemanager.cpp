@@ -1,6 +1,7 @@
 #include "webengineprofilemanager.h"
 #include "common.h"
 #include "settingsmanager.h"
+#include "webtweaks.h"
 
 #include <QDebug>
 #include <QStandardPaths>
@@ -88,4 +89,6 @@ void WebEngineProfileManager::applyUserSettings() {
     m_profile->settings()->setAttribute(
         QWebEngineSettings::PlaybackRequiresUserGesture,
         s.value(QStringLiteral("autoPlayMedia"), false).toBool());
+
+    WebTweaks::install(m_profile);
 }

@@ -109,6 +109,7 @@ set(SOURCES
     src/webenginepage.cpp
     src/webenginenotifproxy.cpp
     src/webengineprofilemanager.cpp
+    src/webtweaks.cpp
     src/webview.cpp
     src/widgets/elidedlabel/elidedlabel.cpp
     src/widgets/scrolltext/scrolltext.cpp
@@ -137,6 +138,7 @@ set(HEADERS
     src/utils.h
     src/webenginepage.h
     src/webengineprofilemanager.h
+    src/webtweaks.h
     src/webview.h
     src/webenginenotifproxy.h
     src/widgets/elidedlabel/elidedlabel.h
