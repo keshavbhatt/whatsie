@@ -368,7 +368,13 @@ QString MainWindow::getPageTheme() const {
         "  return v === 'dark' ? 'dark' : 'light';"
         "})();",
         [=](const QVariant &result) {
-          theme = result.toString() == "dark" ? "dark" : "light";
+          // On quit the page can be torn down before this JS completes; the
+          // callback then fires with an empty result. Persist only a definite
+          // answer, otherwise a dark preference gets overwritten with light.
+          const QString value = result.toString();
+          if (value != "dark" && value != "light")
+            return;
+          theme = value;
           SettingsManager::instance().settings().setValue("windowTheme", theme);
         });
   }
