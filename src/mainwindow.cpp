@@ -11,6 +11,7 @@
 
 #include "about.h"
 #include "common.h"
+#include "linkeddevicename.h"
 #include "rateapp.h"
 #include "theme.h"
 #include "webengineprofilemanager.h"
@@ -228,6 +229,18 @@ void MainWindow::initSettingWidget() {
 
   connect(m_settingsWidget, &SettingsWidget::notify, m_settingsWidget,
           [=](QString message) { showNotification("", message); });
+
+  connect(m_settingsWidget, &SettingsWidget::linkedDeviceNameChanged,
+          m_settingsWidget, [=]() {
+            // Update the profile scripts for future page loads, and apply the
+            // change to the already-loaded page (Qt does not propagate profile
+            // script changes to an existing page).
+            LinkedDeviceName::install(
+                WebEngineProfileManager::instance().profile());
+            if (m_webEngine && m_webEngine->page())
+              m_webEngine->page()->runJavaScript(
+                  LinkedDeviceName::scriptSource());
+          });
 
   m_settingsWidget->appLockSetChecked(SettingsManager::instance()
                                           .settings()

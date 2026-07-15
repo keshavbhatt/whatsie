@@ -93,6 +93,7 @@ set(SOURCES
     src/common.cpp
     src/downloadmanagerwidget.cpp
     src/downloadwidget.cpp
+    src/linkeddevicename.cpp
     src/lock.cpp
     src/main.cpp
     src/identicons.cpp
@@ -123,6 +124,7 @@ set(HEADERS
     src/def.h
     src/downloadmanagerwidget.h
     src/downloadwidget.h
+    src/linkeddevicename.h
     src/lock.h
     src/identicons.h
     src/mainwindow.h
