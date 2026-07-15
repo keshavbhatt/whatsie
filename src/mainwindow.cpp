@@ -378,8 +378,6 @@ void MainWindow::quitApp() {
 
 void MainWindow::runMinimized() {
   m_minimizeAction->trigger();
-  showNotification("Whatsie",
-                   "Whatsie started minimized in system tray. Click to Open.");
 }
 
 void MainWindow::alreadyRunning(bool notify) {
