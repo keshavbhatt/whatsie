@@ -328,14 +328,7 @@ void MainWindow::showNotification(QString title, QString message) {
   }
 }
 
-void MainWindow::notificationClicked() {
-  show();
-  QCoreApplication::processEvents();
-  if (windowState().testFlag(Qt::WindowMinimized))
-    setWindowState(windowState() & ~Qt::WindowMinimized);
-  raise();
-  activateWindow();
-}
+void MainWindow::notificationClicked() { restoreWindow(); }
 
 // ── Lifecycle events ──────────────────────────────────────────────────────────
 
@@ -386,8 +379,7 @@ void MainWindow::alreadyRunning(bool notify) {
   if (notify)
     showNotification(QApplication::applicationName(),
                      "Restored an already running instance.");
-  setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
-  show();
+  restoreWindow();
 }
 
 // ── Dialogs ───────────────────────────────────────────────────────────────────

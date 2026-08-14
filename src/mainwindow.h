@@ -27,6 +27,7 @@ public:
                 bool byLoadingQuirk = false);
 
 public slots:
+  void restoreWindow();
   void updateWindowTheme();
   void updatePageTheme();
   void handleWebViewTitleChanged(const QString &title);
@@ -67,6 +68,7 @@ private:
   void initAutoLock();
   void triggerNewChat(const QString &phone, const QString &text);
   void restoreMainWindow();
+  bool isWindowShown() const;
 
   Notification::Manager m_notifier;
   QIcon m_trayIconNormal;

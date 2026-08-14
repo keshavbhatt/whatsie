@@ -4,8 +4,17 @@
 
 #include <algorithm>
 
+#include <QGuiApplication>
 #include <QShortcut>
 #include <QStyleHints>
+#include <QWindow>
+
+#if __has_include(<QtGui/qguiapplication_platform.h>)
+#include <QtGui/qguiapplication_platform.h>
+#endif
+
+#include <X11/Xatom.h> // keep the X11 headers at the bottom, they define
+#include <X11/Xlib.h>  // None, Status and Bool as macros
 
 // ── Actions ──────────────────────────────────────────────────────────────────
 
@@ -30,7 +39,8 @@ void MainWindow::createActions() {
   minimizeShortcut->setAutoRepeat(false);
 
   m_restoreAction = new QAction(tr("&Restore"), this);
-  connect(m_restoreAction, &QAction::triggered, this, &QMainWindow::show);
+  connect(m_restoreAction, &QAction::triggered, this,
+          &MainWindow::restoreWindow);
   addAction(m_restoreAction);
 
   m_reloadAction = new QAction(tr("Re&load"), this);
@@ -100,34 +110,113 @@ void MainWindow::createTrayIcon() {
   }
 }
 
-void MainWindow::checkWindowState() {
-  QObject *tray_icon_menu = this->findChild<QObject *>("trayIconMenu");
-  if (tray_icon_menu == nullptr)
-    return;
+// ── Window visibility ─────────────────────────────────────────────────────────
 
-  QMenu *menu = qobject_cast<QMenu *>(tray_icon_menu);
-  if (this->isVisible()) {
-    menu->actions().at(0)->setDisabled(false);
-    menu->actions().at(1)->setDisabled(true);
-  } else {
-    menu->actions().at(0)->setDisabled(true);
-    menu->actions().at(1)->setDisabled(false);
-  }
-  menu->actions().at(4)->setDisabled(m_lockWidget && m_lockWidget->getIsLocked());
+namespace {
+
+// Whether the window manager currently keeps the window off screen.
+//
+// Qt derives Qt::WindowMinimized from WM_STATE only, but a window manager is
+// free to minimize a window without ever setting WM_STATE to Iconic. KWin on
+// X11 does exactly that: it sets _NET_WM_STATE_HIDDEN and leaves the window
+// mapped with WM_STATE at Normal, so the application keeps reporting a visible,
+// non-minimized, still exposed window that the user cannot see anywhere.
+// Reading the property the window manager itself sets is the only way to tell.
+bool windowIsHiddenByWM(WId window) {
+#if defined(Q_OS_UNIX) && __has_include(<QtGui/qguiapplication_platform.h>)
+  const auto *x11 =
+      qGuiApp->nativeInterface<QNativeInterface::QX11Application>();
+  if (x11 == nullptr || window == 0)
+    return false;
+
+  Display *display = x11->display();
+  const Atom netWmState = XInternAtom(display, "_NET_WM_STATE", True);
+  const Atom hiddenState = XInternAtom(display, "_NET_WM_STATE_HIDDEN", True);
+  if (netWmState == None || hiddenState == None)
+    return false;
+
+  Atom type = None;
+  int format = 0;
+  unsigned long stateCount = 0, bytesAfter = 0;
+  unsigned char *data = nullptr;
+  if (XGetWindowProperty(display, window, netWmState, 0, 32, False, XA_ATOM,
+                         &type, &format, &stateCount, &bytesAfter,
+                         &data) != Success ||
+      data == nullptr)
+    return false;
+
+  const Atom *states = reinterpret_cast<Atom *>(data);
+  bool hidden = false;
+  for (unsigned long i = 0; i < stateCount && !hidden; ++i)
+    hidden = states[i] == hiddenState;
+
+  XFree(data);
+  return hidden;
+#else
+  Q_UNUSED(window)
+  return false;
+#endif
+}
+
+} // namespace
+
+// Whether the main window is actually on screen for the user.
+//
+// QWidget::isVisible() alone does not answer that: a window minimized by the
+// window manager stays "visible" for Qt, and so does QWindow::isExposed() when
+// the window manager keeps the window mapped while minimizing it. Ask the
+// window manager on top of Qt's own state.
+bool MainWindow::isWindowShown() const {
+  if (isHidden() || isMinimized())
+    return false;
+
+  const QWindow *handle = windowHandle();
+  if (handle == nullptr || !handle->isExposed())
+    return false;
+
+  return !windowIsHiddenByWM(winId());
+}
+
+void MainWindow::restoreWindow() {
+  // A window the window manager minimized behind Qt's back is still "shown" as
+  // far as Qt is concerned, which makes show() a no-op and would leave the
+  // window off screen. Re-mapping it is the one way back that works on every
+  // window manager.
+  if (!isWindowShown() && isVisible())
+    hide();
+
+  setWindowState((windowState() & ~Qt::WindowMinimized) | Qt::WindowActive);
+  show();
+  raise();
+  activateWindow();
+  if (QWindow *handle = windowHandle())
+    handle->requestActivate();
+}
+
+void MainWindow::checkWindowState() {
+  const bool shown = isWindowShown();
+  m_minimizeAction->setDisabled(!shown);
+  m_restoreAction->setDisabled(shown);
+  m_lockAction->setDisabled(m_lockWidget && m_lockWidget->getIsLocked());
 }
 
 void MainWindow::iconActivated(QSystemTrayIcon::ActivationReason reason) {
-  if (SettingsManager::instance()
-              .settings()
-              .value("minimizeOnTrayIconClick", false)
-              .toBool() == false ||
-      reason == QSystemTrayIcon::Context)
+  if (reason != QSystemTrayIcon::Trigger &&
+      reason != QSystemTrayIcon::DoubleClick)
     return;
-  if (isVisible()) {
+
+  // Hiding the window on a tray click stays opt-in, restoring it never is:
+  // clicking the tray icon of a window the user cannot see has to bring that
+  // window back, the way every other tray application behaves.
+  const bool minimizeOnClick = SettingsManager::instance()
+                                   .settings()
+                                   .value("minimizeOnTrayIconClick", false)
+                                   .toBool();
+  if (minimizeOnClick && isWindowShown()) {
     hide();
-  } else {
-    show();
+    return;
   }
+  restoreWindow();
 }
 
 const QIcon MainWindow::getTrayIcon(const int &notificationCount) const {
