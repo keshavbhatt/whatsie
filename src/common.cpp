@@ -1,7 +1,11 @@
 #include "common.h"
 
 // Define global variables here to avoid multiple definition errors
+#ifdef Q_OS_WIN
+QString defaultUserAgentStr = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+#else
 QString defaultUserAgentStr = "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36";
+#endif
 
 int defaultAppAutoLockDuration = 30;
 bool defaultAppAutoLock = false;
