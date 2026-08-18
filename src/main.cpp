@@ -11,14 +11,21 @@
 #include <singleapplication.h>
 
 // Must run before QApplication is created so Qt WebEngine picks these up.
+//
+// Do NOT add --disable-gpu / --disable-gpu-compositing here.  Chromium ties
+// WebGL to the GPU process: with the GPU disabled there is no WebGL context at
+// all (software fallback via SwiftShader now needs an explicit
+// --enable-unsafe-swiftshader), and WhatsApp Web's call UI renders the remote
+// participant's video through WebGL.  The result is a call that connects, with
+// audio and a working self-preview, but a permanently blank remote video.
+// Users on broken drivers can still opt out by exporting
+// QTWEBENGINE_CHROMIUM_FLAGS themselves, which short-circuits this function.
 static void setChromiumFlags() {
   if (!qEnvironmentVariableIsEmpty("QTWEBENGINE_CHROMIUM_FLAGS"))
     return;
 #ifdef QT_DEBUG
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
     "--remote-debugging-port=9421 "
-          "--disable-gpu "
-          "--disable-gpu-compositing "
           "--disable-translate "
           "--disable-extensions "
           "--disable-component-update "
@@ -26,8 +33,6 @@ static void setChromiumFlags() {
           "--no-sandbox");
 #else
   qputenv("QTWEBENGINE_CHROMIUM_FLAGS",
-          "--disable-gpu "
-          "--disable-gpu-compositing "
           "--disable-translate "
           "--disable-extensions "
           "--disable-component-update "
