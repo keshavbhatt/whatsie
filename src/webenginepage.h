@@ -64,6 +64,8 @@ private slots:
   void fullScreenRequestedByPage(QWebEngineFullScreenRequest request);
   void injectPreventScrollWheelZoomHelper();
   void injectNewChatJavaScript();
+  void injectReplyPreviewUpdater();
+  QString loadReplyUpdaterConfig();
 };
 
 #endif // WEBENGINEPAGE_H

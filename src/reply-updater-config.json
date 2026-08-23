@@ -1,0 +1,69 @@
+{
+  "_comment": "Reply preview updater config. Update selectors here without rebuilding.",
+  "_updated": "2026-08-23",
+  "moduleNames": [
+    "WAWebCollections",
+    "WAWebStore",
+    "WAWebMsgStore"
+  ],
+  "msgStoreAccess": [
+    "require('WAWebCollections').Msg",
+    "require('WAWebStore').Msg",
+    "require('WAWebMsgStore')",
+    "window.Store && window.Store.Msg"
+  ],
+  "quotedMessageSelectors": [
+    "[data-testid='quoted-message']",
+    "[data-testid='quoted-msg']",
+    "div[class*='quoted-mention']",
+    "div[aria-label*='Quoted message']",
+    "div._aju3"
+  ],
+  "quotedMessageTextSelectors": [
+    "[data-testid='quoted-message'] span.selectable-text",
+    "[data-testid='quoted-msg-text']",
+    "div._aju3 span.selectable-text",
+    "div._aju3 span._ajxd._ajxk",
+    ".quoted-msg-text",
+    "span._ao3q"
+  ],
+  "messageContainerSelector": [
+    "[data-testid='msg-list']",
+    "#main",
+    ".message-list"
+  ],
+  "messageTextSelectors": [
+    "div[data-testid='msg-container'] div.copyable-text",
+    "[data-testid='msg-text']",
+    "span.selectable-text",
+    "span._ao3q"
+  ],
+  "msgIdAttributes": [
+    "data-id",
+    "data-ref-id",
+    "data-original-msg-id"
+  ],
+  "quoteRefAttributes": [
+    "data-id",
+    "data-ref-id",
+    "data-original-msg-id",
+    "data-msg-id"
+  ],
+  "quoteRefLinkSelectors": [
+    "a[href*='message/']",
+    "[role='button'][data-id]"
+  ],
+  "autoDiscover": {
+    "enabled": true,
+    "discoverySelectors": {
+      "quotedMessage": [
+        "div[tabindex='-1'][data-testid]",
+        "div[role='row'] div[tabindex='-1']"
+      ],
+      "messageBody": [
+        "span.selectable-text",
+        "span[dir='auto']"
+      ]
+    }
+  }
+}

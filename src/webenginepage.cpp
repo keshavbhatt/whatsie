@@ -1,6 +1,12 @@
 #include "webenginepage.h"
 #include "webengineprofilemanager.h"
 
+#include <QFile>
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QJsonArray>
+#include <QStandardPaths>
+
 WebEnginePage::WebEnginePage(QWebEngineProfile *profile, QObject *parent)
     : QWebEnginePage(profile, parent) {
 
@@ -124,6 +130,7 @@ void WebEnginePage::handleLoadFinished(bool ok) {
   if (ok) {
     injectPreventScrollWheelZoomHelper();
     injectNewChatJavaScript();
+    injectReplyPreviewUpdater();
   }
 }
 
@@ -320,6 +327,277 @@ void WebEnginePage::injectPreventScrollWheelZoomHelper() {
                         }
                     })();
                 )";
+  this->runJavaScript(js);
+}
+
+QString WebEnginePage::loadReplyUpdaterConfig() {
+  // Try external config first (allows updates without rebuild)
+  QStringList searchPaths = {
+      QStandardPaths::writableLocation(QStandardPaths::AppConfigLocation),
+      QStandardPaths::writableLocation(QStandardPaths::GenericConfigLocation) +
+          QStringLiteral("/whatsie"),
+      QStandardPaths::writableLocation(QStandardPaths::HomeLocation) +
+          QStringLiteral("/.config/whatsie")};
+
+  for (const QString &path : searchPaths) {
+    QFile file(path + QStringLiteral("/reply-updater-config.json"));
+    if (file.open(QIODevice::ReadOnly)) {
+      QByteArray data = file.readAll();
+      file.close();
+      qDebug() << "Reply updater config loaded from:" << file.fileName();
+      return QString::fromUtf8(data);
+    }
+  }
+
+  // Fallback: use bundled resource
+  QFile bundled(QStringLiteral(":/reply-updater-config.json"));
+  if (bundled.open(QIODevice::ReadOnly)) {
+    QByteArray data = bundled.readAll();
+    bundled.close();
+    return QString::fromUtf8(data);
+  }
+
+  // Ultimate fallback: hardcoded defaults
+  return QStringLiteral(R"json({
+    "msgStoreAccess": [
+      "require('WAWebCollections').Msg",
+      "require('WAWebStore').Msg",
+      "require('WAWebMsgStore')",
+      "window.Store && window.Store.Msg"
+    ],
+    "quotedMessageSelectors": [
+      "[data-testid='quoted-message']",
+      "div[class*='quoted-mention']",
+      "div[aria-label*='Quoted message']",
+      "div._aju3"
+    ],
+    "quotedMessageTextSelectors": [
+      "[data-testid='quoted-message'] span.selectable-text",
+      "div._aju3 span.selectable-text",
+      ".quoted-msg-text",
+      "span._ao3q"
+    ],
+    "messageContainerSelector": [
+      "[data-testid='msg-list']",
+      "#main"
+    ],
+    "msgIdAttributes": ["data-id", "data-ref-id", "data-original-msg-id"],
+    "quoteRefAttributes": ["data-id", "data-ref-id", "data-original-msg-id", "data-msg-id"],
+    "quoteRefLinkSelectors": ["a[href*='message/']", "[role='button'][data-id]"]
+  })json");
+}
+
+void WebEnginePage::injectReplyPreviewUpdater() {
+  QString config = loadReplyUpdaterConfig();
+  // Escape for embedding in JS string literal
+  config.replace(QLatin1Char('\\'), QStringLiteral("\\\\"));
+  config.replace(QLatin1Char('\''), QStringLiteral("\\'"));
+  config.replace(QLatin1Char('\n'), QStringLiteral("\\n"));
+  config.replace(QLatin1Char('\r'), QStringLiteral("\\r"));
+
+  const QString js = QStringLiteral(R"js(
+    (function(cfg) {
+      'use strict';
+      try {
+        // ── Parse config ──────────────────────────────────────────────
+        var C;
+        try { C = JSON.parse(cfg); } catch(e) { return; }
+
+        // ── Layer 1: Access message store (configurable) ──────────────
+        var msgStore = null;
+        var storeExprs = C.msgStoreAccess || [];
+        for (var i = 0; i < storeExprs.length; i++) {
+          try { msgStore = eval(storeExprs[i]); } catch(e) {}
+          if (msgStore) break;
+        }
+        if (!msgStore) return; // WhatsApp structure changed — no-op
+
+        // ── Layer 2: Helper — try multiple selectors, return first match ─
+        function trySelectors(parent, selectors) {
+          if (!parent || !selectors) return null;
+          for (var i = 0; i < selectors.length; i++) {
+            try {
+              var el = parent.querySelector(selectors[i]);
+              if (el) return el;
+            } catch(e) {}
+          }
+          return null;
+        }
+
+        function trySelectorsAll(parent, selectors) {
+          if (!parent || !selectors) return [];
+          for (var i = 0; i < selectors.length; i++) {
+            try {
+              var els = parent.querySelectorAll(selectors[i]);
+              if (els.length > 0) return Array.from(els);
+            } catch(e) {}
+          }
+          return [];
+        }
+
+        // ── Layer 3: Extract message text from node ───────────────────
+        function getMsgText(node) {
+          if (!node) return null;
+          // Try configured selectors first
+          var el = trySelectors(node, C.quotedMessageTextSelectors);
+          if (el) return el.textContent;
+          // Fallback: walk spans
+          try {
+            var spans = node.querySelectorAll('span');
+            for (var i = spans.length - 1; i >= 0; i--) {
+              var t = spans[i].textContent.trim();
+              if (t.length > 0 && !spans[i].querySelector('span')) return t;
+            }
+          } catch(e) {}
+          return null;
+        }
+
+        // ── Layer 4: Get message ID from a reply quote container ──────
+        function getQuoteRefMsgId(quoteContainer) {
+          if (!quoteContainer) return null;
+          try {
+            // Try configured attributes
+            var attrs = C.quoteRefAttributes || ['data-id'];
+            for (var i = 0; i < attrs.length; i++) {
+              var val = quoteContainer.getAttribute(attrs[i]);
+              if (val) return val;
+            }
+            // Try configured link selectors
+            var links = C.quoteRefLinkSelectors || ['a[href*="message/"]'];
+            for (var i = 0; i < links.length; i++) {
+              var link = quoteContainer.querySelector(links[i]);
+              if (link) {
+                return link.getAttribute('data-id')
+                    || (link.href && link.href.split('/').pop());
+              }
+            }
+          } catch(e) {}
+          return null;
+        }
+
+        // ── Layer 5: Get message body from store object ───────────────
+        function getMsgBody(msg) {
+          if (!msg) return null;
+          // WhatsApp message objects have different structures across versions
+          var props = ['body', 'text', 'content', 'message'];
+          for (var i = 0; i < props.length; i++) {
+            if (msg[props[i]] && typeof msg[props[i]] === 'string')
+              return msg[props[i]];
+          }
+          // Try __x wrapper (older versions)
+          if (msg.__x) {
+            for (var i = 0; i < props.length; i++) {
+              if (msg.__x[props[i]] && typeof msg.__x[props[i]] === 'string')
+                return msg.__x[props[i]];
+            }
+          }
+          return null;
+        }
+
+        // ── Layer 6: Check if message is edited ───────────────────────
+        function isEdited(msg) {
+          if (!msg) return false;
+          if (msg.edited === true || msg.isEdited === true) return true;
+          if (msg.__x && (msg.__x.edited === true || msg.__x.isEdited === true))
+            return true;
+          // Check for edited timestamp
+          if (msg.editedTimestamp || msg.t !== undefined) {
+            // Some versions use tsChanged > t to indicate edit
+            if (msg.tsChanged && msg.t && msg.tsChanged > msg.t) return true;
+          }
+          return false;
+        }
+
+        // ── Layer 7: Update all reply quotes for a given message ──────
+        function updateReplyPreviews(msgId, newText) {
+          if (!msgId || !newText) return;
+          var quotes = trySelectorsAll(document, C.quotedMessageSelectors);
+          for (var i = 0; i < quotes.length; i++) {
+            var refId = getQuoteRefMsgId(quotes[i]);
+            if (refId && refId === msgId) {
+              var textEl = trySelectors(quotes[i], C.quotedMessageTextSelectors);
+              if (textEl && textEl.textContent !== newText) {
+                textEl.textContent = newText;
+                console.log('[WhatSie] Updated reply preview for:', msgId);
+              }
+            }
+          }
+        }
+
+        // ── Layer 8: MutationObserver — watch for DOM changes ─────────
+        var targetNode = trySelectors(document, C.messageContainerSelector);
+        if (!targetNode) return; // WhatsApp structure changed — no-op
+
+        var lastScan = 0;
+        var DEBOUNCE_MS = 1000;
+
+        var observer = new MutationObserver(function(mutations) {
+          try {
+            var now = Date.now();
+            if (now - lastScan < DEBOUNCE_MS) return;
+            lastScan = now;
+
+            for (var m = 0; m < mutations.length; m++) {
+              var addedNodes = mutations[m].addedNodes;
+              for (var n = 0; n < addedNodes.length; n++) {
+                var node = addedNodes[n];
+                if (node.nodeType !== 1) continue;
+
+                // Scan all reply quotes in added nodes
+                var quotes = trySelectorsAll(node, C.quotedMessageSelectors);
+                for (var q = 0; q < quotes.length; q++) {
+                  var refId = getQuoteRefMsgId(quotes[q]);
+                  if (!refId) continue;
+                  try {
+                    var origMsg = msgStore.get(refId);
+                    if (origMsg) {
+                      var body = getMsgBody(origMsg);
+                      if (body) {
+                        var textEl = trySelectors(quotes[q], C.quotedMessageTextSelectors);
+                        if (textEl && textEl.textContent !== body) {
+                          textEl.textContent = body;
+                          console.log('[WhatSie] Updated quote preview:', refId);
+                        }
+                      }
+                    }
+                  } catch(e) {}
+                }
+
+                // Also scan the node itself if it's a message container
+                var msgId = node.getAttribute && node.getAttribute('data-id');
+                if (msgId) {
+                  try {
+                    var msg = msgStore.get(msgId);
+                    if (msg && isEdited(msg)) {
+                      var body = getMsgBody(msg);
+                      if (body) updateReplyPreviews(msgId, body);
+                    }
+                  } catch(e) {}
+                }
+              }
+            }
+          } catch(e) { /* observer continues */ }
+        });
+
+        observer.observe(targetNode, {
+          childList: true,
+          subtree: true,
+          attributes: false
+        });
+
+        // Auto-disconnect after 5 minutes (page reload re-injects)
+        setTimeout(function() {
+          try { observer.disconnect(); } catch(e) {}
+        }, 300000);
+
+        console.log('[WhatSie] Reply preview updater active');
+
+      } catch(e) {
+        // Total failure — silent no-op. App is unaffected.
+      }
+    })('%1');
+  )js").arg(config);
+
   this->runJavaScript(js);
 }
 
