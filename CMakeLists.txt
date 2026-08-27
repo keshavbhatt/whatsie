@@ -73,6 +73,19 @@ endif()
 # ---------------------------------------------------------------------------
 add_subdirectory(src)
 
+# ---------------------------------------------------------------------------
+# Desktop integration (Linux): .desktop, AppStream metainfo, hicolor icons.
+# ---------------------------------------------------------------------------
+if(LINUX)
+    include(GNUInstallDirs)
+    install(FILES dist/linux/com.ktechpit.whatsie.desktop
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/applications)
+    install(FILES dist/linux/com.ktechpit.whatsie.metainfo.xml
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
+    install(DIRECTORY src/resources/icons/hicolor
+        DESTINATION ${CMAKE_INSTALL_DATADIR}/icons)
+endif()
+
 if(WHATSIE_BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)

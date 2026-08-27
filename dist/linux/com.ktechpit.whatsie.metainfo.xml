@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+  <id>com.ktechpit.whatsie</id>
+  <metadata_license>CC0-1.0</metadata_license>
+  <project_license>MIT</project_license>
+  <name>Whatsie</name>
+  <summary>WhatsApp Web desktop client built with Qt WebEngine</summary>
+  <description>
+    <p>
+      Whatsie is a lightweight desktop client for WhatsApp Web. It keeps WhatsApp
+      in its own window with native desktop notifications, a system-tray unread
+      badge, light/dark themes, zoom, downloads, and voice, video and screen-share
+      calls.
+    </p>
+  </description>
+  <launchable type="desktop-id">com.ktechpit.whatsie.desktop</launchable>
+  <provides>
+    <binary>whatsie</binary>
+  </provides>
+  <categories>
+    <category>Network</category>
+    <category>InstantMessaging</category>
+  </categories>
+  <url type="homepage">https://github.com/keshavbhatt/whatsie</url>
+  <url type="bugtracker">https://github.com/keshavbhatt/whatsie/issues</url>
+  <developer id="com.ktechpit">
+    <name>Keshav Bhatt</name>
+  </developer>
+  <content_rating type="oars-1.1">
+    <content_attribute id="social-chat">intense</content_attribute>
+  </content_rating>
+  <releases>
+    <release version="5.0.0" date="2026-08-27">
+      <description>
+        <p>From-scratch Qt 6.11 rewrite: notifications, downloads, theme, zoom,
+        calls and screen sharing.</p>
+      </description>
+    </release>
+  </releases>
+</component>

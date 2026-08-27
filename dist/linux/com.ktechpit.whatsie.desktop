@@ -1,0 +1,24 @@
+[Desktop Entry]
+Name=Whatsie
+GenericName=WhatsApp Web Client
+Comment=A WhatsApp Web client built with Qt WebEngine
+Icon=com.ktechpit.whatsie
+Exec=whatsie %u
+Terminal=false
+Type=Application
+Categories=Network;InstantMessaging;Chat;Qt;
+Keywords=Whatsie;WhatsApp;Chat;Messaging;
+StartupWMClass=whatsie
+StartupNotify=true
+MimeType=x-scheme-handler/whatsapp;
+X-GNOME-UsesNotifications=true
+
+Actions=NewChat;Settings;
+
+[Desktop Action NewChat]
+Name=New chat
+Exec=whatsie --new-chat
+
+[Desktop Action Settings]
+Name=Settings
+Exec=whatsie --settings
