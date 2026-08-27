@@ -6,6 +6,8 @@ qt_add_library(whatsie_web STATIC
     bridge.h
     clipboard_fix.cpp
     clipboard_fix.h
+    file_drop.cpp
+    file_drop.h
     download_controller.cpp
     download_controller.h
     logging.cpp
@@ -39,6 +41,7 @@ qt_add_resources(whatsie_web "scripts"
         scripts/connection-watchdog.js
         scripts/sw-recovery.js
         scripts/privacy-blur.js
+        scripts/file-drop.js
 )
 
 target_link_libraries(whatsie_web
@@ -47,4 +50,5 @@ target_link_libraries(whatsie_web
         Qt6::WebEngineWidgets
         Qt6::WebChannel
         Qt6::Network
+        Qt6::Concurrent
 )

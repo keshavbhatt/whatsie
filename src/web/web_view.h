@@ -70,6 +70,8 @@ private:
     void handleConnectionChanged(bool up);
     void checkWatchdog();
     void applyBlurLive();
+    bool maybeHandleDrop(class QObject* watched, class QEvent* event);
+    void handleFileDrop(const QStringList& paths);
 
     core::Settings& m_settings;
     WebProfile* m_profile = nullptr;

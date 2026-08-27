@@ -113,7 +113,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | M3 | Call pop-out window kept in-app, closable | orphan page | yes | CORE | W#333. | **KEEP** | done |
 | M4 | External links → system browser | yes | yes | CORE | | **KEEP** | done |
 | M5 | Native file chooser (portal-aware), last dir | Qt dialog | yes | CORE | W#296, 285. | **KEEP** | done |
-| M6 | Drag-and-drop file attach (portal path resolution, threaded read, synthetic paste) | broken (W#111, 285) | yes (520 LOC) | NICE | Cap complexity; Y#32 lesson. | **KEEP** | — |
+| M6 | Drag-and-drop file attach (portal path resolution, threaded read, synthetic paste) | broken (W#111, 285) | yes (520 LOC) | NICE | Cap complexity; Y#32 lesson. | **KEEP** | done |
 | M7 | Clipboard image paste rescue | no (W#33, 311) | yes (45 LOC) | CORE | | **KEEP** | done |
 | M8 | Downloads: Chromium flow + minimal UI (dir setting, notification with "open folder") | manager window (bugs) | same | CORE (minimal) | Lesson B13. | **KEEP** | done (persistent history + Downloads window, per owner 2026-08-27) |
 | M9 | Mute page audio toggle | yes | yes | CORE | | **KEEP** | done |

@@ -5,6 +5,24 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M3 part B complete (watchdog, SW recovery, blur, drag-drop)
+
+S13/S14/S16/A8 landed earlier today; **M6 drag-and-drop attach** now done: dropped local files
+are read off-thread (`web::buildDropPayload`, size-capped, tested) and injected into WhatsApp as
+a synthetic `drop` carrying real File objects (`file-drop.js`), which works where Chromium's
+native drop can't read the paths (Wayland / Flatpak, Y#32). Verified live: the drop function is
+defined and returns true for a synthetic file; unit test covers the payload builder (cap, skip
+dirs/oversized, MIME).
+
+**Build gotcha fixed:** `Qt6::Concurrent` was linked in `web` without a `find_package`, which
+made the CMake *generate* step fail silently — `cmake --build` then reused stale build files, so
+a just-added script (file-drop.js) wasn't in the running binary even though tests "passed".
+Added Concurrent to the top-level `find_package`. Lesson: watch for "Generate step failed".
+
+M3 part B done → M3 (Web integration) complete. Next: **M4 packaging & CI**.
+
+---
+
 ## 2026-08-27 — Dev-run GPU (screen-share stop crash) + note on runtime-env parity
 
 **Reported:** turning off screen share crashed the app (`EGL_BAD_DISPLAY`, "make lost context
@@ -359,7 +377,7 @@ recovery, A8 privacy blur, M6 drag-and-drop attach.
 | M0 Foundation | ✅ done | 2026-08-27 |
 | M1 Usable shell | ✅ done | 2026-08-27 |
 | M2 Notifications | ✅ done | 2026-08-27 |
-| M3 Web integration | ◐ part A done | part B: S13, S14, S16, A8, M6 |
+| M3 Web integration | ✅ done | 2026-08-27 (parts A + B) |
 | M4 Packaging & CI | — | |
 | M5 Approved extras | — | list fixed in `ROADMAP.md` |
 | M6 Windows | — | ADR-016 |

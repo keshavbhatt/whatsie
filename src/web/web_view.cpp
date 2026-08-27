@@ -6,6 +6,7 @@
 #include "core/zoom_policy.h"
 #include "web/bridge.h"
 #include "web/clipboard_fix.h"
+#include "web/file_drop.h"
 #include "web/logging.h"
 #include "web/permission_controller.h"
 #include "web/popup_window.h"
@@ -16,8 +17,13 @@
 #include <QChildEvent>
 #include <QClipboard>
 #include <QContextMenuEvent>
+#include <QDragMoveEvent>
+#include <QDropEvent>
+#include <QFutureWatcher>
+#include <QJsonDocument>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QMimeData>
 #include <QNetworkInformation>
 #include <QTimer>
 #include <QUrl>
@@ -28,6 +34,7 @@
 #include <QWebEngineScriptCollection>
 #include <QWebEngineSettings>
 #include <QWheelEvent>
+#include <QtConcurrent>
 
 using namespace Qt::StringLiterals;
 
@@ -167,6 +174,66 @@ void WebView::checkWatchdog()
     }
 }
 
+// FEATURES M6: attach files dragged onto the window. We handle the drop
+// ourselves and inject real File objects via file-drop.js, which works where
+// Chromium's native drop cannot read the paths (Wayland / Flatpak, Y#32).
+bool WebView::maybeHandleDrop(QObject* watched, QEvent* event)
+{
+    Q_UNUSED(watched)
+    const QEvent::Type t = event->type();
+    if (t != QEvent::DragEnter && t != QEvent::DragMove && t != QEvent::Drop) {
+        return false;
+    }
+    auto* drop = static_cast<QDropEvent*>(event);
+    const QMimeData* mime = drop->mimeData();
+    if (mime == nullptr || !mime->hasUrls()) {
+        return false; // not a file drop — let Chromium handle it
+    }
+    QStringList paths;
+    for (const QUrl& url : mime->urls()) {
+        if (url.isLocalFile()) {
+            paths << url.toLocalFile();
+        }
+    }
+    if (paths.isEmpty()) {
+        return false;
+    }
+    if (t == QEvent::Drop) {
+        drop->setDropAction(Qt::CopyAction);
+        drop->accept();
+        handleFileDrop(paths);
+    } else {
+        auto* move = static_cast<QDragMoveEvent*>(event);
+        move->setDropAction(Qt::CopyAction);
+        move->accept();
+    }
+    return true;
+}
+
+void WebView::handleFileDrop(const QStringList& paths)
+{
+    qCInfo(lcWeb) << "file drop:" << paths.size() << "file(s)";
+    auto* watcher = new QFutureWatcher<DropOutcome>(this);
+    connect(watcher, &QFutureWatcher<DropOutcome>::finished, this, [this, watcher] {
+        const DropOutcome outcome = watcher->result();
+        watcher->deleteLater();
+        if (!outcome.skipped.isEmpty()) {
+            qCWarning(lcWeb) << "drop skipped:" << outcome.skipped;
+        }
+        if (outcome.files.isEmpty()) {
+            return;
+        }
+        // A JSON array is valid JavaScript (base64/strings are properly escaped),
+        // so pass it straight as the call argument.
+        const QString arrayLiteral =
+            QString::fromUtf8(QJsonDocument(outcome.files).toJson(QJsonDocument::Compact));
+        m_page->runJavaScript(
+            u"window.__whatsieDropFiles && window.__whatsieDropFiles(%1)"_s.arg(arrayLiteral),
+            QWebEngineScript::MainWorld);
+    });
+    watcher->setFuture(QtConcurrent::run([paths] { return buildDropPayload(paths, kMaxDropBytesPerFile); }));
+}
+
 void WebView::applyBlurLive()
 {
     m_page->runJavaScript(
@@ -245,6 +312,9 @@ void WebView::childEvent(QChildEvent* event)
 
 bool WebView::eventFilter(QObject* watched, QEvent* event)
 {
+    if (maybeHandleDrop(watched, event)) {
+        return true;
+    }
     if (event->type() == QEvent::Wheel) {
         auto* wheel = static_cast<QWheelEvent*>(event);
         if (wheel->modifiers().testFlag(Qt::ControlModifier)) {

@@ -42,6 +42,7 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS
     WebEngineWidgets
     WebChannel
     Network
+    Concurrent
     Svg
 )
 qt_standard_project_setup()
