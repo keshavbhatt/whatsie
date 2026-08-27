@@ -58,7 +58,7 @@ QString NotificationService::backendName() const
 
 bool NotificationService::isSuppressed() const
 {
-    return !m_settings.notificationsEnabled() || m_dnd.isActive();
+    return m_lockSuppressed || !m_settings.notificationsEnabled() || m_dnd.isActive();
 }
 
 quint64 NotificationService::notify(Notification notification)

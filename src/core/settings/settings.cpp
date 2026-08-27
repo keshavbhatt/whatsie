@@ -39,6 +39,9 @@ constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
 constexpr bool kDefaultWebrtcPublicOnly = false;
 constexpr bool kDefaultSpellCheckEnabled = true;
+constexpr bool kDefaultLockOnStart = false;
+constexpr bool kDefaultLockOnHide = false;
+constexpr int kDefaultLockIdleMinutes = 0;
 constexpr ProxyMode kDefaultProxyMode = ProxyMode::System;
 constexpr ProxyType kDefaultProxyType = ProxyType::Http;
 constexpr int kDefaultProxyPort = 8080;
@@ -533,6 +536,83 @@ void Settings::setSpellCheckLanguages(const QStringList& languages)
     }
     m_store->setValue(keys::kSpellCheckLanguages, languages);
     Q_EMIT spellCheckLanguagesChanged(languages);
+}
+
+// ---- lock/ (FEATURES P1) ---------------------------------------------------
+
+bool Settings::hasPasscode() const
+{
+    return passcodeRecord().isValid();
+}
+
+PasscodeRecord Settings::passcodeRecord() const
+{
+    PasscodeRecord record;
+    record.salt = m_store->value(keys::kLockSalt).toByteArray();
+    record.hash = m_store->value(keys::kLockHash).toByteArray();
+    record.iterations = m_store->value(keys::kLockIterations, 0).toInt();
+    return record;
+}
+
+void Settings::setPasscode(const PasscodeRecord& record)
+{
+    if (!record.isValid()) {
+        return;
+    }
+    m_store->setValue(keys::kLockSalt, record.salt);
+    m_store->setValue(keys::kLockHash, record.hash);
+    m_store->setValue(keys::kLockIterations, record.iterations);
+    Q_EMIT lockConfigChanged();
+}
+
+void Settings::clearPasscode()
+{
+    if (!hasPasscode()) {
+        return;
+    }
+    m_store->remove(keys::kLockSalt.data());
+    m_store->remove(keys::kLockHash.data());
+    m_store->remove(keys::kLockIterations.data());
+    Q_EMIT lockConfigChanged();
+}
+
+bool Settings::lockOnStart() const
+{
+    return boolValue(keys::kLockOnStart, kDefaultLockOnStart);
+}
+
+void Settings::setLockOnStart(bool enabled)
+{
+    if (storeBool(keys::kLockOnStart, kDefaultLockOnStart, enabled)) {
+        Q_EMIT lockConfigChanged();
+    }
+}
+
+bool Settings::lockOnHide() const
+{
+    return boolValue(keys::kLockOnHide, kDefaultLockOnHide);
+}
+
+void Settings::setLockOnHide(bool enabled)
+{
+    if (storeBool(keys::kLockOnHide, kDefaultLockOnHide, enabled)) {
+        Q_EMIT lockConfigChanged();
+    }
+}
+
+int Settings::lockIdleMinutes() const
+{
+    return std::max(0, m_store->value(keys::kLockIdleMinutes, kDefaultLockIdleMinutes).toInt());
+}
+
+void Settings::setLockIdleMinutes(int minutes)
+{
+    const int clamped = std::max(0, minutes);
+    if (clamped == lockIdleMinutes()) {
+        return;
+    }
+    m_store->setValue(keys::kLockIdleMinutes, clamped);
+    Q_EMIT lockConfigChanged();
 }
 
 // ---- appearance/ -----------------------------------------------------------

@@ -67,6 +67,13 @@ void DownloadsHub::showWindow()
     m_dialog->activateWindow();
 }
 
+void DownloadsHub::hideWindow()
+{
+    if (m_dialog) {
+        m_dialog->close();
+    }
+}
+
 void DownloadsHub::perform(quint64 id, DownloadsDelegate::Action action)
 {
     const auto entry = m_model->entry(id);

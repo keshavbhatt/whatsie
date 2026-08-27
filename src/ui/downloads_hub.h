@@ -35,6 +35,8 @@ public:
     ~DownloadsHub() override;
 
     void showWindow();
+    /// Close the downloads window if open (used when locking, FEATURES P1).
+    void hideWindow();
     [[nodiscard]] core::DownloadModel& model() { return *m_model; }
 
 private:

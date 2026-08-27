@@ -127,7 +127,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| P1 | App lock, **hardened**: PBKDF2 passcode, covers every window, notifications suppressed + page hidden while locked, attempt throttling; lock on start / hide / idle | base64 `asdfg`, overlay | PBKDF2, overlay, bypassable | NICE | ADR-015. | **KEEP** (M5) | — |
+| P1 | App lock, **hardened**: PBKDF2 passcode, covers every window, notifications suppressed + page hidden while locked, attempt throttling; lock on start / hide / idle | base64 `asdfg`, overlay | PBKDF2, overlay, bypassable | NICE | ADR-015. | **KEEP** (M5) | done |
 | P2 | WebRTC IP handling policy | no | yes | NICE | `WebRTCPublicInterfacesOnly` attribute, default off. | **KEEP** | done |
 | P3 | Network proxy (system / none / HTTP / SOCKS5 + auth) | system only (W#75, 223) | yes | NICE | Password session-only, never on disk (ADR-030). | **KEEP** | done |
 | P4 | Autostart at login (XDG / registry), sandbox-aware, starts minimized | no | yes (buggy) | NICE | XDG entry; Windows registry in M6. | **KEEP** | done (Linux) |

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "core/app_lock.h"
+
 #include <QByteArray>
 #include <QObject>
 #include <QSettings>
@@ -128,6 +130,19 @@ public:
     [[nodiscard]] QString lastOpenDirectory() const;
     void setLastOpenDirectory(const QString& directory);
 
+    // lock/ (FEATURES P1)
+    [[nodiscard]] bool hasPasscode() const;
+    [[nodiscard]] PasscodeRecord passcodeRecord() const;
+    void setPasscode(const PasscodeRecord& record);
+    void clearPasscode();
+    [[nodiscard]] bool lockOnStart() const;
+    void setLockOnStart(bool enabled);
+    [[nodiscard]] bool lockOnHide() const;
+    void setLockOnHide(bool enabled);
+    /// 0 = never; otherwise minutes of inactivity before locking.
+    [[nodiscard]] int lockIdleMinutes() const;
+    void setLockIdleMinutes(int minutes);
+
     // spellcheck/ (FEATURES L1)
     [[nodiscard]] bool spellCheckEnabled() const;
     void setSpellCheckEnabled(bool enabled);
@@ -193,6 +208,7 @@ Q_SIGNALS:
     void smoothScrollingChanged(bool enabled);
     void webrtcPublicInterfacesOnlyChanged(bool enabled);
     void proxyChanged();
+    void lockConfigChanged();
     void spellCheckEnabledChanged(bool enabled);
     void spellCheckLanguagesChanged(const QStringList& languages);
     void themeChanged(whatsie::core::Theme theme);

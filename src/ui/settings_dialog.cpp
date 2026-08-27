@@ -1,11 +1,13 @@
 #include "ui/settings_dialog.h"
 
+#include "core/app_lock.h"
 #include "core/downloads/file_naming.h"
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
 #include "core/storage_policy.h"
 #include "core/zoom_policy.h"
 #include "platform/file_manager.h"
+#include "ui/passcode_dialog.h"
 #include "ui/permission_list.h"
 
 #include <QCheckBox>
@@ -19,9 +21,11 @@
 #include <QFutureWatcher>
 #include <QGroupBox>
 #include <QHBoxLayout>
+#include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QLocale>
+#include <QMessageBox>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -322,6 +326,7 @@ QWidget* SettingsDialog::buildPrivacyTab()
     spellLayout->addWidget(spellNote);
     outer->addWidget(spellBox);
 
+    outer->addWidget(buildLockGroup());
     outer->addWidget(buildNetworkGroup());
 
     // Notes and buttons live in the QVBoxLayout, not in the QFormLayout: a
@@ -368,6 +373,75 @@ QWidget* SettingsDialog::buildPrivacyTab()
     outer->addWidget(advBox);
     outer->addStretch();
     return page;
+}
+
+QWidget* SettingsDialog::buildLockGroup()
+{
+    auto* box = new QGroupBox(tr("Screen lock"), this);
+    auto* outer = new QVBoxLayout(box);
+
+    m_lockStatus = new QLabel(box);
+    m_lockStatus->setWordWrap(true);
+    outer->addWidget(m_lockStatus);
+
+    auto* buttons = new QHBoxLayout;
+    m_lockSet = new QPushButton(box);
+    connect(m_lockSet, &QPushButton::clicked, this, [this] {
+        PasscodeDialog dialog(m_settings.passcodeRecord(), this);
+        if (dialog.exec() == QDialog::Accepted) {
+            m_settings.setPasscode(core::makePasscode(dialog.newPasscode()));
+            updateLockUi();
+        }
+    });
+    m_lockRemove = new QPushButton(tr("Remove…"), box);
+    connect(m_lockRemove, &QPushButton::clicked, this, [this] {
+        bool ok = false;
+        const QString current =
+            QInputDialog::getText(this, tr("Remove passcode"), tr("Enter the current passcode:"),
+                                  QLineEdit::Password, QString(), &ok);
+        if (!ok) {
+            return;
+        }
+        if (!core::verifyPasscode(current, m_settings.passcodeRecord())) {
+            QMessageBox::warning(this, tr("Remove passcode"), tr("That passcode is incorrect."));
+            return;
+        }
+        m_settings.clearPasscode();
+        updateLockUi();
+    });
+    buttons->addWidget(m_lockSet);
+    buttons->addWidget(m_lockRemove);
+    buttons->addStretch();
+    outer->addLayout(buttons);
+
+    auto* triggers = new QFormLayout;
+    m_lockOnStart = new QCheckBox(tr("Lock on startup"), box);
+    connect(m_lockOnStart, &QCheckBox::toggled, this, [this](bool on) { m_settings.setLockOnStart(on); });
+    triggers->addRow(QString(), m_lockOnStart);
+    m_lockOnHide = new QCheckBox(tr("Lock when minimized to the tray"), box);
+    connect(m_lockOnHide, &QCheckBox::toggled, this, [this](bool on) { m_settings.setLockOnHide(on); });
+    triggers->addRow(QString(), m_lockOnHide);
+    m_lockIdle = new QSpinBox(box);
+    m_lockIdle->setRange(0, 120);
+    m_lockIdle->setSpecialValueText(tr("Never"));
+    m_lockIdle->setSuffix(tr(" min"));
+    connect(m_lockIdle, &QSpinBox::valueChanged, this, [this](int v) { m_settings.setLockIdleMinutes(v); });
+    triggers->addRow(tr("Lock after idle:"), m_lockIdle);
+    outer->addLayout(triggers);
+
+    return box;
+}
+
+void SettingsDialog::updateLockUi()
+{
+    const bool hasPasscode = m_settings.hasPasscode();
+    m_lockStatus->setText(hasPasscode ? tr("A passcode is set. The app can be locked below.")
+                                      : tr("No passcode set. Set one to enable locking."));
+    m_lockSet->setText(hasPasscode ? tr("Change passcode…") : tr("Set passcode…"));
+    m_lockRemove->setEnabled(hasPasscode);
+    for (QWidget* w : QList<QWidget*>{m_lockOnStart, m_lockOnHide, m_lockIdle}) {
+        w->setEnabled(hasPasscode);
+    }
 }
 
 QWidget* SettingsDialog::buildNetworkGroup()
@@ -478,6 +552,10 @@ void SettingsDialog::loadValues()
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_spellCheck->setChecked(m_settings.spellCheckEnabled());
+    m_lockOnStart->setChecked(m_settings.lockOnStart());
+    m_lockOnHide->setChecked(m_settings.lockOnHide());
+    m_lockIdle->setValue(m_settings.lockIdleMinutes());
+    updateLockUi();
     m_webrtcPublicOnly->setChecked(m_settings.webrtcPublicInterfacesOnly());
     m_proxyMode->setCurrentIndex(m_proxyMode->findData(static_cast<int>(m_settings.proxyMode())));
     m_proxyType->setCurrentIndex(m_proxyType->findData(static_cast<int>(m_settings.proxyType())));

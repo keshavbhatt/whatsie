@@ -5,6 +5,8 @@
 
 class QWebEngineDesktopMediaRequest;
 class QAuthenticator;
+class QStackedWidget;
+class QTimer;
 
 namespace whatsie::core {
 class DndController;
@@ -20,6 +22,7 @@ namespace whatsie::ui {
 class Actions;
 class DownloadsHub;
 class NotificationHub;
+class LockScreen;
 class SettingsDialog;
 class ThemeApplier;
 class TrayController;
@@ -52,6 +55,7 @@ public Q_SLOTS:
     void quit();
 
 protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
     void changeEvent(QEvent* event) override;
     void showEvent(QShowEvent* event) override;
@@ -71,6 +75,13 @@ private:
     void handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request);
     void handleProxyAuth(const QString& proxyHost, QAuthenticator* authenticator);
     void syncAutostart();
+    void setupLock();
+    void lock();
+    void unlock();
+    void attemptUnlock(const QString& passcode);
+    void tickThrottle();
+    void updateIdleTimer();
+    [[nodiscard]] bool isLocked() const { return m_locked; }
     void clearCache();
     void confirmClearSession();
 
@@ -86,6 +97,15 @@ private:
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     bool m_quitting = false;
+
+    // App lock (FEATURES P1)
+    QStackedWidget* m_stack = nullptr;
+    LockScreen* m_lockScreen = nullptr;
+    QTimer* m_idleTimer = nullptr;
+    QTimer* m_throttleTimer = nullptr;
+    int m_failedAttempts = 0;
+    int m_throttleRemaining = 0;
+    bool m_locked = false;
 };
 
 } // namespace whatsie::ui

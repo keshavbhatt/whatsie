@@ -1,7 +1,9 @@
 #include "ui/main_window.h"
 
+#include "core/app_lock.h"
 #include "core/navigation_policy.h"
 #include "core/notifications/dnd_controller.h"
+#include "core/notifications/notification_service.h"
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "core/zoom_policy.h"
@@ -9,6 +11,7 @@
 #include "ui/about_dialog.h"
 #include "ui/actions.h"
 #include "ui/downloads_hub.h"
+#include "ui/lock_screen.h"
 #include "ui/logging.h"
 #include "ui/notification_hub.h"
 #include "ui/permission_prompt.h"
@@ -32,10 +35,14 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSessionManager>
+#include <QStackedWidget>
 #include <QStandardPaths>
+#include <QTimer>
 #include <QWebEngineDesktopMediaRequest>
 #include <QWebEnginePage>
 #include <QWebEnginePermission>
+
+#include <chrono>
 
 using namespace Qt::StringLiterals;
 
@@ -84,7 +91,11 @@ void MainWindow::setupUi()
     setWindowIcon(m_tray->currentIcon());
 
     m_webView = new web::WebView(m_settings, m_theme, this);
-    setCentralWidget(m_webView);
+    m_lockScreen = new LockScreen(this);
+    m_stack = new QStackedWidget(this);
+    m_stack->addWidget(m_webView);    // index 0
+    m_stack->addWidget(m_lockScreen); // index 1
+    setCentralWidget(m_stack);
     m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
         m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
@@ -95,6 +106,7 @@ void MainWindow::setupUi()
     m_downloads = new DownloadsHub(m_settings, m_notifications->service(), *m_webView, this, this);
 
     syncAutostart();
+    setupLock();
 }
 
 void MainWindow::connectActions()
@@ -180,12 +192,18 @@ void MainWindow::handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request
 
 void MainWindow::start(bool startHidden)
 {
+    if (m_settings.lockOnStart()) {
+        lock(); // no-op without a passcode
+    }
     if (startHidden && m_tray->isAvailable()) {
         qCInfo(lcUi) << "starting hidden in tray";
         m_tray->setWindowVisible(false);
         return;
     }
     show();
+    if (m_locked) {
+        m_lockScreen->reset();
+    }
 }
 
 void MainWindow::showAndRaise()
@@ -200,6 +218,9 @@ void MainWindow::toggleVisibility()
 {
     if (isVisible() && !isMinimized() && isActiveWindow()) {
         if (m_tray->isAvailable()) {
+            if (m_settings.lockOnHide()) {
+                lock();
+            }
             hide();
         }
         return;
@@ -219,6 +240,9 @@ void MainWindow::closeEvent(QCloseEvent* event)
 {
     if (!m_quitting && m_settings.closeAction() == core::CloseAction::MinimizeToTray &&
         m_tray->isAvailable()) {
+        if (m_settings.lockOnHide()) {
+            lock();
+        }
         hide();
         event->ignore();
         return;
@@ -302,6 +326,10 @@ void MainWindow::setFullScreenMode(bool on)
 
 void MainWindow::openChat(const QString& target)
 {
+    if (m_locked) {
+        showAndRaise();
+        return;
+    }
     const auto request = core::parseChatLink(target);
     if (!request) {
         qCWarning(lcUi) << "not a chat link or phone number:" << target;
@@ -315,6 +343,10 @@ void MainWindow::openChat(const QString& target)
 
 void MainWindow::promptNewChat()
 {
+    if (m_locked) {
+        showAndRaise();
+        return;
+    }
     bool ok = false;
     const QString target =
         QInputDialog::getText(this, tr("New chat"), tr("Phone number with country code, or a wa.me link:"),
@@ -326,6 +358,10 @@ void MainWindow::promptNewChat()
 
 void MainWindow::showSettings()
 {
+    if (m_locked) {
+        showAndRaise();
+        return;
+    }
     if (!m_settingsDialog) {
         const StoragePaths storage{m_webView->profile().cachePath(),
                                    m_webView->profile().persistentStoragePath()};
@@ -359,6 +395,117 @@ void MainWindow::handleProxyAuth(const QString& proxyHost, QAuthenticator* authe
     authenticator->setPassword(dialog.password());
     m_settings.setProxyUser(dialog.user());         // remembered
     m_settings.setProxyPassword(dialog.password()); // session only
+}
+
+// ---- app lock (FEATURES P1, ADR-015) --------------------------------------
+
+void MainWindow::setupLock()
+{
+    connect(m_lockScreen, &LockScreen::unlockRequested, this, &MainWindow::attemptUnlock);
+    m_idleTimer = new QTimer(this);
+    m_idleTimer->setSingleShot(true);
+    connect(m_idleTimer, &QTimer::timeout, this, &MainWindow::lock);
+    m_throttleTimer = new QTimer(this);
+    m_throttleTimer->setInterval(1000);
+    connect(m_throttleTimer, &QTimer::timeout, this, &MainWindow::tickThrottle);
+    connect(&m_settings, &core::Settings::lockConfigChanged, this, &MainWindow::updateIdleTimer);
+    qApp->installEventFilter(this); // reset the idle timer on any input
+    updateIdleTimer();
+}
+
+void MainWindow::lock()
+{
+    if (m_locked || !m_settings.hasPasscode()) {
+        return;
+    }
+    m_locked = true;
+    m_failedAttempts = 0;
+    m_lockScreen->reset();
+    m_stack->setCurrentWidget(m_lockScreen);
+    m_notifications->service().setLockSuppressed(true);
+    // Cover every window: close the auxiliary ones and any popped-out call.
+    if (m_settingsDialog) {
+        m_settingsDialog->close();
+    }
+    m_downloads->hideWindow();
+    m_webView->closePopups();
+    m_idleTimer->stop();
+    qCInfo(lcUi) << "app locked";
+}
+
+void MainWindow::unlock()
+{
+    if (!m_locked) {
+        return;
+    }
+    m_locked = false;
+    m_failedAttempts = 0;
+    m_throttleRemaining = 0;
+    m_throttleTimer->stop();
+    m_stack->setCurrentWidget(m_webView);
+    m_notifications->service().setLockSuppressed(false);
+    updateIdleTimer();
+    qCInfo(lcUi) << "app unlocked";
+}
+
+void MainWindow::attemptUnlock(const QString& passcode)
+{
+    if (m_throttleRemaining > 0) {
+        return; // still locked out
+    }
+    if (core::verifyPasscode(passcode, m_settings.passcodeRecord())) {
+        unlock();
+        return;
+    }
+    ++m_failedAttempts;
+    const auto lockout = core::lockoutDuration(m_failedAttempts);
+    if (lockout.count() > 0) {
+        m_throttleRemaining =
+            static_cast<int>(std::chrono::duration_cast<std::chrono::seconds>(lockout).count());
+        m_lockScreen->showThrottle(m_throttleRemaining);
+        m_throttleTimer->start();
+    } else {
+        m_lockScreen->showError(tr("Incorrect passcode."));
+    }
+}
+
+void MainWindow::tickThrottle()
+{
+    if (--m_throttleRemaining <= 0) {
+        m_throttleRemaining = 0;
+        m_throttleTimer->stop();
+        m_lockScreen->showThrottle(0); // re-enable entry
+    } else {
+        m_lockScreen->showThrottle(m_throttleRemaining);
+    }
+}
+
+void MainWindow::updateIdleTimer()
+{
+    const int minutes = m_settings.lockIdleMinutes();
+    if (m_settings.hasPasscode() && minutes > 0 && !m_locked) {
+        m_idleTimer->start(minutes * 60 * 1000);
+    } else {
+        m_idleTimer->stop();
+    }
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    switch (event->type()) {
+    case QEvent::MouseMove:
+    case QEvent::MouseButtonPress:
+    case QEvent::KeyPress:
+    case QEvent::Wheel:
+    case QEvent::TouchBegin:
+        if (!m_locked && m_idleTimer != nullptr && m_idleTimer->isActive()) {
+            m_idleTimer->start(); // restart with the configured interval
+        }
+        break;
+    default:
+        break;
+    }
+    return QMainWindow::eventFilter(watched, event);
 }
 
 // FEATURES A1: flip between Light and Dark based on what is on screen now, so it

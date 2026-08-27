@@ -159,11 +159,23 @@ under `org.keshavnrj.ubuntu/WhatSie`. Store continuity (Flathub, snap) favours t
 
 ## ADR-015 — App lock kept, hardened, in M5 (owner, 2026-08-27)
 
-**Decision.** Passcode hashed with PBKDF2 (`QPasswordDigestor`, stored iteration count, constant
--time compare). Lock is an application-level mode: every window covered, notifications
-suppressed, page hidden (or unloaded), IPC commands other than `raise` refused, attempt
-throttling. Modes: lock on start, on hide-to-tray, after idle. Changing the passcode never
-touches the WhatsApp session.
+**Decision.** Passcode hashed with PBKDF2, stored iteration count, constant-time compare. Lock is
+an application-level mode: every window covered, notifications suppressed, page hidden (or
+unloaded), IPC commands other than `raise` refused, attempt throttling. Modes: lock on start, on
+hide-to-tray, after idle. Changing the passcode never touches the WhatsApp session.
+
+**Implementation (2026-08-28).** `core::app_lock` implements PBKDF2-HMAC-SHA256 with QtCore's
+`QMessageAuthenticationCode` (not `QPasswordDigestor`, which lives in QtNetwork — `core` stays
+QtCore/Gui only) at `kDefaultLockIterations = 210000`, a 16-byte random salt, and a constant-time
+compare; `lockoutDuration()` escalates 5s→300s after four wrong entries. Only the salt/hash/
+iterations are persisted, never the passcode. `MainWindow` uses a `QStackedWidget` (web view vs
+`ui::LockScreen`) so the page is hidden by construction — no overlay-over-`QWebEngineView` problem;
+locking closes the settings/downloads windows and `WebView::closePopups()` (calls), sets
+`NotificationService::setLockSuppressed(true)`, and gates `openChat`/`showSettings`/`promptNewChat`
+to a bare raise. Idle uses a `qApp` event filter resetting a single-shot timer. `ui::PasscodeDialog`
+sets/changes it (verifies the current one first); the whole thing is behind a Settings "Screen lock"
+group. Pure crypto/throttle unit-tested; lock coverage verified by screenshot (web view fully
+covered, passcode field focused).
 
 ## ADR-016 — Platforms: Linux + Windows for v1 (owner, 2026-08-27)
 

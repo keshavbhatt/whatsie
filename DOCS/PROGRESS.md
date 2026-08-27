@@ -5,6 +5,28 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — App lock, hardened (P1)
+
+- `core::app_lock` (pure, tested): PBKDF2-HMAC-SHA256 via QtCore `QMessageAuthenticationCode`
+  (QPasswordDigestor is QtNetwork; core stays QtCore/Gui-only), 210k iterations, random salt,
+  constant-time compare; `lockoutDuration()` escalates 5s→300s after 4 wrong entries. Only
+  salt/hash/iterations persist — never the passcode.
+- Settings: passcode record + `lockOnStart` / `lockOnHide` / `lockIdleMinutes`; `hasPasscode`,
+  `setPasscode`, `clearPasscode`.
+- `ui::LockScreen` shown via a `QStackedWidget` in place of the web view (page hidden by
+  construction — no overlay-over-QWebEngineView problem). `MainWindow` orchestrates lock/unlock,
+  throttle countdown, idle (qApp event filter), IPC gating (only raise), and closes settings/
+  downloads windows + `WebView::closePopups()`; `NotificationService::setLockSuppressed` mutes
+  notifications while locked. Triggers: on start, on hide-to-tray, after idle minutes.
+- `ui::PasscodeDialog` sets/changes the passcode (verifies current first); Settings gains a
+  "Screen lock" group (set/change/remove + triggers).
+
+Verified: 23/23 tests (new tst_app_lock — round-trip, salt uniqueness, throttle escalation/cap);
+lock coverage confirmed by screenshot (whatsie window shows only the passcode field, WhatsApp fully
+covered). ADR-015. **M5 remaining: L2 (dictionary downloads), L4 (IME packaging).**
+
+---
+
 ## 2026-08-28 — Align native chrome colors to WhatsApp Web (sampled)
 
 Owner: align the WhatsApp Web theme colors with our Qt theme. Chosen direction: Qt matches the web

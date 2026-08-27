@@ -2,6 +2,8 @@
 # MUST NOT link Widgets, WebEngine, Network UI, or anything in ui/web/platform.
 
 qt_add_library(whatsie_core STATIC
+    app_lock.cpp
+    app_lock.h
     chromium_flags.cpp
     chromium_flags.h
     graphics_fallback.cpp

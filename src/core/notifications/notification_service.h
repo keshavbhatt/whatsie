@@ -29,6 +29,8 @@ public:
     void close(quint64 id);
 
     [[nodiscard]] bool isSuppressed() const;
+    /// Suppress all notifications while the app is locked (FEATURES P1).
+    void setLockSuppressed(bool suppressed) { m_lockSuppressed = suppressed; }
     [[nodiscard]] int activeCount() const { return static_cast<int>(m_active.size()); }
     [[nodiscard]] QString backendName() const;
 
@@ -44,6 +46,7 @@ private:
 
     Settings& m_settings;
     DndController& m_dnd;
+    bool m_lockSuppressed = false;
     INotifier* m_primary;
     INotifier* m_fallback;
     QHash<quint64, Notification> m_active;

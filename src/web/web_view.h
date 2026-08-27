@@ -47,6 +47,8 @@ public:
     [[nodiscard]] WebProfile& profile() { return *m_profile; }
     [[nodiscard]] WebPage& webPage() { return *m_page; }
     [[nodiscard]] PermissionController& permissions() { return *m_permissions; }
+    /// Close any popped-out windows (calls) — used when locking (FEATURES P1).
+    void closePopups();
 
 Q_SIGNALS:
     void unreadCountChanged(int count);

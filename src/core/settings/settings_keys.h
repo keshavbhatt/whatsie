@@ -51,6 +51,14 @@ inline constexpr QLatin1StringView kLastOpenDirectory{"files/lastOpenDirectory"}
 inline constexpr QLatin1StringView kSpellCheckEnabled{"spellcheck/enabled"};
 inline constexpr QLatin1StringView kSpellCheckLanguages{"spellcheck/languages"};
 
+// lock/ (FEATURES P1) — the passcode salt/hash are stored; the passcode is not
+inline constexpr QLatin1StringView kLockSalt{"lock/salt"};
+inline constexpr QLatin1StringView kLockHash{"lock/hash"};
+inline constexpr QLatin1StringView kLockIterations{"lock/iterations"};
+inline constexpr QLatin1StringView kLockOnStart{"lock/onStart"};
+inline constexpr QLatin1StringView kLockOnHide{"lock/onHide"};
+inline constexpr QLatin1StringView kLockIdleMinutes{"lock/idleMinutes"};
+
 // advanced/
 inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};
 inline constexpr QLatin1StringView kWebrtcPublicOnly{"advanced/webrtcPublicInterfacesOnly"};

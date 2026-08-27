@@ -24,6 +24,10 @@ qt_add_library(whatsie_ui STATIC
     notification_hub.h
     permission_list.cpp
     permission_list.h
+    lock_screen.cpp
+    lock_screen.h
+    passcode_dialog.cpp
+    passcode_dialog.h
     permission_prompt.cpp
     permission_prompt.h
     proxy_auth_dialog.cpp

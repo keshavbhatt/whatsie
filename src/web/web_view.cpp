@@ -134,6 +134,13 @@ void WebView::refreshColorScheme()
     qCInfo(lcWeb) << "colour scheme pushed to the page";
 }
 
+void WebView::closePopups()
+{
+    for (PopupWindow* popup : findChildren<PopupWindow*>(Qt::FindDirectChildrenOnly)) {
+        popup->close();
+    }
+}
+
 void WebView::wirePopup(QWidget* window)
 {
     auto* popup = qobject_cast<PopupWindow*>(window);

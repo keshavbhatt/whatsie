@@ -52,7 +52,9 @@ private:
     void loadValues();
     void refreshStorageSizes();
     QWidget* buildNetworkGroup();
+    QWidget* buildLockGroup();
     void updateProxyEnabled();
+    void updateLockUi();
 
     core::Settings& m_settings;
     bool m_trayAvailable;
@@ -81,6 +83,12 @@ private:
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
     QCheckBox* m_spellCheck = nullptr;
+    QLabel* m_lockStatus = nullptr;
+    QPushButton* m_lockSet = nullptr;
+    QPushButton* m_lockRemove = nullptr;
+    QCheckBox* m_lockOnStart = nullptr;
+    QCheckBox* m_lockOnHide = nullptr;
+    QSpinBox* m_lockIdle = nullptr;
     QCheckBox* m_webrtcPublicOnly = nullptr;
     QComboBox* m_proxyMode = nullptr;
     QComboBox* m_proxyType = nullptr;
