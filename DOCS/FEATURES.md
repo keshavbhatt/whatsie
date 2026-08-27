@@ -35,10 +35,10 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | S10 | `whatsapp://send?phone=` scheme handler + desktop actions | yes (`?`→`&` hack) | yes | CORE | Build `/send?phone=` URL in C++ and `load()` it — no JS. | **KEEP** | done |
 | S11 | `https://wa.me/`, `api.whatsapp.com`, `chat.whatsapp.com` invite links | no (W#3, 172, 186) | yes | NICE | Cheap once S10 exists. | **KEEP** | done (parse; handler registration in M4) |
 | S12 | Render-process crash recovery with back-off | dialog per crash | loop breaker | CORE | W#102, Y#28 | **KEEP** | done |
-| S13 | Connection watchdog (WebSocket monkey-patch, reload after resume) | no (W#208) | yes, 2 strikes / 3 reloads | NICE | Policy pure and tested; reload only, never wipe. | **KEEP** | — |
-| S14 | Auto-reload when network returns (`QNetworkInformation`) | no | no | NICE | Complements S13. | **KEEP** | — |
+| S13 | Connection watchdog (WebSocket monkey-patch, reload after resume) | no (W#208) | yes, 2 strikes / 3 reloads | NICE | Policy pure and tested; reload only, never wipe. | **KEEP** | done |
+| S14 | Auto-reload when network returns (`QNetworkInformation`) | no | no | NICE | Complements S13. | **KEEP** | done |
 | S15 | "Loading quirk" / "Error" title → wipe storage + quit | yes | yes | DROP | ADR-011. Diagnostic page with explicit buttons instead. | **DROP** | dropped |
-| S16 | Corrupt service-worker cache recovery (once per page) | no | yes (Y#43) | NICE | 25 lines, non-destructive. | **KEEP** | — |
+| S16 | Corrupt service-worker cache recovery (once per page) | no | yes (Y#43) | NICE | 25 lines, non-destructive. | **KEEP** | done |
 | S17 | Session backup/restore of IndexedDB at startup | no | yes, synchronous | DROP | Blocks GUI; unencrypted session copy. | **DROP** | dropped |
 | S18 | Low-disk warning + movable data dir | no | yes | DROP | | **DROP** | dropped |
 | S19 | Restart-in-place (`--restart-wait`) | no | yes | DROP | Aim for ≤ 2 restart-required settings. | **DROP** | dropped |
@@ -93,7 +93,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | A5 | Widget style selector | yes | yes | DROP | Fusion + palette. | **DROP** | dropped |
 | A6 | Zoom: normal vs maximized, Ctrl+/-/0, Ctrl+wheel blocked, min-size scales | yes (W#192) | yes | CORE | Most-requested #3. | **KEEP** | done |
 | A7 | Interface scale / font size setting | no (W#276) | yes | NICE | `QT_SCALE_FACTOR` mirror; restart. | **KEEP** | — |
-| A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | — |
+| A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | done |
 | A9 | Custom CSS file (covers wallpaper / font override) | no (W#182, 277, 219) | yes | LATER | | **DROP** | dropped |
 | A10 | Chat colour themes (14) | no | yes | DROP | | **DROP** | dropped |
 | A11 | Buttons injected into WA nav rail | no | yes | DROP | | **DROP** | dropped |

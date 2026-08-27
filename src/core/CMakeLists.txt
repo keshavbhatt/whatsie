@@ -4,6 +4,8 @@
 qt_add_library(whatsie_core STATIC
     chromium_flags.cpp
     chromium_flags.h
+    connection_watchdog_policy.cpp
+    connection_watchdog_policy.h
     downloads/download_model.cpp
     downloads/download_model.h
     downloads/file_naming.cpp

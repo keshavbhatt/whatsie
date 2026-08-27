@@ -1,5 +1,6 @@
 #pragma once
 
+#include "core/connection_watchdog_policy.h"
 #include "core/navigation_policy.h"
 #include "core/render_crash_policy.h"
 
@@ -66,12 +67,17 @@ private:
     void wirePopup(QWidget* window);
     void handleTitleChanged(const QString& title);
     void handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status, int exitCode);
+    void handleConnectionChanged(bool up);
+    void checkWatchdog();
+    void applyBlurLive();
 
     core::Settings& m_settings;
     WebProfile* m_profile = nullptr;
     WebPage* m_page = nullptr;
     PermissionController* m_permissions = nullptr;
     core::RenderCrashPolicy m_crashPolicy;
+    core::ConnectionWatchdogPolicy m_watchdog;
+    class QTimer* m_watchdogTimer = nullptr;
     QElapsedTimer m_clock;
     bool m_maximizedMode = false;
     int m_unread = 0;

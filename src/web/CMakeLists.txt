@@ -36,6 +36,9 @@ qt_add_resources(whatsie_web "scripts"
     FILES
         scripts/bootstrap.js
         scripts/storage-persist.js
+        scripts/connection-watchdog.js
+        scripts/sw-recovery.js
+        scripts/privacy-blur.js
 )
 
 target_link_libraries(whatsie_web
@@ -43,4 +46,5 @@ target_link_libraries(whatsie_web
         whatsie_core
         Qt6::WebEngineWidgets
         Qt6::WebChannel
+        Qt6::Network
 )

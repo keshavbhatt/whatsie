@@ -26,6 +26,7 @@ constexpr bool kDefaultNotificationSound = true;
 constexpr int kDefaultNotificationTimeoutSec = 0; // desktop default
 constexpr int kMaxNotificationTimeoutSec = 120;
 constexpr bool kDefaultMuted = false;
+constexpr int kDefaultMessageBlurLevel = 0;
 constexpr bool kDefaultAskWhereToSave = false;
 constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
@@ -213,6 +214,22 @@ void Settings::setMuted(bool muted)
     if (storeBool(keys::kMuted, kDefaultMuted, muted)) {
         Q_EMIT mutedChanged(muted);
     }
+}
+
+int Settings::messageBlurLevel() const
+{
+    const int stored = m_store->value(keys::kMessageBlurLevel, kDefaultMessageBlurLevel).toInt();
+    return std::clamp(stored, 0, kMaxBlurLevel);
+}
+
+void Settings::setMessageBlurLevel(int level)
+{
+    const int clamped = std::clamp(level, 0, kMaxBlurLevel);
+    if (clamped == messageBlurLevel()) {
+        return;
+    }
+    m_store->setValue(keys::kMessageBlurLevel, clamped);
+    Q_EMIT messageBlurLevelChanged(clamped);
 }
 
 // ---- downloads/ ------------------------------------------------------------

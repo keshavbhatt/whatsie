@@ -19,9 +19,12 @@ public Q_SLOTS:
     /// Called by scripts when their try/catch fires.
     void scriptFailed(const QString& name, const QString& message);
     void log(const QString& message);
+    /// The WhatsApp WebSocket connection came up / went down (FEATURES S13).
+    void connectionChanged(bool up);
 
 Q_SIGNALS:
     void scriptFailure(const QString& name, const QString& message);
+    void connectionStateChanged(bool up);
 };
 
 } // namespace whatsie::web

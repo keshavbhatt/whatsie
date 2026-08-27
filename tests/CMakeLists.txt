@@ -45,6 +45,7 @@ whatsie_add_test(tst_zoom_policy         tst_zoom_policy.cpp         whatsie_cor
 whatsie_add_test(tst_unread_badge        tst_unread_badge.cpp        whatsie_core GUI)
 whatsie_add_test(tst_navigation_policy   tst_navigation_policy.cpp   whatsie_core)
 whatsie_add_test(tst_render_crash_policy tst_render_crash_policy.cpp whatsie_core)
+whatsie_add_test(tst_connection_watchdog tst_connection_watchdog.cpp whatsie_core)
 whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_core)
 whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
 whatsie_add_test(tst_download_model      tst_download_model.cpp      whatsie_core)

@@ -33,6 +33,9 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
         this->settings()->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, enabled);
     });
+    // Rebake the config so newly loaded pages start at the current blur level;
+    // WebView applies it live to the already-loaded page.
+    connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { installBootstrap(); });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
 
@@ -94,9 +97,11 @@ void WebProfile::configureAttributes()
 
 void WebProfile::installBootstrap()
 {
-    // Config keys are added as scripts need them; the theme is NOT one of
-    // them (WhatsApp follows prefers-color-scheme, see ThemeApplier / ADR-020).
-    m_scripts->installBootstrap(QJsonObject{});
+    // Config passed to injected scripts as window.__whatsie.config. The theme is
+    // NOT here (WhatsApp follows prefers-color-scheme, ADR-020).
+    m_scripts->installBootstrap(QJsonObject{
+        {u"blurLevel"_s, m_settings.messageBlurLevel()},
+    });
 }
 
 } // namespace whatsie::web

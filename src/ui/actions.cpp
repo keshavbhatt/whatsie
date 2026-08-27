@@ -30,6 +30,7 @@ Actions::Actions(QWidget* owner)
     reload = make(owner, tr("Reload"), QKeySequence::Refresh);       // F5
     downloads = make(owner, tr("Downloads…"), QKeySequence(Qt::CTRL | Qt::Key_J));
     mute = make(owner, tr("Mute sounds"), QKeySequence(Qt::CTRL | Qt::Key_M));
+    blurMessages = make(owner, tr("Blur messages"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_B));
     zoomIn = make(owner, tr("Zoom in"), QKeySequence::ZoomIn);
     zoomOut = make(owner, tr("Zoom out"), QKeySequence::ZoomOut);
     zoomReset = make(owner, tr("Reset zoom"), QKeySequence(Qt::CTRL | Qt::Key_0));
@@ -39,6 +40,7 @@ Actions::Actions(QWidget* owner)
     quit = make(owner, tr("Quit"), QKeySequence::Quit); // Ctrl+Q
 
     mute->setCheckable(true);
+    blurMessages->setCheckable(true);
     fullScreen->setCheckable(true);
     quit->setMenuRole(QAction::QuitRole);
     about->setMenuRole(QAction::AboutRole);
@@ -47,7 +49,7 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {showHide, newChat,   reload,     downloads, mute,  zoomIn,
+    return {showHide, newChat,   reload,     downloads, mute,  blurMessages, zoomIn,
             zoomOut,  zoomReset, fullScreen, settings,  about, quit};
 }
 

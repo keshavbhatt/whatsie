@@ -25,6 +25,7 @@ public:
     QAction* reload = nullptr;
     QAction* downloads = nullptr;
     QAction* mute = nullptr;
+    QAction* blurMessages = nullptr;
     QAction* zoomIn = nullptr;
     QAction* zoomOut = nullptr;
     QAction* zoomReset = nullptr;

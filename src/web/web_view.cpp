@@ -18,12 +18,14 @@
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMenu>
+#include <QNetworkInformation>
 #include <QTimer>
 #include <QUrl>
 #include <QWebChannel>
 #include <QWebEngineContextMenuRequest>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineScript>
+#include <QWebEngineScriptCollection>
 #include <QWebEngineSettings>
 #include <QWheelEvent>
 
@@ -69,8 +71,29 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     connect(m_page, &QWebEnginePage::loadFinished, this, [this](bool ok) {
         if (ok) {
             m_crashPolicy.onLoadSucceeded();
+            applyBlurLive();
         }
     });
+
+    // Connection watchdog (FEATURES S13): the injected script reports up/down;
+    // a timer drives the reload decision while down.
+    m_watchdogTimer = new QTimer(this);
+    m_watchdogTimer->setInterval(5000);
+    connect(m_watchdogTimer, &QTimer::timeout, this, &WebView::checkWatchdog);
+    connect(&m_profile->bridge(), &Bridge::connectionStateChanged, this, &WebView::handleConnectionChanged);
+
+    // Network came back (FEATURES S14): force a reload attempt if we are down.
+    if (QNetworkInformation::loadDefaultBackend()) {
+        connect(QNetworkInformation::instance(), &QNetworkInformation::reachabilityChanged, this,
+                [this](QNetworkInformation::Reachability r) {
+                    if (r == QNetworkInformation::Reachability::Online) {
+                        m_watchdog.networkReturned(std::chrono::milliseconds(m_clock.elapsed()));
+                        checkWatchdog();
+                    }
+                });
+    }
+
+    connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { applyBlurLive(); });
     connect(m_page, &QWebEnginePage::fullScreenRequested, this, [this](QWebEngineFullScreenRequest request) {
         request.accept();
         Q_EMIT fullScreenRequested(request.toggleOn());
@@ -122,6 +145,33 @@ WebView::~WebView()
     delete m_permissions;
     m_permissions = nullptr;
     // m_profile (still a child) is destroyed last, by the QObject base dtor.
+}
+
+void WebView::handleConnectionChanged(bool up)
+{
+    m_watchdog.setConnected(up, std::chrono::milliseconds(m_clock.elapsed()));
+    if (up) {
+        m_watchdogTimer->stop();
+    } else {
+        m_watchdogTimer->start();
+    }
+}
+
+void WebView::checkWatchdog()
+{
+    const std::chrono::milliseconds now(m_clock.elapsed());
+    if (m_watchdog.shouldReload(now)) {
+        qCInfo(lcWeb) << "connection down; reloading (attempt" << m_watchdog.reloadsThisEpisode() + 1 << ")";
+        m_watchdog.noteReload(now);
+        reload();
+    }
+}
+
+void WebView::applyBlurLive()
+{
+    m_page->runJavaScript(
+        u"window.__whatsieSetBlur && window.__whatsieSetBlur(%1)"_s.arg(m_settings.messageBlurLevel()),
+        QWebEngineScript::MainWorld);
 }
 
 void WebView::loadWhatsApp()

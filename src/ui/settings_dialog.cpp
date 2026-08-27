@@ -169,6 +169,17 @@ QWidget* SettingsDialog::buildAppearanceTab()
     connect(m_smoothScrolling, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setSmoothScrolling(on); });
     form->addRow(QString(), m_smoothScrolling);
+
+    m_messageBlur = new QComboBox(page);
+    m_messageBlur->addItem(tr("Off"), 0);
+    m_messageBlur->addItem(tr("Light"), 1);
+    m_messageBlur->addItem(tr("Medium"), 2);
+    m_messageBlur->addItem(tr("Strong"), 3);
+    connect(m_messageBlur, &QComboBox::currentIndexChanged, this,
+            [this](int index) { m_settings.setMessageBlurLevel(m_messageBlur->itemData(index).toInt()); });
+    connect(&m_settings, &core::Settings::messageBlurLevelChanged, this,
+            [this](int level) { m_messageBlur->setCurrentIndex(m_messageBlur->findData(level)); });
+    form->addRow(tr("Blur messages until hover:"), m_messageBlur);
     return page;
 }
 
@@ -313,6 +324,7 @@ void SettingsDialog::loadValues()
     m_zoom->setValue(m_settings.zoomFactor());
     m_zoomMaximized->setValue(m_settings.zoomFactorMaximized());
     m_smoothScrolling->setChecked(m_settings.smoothScrolling());
+    m_messageBlur->setCurrentIndex(m_messageBlur->findData(m_settings.messageBlurLevel()));
     m_notificationsEnabled->setChecked(m_settings.notificationsEnabled());
     m_notificationSound->setChecked(m_settings.notificationSound());
     m_notificationSound->setEnabled(m_settings.notificationsEnabled());

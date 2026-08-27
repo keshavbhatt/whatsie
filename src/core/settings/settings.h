@@ -68,6 +68,11 @@ public:
     [[nodiscard]] bool muted() const;
     void setMuted(bool muted);
 
+    // privacy/ : 0 = off, 1..kMaxBlurLevel = increasing blur (FEATURES A8)
+    [[nodiscard]] int messageBlurLevel() const;
+    void setMessageBlurLevel(int level);
+    static constexpr int kMaxBlurLevel = 3;
+
     // downloads/
     /// Always an absolute directory; falls back to the platform Downloads folder.
     [[nodiscard]] QString downloadDirectory() const;
@@ -116,6 +121,7 @@ Q_SIGNALS:
     void notificationSoundChanged(bool enabled);
     void notificationTimeoutSecChanged(int seconds);
     void mutedChanged(bool muted);
+    void messageBlurLevelChanged(int level);
     void downloadDirectoryChanged(const QString& directory);
     void askWhereToSaveChanged(bool ask);
     void showDownloadsOnStartChanged(bool show);

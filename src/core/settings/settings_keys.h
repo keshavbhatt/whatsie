@@ -21,6 +21,9 @@ inline constexpr QLatin1StringView kZoomFactorMaximized{"view/zoomFactorMaximize
 inline constexpr QLatin1StringView kSmoothScrolling{"view/smoothScrolling"};
 inline constexpr QLatin1StringView kMuted{"view/muted"};
 
+// privacy/
+inline constexpr QLatin1StringView kMessageBlurLevel{"privacy/messageBlurLevel"};
+
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};
 

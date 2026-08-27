@@ -19,4 +19,10 @@ void Bridge::log(const QString& message)
     qCDebug(lcWebJs).noquote() << "script:" << message;
 }
 
+void Bridge::connectionChanged(bool up)
+{
+    qCInfo(lcWebJs) << "connection" << (up ? "up" : "down");
+    Q_EMIT connectionStateChanged(up);
+}
+
 } // namespace whatsie::web

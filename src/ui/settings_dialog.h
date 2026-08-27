@@ -67,6 +67,7 @@ private:
     QDoubleSpinBox* m_zoom = nullptr;
     QDoubleSpinBox* m_zoomMaximized = nullptr;
     QCheckBox* m_smoothScrolling = nullptr;
+    QComboBox* m_messageBlur = nullptr;
     QCheckBox* m_notificationsEnabled = nullptr;
     QCheckBox* m_notificationSound = nullptr;
     QSpinBox* m_notificationTimeout = nullptr;

@@ -100,6 +100,11 @@ void MainWindow::connectActions()
     m_actions->mute->setChecked(m_settings.muted());
     connect(m_actions->mute, &QAction::toggled, this, [this](bool on) { m_settings.setMuted(on); });
     connect(&m_settings, &core::Settings::mutedChanged, m_actions->mute, &QAction::setChecked);
+    m_actions->blurMessages->setChecked(m_settings.messageBlurLevel() > 0);
+    connect(m_actions->blurMessages, &QAction::toggled, this,
+            [this](bool on) { m_settings.setMessageBlurLevel(on ? 2 : 0); });
+    connect(&m_settings, &core::Settings::messageBlurLevelChanged, this,
+            [this](int level) { m_actions->blurMessages->setChecked(level > 0); });
     connect(m_actions->zoomIn, &QAction::triggered, this, [this] { m_webView->zoomStep(+1); });
     connect(m_actions->zoomOut, &QAction::triggered, this, [this] { m_webView->zoomStep(-1); });
     connect(m_actions->zoomReset, &QAction::triggered, this, [this] { m_webView->zoomReset(); });
