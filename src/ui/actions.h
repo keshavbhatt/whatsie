@@ -27,6 +27,7 @@ public:
     QAction* mute = nullptr;
     QAction* blurMessages = nullptr;
     QAction* toggleTheme = nullptr;
+    QAction* lock = nullptr;
     QAction* zoomIn = nullptr;
     QAction* zoomOut = nullptr;
     QAction* zoomReset = nullptr;

@@ -32,6 +32,7 @@ Actions::Actions(QWidget* owner)
     mute = make(owner, tr("Mute sounds"), QKeySequence(Qt::CTRL | Qt::Key_M));
     blurMessages = make(owner, tr("Blur messages"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_B));
     toggleTheme = make(owner, tr("Toggle theme"), QKeySequence(Qt::CTRL | Qt::Key_T));
+    lock = make(owner, tr("Lock"), QKeySequence(Qt::CTRL | Qt::Key_L));
     zoomIn = make(owner, tr("Zoom in"), QKeySequence::ZoomIn);
     zoomOut = make(owner, tr("Zoom out"), QKeySequence::ZoomOut);
     zoomReset = make(owner, tr("Reset zoom"), QKeySequence(Qt::CTRL | Qt::Key_0));
@@ -51,8 +52,8 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {showHide, newChat,   reload,     downloads, mute,      blurMessages, toggleTheme, zoomIn,
-            zoomOut,  zoomReset, fullScreen, settings,  shortcuts, about,        quit};
+    return {showHide, newChat, reload,    downloads,  mute,     blurMessages, toggleTheme, lock,
+            zoomIn,   zoomOut, zoomReset, fullScreen, settings, shortcuts,    about,       quit};
 }
 
 } // namespace whatsie::ui

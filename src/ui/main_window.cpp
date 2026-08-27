@@ -122,6 +122,7 @@ void MainWindow::connectActions()
     connect(m_actions->blurMessages, &QAction::toggled, this,
             [this](bool on) { m_settings.setMessageBlurLevel(on ? 2 : 0); });
     connect(m_actions->toggleTheme, &QAction::triggered, this, &MainWindow::toggleTheme);
+    connect(m_actions->lock, &QAction::triggered, this, &MainWindow::requestLock);
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this,
             [this](int level) { m_actions->blurMessages->setChecked(level > 0); });
     connect(m_actions->zoomIn, &QAction::triggered, this, [this] { m_webView->zoomStep(+1); });
@@ -411,6 +412,20 @@ void MainWindow::setupLock()
     connect(&m_settings, &core::Settings::lockConfigChanged, this, &MainWindow::updateIdleTimer);
     qApp->installEventFilter(this); // reset the idle timer on any input
     updateIdleTimer();
+}
+
+void MainWindow::requestLock()
+{
+    if (!m_settings.hasPasscode()) {
+        const auto choice = QMessageBox::question(
+            this, tr("Screen lock"), tr("Set a passcode first to use the lock.\n\nOpen Settings now?"),
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::Yes);
+        if (choice == QMessageBox::Yes) {
+            showSettings();
+        }
+        return;
+    }
+    lock();
 }
 
 void MainWindow::lock()

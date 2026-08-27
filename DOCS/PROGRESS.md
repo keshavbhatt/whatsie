@@ -5,6 +5,14 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Ctrl+L to lock
+
+Added `Actions::lock` (Ctrl+L, old whatsie's shortcut) — in the tray menu and the shortcuts sheet,
+wired to `MainWindow::requestLock()`: locks when a passcode is set, otherwise offers to open
+Settings to set one. Reuses the existing WindowShortcut pattern (like Ctrl+T). 23/23.
+
+---
+
 ## 2026-08-28 — App lock, hardened (P1)
 
 - `core::app_lock` (pure, tested): PBKDF2-HMAC-SHA256 via QtCore `QMessageAuthenticationCode`

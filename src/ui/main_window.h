@@ -76,6 +76,7 @@ private:
     void handleProxyAuth(const QString& proxyHost, QAuthenticator* authenticator);
     void syncAutostart();
     void setupLock();
+    void requestLock();
     void lock();
     void unlock();
     void attemptUnlock(const QString& passcode);

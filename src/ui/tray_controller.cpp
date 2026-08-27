@@ -81,6 +81,7 @@ void TrayController::buildMenu()
     m_menu->addAction(m_actions.mute);
     m_menu->addAction(m_actions.blurMessages);
     m_menu->addAction(m_actions.toggleTheme);
+    m_menu->addAction(m_actions.lock);
     m_menu->addMenu(buildDndMenu());
     m_menu->addSeparator();
     m_menu->addAction(m_actions.settings);
