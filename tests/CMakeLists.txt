@@ -39,6 +39,15 @@ function(whatsie_add_test name source link_target)
     endif()
 endfunction()
 
-whatsie_add_test(tst_settings   tst_settings.cpp   whatsie_core)
-whatsie_add_test(tst_user_agent tst_user_agent.cpp whatsie_web)
-whatsie_add_test(tst_smoke      tst_smoke.cpp      whatsie_app GUI)
+# core
+whatsie_add_test(tst_settings            tst_settings.cpp            whatsie_core)
+whatsie_add_test(tst_zoom_policy         tst_zoom_policy.cpp         whatsie_core)
+whatsie_add_test(tst_unread_badge        tst_unread_badge.cpp        whatsie_core GUI)
+whatsie_add_test(tst_navigation_policy   tst_navigation_policy.cpp   whatsie_core)
+whatsie_add_test(tst_render_crash_policy tst_render_crash_policy.cpp whatsie_core)
+whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_core)
+whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
+# web
+whatsie_add_test(tst_user_agent          tst_user_agent.cpp          whatsie_web)
+# app / ui
+whatsie_add_test(tst_smoke               tst_smoke.cpp               whatsie_app GUI)

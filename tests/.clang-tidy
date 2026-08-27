@@ -1,0 +1,8 @@
+---
+# Test sources: QTest slots must be non-static members and _data() suffixes
+# are a QTest convention, so relax those two checks here.
+InheritParentConfig: true
+Checks: >
+  -readability-convert-member-functions-to-static,
+  -readability-identifier-naming,
+  -readability-function-cognitive-complexity
