@@ -1,0 +1,46 @@
+# Build the snap in GitHub's CI (we do not build locally). On push to main the
+# snap is built with snapcore/action-build and uploaded as an artifact; set the
+# repo variable PUBLISH_TO_STORE=true and the SNAPCRAFT_STORE_CREDENTIALS secret
+# to also release it to the edge channel.
+name: snap
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'src/**'
+      - 'cmake/**'
+      - 'CMakeLists.txt'
+      - 'dist/**'
+      - 'snap/**'
+      - '.github/workflows/snap.yml'
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build snap
+        uses: snapcore/action-build@v1
+        id: build
+
+      - name: Upload the snap artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: whatsie-snap
+          path: ${{ steps.build.outputs.snap }}
+          if-no-files-found: error
+
+      - name: Publish to the Snap Store (edge)
+        if: >-
+          vars.PUBLISH_TO_STORE == 'true' &&
+          github.ref == 'refs/heads/main' &&
+          github.event_name == 'push'
+        uses: snapcore/action-publish@v1
+        env:
+          SNAPCRAFT_STORE_CREDENTIALS: ${{ secrets.SNAPCRAFT_STORE_CREDENTIALS }}
+        with:
+          snap: ${{ steps.build.outputs.snap }}
+          release: edge

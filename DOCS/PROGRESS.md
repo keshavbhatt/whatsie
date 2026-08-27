@@ -5,6 +5,27 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M4: snap packaging (config + CI; build in the cloud)
+
+Snap configured and building via CI (owner: no local snap builds — a snapcraft build pulls a
+multi-GB KDE SDK into LXD).
+- `snap/snapcraft.yaml`: core24, **kde-neon-6** extension (Qt 6.11 from `kf6-core24`), strict,
+  amd64. Plugs: home, desktop(-legacy), opengl, x11, wayland, network(+bind/status/observe),
+  camera, audio-playback, audio-record, removable-media, screen-inhibit-control, hardware-observe,
+  unity7, and `browser-sandbox` (`browser-support` allow-sandbox: true, ADR-008).
+- `dist/linux/com.ktechpit.whatsie.desktop` + `.metainfo.xml`; top-level CMake `install()` rules
+  stage the binary, desktop file, metainfo and hicolor icons. `adopt-info` takes the version from
+  the metainfo. Verified the install tree stages correctly into a `/usr` prefix.
+- `.github/workflows/snap.yml`: `snapcore/action-build` on push → artifact, optional edge publish
+  behind `PUBLISH_TO_STORE`.
+- The kde-neon-6 runtime provides GPU/audio/PipeWire/portal wiring natively, so the shipped snap
+  needs none of the dev-run workarounds.
+
+Local snap build attempt was cancelled and the LXD build containers cleaned (recovered ~9 GB).
+Flatpak deferred (owner). **Owner to confirm** the CI snap build once pushed.
+
+---
+
 ## 2026-08-27 — M3 part B complete (watchdog, SW recovery, blur, drag-drop)
 
 S13/S14/S16/A8 landed earlier today; **M6 drag-and-drop attach** now done: dropped local files
@@ -378,6 +399,6 @@ recovery, A8 privacy blur, M6 drag-and-drop attach.
 | M1 Usable shell | ✅ done | 2026-08-27 |
 | M2 Notifications | ✅ done | 2026-08-27 |
 | M3 Web integration | ✅ done | 2026-08-27 (parts A + B) |
-| M4 Packaging & CI | — | |
+| M4 Packaging & CI | ◐ snap done | snap config + CI; flatpak later |
 | M5 Approved extras | — | list fixed in `ROADMAP.md` |
 | M6 Windows | — | ADR-016 |

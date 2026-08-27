@@ -78,7 +78,10 @@ reload, S16 service-worker recovery, A8 privacy blur, M6 drag-and-drop attach.
 **Exit:** voice/video call with camera+mic works; screen share picker appears; file attach via
 dialog, paste and (if KEEP) drag-drop; theme survives restart 20/20 times (scripted test).
 
-## M4 — Packaging & CI
+## M4 — Packaging & CI — snap ✅ (2026-08-27), flatpak later
+
+Snap: `snap/snapcraft.yaml` + `.github/workflows/snap.yml` (built in CI, not locally). Flatpak deferred.
+
 
 | Target | Work |
 |---|---|
