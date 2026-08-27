@@ -34,7 +34,12 @@ whatsie_prepare_runtime_farm() {
 
 whatsie_runtime_lib_path() {
     local build="$1"
-    echo "$WHATSIE_RT/usr/lib/x86_64-linux-gnu:$WHATSIE_RT/usr/lib/x86_64-linux-gnu/libproxy:$build/core24-libs"
+    # The pulseaudio subdir carries libpulsecommon, which the runtime's
+    # libpulse.so.0 needs but reaches only through a RUNPATH that does not exist
+    # off-snap; without it Chromium's audio falls back to ALSA and mic capture
+    # fails, so WhatsApp reports a call as unsupported.
+    local rt="$WHATSIE_RT/usr/lib/x86_64-linux-gnu"
+    echo "$rt:$rt/libproxy:$rt/pulseaudio:$build/core24-libs"
 }
 
 whatsie_export_runtime_env() {

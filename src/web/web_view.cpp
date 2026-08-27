@@ -8,6 +8,7 @@
 #include "web/clipboard_fix.h"
 #include "web/logging.h"
 #include "web/permission_controller.h"
+#include "web/popup_window.h"
 #include "web/web_page.h"
 #include "web/web_profile.h"
 
@@ -88,6 +89,24 @@ void WebView::refreshColorScheme()
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, !smooth);
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, smooth);
     qCInfo(lcWeb) << "colour scheme pushed to the page";
+}
+
+WebView::~WebView()
+{
+    // Qt WebEngine requires the profile to outlive every page created from it.
+    // The profile and pages are siblings under this view, and QObject would
+    // otherwise destroy the profile first ("Release of profile requested but
+    // WebEnginePage still not deleted"). Detach and delete the page (and any
+    // open pop-up windows, whose pages also use the profile) up front.
+    setPage(nullptr);
+    for (PopupWindow* popup : findChildren<PopupWindow*>(Qt::FindDirectChildrenOnly)) {
+        delete popup;
+    }
+    delete m_page;
+    m_page = nullptr;
+    delete m_permissions;
+    m_permissions = nullptr;
+    // m_profile (still a child) is destroyed last, by the QObject base dtor.
 }
 
 void WebView::loadWhatsApp()

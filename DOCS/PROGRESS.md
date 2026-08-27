@@ -5,6 +5,32 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Calls: audio device fix (the real cause) + shutdown warning
+
+**Reported:** the "Allow camera and microphone" modal still appears *after* permissions are
+granted; log shows `PcmOpen: default, No such device` and `Cannot open
+libasound_module_pcm_pipewire.so`, plus "Release of profile requested but WebEnginePage still
+not deleted" on quit.
+
+**Cause.** Not permissions — audio capture. The runtime snap's `libpulse.so.0` needs
+`libpulsecommon-16.1.so` but reaches it only through a RUNPATH (`/usr/lib/.../pulseaudio`) that
+does not exist off-snap, so libpulse failed to load and Chromium fell back to ALSA, whose
+Ubuntu-built libasound looked for the PipeWire plugin in the Debian path absent on Arch. mic
+open failed → `getUserMedia` rejected → WhatsApp's generic "unsupported" modal.
+
+**Fixed.**
+- `scripts/snap-runtime-env.sh` adds the runtime's `.../pulseaudio` dir to `LD_LIBRARY_PATH`, so
+  libpulse loads and Chromium uses PulseAudio (pipewire-pulse). Verified via CDP:
+  `getUserMedia({audio:true})` succeeds, the real mic enumerates, zero ALSA errors. (Shipping
+  snap/flatpak get this from their audio interfaces; this is a dev-run parity fix.)
+- `WebView::~WebView()` detaches and deletes the page and any pop-up windows before the profile
+  (they are siblings under the view; QObject would otherwise free the profile first). Verified:
+  a clean `--quit` no longer prints the warning.
+
+**Owner to confirm:** a real voice/video call end to end.
+
+---
+
 ## 2026-08-27 — Call permissions round 2 + settings polish
 
 **Reported:** call permissions still messy ("if the user can't allow in time it's treated denied

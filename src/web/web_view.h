@@ -29,7 +29,7 @@ class WebView : public QWebEngineView
 
 public:
     WebView(core::Settings& settings, core::ThemeService& theme, QWidget* parent = nullptr);
-    ~WebView() override = default;
+    ~WebView() override;
 
     /// Navigates to WhatsApp Web (idempotent).
     void loadWhatsApp();
