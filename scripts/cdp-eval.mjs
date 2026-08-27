@@ -43,7 +43,7 @@ for (const [method, params] of calls) {
     console.log(JSON.stringify(r.result ?? r.error));
 }
 for (const expression of exprs) {
-    const r = await call('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true });
+    const r = await call('Runtime.evaluate', { expression, returnByValue: true, awaitPromise: true, userGesture: true });
     if (r.result?.exceptionDetails) {
         console.error('exception:', r.result.exceptionDetails.text, r.result.exceptionDetails.exception?.description ?? '');
     } else {

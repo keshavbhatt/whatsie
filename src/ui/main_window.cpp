@@ -19,14 +19,17 @@
 #include "web/web_profile.h"
 #include "web/web_view.h"
 
+#include <QAbstractItemModel>
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
 #include <QFile>
+#include <QGuiApplication>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSessionManager>
 #include <QStandardPaths>
+#include <QWebEngineDesktopMediaRequest>
 #include <QWebEnginePage>
 #include <QWebEnginePermission>
 
@@ -125,11 +128,34 @@ void MainWindow::connectWebView()
                 });
             });
     connect(m_webView, &web::WebView::desktopMediaRequested, this,
-            [this](QWebEngineDesktopMediaRequest request) {
-                auto* picker = new ScreenPickerDialog(std::move(request), this);
-                picker->setAttribute(Qt::WA_DeleteOnClose);
-                picker->open();
-            });
+            [this](QWebEngineDesktopMediaRequest request) { handleDesktopMediaRequest(std::move(request)); });
+}
+
+// Screen sharing (getDisplayMedia). On Wayland the PipeWire desktop portal
+// presents its own native picker (screen, window, region) and performs the
+// capture; a second in-app picker is redundant and — because the portal can
+// invalidate the request out from under it — was the source of a crash when
+// the user dismissed the portal and then clicked our dialog. So on Wayland we
+// hand the request to the portal by selecting the primary screen and show no
+// dialog. On X11 there is no portal, so our own picker is the only UI.
+void MainWindow::handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request)
+{
+    const bool wayland = QGuiApplication::platformName() == QLatin1StringView("wayland");
+    qCInfo(lcUi) << "desktopMediaRequested platform=" << QGuiApplication::platformName();
+    if (wayland) {
+        QAbstractItemModel* screens = request.screensModel();
+        if (screens != nullptr && screens->rowCount() > 0) {
+            request.selectScreen(screens->index(0, 0)); // portal decides the actual source
+        } else if (request.windowsModel() != nullptr && request.windowsModel()->rowCount() > 0) {
+            request.selectWindow(request.windowsModel()->index(0, 0));
+        } else {
+            request.cancel();
+        }
+        return;
+    }
+    auto* picker = new ScreenPickerDialog(std::move(request), this);
+    picker->setAttribute(Qt::WA_DeleteOnClose);
+    picker->open();
 }
 
 // ---- lifecycle -------------------------------------------------------------

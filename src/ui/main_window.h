@@ -3,6 +3,8 @@
 #include <QMainWindow>
 #include <QPointer>
 
+class QWebEngineDesktopMediaRequest;
+
 namespace whatsie::core {
 class DndController;
 class Settings;
@@ -63,6 +65,7 @@ private:
     void setFullScreenMode(bool on);
     void handleUnread(int count);
     void handleRenderProcessGaveUp();
+    void handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request);
     void clearCache();
     void confirmClearSession();
 

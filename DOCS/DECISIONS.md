@@ -206,6 +206,24 @@ listeners and its CSS `@media` rules follow). `theme-preload.js` was removed. `T
 ignores `colorSchemeChanged` while an explicit theme is set (the signal is our own override).
 A pure `matchMedia` shim was tried and rejected: it only moves the JS-driven parts.
 
+## ADR-023 — Screen sharing: the portal is the picker on Wayland (2026-08-27)
+
+**Context.** Owner testing on KDE Wayland: starting a screen share showed THREE dialogs — the
+PipeWire portal's screen picker, the portal's window picker, and our own `ScreenPickerDialog` —
+and clicking ours after dismissing the portal crashed the app. `QWebEngineDesktopMediaRequest`
+has no validity query, so acting on a request the portal already consumed is unsafe, and a
+non-modal app dialog let exactly that happen.
+
+**Decision.** On Wayland, `MainWindow::handleDesktopMediaRequest` shows no dialog: it selects the
+primary screen on the request and lets xdg-desktop-portal present its native picker and perform
+the capture (verified: `getDisplayMedia` succeeds, no app dialog, no crash). On X11 there is no
+portal, so `ScreenPickerDialog` remains the picker. `--enable-features=WebRTCPipeWireCapturer`
+stays on (ADR-021 note / M2).
+
+**Consequences.** One native picker on Wayland instead of three dialogs; the crash is gone.
+`ScreenPickerDialog` is now X11-only. Window-specific sharing on Wayland goes through the
+portal's own UI.
+
 ## ADR-022 — Camera/microphone pre-granted for WhatsApp; per-permission toggles (2026-08-27)
 
 **Context.** Owner testing: on a video call WhatsApp shows "Allow camera and microphone — click

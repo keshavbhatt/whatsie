@@ -5,6 +5,18 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Screen sharing: hand off to the portal on Wayland (fixes crash)
+
+**Reported:** starting a screen share showed three dialogs (two native portal pickers + our own)
+and interacting with ours after closing the portal crashed the app.
+
+**Fixed (ADR-023).** On Wayland the PipeWire portal is the picker; `handleDesktopMediaRequest`
+now selects the primary screen and shows no app dialog, so the portal's native picker drives and
+performs the capture. Verified over CDP: `getDisplayMedia` returns a track, our dialog never
+appears, the app survives. `ScreenPickerDialog` is now the X11-only path.
+
+---
+
 ## 2026-08-27 — Calls: audio device fix (the real cause) + shutdown warning
 
 **Reported:** the "Allow camera and microphone" modal still appears *after* permissions are
