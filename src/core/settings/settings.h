@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QSettings>
 #include <QString>
+#include <QStringList>
 
 #include <memory>
 
@@ -127,6 +128,13 @@ public:
     [[nodiscard]] QString lastOpenDirectory() const;
     void setLastOpenDirectory(const QString& directory);
 
+    // spellcheck/ (FEATURES L1)
+    [[nodiscard]] bool spellCheckEnabled() const;
+    void setSpellCheckEnabled(bool enabled);
+    /// Dictionary names (e.g. "en-US"); defaults to the system locale's.
+    [[nodiscard]] QStringList spellCheckLanguages() const;
+    void setSpellCheckLanguages(const QStringList& languages);
+
     // advanced/
     [[nodiscard]] HardwareAcceleration hardwareAcceleration() const;
     void setHardwareAcceleration(HardwareAcceleration mode);
@@ -185,6 +193,8 @@ Q_SIGNALS:
     void smoothScrollingChanged(bool enabled);
     void webrtcPublicInterfacesOnlyChanged(bool enabled);
     void proxyChanged();
+    void spellCheckEnabledChanged(bool enabled);
+    void spellCheckLanguagesChanged(const QStringList& languages);
     void themeChanged(whatsie::core::Theme theme);
     void notificationsEnabledChanged(bool enabled);
     void notificationSoundChanged(bool enabled);

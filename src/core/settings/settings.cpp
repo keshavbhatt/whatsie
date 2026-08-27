@@ -2,9 +2,11 @@
 
 #include "core/logging.h"
 #include "core/settings/settings_keys.h"
+#include "core/spellcheck.h"
 #include "core/zoom_policy.h"
 
 #include <QDir>
+#include <QLocale>
 #include <QStandardPaths>
 
 #include <algorithm>
@@ -36,6 +38,7 @@ constexpr bool kDefaultAskWhereToSave = false;
 constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
 constexpr bool kDefaultWebrtcPublicOnly = false;
+constexpr bool kDefaultSpellCheckEnabled = true;
 constexpr ProxyMode kDefaultProxyMode = ProxyMode::System;
 constexpr ProxyType kDefaultProxyType = ProxyType::Http;
 constexpr int kDefaultProxyPort = 8080;
@@ -500,6 +503,36 @@ void Settings::setProxyPassword(const QString& password)
 ProxyConfig Settings::proxyConfig() const
 {
     return ProxyConfig{proxyMode(), proxyType(), proxyHost(), proxyPort(), proxyUser(), m_proxyPassword};
+}
+
+bool Settings::spellCheckEnabled() const
+{
+    return boolValue(keys::kSpellCheckEnabled, kDefaultSpellCheckEnabled);
+}
+
+void Settings::setSpellCheckEnabled(bool enabled)
+{
+    if (storeBool(keys::kSpellCheckEnabled, kDefaultSpellCheckEnabled, enabled)) {
+        Q_EMIT spellCheckEnabledChanged(enabled);
+    }
+}
+
+QStringList Settings::spellCheckLanguages() const
+{
+    const QVariant stored = m_store->value(keys::kSpellCheckLanguages);
+    if (stored.isValid() && !stored.toStringList().isEmpty()) {
+        return stored.toStringList();
+    }
+    return {dictionaryNameForLocale(QLocale::system())};
+}
+
+void Settings::setSpellCheckLanguages(const QStringList& languages)
+{
+    if (languages == spellCheckLanguages()) {
+        return;
+    }
+    m_store->setValue(keys::kSpellCheckLanguages, languages);
+    Q_EMIT spellCheckLanguagesChanged(languages);
 }
 
 // ---- appearance/ -----------------------------------------------------------

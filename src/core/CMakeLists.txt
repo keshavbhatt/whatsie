@@ -6,6 +6,8 @@ qt_add_library(whatsie_core STATIC
     chromium_flags.h
     graphics_fallback.cpp
     graphics_fallback.h
+    spellcheck.cpp
+    spellcheck.h
     connection_watchdog_policy.cpp
     connection_watchdog_policy.h
     downloads/download_model.cpp

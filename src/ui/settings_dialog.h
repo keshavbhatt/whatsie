@@ -80,6 +80,7 @@ private:
     QCheckBox* m_notificationSound = nullptr;
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
+    QCheckBox* m_spellCheck = nullptr;
     QCheckBox* m_webrtcPublicOnly = nullptr;
     QComboBox* m_proxyMode = nullptr;
     QComboBox* m_proxyType = nullptr;

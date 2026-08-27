@@ -21,6 +21,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QLocale>
 #include <QPushButton>
 #include <QScrollArea>
 #include <QSpinBox>
@@ -306,6 +307,21 @@ QWidget* SettingsDialog::buildPrivacyTab()
     sform->addRow(QString(), buttons);
     outer->addWidget(storageBox);
 
+    auto* spellBox = new QGroupBox(tr("Spell check"), page);
+    auto* spellLayout = new QVBoxLayout(spellBox);
+    m_spellCheck = new QCheckBox(tr("Check spelling as I type"), spellBox);
+    connect(m_spellCheck, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setSpellCheckEnabled(on); });
+    spellLayout->addWidget(m_spellCheck);
+    auto* spellNote = new QLabel(tr("Dictionary: %1. More languages can be added by installing their "
+                                    "dictionaries.")
+                                     .arg(m_settings.spellCheckLanguages().join(u", "_s)),
+                                 spellBox);
+    spellNote->setWordWrap(true);
+    spellNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    spellLayout->addWidget(spellNote);
+    outer->addWidget(spellBox);
+
     outer->addWidget(buildNetworkGroup());
 
     // Notes and buttons live in the QVBoxLayout, not in the QFormLayout: a
@@ -461,6 +477,7 @@ void SettingsDialog::loadValues()
     m_notificationTimeout->setEnabled(m_settings.notificationsEnabled());
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
+    m_spellCheck->setChecked(m_settings.spellCheckEnabled());
     m_webrtcPublicOnly->setChecked(m_settings.webrtcPublicInterfacesOnly());
     m_proxyMode->setCurrentIndex(m_proxyMode->findData(static_cast<int>(m_settings.proxyMode())));
     m_proxyType->setCurrentIndex(m_proxyType->findData(static_cast<int>(m_settings.proxyType())));

@@ -5,6 +5,27 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Spell check (L1)
+
+- `core::Settings`: `spellCheckEnabled` (default on) + `spellCheckLanguages` (default = the system
+  locale's `.bdic` name via pure `core::dictionaryNameForLocale`).
+- `WebProfile::configureSpellCheck()` applies `setSpellCheckEnabled` / `setSpellCheckLanguages` and
+  reacts to changes. `Application::configureDictionaries()` points
+  `QTWEBENGINE_DICTIONARIES_PATH` at the first bundled `qtwebengine_dictionaries` dir it finds
+  (dev / /usr / snap / flatpak roots), via pure `core::findDictionariesPath`.
+- CMake converts hunspell `.aff`/`.dic` → `.bdic` at configure time (best-effort: no-op when the
+  tool or dictionaries are absent, e.g. this dev host) and installs them under
+  `share/whatsie/qtwebengine_dictionaries`. snap `build-packages` gains a base set of
+  `hunspell-*` so the packaged app ships dictionaries.
+- Settings → Privacy & Advanced gains a "Spell check" group (toggle + active-language note).
+
+Verified live: with an en-US `.bdic` present, the log shows the dir found and `spell check on
+QList("en-US")` with no "cannot be enabled" error; without one it degrades cleanly. 22/22 tests
+(new tst_spellcheck). ADR-017. **M5 remaining: L2 (dictionary downloads), L4 (IME packaging),
+P1 (app lock, last).**
+
+---
+
 ## 2026-08-28 — M5 network batch: proxy (P3), proxy-auth (M12b), WebRTC policy (P2), smooth-scroll (A14)
 
 - **P3 Network proxy**: settings for mode (System/None/Manual), type (HTTP/SOCKS5), host, port, user;

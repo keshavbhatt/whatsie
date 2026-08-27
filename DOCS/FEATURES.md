@@ -153,7 +153,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| L1 | Spell check with `.bdic` for the system language (bundled, built from hunspell) | advertised, absent | yes | NICE | ADR-017. | **KEEP** | — |
+| L1 | Spell check with `.bdic` for the system language (bundled, built from hunspell) | advertised, absent | yes | NICE | ADR-017. | **KEEP** | done |
 | L2 | Additional dictionaries on demand (SHA-256 verified), plain list UI | no | yes + painted delegate | LATER | ADR-017; needs hosted dictionary release. | **KEEP** | — |
 | L3 | Spell-check focus/cycle shortcut, tray spelling submenu | no | yes | DROP | | **DROP** | dropped |
 | L4 | IME plugins (fcitx5/ibus) bundled in snap/flatpak | missing (W#7, 21) | partial | CORE (packaging) | | **KEEP** | — |

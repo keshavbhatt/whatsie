@@ -30,6 +30,7 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     configureUserAgent();
     configureAttributes();
     installBootstrap();
+    configureSpellCheck();
 
     connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
         this->settings()->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, enabled);
@@ -47,6 +48,10 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     connect(&m_settings, &core::Settings::webrtcPublicInterfacesOnlyChanged, this, [this](bool on) {
         this->settings()->setAttribute(QWebEngineSettings::WebRTCPublicInterfacesOnly, on);
     });
+    connect(&m_settings, &core::Settings::spellCheckEnabledChanged, this,
+            [this](bool on) { setSpellCheckEnabled(on); });
+    connect(&m_settings, &core::Settings::spellCheckLanguagesChanged, this,
+            [this](const QStringList& langs) { setSpellCheckLanguages(langs); });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
 
@@ -119,6 +124,16 @@ QString WebProfile::themeName(core::Theme theme)
         break;
     }
     return u"system"_s;
+}
+
+void WebProfile::configureSpellCheck()
+{
+    // FEATURES L1: dictionaries come from QTWEBENGINE_DICTIONARIES_PATH (set by
+    // Application). With none present the checker is a harmless no-op.
+    setSpellCheckEnabled(m_settings.spellCheckEnabled());
+    setSpellCheckLanguages(m_settings.spellCheckLanguages());
+    qCInfo(lcWeb) << "spell check" << (m_settings.spellCheckEnabled() ? "on" : "off")
+                  << m_settings.spellCheckLanguages();
 }
 
 void WebProfile::installBootstrap()

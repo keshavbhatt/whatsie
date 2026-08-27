@@ -51,6 +51,7 @@ private:
     void applyIdentity();
     void setupLogging();
     void applyChromiumFlags();
+    void configureDictionaries();
     void honourClearSessionMarker();
     [[nodiscard]] bool forwardToPrimary();
 

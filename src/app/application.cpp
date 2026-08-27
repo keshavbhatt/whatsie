@@ -7,10 +7,12 @@
 #include "core/log_sink.h"
 #include "core/logging.h"
 #include "core/settings/settings.h"
+#include "core/spellcheck.h"
 #include "core/storage_policy.h"
 #include "core/theme/theme_service.h"
 #include "platform/platform_info.h"
 
+#include <QDir>
 #include <QFile>
 #include <QIcon>
 #include <QStandardPaths>
@@ -66,6 +68,7 @@ Application::Application(int& argc, char** argv)
     m_settings = std::make_unique<core::Settings>();
     m_theme = std::make_unique<core::ThemeService>(*m_settings);
     applyChromiumFlags();
+    configureDictionaries();
     honourClearSessionMarker();
 
     qCInfo(core::lcCore).noquote() << u"whatsie %1 (%2) profile=%3 on %4"_s.arg(
@@ -113,6 +116,30 @@ void Application::applyChromiumFlags()
     const QString merged = core::mergeChromiumFlags(existing, ours);
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", merged.toUtf8());
     qCInfo(lcApp) << "chromium flags:" << merged;
+}
+
+void Application::configureDictionaries()
+{
+    // Point QtWebEngine at bundled .bdic spell-check dictionaries (FEATURES L1),
+    // unless the environment already sets it. Roots cover dev, /usr, snap and
+    // flatpak; findDictionariesPath returns the qtwebengine_dictionaries dir.
+    if (qEnvironmentVariableIsSet("QTWEBENGINE_DICTIONARIES_PATH")) {
+        return;
+    }
+    QStringList roots;
+    if (qEnvironmentVariableIsSet("SNAP")) {
+        roots << qEnvironmentVariable("SNAP") + u"/usr/share/whatsie"_s;
+    }
+    const QString appDir = applicationDirPath();
+    roots << QDir(appDir).filePath(u"../share/whatsie"_s) << appDir << u"/app/share/whatsie"_s
+          << u"/usr/share/whatsie"_s;
+    const QString dir = core::findDictionariesPath(roots);
+    if (!dir.isEmpty()) {
+        qputenv("QTWEBENGINE_DICTIONARIES_PATH", QDir(dir).absolutePath().toUtf8());
+        qCInfo(lcApp) << "spell-check dictionaries:" << dir;
+    } else {
+        qCInfo(lcApp) << "no bundled spell-check dictionaries found; relying on defaults";
+    }
 }
 
 void Application::honourClearSessionMarker()

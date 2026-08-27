@@ -58,6 +58,16 @@ parts:
     build-packages:
       - libxkbcommon-dev
       - libdrm-dev
+      # Hunspell dictionaries: CMake converts these to .bdic at configure time
+      # and bundles them for spell check (FEATURES L1, ADR-017). Base set only;
+      # more languages are a download (L2).
+      - hunspell-en-us
+      - hunspell-en-gb
+      - hunspell-de-de
+      - hunspell-fr
+      - hunspell-es
+      - hunspell-it
+      - hunspell-ru
     stage-packages:
       - libdrm2
       # libqxcb links against it; without it the snap does not start (W#320).

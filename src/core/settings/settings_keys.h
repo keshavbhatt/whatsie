@@ -47,6 +47,10 @@ inline constexpr QLatin1StringView kShowDownloadsOnStart{"downloads/showWindowOn
 // files/
 inline constexpr QLatin1StringView kLastOpenDirectory{"files/lastOpenDirectory"};
 
+// spellcheck/
+inline constexpr QLatin1StringView kSpellCheckEnabled{"spellcheck/enabled"};
+inline constexpr QLatin1StringView kSpellCheckLanguages{"spellcheck/languages"};
+
 // advanced/
 inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};
 inline constexpr QLatin1StringView kWebrtcPublicOnly{"advanced/webrtcPublicInterfacesOnly"};

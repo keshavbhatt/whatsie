@@ -84,6 +84,42 @@ if(LINUX)
         DESTINATION ${CMAKE_INSTALL_DATADIR}/metainfo)
     install(DIRECTORY src/resources/icons/hicolor
         DESTINATION ${CMAKE_INSTALL_DATADIR}/icons)
+
+    # FEATURES L1 / ADR-017: convert hunspell dictionaries to Chromium .bdic at
+    # build time and bundle them under share/whatsie/qtwebengine_dictionaries.
+    # Best-effort: if the tool or the dictionaries are absent (e.g. this dev
+    # host), it silently produces nothing and spell check falls back to a no-op.
+    # CI (kde-neon-6) has both, so the packaged app ships real dictionaries.
+    find_program(WHATSIE_CONVERT_DICT qwebengine_convert_dict
+        HINTS /usr/lib/qt6 /usr/lib/qt6/libexec /usr/lib/x86_64-linux-gnu/qt6/libexec /usr/libexec)
+    set(WHATSIE_HUNSPELL_DIR "/usr/share/hunspell" CACHE PATH "hunspell .aff/.dic directory")
+    set(_whatsie_dicts_out "${CMAKE_BINARY_DIR}/qtwebengine_dictionaries")
+    if(WHATSIE_CONVERT_DICT AND EXISTS "${WHATSIE_HUNSPELL_DIR}")
+        file(GLOB _whatsie_affs "${WHATSIE_HUNSPELL_DIR}/*.aff")
+        file(MAKE_DIRECTORY "${_whatsie_dicts_out}")
+        foreach(_aff ${_whatsie_affs})
+            get_filename_component(_base "${_aff}" NAME_WE)
+            if(EXISTS "${WHATSIE_HUNSPELL_DIR}/${_base}.dic")
+                string(REPLACE "_" "-" _dictname "${_base}")
+                execute_process(
+                    COMMAND "${WHATSIE_CONVERT_DICT}"
+                            "${WHATSIE_HUNSPELL_DIR}/${_base}.dic"
+                            "${_whatsie_dicts_out}/${_dictname}.bdic"
+                    RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_QUIET)
+                if(_rc EQUAL 0)
+                    message(STATUS "whatsie: bundled spell-check dictionary ${_dictname}")
+                endif()
+            endif()
+        endforeach()
+    else()
+        message(STATUS "whatsie: spell-check dictionaries not built "
+                       "(need qwebengine_convert_dict and ${WHATSIE_HUNSPELL_DIR})")
+    endif()
+    if(EXISTS "${_whatsie_dicts_out}")
+        install(DIRECTORY "${_whatsie_dicts_out}"
+            DESTINATION ${CMAKE_INSTALL_DATADIR}/whatsie
+            FILES_MATCHING PATTERN "*.bdic")
+    endif()
 endif()
 
 if(WHATSIE_BUILD_TESTS)
