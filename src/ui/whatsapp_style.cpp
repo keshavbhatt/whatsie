@@ -37,6 +37,7 @@ const char* kSheet = R"qss(
 QDialog, QMainWindow { background: {{bg}}; }
 QWidget { color: {{text}}; }
 QLabel, QCheckBox, QRadioButton, QGroupBox, QTabWidget, QTabBar { background: transparent; }
+QScrollArea, QScrollArea > QWidget > QWidget { background: transparent; border: none; }
 QToolTip {
     background: {{elevated}}; color: {{text}};
     border: 1px solid {{border}}; border-radius: 6px; padding: 4px 7px;

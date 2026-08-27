@@ -22,6 +22,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
+#include <QScrollArea>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QUrl>
@@ -56,10 +57,10 @@ void SettingsDialog::setupUi()
     setModal(false);
 
     m_tabs = new QTabWidget(this);
-    m_tabs->addTab(buildGeneralTab(), tr("General"));
-    m_tabs->addTab(buildAppearanceTab(), tr("Appearance"));
-    m_tabs->addTab(buildNotificationsTab(), tr("Notifications"));
-    m_tabs->addTab(buildPrivacyTab(), tr("Privacy && Advanced"));
+    m_tabs->addTab(wrapInScroll(buildGeneralTab()), tr("General"));
+    m_tabs->addTab(wrapInScroll(buildAppearanceTab()), tr("Appearance"));
+    m_tabs->addTab(wrapInScroll(buildNotificationsTab()), tr("Notifications"));
+    m_tabs->addTab(wrapInScroll(buildPrivacyTab()), tr("Privacy && Advanced"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::close);
@@ -67,7 +68,21 @@ void SettingsDialog::setupUi()
     auto* layout = new QVBoxLayout(this);
     layout->addWidget(m_tabs, 1);
     layout->addWidget(buttons);
-    resize(560, 460);
+    // Tall tabs (Privacy & Advanced especially) scroll inside a fixed dialog
+    // instead of stretching it past the screen.
+    resize(580, 560);
+}
+
+QWidget* SettingsDialog::wrapInScroll(QWidget* content)
+{
+    auto* area = new QScrollArea(this);
+    area->setWidget(content);
+    area->setWidgetResizable(true);
+    area->setFrameShape(QFrame::NoFrame);
+    area->setHorizontalScrollBarPolicy(Qt::ScrollBarAlwaysOff);
+    area->viewport()->setAutoFillBackground(false);
+    content->setAutoFillBackground(false);
+    return area;
 }
 
 QWidget* SettingsDialog::buildGeneralTab()

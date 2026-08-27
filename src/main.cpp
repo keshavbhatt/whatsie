@@ -1,5 +1,6 @@
 #include "app/application.h"
 #include "app/version.h"
+#include "core/graphics_fallback.h"
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
 #include "core/settings/settings_keys.h"
@@ -7,9 +8,13 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QGuiApplication>
+#include <QProcess>
 #include <QSettings>
+#include <QTimer>
 
 #include <algorithm>
+#include <atomic>
 #include <cmath>
 
 namespace {
@@ -34,6 +39,31 @@ void applyInterfaceScaleEnv()
     }
 }
 
+// FEATURES S20: watch the log stream for a graphics-backend init failure so we
+// can fall back from a broken Wayland RHI to XCB, once.
+std::atomic<bool> g_graphicsFailed{false};
+QtMessageHandler g_previousHandler = nullptr;
+
+void graphicsWatchHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
+{
+    if (whatsie::core::isGraphicsInitFailure(message)) {
+        g_graphicsFailed.store(true);
+    }
+    if (g_previousHandler != nullptr) {
+        g_previousHandler(type, context, message);
+    }
+}
+
+void relaunchUnderXcb()
+{
+    qputenv("QT_QPA_PLATFORM", "xcb");
+    qputenv("WHATSIE_XCB_RETRY", "1");
+    const QStringList args = QCoreApplication::arguments().mid(1);
+    if (QProcess::startDetached(QCoreApplication::applicationFilePath(), args)) {
+        QCoreApplication::quit();
+    }
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -51,6 +81,10 @@ int main(int argc, char* argv[])
         return app.exitCode();
     }
 
+    // Chain onto the sink Application just installed, so a later graphics failure
+    // during window/WebEngine creation is observed (FEATURES S20).
+    g_previousHandler = qInstallMessageHandler(graphicsWatchHandler);
+
     whatsie::ui::MainWindow window(app.settings(), app.themeService());
     QObject::connect(&app, &whatsie::app::Application::raiseRequested, &window,
                      &whatsie::ui::MainWindow::showAndRaise);
@@ -63,6 +97,17 @@ int main(int argc, char* argv[])
 
     const whatsie::app::CliOptions& cli = app.cliOptions();
     window.start(cli.startMinimized || app.settings().startMinimized());
+
+    // Give the GPU stack time to fail, then fall back to XCB if it did (once).
+    const bool retried = qEnvironmentVariableIsSet("WHATSIE_XCB_RETRY");
+    if (!retried && QGuiApplication::platformName() == QLatin1StringView("wayland")) {
+        QTimer::singleShot(3000, &window, [] {
+            if (whatsie::core::shouldRetryUnderXcb(QLatin1StringView("wayland"), false,
+                                                   g_graphicsFailed.load())) {
+                relaunchUnderXcb();
+            }
+        });
+    }
 
     // Commands given on our own command line (we are the primary instance).
     for (const QJsonObject& command : whatsie::app::commandsFor(cli)) {

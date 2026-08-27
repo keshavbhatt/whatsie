@@ -44,6 +44,7 @@ Q_SIGNALS:
 
 private:
     void setupUi();
+    QWidget* wrapInScroll(QWidget* content);
     QWidget* buildGeneralTab();
     QWidget* buildAppearanceTab();
     QWidget* buildNotificationsTab();
