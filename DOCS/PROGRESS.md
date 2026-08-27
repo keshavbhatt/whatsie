@@ -5,6 +5,35 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Dev-run GPU (screen-share stop crash) + note on runtime-env parity
+
+**Reported:** turning off screen share crashed the app (`EGL_BAD_DISPLAY`, "make lost context
+current", `Trace/breakpoint trap`), after repeated `Failed to create GBM buffer for EGL`.
+
+**Cause (environment, not our code).** The `kf6-core24` runtime snap ships only stub Mesa — its
+`dri/` has no driver for the host GPU — so GBM allocation fails and stopping a PipeWire
+screencast tears down the EGL context and aborts. The shipped snap/flatpak get real Mesa from the
+`mesa-2404` content snap via the `kde-neon-6` / KDE runtime; dev-run did not wire it.
+
+**Fixed (dev-run only).** `scripts/snap-runtime-env.sh` now points `LD_LIBRARY_PATH`,
+`LIBGL_DRIVERS_PATH`, `GBM_BACKENDS_PATH`, `LIBVA_DRIVERS_PATH`, `__EGL_VENDOR_LIBRARY_DIRS`,
+`DRIRC_CONFIGDIR` at `mesa-2404` (mirrors `gpu-2404-provider-wrapper`). Verified: start→stop
+screencast no longer crashes; only a transient non-fatal "lost context" warning remains.
+
+### Note: dev-run environment-parity workarounds (owner call, 2026-08-27)
+None of these were application-code bugs — they are the dev-run harness lacking wiring the
+shipped package gets for free from its runtime/interfaces. All live in `scripts/` only:
+- **Audio** — `libpulse` needs the runtime's `pulseaudio` dir (else ALSA fallback fails).
+- **PipeWire** — `SPA_PLUGIN_DIR`/`PIPEWIRE_MODULE_DIR` point at the runtime's own plugins.
+- **GPU/Mesa** — `mesa-2404` provider wiring (this entry).
+- **File dialogs** — `QT_QPA_PLATFORMTHEME=xdgdesktopportal` (the KDE theme plugin isn't in the
+  runtime snap).
+These will be validated for real in **M4** (snap/flatpak build on a clean VM). The genuine code
+fixes this session were the theme mechanism (ADR-020), permission wiring/auto-grant, pop-out
+media wiring, the profile-release shutdown ordering, and the screen-picker handoff (ADR-023).
+
+---
+
 ## 2026-08-27 — Call pop-out media + PipeWire screen-share crash
 
 **Reported:** in a call moved to its own window the camera stays off until toggled, screen share

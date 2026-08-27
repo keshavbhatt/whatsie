@@ -54,6 +54,20 @@ whatsie_export_runtime_env() {
     # the Debian SPA/module paths, which do not exist on non-Debian hosts, so
     # pw_loop_new() fails ("can't make support.system handle") and Chromium
     # segfaults. Point it at the matching plugins the runtime snap ships.
+    # GPU: the runtime snap ships only stub Mesa (its DRI dir lacks the host GPU
+    # driver), so GBM buffer allocation fails and stopping a PipeWire screencast
+    # tears down the EGL context and crashes (EGL_BAD_DISPLAY). The shipped snap
+    # gets real Mesa from the mesa-2404 content snap via the kde-neon-6
+    # extension; wire the same provider here (mirrors gpu-2404-provider-wrapper).
+    local mesa=/snap/mesa-2404/current
+    if [ -d "$mesa/usr/lib/x86_64-linux-gnu/dri" ]; then
+        export LD_LIBRARY_PATH="$mesa/usr/lib/x86_64-linux-gnu:$mesa/usr/lib/x86_64-linux-gnu/dri:$mesa/usr/lib/x86_64-linux-gnu/vdpau:$LD_LIBRARY_PATH"
+        export LIBGL_DRIVERS_PATH="$mesa/usr/lib/x86_64-linux-gnu/dri"
+        export GBM_BACKENDS_PATH="$mesa/usr/lib/x86_64-linux-gnu/gbm"
+        export LIBVA_DRIVERS_PATH="$mesa/usr/lib/x86_64-linux-gnu/dri"
+        export __EGL_VENDOR_LIBRARY_DIRS="$mesa/usr/share/glvnd/egl_vendor.d"
+        export DRIRC_CONFIGDIR="$mesa/drirc.d"
+    fi
     export SPA_PLUGIN_DIR="$WHATSIE_RT/usr/lib/x86_64-linux-gnu/spa-0.2"
     export PIPEWIRE_MODULE_DIR="$WHATSIE_RT/usr/lib/x86_64-linux-gnu/pipewire-0.3"
     export QT_FORCE_STDERR_LOGGING=1
