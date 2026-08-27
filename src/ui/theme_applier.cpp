@@ -2,6 +2,7 @@
 
 #include "core/theme/theme_service.h"
 #include "ui/logging.h"
+#include "ui/whatsapp_style.h"
 
 #include <QApplication>
 #include <QStyleFactory>
@@ -28,6 +29,9 @@ ThemeApplier::ThemeApplier(core::ThemeService& theme, QObject* parent)
 void ThemeApplier::apply()
 {
     QApplication::setPalette(m_theme.palette());
+    // WhatsApp Web's design language on top of the palette (green accent, rounded
+    // inputs, underlined tabs). Re-applied on every scheme change.
+    qApp->setStyleSheet(whatsappStyleSheet(m_theme.isDark()));
     // WhatsApp Web follows prefers-color-scheme live (verified 2026-08-27 via
     // CDP media emulation). Qt WebEngine derives that media query from the
     // application colour scheme, so an explicit Light/Dark choice is pushed

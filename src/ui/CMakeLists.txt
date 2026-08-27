@@ -30,6 +30,8 @@ qt_add_library(whatsie_ui STATIC
     screen_picker_dialog.h
     settings_dialog.cpp
     settings_dialog.h
+    whatsapp_style.cpp
+    whatsapp_style.h
     shortcuts_dialog.cpp
     shortcuts_dialog.h
     theme_applier.cpp
@@ -48,6 +50,9 @@ qt_add_resources(whatsie_ui "icons"
     FILES
         "${WHATSIE_ICON_DIR}/whatsie.svg"
         "${WHATSIE_ICON_DIR}/whatsie-symbolic.svg"
+        "${WHATSIE_ICON_DIR}/check.svg"
+        "${WHATSIE_ICON_DIR}/chevron-down.svg"
+        "${WHATSIE_ICON_DIR}/chevron-up.svg"
         "${WHATSIE_ICON_DIR}/hicolor/64x64/apps/com.ktechpit.whatsie.png"
         "${WHATSIE_ICON_DIR}/hicolor/128x128/apps/com.ktechpit.whatsie.png"
         "${WHATSIE_ICON_DIR}/hicolor/256x256/apps/com.ktechpit.whatsie.png"

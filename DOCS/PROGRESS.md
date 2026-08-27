@@ -5,6 +5,18 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Widgets styled to WhatsApp's design system
+
+Owner: match the settings dialog / widget style with WhatsApp's design system. Added
+`ui::whatsappStyleSheet(dark)` (WhatsApp tokens: accent #00a884, panels, inputs, muted text),
+applied on `qApp` from `ThemeApplier` on every scheme change. Styles tabs (green underline), group
+boxes (rounded cards), inputs/combos/spinboxes (rounded pills + chevron glyphs), checkboxes (green
++ white tick), menus, scrollbars, list selection. New assets: check.svg, chevron-up/down.svg.
+Buttons neutral; green reserved for a `whatsiePrimary` property (Qt `:default` lit the wrong button
+across tabs). Verified by screenshots in light and dark — the dialog now reads as WhatsApp. ADR-029.
+
+---
+
 ## 2026-08-28 — Monochrome tray icon made visible
 
 Owner: symbolic tray icon "still looks ugly and invisible". Cause: it was tinted to the *app*

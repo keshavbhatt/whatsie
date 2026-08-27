@@ -268,6 +268,27 @@ already used `FileManager1.ShowItems` for selecting a file; folders now match.
 **Consequences.** The button works on the desktop and stays correct under confinement via the fd
 path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
+## ADR-029 — Widgets follow WhatsApp Web's design system via a Qt style sheet (2026-08-28)
+
+**Context.** Owner: the settings dialog and other widgets should match WhatsApp Web's look. The
+Fusion style + WhatsApp palette (ADR-020/ThemeApplier) got the background colours right but the
+controls still read as generic Fusion — square combos, default checkboxes, grey buttons.
+
+**Decision.** `ui::whatsappStyleSheet(bool dark)` returns a Qt style sheet built from WhatsApp Web's
+tokens (accent `#00a884`, panels, inputs, borders, muted text) in a light and a dark variant, and
+`ThemeApplier::apply()` sets it on `qApp` on every scheme change, on top of the palette. It styles
+tabs (green underline on the active one), group boxes (rounded panel cards), text inputs / combos /
+spin boxes (rounded pills with chevron arrows from `:/icons/chevron-*.svg`), check boxes (green with
+a white `:/icons/check.svg` tick), menus (rounded cards, green selection), scrollbars, and list
+selection. Backgrounds are set only where the look needs them, so nothing paints an opaque block
+over the web view. Buttons are neutral; only a `whatsiePrimary` property turns one green — never Qt's
+`:default`, which followed tab order and lit up the wrong button (e.g. "Change…" over "Close").
+
+**Consequences.** The whole widget layer (settings, about, downloads, menus, prompts) matches
+WhatsApp in both themes with no per-dialog styling. Verified via screenshots, light and dark. A
+single sheet is the maintenance point; the arrow/tick glyphs are the only new assets. Custom-painted
+widgets (the downloads delegate) keep painting themselves; the sheet only affects their frame.
+
 ## ADR-028 — The in-page Settings button lives in WhatsApp's nav rail (2026-08-28)
 
 **Context.** A11 wanted a Settings entry point that does not depend on a system tray. The first
