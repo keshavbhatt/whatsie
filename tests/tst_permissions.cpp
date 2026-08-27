@@ -100,53 +100,46 @@ private Q_SLOTS:
                  State::Denied);
     }
 
-    void promptOnceThenAnswerFromStore()
+    void autoGrantsMediaWithoutPromptAndStores()
     {
         DiskProfile p;
         QWebEnginePage page(&p.profile);
         PermissionController controller;
         controller.attach(page);
         QSignalSpy prompts(&controller, &PermissionController::promptRequested);
-
-        page.load(QUrl(u"wtest://app/"_s));
-        if (!prompts.wait(10000)) {
-            QSKIP("getUserMedia produced no permission request on this host (no media stack?)");
-        }
-        QCOMPARE(prompts.count(), 1);
-        const auto permission = prompts.first().first().value<QWebEnginePermission>();
-        QCOMPARE(permission.permissionType(), PermissionType::MediaAudioVideoCapture);
-        QCOMPARE(permission.origin(), kOrigin);
-
-        controller.answer(permission, true);
-        QCOMPARE(PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaAudioCapture),
-                 State::Granted);
-        QCOMPARE(PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaVideoCapture),
-                 State::Granted);
-        // Second request (a reload): no prompt — answered from the store.
         QSignalSpy loaded(&page, &QWebEnginePage::loadFinished);
+
         page.load(QUrl(u"wtest://app/"_s));
         QVERIFY(loaded.wait(10000));
-        QTest::qWait(1500);
-        QCOMPARE(prompts.count(), 1);
+        // Camera/mic are granted automatically for a WhatsApp client — no prompt.
+        QTRY_COMPARE_WITH_TIMEOUT(page.title(), u"granted"_s, 10000);
+        QCOMPARE(prompts.count(), 0);
+        QTRY_COMPARE(PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaVideoCapture),
+                     State::Granted);
+        QCOMPARE(PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaAudioCapture),
+                 State::Granted);
     }
 
-    void denialIsStoredToo()
+    void storedDenialIsHonouredWithoutPrompt()
     {
         DiskProfile p;
-        QWebEnginePage page(&p.profile);
-        PermissionController controller;
-        controller.attach(page);
-        QSignalSpy prompts(&controller, &PermissionController::promptRequested);
-        page.load(QUrl(u"wtest://app/"_s));
-        if (!prompts.wait(10000)) {
-            QSKIP("getUserMedia produced no permission request on this host");
-        }
-        controller.answer(prompts.first().first().value<QWebEnginePermission>(), false);
+        // User previously denied camera/mic (e.g. via the Settings toggles).
+        p.profile.queryPermission(kOrigin, PermissionType::MediaAudioCapture).deny();
+        p.profile.queryPermission(kOrigin, PermissionType::MediaVideoCapture).deny();
         QCOMPARE(
             PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaAudioVideoCapture),
             State::Denied);
-        QCOMPARE(PermissionController::storedState(p.profile, kOrigin, PermissionType::MediaAudioCapture),
-                 State::Denied);
+
+        QWebEnginePage page(&p.profile);
+        PermissionController controller;
+        controller.attach(page);
+        QSignalSpy prompts(&controller, &PermissionController::promptRequested);
+        QSignalSpy loaded(&page, &QWebEnginePage::loadFinished);
+        page.load(QUrl(u"wtest://app/"_s));
+        QVERIFY(loaded.wait(10000));
+        // getUserMedia is refused (no camera) and there is no prompt.
+        QTRY_VERIFY_WITH_TIMEOUT(page.title().startsWith(u"error:"_s), 10000);
+        QCOMPARE(prompts.count(), 0);
     }
 };
 

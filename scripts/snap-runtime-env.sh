@@ -50,5 +50,11 @@ whatsie_export_runtime_env() {
     export QTWEBENGINE_RESOURCES_PATH="$WHATSIE_RT/usr/share/qt6/resources"
     # This Qt build logs to journald when stderr is not a TTY; for dev runs we
     # want plain stderr (file-capturable).
+    # PipeWire (screen share via the portal): the runtime's libpipewire hardcodes
+    # the Debian SPA/module paths, which do not exist on non-Debian hosts, so
+    # pw_loop_new() fails ("can't make support.system handle") and Chromium
+    # segfaults. Point it at the matching plugins the runtime snap ships.
+    export SPA_PLUGIN_DIR="$WHATSIE_RT/usr/lib/x86_64-linux-gnu/spa-0.2"
+    export PIPEWIRE_MODULE_DIR="$WHATSIE_RT/usr/lib/x86_64-linux-gnu/pipewire-0.3"
     export QT_FORCE_STDERR_LOGGING=1
 }

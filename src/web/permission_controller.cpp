@@ -55,6 +55,14 @@ QList<PermissionType> PermissionController::relatedTypes(PermissionType type)
     }
 }
 
+namespace {
+bool isMediaType(PermissionType type)
+{
+    return type == PermissionType::MediaAudioCapture || type == PermissionType::MediaVideoCapture ||
+           type == PermissionType::MediaAudioVideoCapture;
+}
+} // namespace
+
 QString PermissionController::describe(PermissionType type)
 {
     switch (type) {
@@ -159,6 +167,19 @@ void PermissionController::handle(QWebEnginePermission permission)
         case State::Invalid:
             break;
         }
+    }
+
+    // Camera and microphone are core to a WhatsApp client and asking again in a
+    // call pop-out window (a fresh page) is jarring, so grant on first request
+    // and remember it — the user can still revoke via Settings -> Privacy, which
+    // is stored and honoured above. Geolocation still asks.
+    if (isMediaType(type)) {
+        qCInfo(lcWeb) << "media permission auto-granted:" << type << permission.origin();
+        permission.grant();
+        if (m_profile != nullptr) {
+            store(*m_profile, permission.origin(), type, true);
+        }
+        return;
     }
     qCInfo(lcWeb) << "permission prompt:" << type << permission.origin();
     Q_EMIT promptRequested(permission);

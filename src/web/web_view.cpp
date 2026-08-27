@@ -55,6 +55,9 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     m_permissions->attach(*m_page);
     connect(m_permissions, &PermissionController::promptRequested, this, &WebView::permissionPromptRequested);
     connect(m_page, &QWebEnginePage::desktopMediaRequested, this, &WebView::desktopMediaRequested);
+    // Call pop-out windows use a separate page on the same profile; give it the
+    // same permission answering and screen-share handling as the main view.
+    connect(m_page, &WebPage::popupOpened, this, &WebView::wirePopup);
 
     connect(&m_settings, &core::Settings::zoomFactorChanged, this, [this](double) { applyZoom(); });
     connect(&m_settings, &core::Settings::zoomFactorMaximizedChanged, this, [this](double) { applyZoom(); });
@@ -89,6 +92,18 @@ void WebView::refreshColorScheme()
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, !smooth);
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, smooth);
     qCInfo(lcWeb) << "colour scheme pushed to the page";
+}
+
+void WebView::wirePopup(QWidget* window)
+{
+    auto* popup = qobject_cast<PopupWindow*>(window);
+    if (popup == nullptr) {
+        return;
+    }
+    QWebEnginePage* page = popup->page();
+    m_permissions->attach(*page);
+    connect(page, &QWebEnginePage::desktopMediaRequested, this, &WebView::desktopMediaRequested);
+    qCInfo(lcWeb) << "wired pop-out window for media";
 }
 
 WebView::~WebView()

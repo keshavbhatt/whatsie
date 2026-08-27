@@ -63,6 +63,7 @@ protected:
 private:
     void applyZoom();
     void refreshColorScheme();
+    void wirePopup(QWidget* window);
     void handleTitleChanged(const QString& title);
     void handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status, int exitCode);
 

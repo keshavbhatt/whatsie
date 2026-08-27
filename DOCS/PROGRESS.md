@@ -5,6 +5,36 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Call pop-out media + PipeWire screen-share crash
+
+**Reported:** in a call moved to its own window the camera stays off until toggled, screen share
+does nothing; screen share sometimes segfaulted (`pw.loop: can't make support.system handle`).
+
+**Causes.**
+1. The pop-out window uses a separate page that never got the permission or `desktopMediaRequested`
+   wiring the main view has.
+2. Camera/mic did not pre-grant reliably, so the pop-out re-prompted (and the async prompt lost
+   the call's race).
+3. The runtime snap's libpipewire hardcodes the Debian SPA/module paths (absent on Arch), so
+   `pw_loop_new()` failed and Chromium segfaulted during portal screen capture.
+
+**Fixed.**
+- `WebView::wirePopup` attaches the PermissionController and forwards `desktopMediaRequested` for
+  every pop-out page, so calls in the detached window get camera and screen share. (Verified the
+  wiring is not the crash source: a two-full-instance test crashes with the wiring *disabled* too
+  — that is an artefact of loading two full WhatsApp apps, which a real call pop-out does not do.)
+- `PermissionController` now grants camera/mic on first request (a WhatsApp client) and stores it,
+  while still honouring an explicit deny from the Settings toggles; geolocation still asks.
+  `PermissionList` shows camera/mic checked by default. Verified: fresh profile, `getUserMedia`
+  auto-granted with zero prompts.
+- `scripts/snap-runtime-env.sh` sets `SPA_PLUGIN_DIR`/`PIPEWIRE_MODULE_DIR` to the runtime snap's
+  own plugins. Verified: `getDisplayMedia` returns a track, no `pw.loop` error, no segfault.
+
+18/18 tests pass (`tst_permissions` rewritten for auto-grant + honoured deny). **Owner to
+confirm:** camera + screen share inside a real "move to new window" call.
+
+---
+
 ## 2026-08-27 — Screen sharing: hand off to the portal on Wayland (fixes crash)
 
 **Reported:** starting a screen share showed three dialogs (two native portal pickers + our own)
