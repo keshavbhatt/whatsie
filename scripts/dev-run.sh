@@ -27,6 +27,11 @@ fi
 
 whatsie_prepare_runtime_farm "$BUILD"
 whatsie_export_runtime_env "$BUILD"
+# Route file dialogs and file opening through xdg-desktop-portal so they use
+# the system dialogs (the KDE platform-theme plugin is not in the runtime snap;
+# a host QT_QPA_PLATFORMTHEME like qt5ct would otherwise force Qt's own dialog).
+# The shipped snap/flatpak get the native theme from their runtime instead.
+export QT_QPA_PLATFORMTHEME="${QT_QPA_PLATFORMTHEME_OVERRIDE:-xdgdesktopportal}"
 export QT_LOGGING_RULES="${QT_LOGGING_RULES:-whatsie.*.debug=true}"
 
 [ "${1:-}" = "--" ] && shift

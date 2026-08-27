@@ -285,12 +285,11 @@ void MainWindow::showSettings()
     if (!m_settingsDialog) {
         const StoragePaths storage{m_webView->profile().cachePath(),
                                    m_webView->profile().persistentStoragePath()};
-        m_settingsDialog = new SettingsDialog(m_settings, m_tray->isAvailable(), storage, this);
+        m_settingsDialog =
+            new SettingsDialog(m_settings, m_tray->isAvailable(), storage, m_webView->profile(), this);
         m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_settingsDialog, &SettingsDialog::testNotificationRequested, m_notifications,
                 &NotificationHub::sendTest);
-        connect(m_settingsDialog, &SettingsDialog::resetPermissionsRequested, this,
-                &MainWindow::resetSitePermissions);
         connect(m_settingsDialog, &SettingsDialog::clearCacheRequested, this, &MainWindow::clearCache);
         connect(m_settingsDialog, &SettingsDialog::clearSessionRequested, this,
                 &MainWindow::confirmClearSession);
@@ -329,21 +328,6 @@ void MainWindow::handleRenderProcessGaveUp()
 }
 
 // ---- privacy & storage (FEATURES M1, P5) ----------------------------------
-
-void MainWindow::resetSitePermissions()
-{
-    int count = 0;
-    for (QWebEnginePermission permission : m_webView->profile().listAllPermissions()) {
-        if (permission.permissionType() != QWebEnginePermission::PermissionType::Notifications) {
-            permission.reset();
-            ++count;
-        }
-    }
-    qCInfo(lcUi) << "reset" << count << "site permissions";
-    QMessageBox::information(
-        this, tr("Permissions reset"),
-        tr("WhatsApp will ask again the next time it needs your camera, microphone or location."));
-}
 
 void MainWindow::clearCache()
 {

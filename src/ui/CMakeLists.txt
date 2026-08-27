@@ -22,6 +22,8 @@ qt_add_library(whatsie_ui STATIC
     main_window.h
     notification_hub.cpp
     notification_hub.h
+    permission_list.cpp
+    permission_list.h
     permission_prompt.cpp
     permission_prompt.h
     screen_picker_dialog.cpp

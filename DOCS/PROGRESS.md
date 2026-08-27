@@ -5,6 +5,36 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Call permissions round 2 + settings polish
+
+**Reported:** call permissions still messy ("if the user can't allow in time it's treated denied
+and they never see the dialog again this session"); note-only permission UI shows nothing and
+can't be toggled; Settings → Open log folder does nothing; WhatsApp file attach opens Qt's own
+dialog, not the system one; Advanced tab layout overlaps (screenshot).
+
+**Fixed**
+- **Calls (ADR-022):** camera/mic (and Notifications) pre-granted for web.whatsapp.com at
+  start-up while still undecided → `navigator.permissions.query` returns granted, no prompt, no
+  timeout, no "address-bar icon" modal. Verified on a fresh profile: `{camera:granted,
+  microphone:granted}`.
+- **Permission UI:** new `ui::PermissionList` — real Camera/Microphone/Location toggles bound to
+  the permission store; replaces the note + "Reset permissions" button (and its MainWindow
+  plumbing).
+- **Open log folder / reveal:** `platform::openDirectory` now uses the xdg-desktop-portal
+  `OpenURI` D-Bus call (no spawned child, works under confinement and in dev); QDesktopServices
+  fallback. Reveal keeps FileManager1 ShowItems.
+- **System file dialog:** `scripts/dev-run.sh` sets `QT_QPA_PLATFORMTHEME=xdgdesktopportal` so
+  file dialogs use the portal (system) chooser — the KDE platform-theme plugin is absent from
+  the runtime snap and a host `qt5ct` theme forced Qt's own dialog. Shipped snap/flatpak get the
+  native theme from their runtime.
+- **Advanced tab overlap:** word-wrapped notes moved out of the `QFormLayout` field column into
+  the group's `QVBoxLayout` (a wrapped label in a form field mis-sizes and overlaps the next
+  row).
+
+18/18 tests pass. **Owner to confirm:** a real call, attach-document dialog, Open log folder.
+
+---
+
 ## 2026-08-27 — Call permissions: persisted and asked once
 
 **Reported:** theme works; "call permissions are still messy". Logs showed the camera/mic grant

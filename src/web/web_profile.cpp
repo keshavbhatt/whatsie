@@ -52,10 +52,26 @@ void WebProfile::configureStorage()
     setHttpCacheType(QWebEngineProfile::DiskHttpCache);
     setPersistentPermissionsPolicy(QWebEngineProfile::PersistentPermissionsPolicy::StoreOnDisk);
 
-    // FEATURES N11: pre-grant so WhatsApp never shows its "notifications are
-    // off" banner (W#307).
-    queryPermission(QUrl(u"https://web.whatsapp.com"_s), QWebEnginePermission::PermissionType::Notifications)
-        .grant();
+    // Pre-grant the permissions a WhatsApp client needs so the page never has
+    // to prompt for its own origin. Notifications: avoids WhatsApp's "off"
+    // banner (W#307). Camera + microphone: WhatsApp requests them the instant a
+    // call starts and treats a slow/late answer as a denial for the rest of the
+    // session, then shows a misleading "click the address-bar icon" modal (no
+    // address bar exists here). Pre-granting makes navigator.permissions.query
+    // return "granted" and getUserMedia resolve immediately — calls just work.
+    // The OS still controls the physical devices, and Settings → Reset
+    // permissions clears these (ADR-022).
+    // Only when still undecided, so a later user choice (Settings → Privacy
+    // toggles) is never overridden on the next launch.
+    const QUrl origin(u"https://web.whatsapp.com"_s);
+    using PermissionType = QWebEnginePermission::PermissionType;
+    for (const PermissionType type : {PermissionType::Notifications, PermissionType::MediaAudioCapture,
+                                      PermissionType::MediaVideoCapture}) {
+        QWebEnginePermission permission = queryPermission(origin, type);
+        if (permission.state() == QWebEnginePermission::State::Ask) {
+            permission.grant();
+        }
+    }
 }
 
 QStringList WebProfile::storageRoots() const

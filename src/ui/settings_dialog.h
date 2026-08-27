@@ -9,6 +9,7 @@ class QLabel;
 class QLineEdit;
 class QSpinBox;
 class QTabWidget;
+class QWebEngineProfile;
 
 namespace whatsie::core {
 class Settings;
@@ -33,12 +34,11 @@ class SettingsDialog : public QDialog
 
 public:
     SettingsDialog(core::Settings& settings, bool trayAvailable, StoragePaths storage,
-                   QWidget* parent = nullptr);
+                   QWebEngineProfile& profile, QWidget* parent = nullptr);
     ~SettingsDialog() override = default;
 
 Q_SIGNALS:
     void testNotificationRequested();
-    void resetPermissionsRequested();
     void clearCacheRequested();
     void clearSessionRequested();
 
@@ -54,6 +54,7 @@ private:
     core::Settings& m_settings;
     bool m_trayAvailable;
     StoragePaths m_storage;
+    QWebEngineProfile& m_profile;
 
     QTabWidget* m_tabs = nullptr;
     QComboBox* m_closeAction = nullptr;

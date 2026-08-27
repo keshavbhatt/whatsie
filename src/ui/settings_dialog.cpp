@@ -5,6 +5,8 @@
 #include "core/settings/settings.h"
 #include "core/storage_policy.h"
 #include "core/zoom_policy.h"
+#include "platform/file_manager.h"
+#include "ui/permission_list.h"
 
 #include <QCheckBox>
 #include <QComboBox>
@@ -34,11 +36,12 @@ using whatsie::core::Theme;
 namespace whatsie::ui {
 
 SettingsDialog::SettingsDialog(core::Settings& settings, bool trayAvailable, StoragePaths storage,
-                               QWidget* parent)
+                               QWebEngineProfile& profile, QWidget* parent)
     : QDialog(parent)
     , m_settings(settings)
     , m_trayAvailable(trayAvailable)
     , m_storage(std::move(storage))
+    , m_profile(profile)
 {
     setupUi();
     loadValues();
@@ -211,16 +214,15 @@ QWidget* SettingsDialog::buildPrivacyTab()
     auto* page = new QWidget(this);
     auto* outer = new QVBoxLayout(page);
 
-    auto* permBox = new QGroupBox(tr("Site permissions"), page);
+    auto* permBox = new QGroupBox(tr("What WhatsApp may use"), page);
     auto* pl = new QVBoxLayout(permBox);
-    auto* permNote = new QLabel(tr("Camera, microphone and location decisions are remembered. "
-                                   "Reset them to be asked again."),
+    auto* permNote = new QLabel(tr("Camera and microphone are on by default so calls work without a "
+                                   "prompt. Turn anything off here."),
                                 permBox);
     permNote->setWordWrap(true);
-    auto* resetPerms = new QPushButton(tr("Reset permissions"), permBox);
-    connect(resetPerms, &QPushButton::clicked, this, &SettingsDialog::resetPermissionsRequested);
+    permNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
     pl->addWidget(permNote);
-    pl->addWidget(resetPerms, 0, Qt::AlignLeft);
+    pl->addWidget(new PermissionList(m_profile, QUrl(u"https://web.whatsapp.com"_s), permBox));
     outer->addWidget(permBox);
 
     auto* storageBox = new QGroupBox(tr("Storage"), page);
@@ -246,8 +248,12 @@ QWidget* SettingsDialog::buildPrivacyTab()
     sform->addRow(QString(), buttons);
     outer->addWidget(storageBox);
 
+    // Notes and buttons live in the QVBoxLayout, not in the QFormLayout: a
+    // word-wrapped label placed in a form's field column mis-sizes and overlaps
+    // the next row.
     auto* advBox = new QGroupBox(tr("Advanced"), page);
-    auto* aform = new QFormLayout(advBox);
+    auto* av = new QVBoxLayout(advBox);
+    auto* aform = new QFormLayout;
     m_hardwareAcceleration = new QComboBox(advBox);
     m_hardwareAcceleration->addItem(tr("Automatic"), static_cast<int>(HardwareAcceleration::Auto));
     m_hardwareAcceleration->addItem(tr("Always on (ignore GPU blocklist)"),
@@ -258,22 +264,25 @@ QWidget* SettingsDialog::buildPrivacyTab()
             static_cast<HardwareAcceleration>(m_hardwareAcceleration->itemData(index).toInt()));
     });
     aform->addRow(tr("Hardware acceleration:"), m_hardwareAcceleration);
+    av->addLayout(aform);
+
     auto* hwNote =
         new QLabel(tr("Takes effect after restarting Whatsie. Turn off if the window stays blank."), advBox);
     hwNote->setWordWrap(true);
     hwNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
-    aform->addRow(QString(), hwNote);
+    av->addWidget(hwNote);
 
     const QString logPath = core::LogSink::logFilePath();
-    auto* logLabel = new QLabel(logPath.isEmpty() ? tr("disabled (--no-log-file)") : logPath, advBox);
+    auto* logLabel = new QLabel(
+        tr("Log file: %1").arg(logPath.isEmpty() ? tr("disabled (--no-log-file)") : logPath), advBox);
     logLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     logLabel->setWordWrap(true);
-    aform->addRow(tr("Log file:"), logLabel);
-    auto* openLog = new QPushButton(tr("Open log folder"), advBox);
+    av->addWidget(logLabel);
+    auto* openLog = new QPushButton(QIcon::fromTheme(u"folder-open"_s), tr("Open log folder"), advBox);
     openLog->setEnabled(!logPath.isEmpty());
     connect(openLog, &QPushButton::clicked, this,
-            [logPath] { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(logPath).absolutePath())); });
-    aform->addRow(QString(), openLog);
+            [logPath] { platform::openDirectory(QFileInfo(logPath).absolutePath()); });
+    av->addWidget(openLog, 0, Qt::AlignLeft);
     outer->addWidget(advBox);
     outer->addStretch();
     return page;

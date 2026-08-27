@@ -63,7 +63,6 @@ private:
     void setFullScreenMode(bool on);
     void handleUnread(int count);
     void handleRenderProcessGaveUp();
-    void resetSitePermissions();
     void clearCache();
     void confirmClearSession();
 

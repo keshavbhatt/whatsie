@@ -108,7 +108,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| M1 | Camera / mic / notification / geolocation permissions (`QWebEnginePermission`), persisted, reviewable | dialog inert | works | CORE | Calls (W#287). | **KEEP** | done |
+| M1 | Camera / mic / notification / geolocation permissions (`QWebEnginePermission`), persisted, reviewable | dialog inert | works | CORE | Calls (W#287). | **KEEP** | done (pre-grant + PermissionList toggles; ADR-022) |
 | M2 | Screen-share picker + PipeWire flag | no | yes | CORE | | **KEEP** | done |
 | M3 | Call pop-out window kept in-app, closable | orphan page | yes | CORE | W#333. | **KEEP** | done |
 | M4 | External links → system browser | yes | yes | CORE | | **KEEP** | done |

@@ -206,6 +206,23 @@ listeners and its CSS `@media` rules follow). `theme-preload.js` was removed. `T
 ignores `colorSchemeChanged` while an explicit theme is set (the signal is our own override).
 A pure `matchMedia` shim was tried and rejected: it only moves the JS-driven parts.
 
+## ADR-022 — Camera/microphone pre-granted for WhatsApp; per-permission toggles (2026-08-27)
+
+**Context.** Owner testing: on a video call WhatsApp shows "Allow camera and microphone — click
+the icon next to the address bar" (there is no address bar). Cause: WhatsApp checks
+`navigator.permissions.query` / calls `getUserMedia` the instant a call starts and treats a
+slow or timed-out answer as a denial *for the whole session*, then shows that modal and never
+re-asks. An async Allow/Deny prompt cannot win that race. The owner also noted the note-only
+"Site permissions" UI didn't show or let them change what was granted.
+
+**Decision.** `WebProfile` pre-grants Notifications, camera and microphone for
+`https://web.whatsapp.com` at start-up, but only while the state is still *Ask*, so an explicit
+user choice is never overridden. `navigator.permissions.query` then returns "granted" and calls
+work with no prompt. Settings → Privacy shows a `ui::PermissionList` of real toggles (Camera,
+Microphone, Location) bound to `QWebEngineProfile::queryPermission().grant()/deny()` — replacing
+whatsie's inert checkbox table (LESSONS A2) and the blanket "Reset permissions" button. The OS
+still gates the physical devices. Geolocation stays *Ask* (prompted on demand).
+
 ## ADR-021 — SharedArrayBuffer enabled for WhatsApp calls (2026-08-27)
 
 **Context.** "Your browser doesn't support calling" (also whatly Y#97). WhatsApp's
