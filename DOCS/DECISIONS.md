@@ -207,10 +207,36 @@ Light/Dark choice and `unsetColorScheme()` for System. Qt WebEngine copies that 
 Blink's web preferences only when settings are applied (at start-up — verified: neither a
 platform change nor a reload updates it), so `web::WebView::refreshColorScheme()` toggles a
 `QWebEngineSettings` attribute after every scheme change to force a re-apply. Result: WhatsApp
-switches instantly, no reload, no script touches its storage (both its JS `matchMedia`
+(REVISED by ADR-026 — the QStyleHints override does not survive a portal/KDE platform theme, so the page is now themed by theme-control.js; the note below describes the original approach.) switches instantly, no reload, no script touches its storage (both its JS `matchMedia`
 listeners and its CSS `@media` rules follow). `theme-preload.js` was removed. `ThemeService`
 ignores `colorSchemeChanged` while an explicit theme is set (the signal is our own override).
 A pure `matchMedia` shim was tried and rejected: it only moves the JS-driven parts.
+
+## ADR-026 — WhatsApp theme is forced at the page level, not via QStyleHints (2026-08-27)
+
+**Context.** ADR-020 pushed the colour scheme by calling `QStyleHints::setColorScheme()` and
+re-applying web settings so Blink re-reads `prefers-color-scheme`. Owner re-test: an explicit
+Light/Dark did nothing while System-follow worked. CDP proved why — with a portal/KDE QPA
+platform theme active, the platform theme *manages* `QStyleHints::colorScheme()` from the desktop
+and immediately overrides our app-level `setColorScheme()`, so it never reaches Blink. (The dev
+run forces `QT_QPA_PLATFORMTHEME=xdgdesktopportal`; the shipped snap's KDE platform theme does the
+same.) CDP also showed WhatsApp's dark styling is keyed on a **`dark` class on `<body>`** (removing
+it themes the page instantly, and WA does not re-add it), set from its own `matchMedia` read.
+
+**Decision.** Theme the page directly. `theme-control.js` (a DocumentCreation bootstrap script)
+replaces `window.matchMedia` so `prefers-color-scheme` queries return the app's chosen scheme,
+and toggles the `body.dark` class (plus `localStorage.theme`) to match. Config arrives as
+`__whatsie.config.colorScheme` (`system`/`light`/`dark`); `window.__whatsieSetTheme(mode)` applies
+live changes, called from `WebView::applyThemeLive()` on `Settings::themeChanged` and on every
+`loadFinished`. `system` clears the override so WA follows the real OS scheme — the one path that
+already worked. `ThemeService` + `ThemeApplier` still drive the **Qt widgets** (settings dialog,
+tray, dialogs) via `setColorScheme`; only the web page moved to script control.
+
+**Consequences.** Explicit Light/Dark now works regardless of platform theme, live, no reload
+(verified via CDP: light/dark/system all flip `body.class` and background instantly). The
+`matchMedia` shim that ADR-020 rejected is viable here precisely because WA's CSS is class-driven,
+not `@media`-driven — confirmed empirically. The `ScrollAnimatorEnabled` re-push (ADR-020) stays
+only to update the real `prefers-color-scheme` for System mode.
 
 ## ADR-024 — Interface scale, tray-less Settings access, and the expert flags hatch (2026-08-27)
 

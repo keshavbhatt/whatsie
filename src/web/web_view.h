@@ -72,6 +72,7 @@ private:
     void handleConnectionChanged(bool up);
     void checkWatchdog();
     void applyBlurLive();
+    void applyThemeLive();
     bool maybeHandleDrop(class QObject* watched, class QEvent* event);
     void handleFileDrop(const QStringList& paths);
 

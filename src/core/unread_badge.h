@@ -18,4 +18,8 @@ namespace whatsie::core {
 /// the tray icon while disconnected (FEATURES T6).
 [[nodiscard]] QImage dimImage(const QImage& image, qreal amount);
 
+/// Recolours `image` to `color`, keeping its alpha (silhouette) — turns the
+/// symbolic-icon glyph into a visible foreground for the tray (FEATURES T3).
+[[nodiscard]] QImage tintImage(const QImage& image, const QColor& color);
+
 } // namespace whatsie::core

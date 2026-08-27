@@ -1,12 +1,14 @@
 #pragma once
 
+#include <QString>
 #include <QWebEngineProfile>
 
 #include <memory>
 
 namespace whatsie::core {
 class Settings;
-}
+enum class Theme;
+} // namespace whatsie::core
 
 namespace whatsie::web {
 
@@ -37,6 +39,7 @@ private:
     void configureUserAgent();
     void configureAttributes();
     void installBootstrap();
+    static QString themeName(core::Theme theme);
 
     core::Settings& m_settings;
     std::unique_ptr<Bridge> m_bridge;

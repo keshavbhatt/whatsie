@@ -81,7 +81,7 @@ void MainWindow::setupUi()
     m_themeApplier = new ThemeApplier(m_theme, this);
     m_actions = new Actions(this);
     m_dnd = new core::DndController(this);
-    m_tray = new TrayController(m_settings, *m_dnd, *m_actions, this);
+    m_tray = new TrayController(m_settings, m_theme, *m_dnd, *m_actions, this);
     setWindowIcon(m_tray->currentIcon());
 
     m_webView = new web::WebView(m_settings, m_theme, this);
@@ -362,9 +362,9 @@ void MainWindow::showAbout()
     dialog.exec();
 }
 
-// FEATURES A11: a small settings button floating over the web view, so users
-// without a system tray (their only other route to Settings) still have one.
-// It only appears when the tray is unavailable, to avoid cluttering the UI.
+// FEATURES A11: a small settings button floating over the web view — a reliable
+// route to Settings that never depends on a system tray. Shown always (owner
+// request), since our web UI has no in-page settings affordance of its own.
 void MainWindow::createSettingsButton()
 {
     m_settingsButton = new QToolButton(m_webView);
@@ -381,7 +381,7 @@ void MainWindow::createSettingsButton()
         u"QToolButton{background:rgba(0,0,0,0.45);border:none;border-radius:16px;padding:6px;}"
         "QToolButton:hover{background:rgba(0,0,0,0.70);}"_s);
     connect(m_settingsButton, &QToolButton::clicked, this, &MainWindow::showSettings);
-    m_settingsButton->setVisible(!m_tray->isAvailable());
+    m_settingsButton->setVisible(true); // always available (owner request), tray or not
     m_webView->installEventFilter(this);
     repositionSettingsButton();
 }

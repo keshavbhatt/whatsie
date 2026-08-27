@@ -17,4 +17,5 @@ JavaScript injected into WhatsApp Web. Rules (see `DOCS/CODING_STANDARDS.md` §7
 | File | Injection | Feature |
 |---|---|---|
 | `bootstrap.js` | DocumentCreation (bundled with config + qwebchannel.js) | infrastructure |
+| `theme-control.js` | DocumentCreation (bundled) | A1 (page-level theme, ADR-026) |
 | `storage-persist.js` | DocumentCreation (bundled) | S1 |

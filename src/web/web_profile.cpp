@@ -36,6 +36,7 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     // Rebake the config so newly loaded pages start at the current blur level;
     // WebView applies it live to the already-loaded page.
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { installBootstrap(); });
+    connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { installBootstrap(); });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
 
@@ -95,12 +96,27 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
 }
 
+QString WebProfile::themeName(core::Theme theme)
+{
+    switch (theme) {
+    case core::Theme::Light:
+        return u"light"_s;
+    case core::Theme::Dark:
+        return u"dark"_s;
+    case core::Theme::System:
+        break;
+    }
+    return u"system"_s;
+}
+
 void WebProfile::installBootstrap()
 {
-    // Config passed to injected scripts as window.__whatsie.config. The theme is
-    // NOT here (WhatsApp follows prefers-color-scheme, ADR-020).
+    // Config passed to injected scripts as window.__whatsie.config. theme-control.js
+    // forces an explicit colorScheme at the page level; "system" lets WhatsApp
+    // follow the OS prefers-color-scheme (ADR-020, revised by ADR-026).
     m_scripts->installBootstrap(QJsonObject{
         {u"blurLevel"_s, m_settings.messageBlurLevel()},
+        {u"colorScheme"_s, themeName(m_settings.theme())},
     });
 }
 

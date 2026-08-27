@@ -5,6 +5,29 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M5 batch A fixes: page-level theme, symbolic icon, always-on Settings button
+
+Owner test feedback on batch A, all fixed and verified live via CDP:
+
+- **Theme toggle regressed (explicit Light/Dark did nothing).** Root cause found with CDP: a
+  portal/KDE QPA platform theme manages `QStyleHints::colorScheme()` and overrides our app-level
+  `setColorScheme()`, so it never reached Blink — only System-follow worked. WhatsApp's dark
+  styling is keyed on a `body.dark` class (removing it themes instantly). Fixed by theming the
+  page directly: `theme-control.js` replaces `window.matchMedia` for `prefers-color-scheme` and
+  toggles `body.dark`; `WebView::applyThemeLive()` pushes the mode on `themeChanged`/`loadFinished`;
+  config carries `colorScheme`. Qt widgets still use QStyleHints. **Verified live**: explicit Light
+  stays light on a Dark desktop; live dark/light/system flips are instant, no reload. See ADR-026.
+- **Symbolic tray icon looked bad** — the SVG is a solid-black glyph, invisible on dark panels.
+  Now recoloured to the effective scheme's foreground via the pure/tested `core::tintImage()`
+  (light glyph in dark mode, dark in light), reacting to scheme changes.
+- **A11 Settings button** now always visible (was tray-less only), per owner.
+
+Tests 19/19 (adds `tintImage` coverage). clang-format clean. CDP method: launch with
+`QTWEBENGINE_REMOTE_DEBUGGING`, drive the desktop scheme with `plasma-apply-colorscheme`, read
+`matchMedia`/`body.class`/background through `scripts/cdp-eval.mjs`.
+
+---
+
 ## 2026-08-27 — M5 batch A: autostart, shortcuts, tray options, interface scale, tray-less Settings
 
 Version bumped **5.0.0 → 6.0.0** (original whatsie is already at 5.1.0): `project(VERSION)` and

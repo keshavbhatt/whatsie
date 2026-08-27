@@ -86,7 +86,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done (via QStyleHints → prefers-color-scheme, instant; ADR-020) |
+| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page themed by theme-control.js (body `dark` class); System follows OS. | **KEEP** | done (page-level, instant, no reload; ADR-026) |
 | A2 | Live follow-system-theme | no (W#157) | portal | CORE | `QStyleHints::colorSchemeChanged`; portal fallback. | **KEEP** | done |
 | A3 | Push theme into running page (React fiber, WA modules) | yes | yes | DROP | Reload on theme change instead. | **DROP** | dropped |
 | A4 | Automatic sunrise/sunset theme | yes (bugs) | yes (680 LOC) | DROP | | **DROP** | dropped |
@@ -96,7 +96,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | done |
 | A9 | Custom CSS file (covers wallpaper / font override) | no (W#182, 277, 219) | yes | LATER | | **DROP** | dropped |
 | A10 | Chat colour themes (14) | no | yes | DROP | | **DROP** | dropped |
-| A11 | In-window Settings button (tray-less access) | no | yes | DROP→KEEP | Owner 2026-08-27: app-chrome overlay button, **not** DOM nav-rail injection. Shows when no tray. | **KEEP** | done |
+| A11 | In-window Settings button | no | yes | DROP→KEEP | Owner 2026-08-27: app-chrome overlay button, **not** DOM nav-rail injection. Always shown (owner). | **KEEP** | done |
 | A12 | Chat-list collapse to avatar strip | no (W#159, 331) | yes (800 LOC) | DROP | | **DROP** | dropped |
 | A13 | Muted-updates hide / focus mode / HD AB flag / linked-device name patch | no | yes | DROP | | **DROP** | dropped |
 | A14 | Smooth scrolling (`ScrollAnimatorEnabled`) — **setting, default OFF** | no (W#178) | yes | NICE | Owner: expose as option, off by default. | **KEEP** | — (attr default off in skeleton) |

@@ -1,5 +1,6 @@
 #include "core/unread_badge.h"
 
+#include <QColor>
 #include <QFont>
 #include <QPainter>
 #include <QRegularExpression>
@@ -78,6 +79,21 @@ QImage dimImage(const QImage& image, qreal amount)
             line[x] = qRgba(r, g, b, static_cast<int>(alpha * (1.0 - 0.35 * a)));
         }
     }
+    return out;
+}
+
+QImage tintImage(const QImage& image, const QColor& color)
+{
+    if (image.isNull()) {
+        return image;
+    }
+    QImage out(image.size(), QImage::Format_ARGB32_Premultiplied);
+    out.fill(Qt::transparent);
+    QPainter painter(&out);
+    painter.drawImage(0, 0, image);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    painter.fillRect(out.rect(), color);
+    painter.end();
     return out;
 }
 

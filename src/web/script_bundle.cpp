@@ -37,10 +37,10 @@ QString ScriptBundle::readResource(const QString& resourcePath)
 QStringList ScriptBundle::bootstrapResources()
 {
     return {
-        u":/qtwebchannel/qwebchannel.js"_s, u":/scripts/bootstrap.js"_s,
-        u":/scripts/storage-persist.js"_s,  u":/scripts/connection-watchdog.js"_s,
-        u":/scripts/sw-recovery.js"_s,      u":/scripts/privacy-blur.js"_s,
-        u":/scripts/file-drop.js"_s,
+        u":/qtwebchannel/qwebchannel.js"_s,    u":/scripts/bootstrap.js"_s,
+        u":/scripts/theme-control.js"_s,       u":/scripts/storage-persist.js"_s,
+        u":/scripts/connection-watchdog.js"_s, u":/scripts/sw-recovery.js"_s,
+        u":/scripts/privacy-blur.js"_s,        u":/scripts/file-drop.js"_s,
     };
 }
 

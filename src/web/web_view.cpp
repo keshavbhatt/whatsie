@@ -79,6 +79,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
         if (ok) {
             m_crashPolicy.onLoadSucceeded();
             applyBlurLive();
+            applyThemeLive();
         }
     });
 
@@ -101,6 +102,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     }
 
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { applyBlurLive(); });
+    connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { applyThemeLive(); });
     connect(m_page, &QWebEnginePage::fullScreenRequested, this, [this](QWebEngineFullScreenRequest request) {
         request.accept();
         Q_EMIT fullScreenRequested(request.toggleOn());
@@ -240,6 +242,26 @@ void WebView::applyBlurLive()
     m_page->runJavaScript(
         u"window.__whatsieSetBlur && window.__whatsieSetBlur(%1)"_s.arg(m_settings.messageBlurLevel()),
         QWebEngineScript::MainWorld);
+}
+
+void WebView::applyThemeLive()
+{
+    // WhatsApp is themed at the page level because the platform theme overrides
+    // QStyleHints::setColorScheme before it reaches Blink (ADR-026).
+    QString mode;
+    switch (m_settings.theme()) {
+    case core::Theme::Light:
+        mode = u"light"_s;
+        break;
+    case core::Theme::Dark:
+        mode = u"dark"_s;
+        break;
+    case core::Theme::System:
+        mode = u"system"_s;
+        break;
+    }
+    m_page->runJavaScript(u"window.__whatsieSetTheme && window.__whatsieSetTheme('%1')"_s.arg(mode),
+                          QWebEngineScript::MainWorld);
 }
 
 void WebView::loadWhatsApp()

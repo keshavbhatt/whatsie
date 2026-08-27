@@ -1,5 +1,6 @@
 #include "core/unread_badge.h"
 
+#include <QColor>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -81,6 +82,27 @@ private Q_SLOTS:
     }
 
     void dimImageNullPassesThrough() { QVERIFY(dimImage(QImage(), 0.5).isNull()); }
+
+    void tintImageRecoloursKeepingAlpha()
+    {
+        // A half-transparent black square tinted red: RGB becomes red, alpha kept.
+        QImage src(4, 4, QImage::Format_ARGB32);
+        src.fill(QColor(0, 0, 0, 128));
+        const QImage out = tintImage(src, QColor(Qt::red));
+        const QColor px = out.pixelColor(1, 1);
+        QCOMPARE(px.alpha(), 128);
+        QVERIFY(px.red() > 200 && px.green() < 40 && px.blue() < 40);
+    }
+
+    void tintImageFullyTransparentStaysTransparent()
+    {
+        QImage src(4, 4, QImage::Format_ARGB32);
+        src.fill(Qt::transparent);
+        const QImage out = tintImage(src, QColor(Qt::green));
+        QCOMPARE(out.pixelColor(2, 2).alpha(), 0);
+    }
+
+    void tintImageNullPassesThrough() { QVERIFY(tintImage(QImage(), Qt::white).isNull()); }
 
 private:
     static QImage solid(int size, const QColor& color)
