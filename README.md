@@ -12,8 +12,9 @@ project keeps the good parts of both and stays small. The reasoning is in
 ## Status
 
 Milestone **M0 — Foundation** is done: layered CMake scaffold, settings facade, WebEngine
-profile/page/view, tests, dev scripts, and the full documentation set. Feature work starts
-after the scope review. See [`DOCS/PROGRESS.md`](DOCS/PROGRESS.md).
+profile/page/view, tests, dev scripts, and the full documentation set. Scope has been decided
+(Linux + Windows, ~24 settings, no automation/AI features). Next: M1, the usable shell. See
+[`DOCS/PROGRESS.md`](DOCS/PROGRESS.md) and [`DOCS/ROADMAP.md`](DOCS/ROADMAP.md).
 
 ## Build
 

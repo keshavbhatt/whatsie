@@ -58,7 +58,8 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::ScreenCaptureEnabled, true);
     s->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
     s->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, true);
+    // FEATURES A14: user option, off by default (wired to Settings in M1).
+    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, false);
     s->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
 }
 

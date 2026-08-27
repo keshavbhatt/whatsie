@@ -45,7 +45,7 @@ Goal: replaces whatsie for daily use *without* notifications yet.
 | N1, D5 | `core::INotifier`; `platform::linux::FreedesktopNotifier` (QDBus, id tracking, `image-data` RGBA8888, `desktop-entry`, `category`, actions); identicon with stable hash; unit tests with a fake D-Bus interface. |
 | N6, N11, N10 | Presenter wiring on the profile; auto-grant Notification permission; click → raise (chat focus delegated to WA's own `onclick`). |
 | N5, N7 (if KEEP) | sound hint; manual DND in tray. |
-| N2 (if OQ-3 = yes) | `platform::windows::TrayNotifier`. |
+| N2 | `platform::windows::TrayNotifier` (can land in M6 if Windows CI is not ready). |
 
 **Exit:** GNOME + KDE show native notifications with avatar; clicking raises the window;
 unrelated notification clicks do nothing (regression test on id matching).
@@ -80,17 +80,28 @@ dialog, paste and (if KEEP) drag-drop; theme survives restart 20/20 times (scrip
 
 **Exit:** `snap install whatsie --edge` works on a clean Ubuntu 24.04 VM; Flatpak builds locally.
 
-## M5 — Approved extras
+## M5 — Approved extras (decided 2026-08-27)
 
-Whatever the owner marks `KEEP` among NICE/LATER: app lock (P1, hardened), autostart (P4),
-proxy (P3), spell check (L1/L2), shortcuts (S24, S26), translations (S27), wa.me links (S11),
-tray options (T3, T5, T6), font scale (A7), custom CSS (A9), unread launcher badge (T8).
-Each is its own small PR with tests and a `FEATURES.md` status update.
+Each is its own small PR with tests and a `FEATURES.md` status update. Order by value/cost:
 
-## M6 — Windows / macOS (if OQ-3 = yes)
+1. **Spell check** L1 (system-language `.bdic` at build) → L2 (on-demand download list). ADR-017.
+2. **Autostart** P4 (XDG desktop entry; Windows registry in M6).
+3. **Proxy** P3 + proxy-auth dialog M12b.
+4. **Privacy blur** A8; **interface scale** A7; **smooth scrolling option** A14 (default off).
+5. **Tray options** T3 (symbolic icon), T5 (hide tray), T6 (connection-dim, needs S13).
+6. **DND** N7 (manual), **sound hint** N5, **portal notifications** N3.
+7. **Shortcuts sheet** S26; **wa.me / invite links** S11.
+8. **App lock** P1, hardened per ADR-015 — last, because it touches every window and the IPC layer.
 
-Platform backends: notifications (N2), autostart, tray quirks, installer (MSI + SignPath per
-W#325), macOS bundle + LaunchAgent. No `#ifdef` inside business logic (ADR-003).
+Planned after v1 (LATER): S23 global hotkey (portal), T8 launcher badge, P8 unload-when-hidden,
+X2 account tabs.
+
+## M6 — Windows (ADR-016)
+
+`platform/windows/` backends: notifications (N2, tray toast), autostart (registry), tray
+click focus grace (T4), taskbar badge (T8, later). Packaging: MSI with bundled MSVC runtime
+(Y#68), SignPath signing (W#325), `windeployqt`; CI job on `windows-latest` with Qt 6.11
+msvc2022_64. No `#ifdef` inside business logic (ADR-003). macOS is out of scope.
 
 ## Release criteria for 5.0.0
 

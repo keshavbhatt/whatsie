@@ -7,7 +7,9 @@ inline constexpr auto kVersion = "@WHATSIE_VERSION@";
 inline constexpr auto kGitRevision = "@WHATSIE_GIT_REVISION@";
 inline constexpr auto kApplicationName = "whatsie";
 inline constexpr auto kDisplayName = "Whatsie";
-inline constexpr auto kOrganizationName = "org.keshavbhatt";
-inline constexpr auto kOrganizationDomain = "keshavbhatt.org";
+// ADR-014: settings/data paths derive from these; desktop id is kDesktopId.
+inline constexpr auto kOrganizationName = "ktechpit";
+inline constexpr auto kOrganizationDomain = "ktechpit.com";
+inline constexpr auto kDesktopId = "com.ktechpit.whatsie";
 
 } // namespace whatsie::app::version

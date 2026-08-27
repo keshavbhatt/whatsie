@@ -19,7 +19,7 @@ Application::Application(int& argc, char** argv)
     setApplicationVersion(QString::fromLatin1(version::kVersion));
     setOrganizationName(QString::fromLatin1(version::kOrganizationName));
     setOrganizationDomain(QString::fromLatin1(version::kOrganizationDomain));
-    setDesktopFileName(u"org.keshavbhatt.whatsie"_s);
+    setDesktopFileName(QString::fromLatin1(version::kDesktopId));
     setQuitOnLastWindowClosed(true);
 
     // Settings must be created after the identity is set (QSettings derives

@@ -4,7 +4,7 @@ Everything about the rewrite lives here. If it is not in `DOCS/`, it did not hap
 
 | File | What it is | Who edits it |
 |---|---|---|
-| [`FEATURES.md`](FEATURES.md) | Feature diff whatsie ↔ whatly ↔ proposal. **The scope contract.** Owner fills `Decision`; implementer updates `Status`. | owner + implementer |
+| [`FEATURES.md`](FEATURES.md) | Feature diff whatsie ↔ whatly ↔ decision. **The scope contract.** Decisions are taken by the owner via interactive review (not by hand-editing); implementer records them and updates `Status`. | owner (decides) + implementer (records) |
 | [`ROADMAP.md`](ROADMAP.md) | Milestones M0–M6 with feature rows and exit criteria. | implementer |
 | [`PROGRESS.md`](PROGRESS.md) | Session-by-session log + milestone status table. Newest first. | implementer, every session |
 | [`CODING_STANDARDS.md`](CODING_STANDARDS.md) | Binding Qt 6 / C++20 rules: layout, naming, ownership, Qt idioms, WebEngine/JS rules, tests, git. | rarely; via ADR |

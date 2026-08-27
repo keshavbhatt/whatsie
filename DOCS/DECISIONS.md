@@ -135,14 +135,39 @@ option (M1). CI builds Linux with `WHATSIE_WERROR=ON` and runs the suite.
 **Decision.** A feature is implemented only when its row in `DOCS/FEATURES.md` is marked
 **Approved**. Rows are proposed by the analysis, decided by the owner.
 
+## ADR-014 — Application id `com.ktechpit.whatsie` (owner, 2026-08-27)
+
+**Context.** whatsie's desktop/AppStream id was `com.ktechpit.whatsie` while its settings lived
+under `org.keshavnrj.ubuntu/WhatSie`. Store continuity (Flathub, snap) favours the existing id.
+
+**Decision.** Desktop file / AppStream / snap / flatpak id: `com.ktechpit.whatsie`.
+`organizationName = "ktechpit"`, `organizationDomain = "ktechpit.com"`, `applicationName =
+"whatsie"` → settings at `~/.config/ktechpit/whatsie.conf`, data under
+`~/.local/share/ktechpit/whatsie/`. No migration from the old settings path (ADR-005).
+
+## ADR-015 — App lock kept, hardened, in M5 (owner, 2026-08-27)
+
+**Decision.** Passcode hashed with PBKDF2 (`QPasswordDigestor`, stored iteration count, constant
+-time compare). Lock is an application-level mode: every window covered, notifications
+suppressed, page hidden (or unloaded), IPC commands other than `raise` refused, attempt
+throttling. Modes: lock on start, on hide-to-tray, after idle. Changing the passcode never
+touches the WhatsApp session.
+
+## ADR-016 — Platforms: Linux + Windows for v1 (owner, 2026-08-27)
+
+**Decision.** Linux (snap, flatpak) and Windows (MSI, SignPath per W#325) are release targets.
+macOS is not (no maintainer/hardware). Windows differences live in `platform/windows/`
+backends (notifications via tray toast, registry autostart, taskbar badge later).
+
+## ADR-017 — Spell check: system language bundled + on-demand downloads (owner, 2026-08-27)
+
+**Decision.** Build converts hunspell → `.bdic` for a base set and bundles the dictionary matching
+the system locale; other languages are downloadable from a fixed-tag GitHub release with a
+SHA-256 manifest, listed in a plain `QListWidget`. A missing dictionary is a visible error, never
+silent. Windows builds ship the same mechanism.
+
 ---
 
-## Open questions (need an owner decision)
+## Open questions
 
-- **OQ-1** Application id / org name: skeleton uses `org.keshavbhatt.whatsie`
-  (desktop file id, settings path `~/.config/org.keshavbhatt/whatsie.conf`). whatsie used
-  `com.ktechpit.whatsie` for the desktop id but `org.keshavnrj.ubuntu` for settings. Pick one;
-  the snap/flatpak ids must match it.
-- **OQ-2** App lock: keep (with the hardened design in A10) or drop for v1?
-- **OQ-3** Windows/macOS: in scope for v1 or Linux-first with platform backends stubbed?
-- **OQ-4** Spell check: ship system-language `.bdic` only, on-demand others, or drop?
+None open. Feature-level decisions are in `FEATURES.md` (Decision column).
