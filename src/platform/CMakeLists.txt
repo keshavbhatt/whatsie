@@ -3,6 +3,7 @@
 # (the notifier factory is the one sanctioned switch).
 
 qt_add_library(whatsie_platform STATIC
+    autostart.h
     file_manager.h
     logging.cpp
     logging.h
@@ -21,6 +22,7 @@ target_link_libraries(whatsie_platform
 if(LINUX)
     find_package(Qt6 6.11 REQUIRED COMPONENTS DBus)
     target_sources(whatsie_platform PRIVATE
+        linux/autostart_xdg.cpp
         linux/dbus_image.cpp
         linux/dbus_image.h
         linux/file_manager_dbus.cpp

@@ -60,6 +60,28 @@ private Q_SLOTS:
 
     void nullImagePassesThrough() { QVERIFY(composeUnreadBadge(QImage(), 3).isNull()); }
 
+    void dimImageDesaturatesAndFades()
+    {
+        const QImage base = solid(16, QColor(0, 200, 0)); // saturated green
+        const QColor before = base.pixelColor(8, 8);
+        const QImage dim = dimImage(base, 0.85);
+        QCOMPARE(dim.size(), base.size());
+        const QColor after = dim.pixelColor(8, 8);
+        // Toward grey: red/blue channels rise toward the green's luma.
+        QVERIFY(after.red() > before.red());
+        QVERIFY(after.green() < before.green());
+        // And more transparent than the opaque original.
+        QVERIFY(after.alpha() < before.alpha());
+    }
+
+    void dimImageZeroAmountIsIdentity()
+    {
+        const QImage base = solid(8, Qt::red);
+        QCOMPARE(dimImage(base, 0.0), base);
+    }
+
+    void dimImageNullPassesThrough() { QVERIFY(dimImage(QImage(), 0.5).isNull()); }
+
 private:
     static QImage solid(int size, const QColor& color)
     {

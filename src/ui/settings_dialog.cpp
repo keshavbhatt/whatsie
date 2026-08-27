@@ -90,6 +90,9 @@ QWidget* SettingsDialog::buildGeneralTab()
     connect(m_trayLeftClick, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setTrayLeftClickToggles(on); });
     form->addRow(QString(), m_trayLeftClick);
+    m_autostart = new QCheckBox(tr("Start Whatsie automatically when I log in"), windowBox);
+    connect(m_autostart, &QCheckBox::toggled, this, [this](bool on) { m_settings.setAutostart(on); });
+    form->addRow(QString(), m_autostart);
     if (!m_trayAvailable) {
         auto* note =
             new QLabel(tr("No system tray was detected: the window will never be hidden."), windowBox);
@@ -101,6 +104,23 @@ QWidget* SettingsDialog::buildGeneralTab()
         m_trayLeftClick->setEnabled(false);
     }
     outer->addWidget(windowBox);
+
+    // Tray appearance preferences apply to the window/taskbar icon too, so they
+    // stay usable even when no system tray is present (e.g. to un-hide it).
+    auto* trayBox = new QGroupBox(tr("System tray"), page);
+    auto* trayForm = new QFormLayout(trayBox);
+    m_traySymbolic = new QCheckBox(tr("Use a monochrome (symbolic) icon"), trayBox);
+    connect(m_traySymbolic, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setTraySymbolicIcon(on); });
+    trayForm->addRow(QString(), m_traySymbolic);
+    m_trayHidden = new QCheckBox(tr("Hide the tray icon"), trayBox);
+    connect(m_trayHidden, &QCheckBox::toggled, this, [this](bool on) { m_settings.setTrayHidden(on); });
+    trayForm->addRow(QString(), m_trayHidden);
+    m_trayDim = new QCheckBox(tr("Dim the icon while disconnected"), trayBox);
+    connect(m_trayDim, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setTrayDimWhenDisconnected(on); });
+    trayForm->addRow(QString(), m_trayDim);
+    outer->addWidget(trayBox);
 
     auto* downloadsBox = new QGroupBox(tr("Downloads"), page);
     auto* dform = new QFormLayout(downloadsBox);
@@ -169,6 +189,16 @@ QWidget* SettingsDialog::buildAppearanceTab()
     connect(m_smoothScrolling, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setSmoothScrolling(on); });
     form->addRow(QString(), m_smoothScrolling);
+
+    m_interfaceScale = new QDoubleSpinBox(page);
+    m_interfaceScale->setRange(core::Settings::kMinInterfaceScale, core::Settings::kMaxInterfaceScale);
+    m_interfaceScale->setSingleStep(0.25);
+    m_interfaceScale->setDecimals(2);
+    m_interfaceScale->setSuffix(u"×"_s);
+    m_interfaceScale->setToolTip(tr("Scales the whole interface. Applies after restarting Whatsie."));
+    connect(m_interfaceScale, &QDoubleSpinBox::valueChanged, this,
+            [this](double v) { m_settings.setInterfaceScale(v); });
+    form->addRow(tr("Interface scale:"), m_interfaceScale);
 
     m_messageBlur = new QComboBox(page);
     m_messageBlur->addItem(tr("Off"), 0);
@@ -317,6 +347,10 @@ void SettingsDialog::loadValues()
     m_closeAction->setCurrentIndex(m_closeAction->findData(static_cast<int>(m_settings.closeAction())));
     m_startMinimized->setChecked(m_settings.startMinimized());
     m_trayLeftClick->setChecked(m_settings.trayLeftClickToggles());
+    m_autostart->setChecked(m_settings.autostart());
+    m_traySymbolic->setChecked(m_settings.traySymbolicIcon());
+    m_trayHidden->setChecked(m_settings.trayHidden());
+    m_trayDim->setChecked(m_settings.trayDimWhenDisconnected());
     m_downloadDir->setText(m_settings.downloadDirectory());
     m_askWhereToSave->setChecked(m_settings.askWhereToSave());
     m_showDownloads->setChecked(m_settings.showDownloadsOnStart());
@@ -324,6 +358,7 @@ void SettingsDialog::loadValues()
     m_zoom->setValue(m_settings.zoomFactor());
     m_zoomMaximized->setValue(m_settings.zoomFactorMaximized());
     m_smoothScrolling->setChecked(m_settings.smoothScrolling());
+    m_interfaceScale->setValue(m_settings.interfaceScale());
     m_messageBlur->setCurrentIndex(m_messageBlur->findData(m_settings.messageBlurLevel()));
     m_notificationsEnabled->setChecked(m_settings.notificationsEnabled());
     m_notificationSound->setChecked(m_settings.notificationSound());

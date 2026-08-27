@@ -60,6 +60,10 @@ private:
     QComboBox* m_closeAction = nullptr;
     QCheckBox* m_startMinimized = nullptr;
     QCheckBox* m_trayLeftClick = nullptr;
+    QCheckBox* m_autostart = nullptr;
+    QCheckBox* m_traySymbolic = nullptr;
+    QCheckBox* m_trayHidden = nullptr;
+    QCheckBox* m_trayDim = nullptr;
     QLineEdit* m_downloadDir = nullptr;
     QCheckBox* m_askWhereToSave = nullptr;
     QCheckBox* m_showDownloads = nullptr;
@@ -67,6 +71,7 @@ private:
     QDoubleSpinBox* m_zoom = nullptr;
     QDoubleSpinBox* m_zoomMaximized = nullptr;
     QCheckBox* m_smoothScrolling = nullptr;
+    QDoubleSpinBox* m_interfaceScale = nullptr;
     QComboBox* m_messageBlur = nullptr;
     QCheckBox* m_notificationsEnabled = nullptr;
     QCheckBox* m_notificationSound = nullptr;

@@ -14,12 +14,19 @@ inline constexpr QLatin1StringView kStartMinimized{"window/startMinimized"};
 
 // tray/
 inline constexpr QLatin1StringView kTrayLeftClickToggles{"tray/leftClickToggles"};
+inline constexpr QLatin1StringView kTraySymbolicIcon{"tray/symbolicIcon"};
+inline constexpr QLatin1StringView kTrayHidden{"tray/hidden"};
+inline constexpr QLatin1StringView kTrayDimWhenDisconnected{"tray/dimWhenDisconnected"};
 
 // view/
 inline constexpr QLatin1StringView kZoomFactor{"view/zoomFactor"};
 inline constexpr QLatin1StringView kZoomFactorMaximized{"view/zoomFactorMaximized"};
 inline constexpr QLatin1StringView kSmoothScrolling{"view/smoothScrolling"};
+inline constexpr QLatin1StringView kInterfaceScale{"view/interfaceScale"};
 inline constexpr QLatin1StringView kMuted{"view/muted"};
+
+// general/
+inline constexpr QLatin1StringView kAutostart{"general/autostart"};
 
 // privacy/
 inline constexpr QLatin1StringView kMessageBlurLevel{"privacy/messageBlurLevel"};

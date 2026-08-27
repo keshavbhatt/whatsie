@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QRegularExpression>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 
 namespace whatsie::core {
@@ -51,6 +53,31 @@ QImage composeUnreadBadge(const QImage& base, int count)
     painter.setPen(Qt::white);
     painter.drawText(bubble, Qt::AlignCenter, label);
 
+    return out;
+}
+
+QImage dimImage(const QImage& image, qreal amount)
+{
+    if (image.isNull() || amount <= 0.0) {
+        return image;
+    }
+    const qreal a = std::clamp(amount, 0.0, 1.0);
+    QImage out = image.convertToFormat(QImage::Format_ARGB32);
+    for (int y = 0; y < out.height(); ++y) {
+        auto* line = reinterpret_cast<QRgb*>(out.scanLine(y));
+        for (int x = 0; x < out.width(); ++x) {
+            const QRgb p = line[x];
+            const int alpha = qAlpha(p);
+            if (alpha == 0) {
+                continue;
+            }
+            const int grey = qGray(p);
+            const int r = static_cast<int>(qRed(p) * (1.0 - a) + grey * a);
+            const int g = static_cast<int>(qGreen(p) * (1.0 - a) + grey * a);
+            const int b = static_cast<int>(qBlue(p) * (1.0 - a) + grey * a);
+            line[x] = qRgba(r, g, b, static_cast<int>(alpha * (1.0 - 0.35 * a)));
+        }
+    }
     return out;
 }
 

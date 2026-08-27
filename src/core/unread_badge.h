@@ -14,4 +14,8 @@ namespace whatsie::core {
 /// `count <= 0` returns `base` unchanged. Counts above 99 render as "99+".
 [[nodiscard]] QImage composeUnreadBadge(const QImage& base, int count);
 
+/// Desaturates and fades `image` toward grey by `amount` in [0,1] — used to dim
+/// the tray icon while disconnected (FEATURES T6).
+[[nodiscard]] QImage dimImage(const QImage& image, qreal amount);
+
 } // namespace whatsie::core

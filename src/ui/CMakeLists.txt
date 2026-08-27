@@ -30,6 +30,8 @@ qt_add_library(whatsie_ui STATIC
     screen_picker_dialog.h
     settings_dialog.cpp
     settings_dialog.h
+    shortcuts_dialog.cpp
+    shortcuts_dialog.h
     theme_applier.cpp
     theme_applier.h
     tray_controller.cpp

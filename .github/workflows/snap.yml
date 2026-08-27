@@ -1,7 +1,7 @@
-# Build the snap in GitHub's CI (we do not build locally). On push to main the
-# snap is built with snapcore/action-build and uploaded as an artifact; set the
-# repo variable PUBLISH_TO_STORE=true and the SNAPCRAFT_STORE_CREDENTIALS secret
-# to also release it to the edge channel.
+# Build the snap in GitHub's CI (we do not build locally). Each architecture is
+# built on its native runner; on push the .snap is uploaded as an artifact, and
+# with the repo variable PUBLISH_TO_STORE=true plus the SNAPCRAFT_STORE_CREDENTIALS
+# secret it is also released to the edge channel.
 name: snap
 
 on:
@@ -18,18 +18,26 @@ on:
 
 jobs:
   build:
-    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - arch: amd64
+            runner: ubuntu-24.04
+          - arch: arm64
+            runner: ubuntu-24.04-arm
+    runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build snap
+      - name: Build snap (${{ matrix.arch }})
         uses: snapcore/action-build@v1
         id: build
 
       - name: Upload the snap artifact
         uses: actions/upload-artifact@v4
         with:
-          name: whatsie-snap
+          name: whatsie-snap-${{ matrix.arch }}
           path: ${{ steps.build.outputs.snap }}
           if-no-files-found: error
 

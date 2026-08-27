@@ -5,6 +5,37 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M5 batch A: autostart, shortcuts, tray options, interface scale, tray-less Settings
+
+Version bumped **5.0.0 → 6.0.0** (original whatsie is already at 5.1.0): `project(VERSION)` and
+the AppStream `<release>`.
+
+Landed (each with a settings row + `FEATURES.md` status):
+- **P4 Autostart (Linux):** `platform::setAutostartEnabled()` writes/removes
+  `~/.config/autostart/com.ktechpit.whatsie.desktop` (`Exec` = snap app name under `$SNAP`, else
+  `applicationFilePath()`; ` --minimized` when "start hidden" is on). `MainWindow::syncAutostart()`
+  reconciles the file to the setting on launch and on change. Windows registry deferred to M6.
+- **S26 Shortcuts sheet:** `ui::ShortcutsDialog` generated from `Actions::all()` (F1 action, also
+  in the tray menu) — can't drift from the real `QKeySequence` bindings.
+- **T3/T5/T6 Tray options:** symbolic monochrome icon (SVG→bitmap), hide-tray (live create/destroy
+  of the `QSystemTrayIcon`), and connection-dim via the pure, tested `core::dimImage()` driven by
+  a new `WebView::connectionChanged` signal off the S13 watchdog bridge. React to live settings
+  changes; the same composed icon also feeds the window/taskbar icon. See ADR-025.
+- **A7 Interface scale:** `main()` reads `view/interfaceScale` before `QApplication` and sets
+  `QT_SCALE_FACTOR`; `applyChromiumFlags()` mirrors `--force-device-scale-factor`. Restart-required
+  (noted in UI). Default profile only. See ADR-024.
+- **A11 (DROP→KEEP, owner request):** a translucent Settings gear floating over our web-view
+  widget (not DOM-injected), visible only when no system tray — so tray-less users can reach
+  Settings. See ADR-024.
+- **P7 (DROP→KEEP, owner request):** documented that user-set `QTWEBENGINE_CHROMIUM_FLAGS` is
+  merged (never overwritten) — the supported expert perf hatch. No new code.
+
+Verified: `scripts/dev-build.sh --tests` green (19/19; `tst_unread_badge` gains `dimImage`
+coverage — desaturate+fade, zero-amount identity, null passthrough). clang-format clean.
+Still pending in M5: spell check (L1/L2), proxy (P3 + auth M12b), app lock (P1, last).
+
+---
+
 ## 2026-08-27 — M4: snap packaging (config + CI; build in the cloud)
 
 Snap configured and building via CI (owner: no local snap builds — a snapcraft build pulls a

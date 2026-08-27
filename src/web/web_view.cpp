@@ -156,6 +156,7 @@ WebView::~WebView()
 
 void WebView::handleConnectionChanged(bool up)
 {
+    Q_EMIT connectionChanged(up);
     m_watchdog.setConnected(up, std::chrono::milliseconds(m_clock.elapsed()));
     if (up) {
         m_watchdogTimer->stop();

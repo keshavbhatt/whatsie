@@ -16,6 +16,8 @@
 #include <QStandardPaths>
 #include <QTextStream>
 
+#include <cmath>
+
 using namespace Qt::StringLiterals;
 
 namespace whatsie::app {
@@ -101,8 +103,14 @@ void Application::applyChromiumFlags()
 {
     // Must happen before the first QWebEngineProfile is created (FEATURES P6).
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
-    const QString merged =
-        core::mergeChromiumFlags(existing, core::chromiumFlags(m_settings->hardwareAcceleration()));
+    QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration());
+    // Keep Chromium's device scale in step with QT_SCALE_FACTOR (FEATURES A7) so
+    // page rendering stays crisp rather than bitmap-stretched.
+    const double scale = m_settings->interfaceScale();
+    if (std::abs(scale - 1.0) > 0.001) {
+        ours << u"--force-device-scale-factor=%1"_s.arg(scale, 0, 'g', 4);
+    }
+    const QString merged = core::mergeChromiumFlags(existing, ours);
     qputenv("QTWEBENGINE_CHROMIUM_FLAGS", merged.toUtf8());
     qCInfo(lcApp) << "chromium flags:" << merged;
 }

@@ -36,6 +36,7 @@ Actions::Actions(QWidget* owner)
     zoomReset = make(owner, tr("Reset zoom"), QKeySequence(Qt::CTRL | Qt::Key_0));
     fullScreen = make(owner, tr("Full screen"), QKeySequence::FullScreen); // F11
     settings = make(owner, tr("Settings…"), QKeySequence(Qt::CTRL | Qt::Key_Comma));
+    shortcuts = make(owner, tr("Keyboard shortcuts"), QKeySequence(Qt::Key_F1));
     about = make(owner, tr("About Whatsie"));
     quit = make(owner, tr("Quit"), QKeySequence::Quit); // Ctrl+Q
 
@@ -49,8 +50,8 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {showHide, newChat,   reload,     downloads, mute,  blurMessages, zoomIn,
-            zoomOut,  zoomReset, fullScreen, settings,  about, quit};
+    return {showHide, newChat,   reload,     downloads, mute,      blurMessages, zoomIn,
+            zoomOut,  zoomReset, fullScreen, settings,  shortcuts, about,        quit};
 }
 
 } // namespace whatsie::ui

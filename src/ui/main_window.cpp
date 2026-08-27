@@ -5,6 +5,7 @@
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "core/zoom_policy.h"
+#include "platform/autostart.h"
 #include "ui/about_dialog.h"
 #include "ui/actions.h"
 #include "ui/downloads_hub.h"
@@ -13,6 +14,7 @@
 #include "ui/permission_prompt.h"
 #include "ui/screen_picker_dialog.h"
 #include "ui/settings_dialog.h"
+#include "ui/shortcuts_dialog.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
 #include "web/permission_controller.h"
@@ -27,8 +29,11 @@
 #include <QGuiApplication>
 #include <QInputDialog>
 #include <QMessageBox>
+#include <QResizeEvent>
 #include <QSessionManager>
 #include <QStandardPaths>
+#include <QStyle>
+#include <QToolButton>
 #include <QWebEngineDesktopMediaRequest>
 #include <QWebEnginePage>
 #include <QWebEnginePermission>
@@ -89,6 +94,9 @@ void MainWindow::setupUi()
     m_notifications = new NotificationHub(m_settings, *m_dnd, *m_tray, *m_webView, this);
     connect(m_notifications, &NotificationHub::activated, this, &MainWindow::showAndRaise);
     m_downloads = new DownloadsHub(m_settings, m_notifications->service(), *m_webView, this, this);
+
+    createSettingsButton();
+    syncAutostart();
 }
 
 void MainWindow::connectActions()
@@ -110,7 +118,10 @@ void MainWindow::connectActions()
     connect(m_actions->zoomReset, &QAction::triggered, this, [this] { m_webView->zoomReset(); });
     connect(m_actions->fullScreen, &QAction::toggled, this, &MainWindow::setFullScreenMode);
     connect(m_actions->settings, &QAction::triggered, this, &MainWindow::showSettings);
+    connect(m_actions->shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(m_actions->about, &QAction::triggered, this, &MainWindow::showAbout);
+    connect(&m_settings, &core::Settings::autostartChanged, this, [this] { syncAutostart(); });
+    connect(&m_settings, &core::Settings::startMinimizedChanged, this, [this] { syncAutostart(); });
     connect(m_actions->quit, &QAction::triggered, this, &MainWindow::quit);
 
     connect(m_tray, &TrayController::toggleRequested, this, &MainWindow::toggleVisibility);
@@ -134,6 +145,7 @@ void MainWindow::connectWebView()
             });
     connect(m_webView, &web::WebView::desktopMediaRequested, this,
             [this](QWebEngineDesktopMediaRequest request) { handleDesktopMediaRequest(std::move(request)); });
+    connect(m_webView, &web::WebView::connectionChanged, m_tray, &TrayController::setConnected);
 }
 
 // Screen sharing (getDisplayMedia). On Wayland the PipeWire desktop portal
@@ -200,6 +212,14 @@ void MainWindow::quit()
     saveWindowState();
     m_settings.sync();
     QApplication::quit();
+}
+
+bool MainWindow::eventFilter(QObject* watched, QEvent* event)
+{
+    if (watched == m_webView && event->type() == QEvent::Resize) {
+        repositionSettingsButton();
+    }
+    return QMainWindow::eventFilter(watched, event);
 }
 
 void MainWindow::closeEvent(QCloseEvent* event)
@@ -330,10 +350,60 @@ void MainWindow::showSettings()
     m_settingsDialog->activateWindow();
 }
 
+void MainWindow::showShortcuts()
+{
+    ShortcutsDialog dialog(*m_actions, this);
+    dialog.exec();
+}
+
 void MainWindow::showAbout()
 {
     AboutDialog dialog(m_settings, m_webView->userAgent(), this);
     dialog.exec();
+}
+
+// FEATURES A11: a small settings button floating over the web view, so users
+// without a system tray (their only other route to Settings) still have one.
+// It only appears when the tray is unavailable, to avoid cluttering the UI.
+void MainWindow::createSettingsButton()
+{
+    m_settingsButton = new QToolButton(m_webView);
+    m_settingsButton->setCursor(Qt::PointingHandCursor);
+    m_settingsButton->setToolTip(tr("Settings"));
+    m_settingsButton->setAutoRaise(true);
+    QIcon gear = QIcon::fromTheme(u"configure"_s, QIcon::fromTheme(u"preferences-system"_s));
+    if (gear.isNull()) {
+        gear = style()->standardIcon(QStyle::SP_FileDialogDetailedView);
+    }
+    m_settingsButton->setIcon(gear);
+    m_settingsButton->setIconSize(QSize(20, 20));
+    m_settingsButton->setStyleSheet(
+        u"QToolButton{background:rgba(0,0,0,0.45);border:none;border-radius:16px;padding:6px;}"
+        "QToolButton:hover{background:rgba(0,0,0,0.70);}"_s);
+    connect(m_settingsButton, &QToolButton::clicked, this, &MainWindow::showSettings);
+    m_settingsButton->setVisible(!m_tray->isAvailable());
+    m_webView->installEventFilter(this);
+    repositionSettingsButton();
+}
+
+void MainWindow::repositionSettingsButton()
+{
+    if (m_settingsButton == nullptr) {
+        return;
+    }
+    const QSize hint = m_settingsButton->sizeHint();
+    const int margin = 12;
+    m_settingsButton->move(margin, m_webView->height() - hint.height() - margin);
+    m_settingsButton->raise();
+}
+
+void MainWindow::syncAutostart()
+{
+    if (!platform::setAutostartEnabled(m_settings.autostart(), m_settings.startMinimized())) {
+        if (m_settings.autostart()) {
+            qCWarning(lcUi) << "could not write autostart entry";
+        }
+    }
 }
 
 void MainWindow::handleUnread(int count)

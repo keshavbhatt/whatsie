@@ -8,6 +8,7 @@
 
 #include <QAction>
 #include <QActionGroup>
+#include <QIcon>
 #include <QMenu>
 #include <QPixmap>
 #include <QSystemTrayIcon>
@@ -23,11 +24,19 @@ TrayController::TrayController(core::Settings& settings, core::DndController& dn
     , m_settings(settings)
     , m_dnd(dnd)
     , m_actions(actions)
-    , m_baseImage(u":/icons/hicolor/128x128/apps/com.ktechpit.whatsie.png"_s)
 {
+    reloadBaseImage();
+
+    if (m_settings.trayHidden()) {
+        qCInfo(lcUi) << "tray hidden by setting; window will never auto-hide";
+        rebuildIcon();
+        watchSettings();
+        return;
+    }
     if (!QSystemTrayIcon::isSystemTrayAvailable()) {
         qCWarning(lcUi) << "no system tray available; window will never auto-hide";
         rebuildIcon();
+        watchSettings();
         return;
     }
 
@@ -52,6 +61,7 @@ TrayController::TrayController(core::Settings& settings, core::DndController& dn
         updateTooltip();
     });
     m_tray->show();
+    watchSettings();
     qCDebug(lcUi) << "tray icon shown";
 }
 
@@ -73,6 +83,7 @@ void TrayController::buildMenu()
     m_menu->addMenu(buildDndMenu());
     m_menu->addSeparator();
     m_menu->addAction(m_actions.settings);
+    m_menu->addAction(m_actions.shortcuts);
     m_menu->addAction(m_actions.about);
     m_menu->addSeparator();
     m_menu->addAction(m_actions.quit);
@@ -122,9 +133,74 @@ void TrayController::setWindowVisible(bool visible)
     m_actions.showHide->setText(visible ? tr("Hide to tray") : tr("Show window"));
 }
 
+void TrayController::reloadBaseImage()
+{
+    if (m_settings.traySymbolicIcon()) {
+        // The symbolic (monochrome) logo, rendered from SVG to a badge-able bitmap.
+        m_baseImage = QIcon(u":/icons/whatsie-symbolic.svg"_s).pixmap(QSize(128, 128)).toImage();
+    } else {
+        m_baseImage = QImage(u":/icons/hicolor/128x128/apps/com.ktechpit.whatsie.png"_s);
+    }
+}
+
+void TrayController::setConnected(bool connected)
+{
+    if (connected == m_connected) {
+        return;
+    }
+    m_connected = connected;
+    if (m_settings.trayDimWhenDisconnected()) {
+        rebuildIcon();
+    }
+}
+
+void TrayController::applyTrayVisibility()
+{
+    const bool wantHidden = m_settings.trayHidden();
+    if (wantHidden && m_tray != nullptr) {
+        m_tray->hide();
+        m_tray->deleteLater();
+        m_tray = nullptr;
+        qCInfo(lcUi) << "tray hidden by setting change";
+    } else if (!wantHidden && m_tray == nullptr && QSystemTrayIcon::isSystemTrayAvailable()) {
+        if (m_menu == nullptr) {
+            buildMenu();
+        }
+        m_tray = new QSystemTrayIcon(this);
+        m_tray->setContextMenu(m_menu);
+        connect(m_tray, &QSystemTrayIcon::activated, this, [this](QSystemTrayIcon::ActivationReason reason) {
+            if (reason != QSystemTrayIcon::Trigger && reason != QSystemTrayIcon::DoubleClick) {
+                return;
+            }
+            if (m_settings.trayLeftClickToggles()) {
+                Q_EMIT toggleRequested();
+            } else {
+                Q_EMIT showRequested();
+            }
+        });
+        rebuildIcon();
+        m_tray->show();
+        qCInfo(lcUi) << "tray shown by setting change";
+    }
+}
+
+void TrayController::watchSettings()
+{
+    connect(&m_settings, &core::Settings::traySymbolicIconChanged, this, [this] {
+        reloadBaseImage();
+        rebuildIcon();
+    });
+    connect(&m_settings, &core::Settings::trayDimWhenDisconnectedChanged, this, [this] { rebuildIcon(); });
+    connect(&m_settings, &core::Settings::trayHiddenChanged, this, [this] { applyTrayVisibility(); });
+}
+
 void TrayController::rebuildIcon()
 {
-    m_icon = QIcon(QPixmap::fromImage(core::composeUnreadBadge(m_baseImage, m_unread)));
+    QImage image = core::composeUnreadBadge(m_baseImage, m_unread);
+    if (!m_connected && m_settings.trayDimWhenDisconnected()) {
+        image = core::dimImage(image, 0.85);
+    }
+    m_icon = QIcon(QPixmap::fromImage(image));
     if (m_tray == nullptr) {
         return;
     }

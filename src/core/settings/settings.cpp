@@ -20,6 +20,11 @@ constexpr Theme kDefaultTheme = Theme::System;
 constexpr CloseAction kDefaultCloseAction = CloseAction::MinimizeToTray;
 constexpr bool kDefaultStartMinimized = false;
 constexpr bool kDefaultTrayLeftClickToggles = true;
+constexpr bool kDefaultTraySymbolicIcon = false;
+constexpr bool kDefaultTrayHidden = false;
+constexpr bool kDefaultTrayDimWhenDisconnected = true;
+constexpr bool kDefaultAutostart = false;
+constexpr double kDefaultInterfaceScale = 1.0;
 constexpr bool kDefaultSmoothScrolling = false; // FEATURES A14: off by default
 constexpr bool kDefaultNotificationsEnabled = true;
 constexpr bool kDefaultNotificationSound = true;
@@ -160,6 +165,54 @@ void Settings::setTrayLeftClickToggles(bool enabled)
     }
 }
 
+bool Settings::traySymbolicIcon() const
+{
+    return boolValue(keys::kTraySymbolicIcon, kDefaultTraySymbolicIcon);
+}
+
+void Settings::setTraySymbolicIcon(bool enabled)
+{
+    if (storeBool(keys::kTraySymbolicIcon, kDefaultTraySymbolicIcon, enabled)) {
+        Q_EMIT traySymbolicIconChanged(enabled);
+    }
+}
+
+bool Settings::trayHidden() const
+{
+    return boolValue(keys::kTrayHidden, kDefaultTrayHidden);
+}
+
+void Settings::setTrayHidden(bool hidden)
+{
+    if (storeBool(keys::kTrayHidden, kDefaultTrayHidden, hidden)) {
+        Q_EMIT trayHiddenChanged(hidden);
+    }
+}
+
+bool Settings::trayDimWhenDisconnected() const
+{
+    return boolValue(keys::kTrayDimWhenDisconnected, kDefaultTrayDimWhenDisconnected);
+}
+
+void Settings::setTrayDimWhenDisconnected(bool enabled)
+{
+    if (storeBool(keys::kTrayDimWhenDisconnected, kDefaultTrayDimWhenDisconnected, enabled)) {
+        Q_EMIT trayDimWhenDisconnectedChanged(enabled);
+    }
+}
+
+bool Settings::autostart() const
+{
+    return boolValue(keys::kAutostart, kDefaultAutostart);
+}
+
+void Settings::setAutostart(bool enabled)
+{
+    if (storeBool(keys::kAutostart, kDefaultAutostart, enabled)) {
+        Q_EMIT autostartChanged(enabled);
+    }
+}
+
 // ---- view/ -----------------------------------------------------------------
 
 double Settings::zoomFactor() const
@@ -202,6 +255,22 @@ void Settings::setSmoothScrolling(bool enabled)
     if (storeBool(keys::kSmoothScrolling, kDefaultSmoothScrolling, enabled)) {
         Q_EMIT smoothScrollingChanged(enabled);
     }
+}
+
+double Settings::interfaceScale() const
+{
+    const double stored = m_store->value(keys::kInterfaceScale, kDefaultInterfaceScale).toDouble();
+    return std::clamp(stored, kMinInterfaceScale, kMaxInterfaceScale);
+}
+
+void Settings::setInterfaceScale(double scale)
+{
+    const double clamped = std::clamp(scale, kMinInterfaceScale, kMaxInterfaceScale);
+    if (qFuzzyCompare(clamped, interfaceScale())) {
+        return;
+    }
+    m_store->setValue(keys::kInterfaceScale, clamped);
+    Q_EMIT interfaceScaleChanged(clamped);
 }
 
 bool Settings::muted() const

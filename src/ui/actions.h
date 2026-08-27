@@ -31,6 +31,7 @@ public:
     QAction* zoomReset = nullptr;
     QAction* fullScreen = nullptr;
     QAction* settings = nullptr;
+    QAction* shortcuts = nullptr;
     QAction* about = nullptr;
     QAction* quit = nullptr;
 

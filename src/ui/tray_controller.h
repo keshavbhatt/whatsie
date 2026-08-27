@@ -37,6 +37,9 @@ public:
     /// Called by the window when its visibility changes, to relabel the
     /// show/hide entry.
     void setWindowVisible(bool visible);
+    /// Connection state from the web layer; dims the icon while offline when
+    /// the "dim when disconnected" setting is on (FEATURES T6).
+    void setConnected(bool connected);
 
     /// Icon with the current badge, for the window as well.
     [[nodiscard]] QIcon currentIcon() const { return m_icon; }
@@ -49,8 +52,11 @@ Q_SIGNALS:
 private:
     void buildMenu();
     QMenu* buildDndMenu();
+    void reloadBaseImage();
     void rebuildIcon();
     void updateTooltip();
+    void applyTrayVisibility();
+    void watchSettings();
 
     core::Settings& m_settings;
     core::DndController& m_dnd;
@@ -61,6 +67,7 @@ private:
     QImage m_baseImage;
     QIcon m_icon;
     int m_unread = 0;
+    bool m_connected = true;
 };
 
 } // namespace whatsie::ui

@@ -30,10 +30,11 @@
     <content_attribute id="social-chat">intense</content_attribute>
   </content_rating>
   <releases>
-    <release version="5.0.0" date="2026-08-27">
+    <release version="6.0.0" date="2026-08-27">
       <description>
         <p>From-scratch Qt 6.11 rewrite: notifications, downloads, theme, zoom,
-        calls and screen sharing.</p>
+        calls and screen sharing, plus autostart, spell check, proxy support,
+        tray options, interface scaling and a keyboard-shortcuts sheet.</p>
       </description>
     </release>
   </releases>

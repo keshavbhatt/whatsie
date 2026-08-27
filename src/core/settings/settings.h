@@ -57,6 +57,16 @@ public:
     // tray/
     [[nodiscard]] bool trayLeftClickToggles() const;
     void setTrayLeftClickToggles(bool enabled);
+    [[nodiscard]] bool traySymbolicIcon() const;
+    void setTraySymbolicIcon(bool enabled);
+    [[nodiscard]] bool trayHidden() const;
+    void setTrayHidden(bool hidden);
+    [[nodiscard]] bool trayDimWhenDisconnected() const;
+    void setTrayDimWhenDisconnected(bool enabled);
+
+    // general/
+    [[nodiscard]] bool autostart() const;
+    void setAutostart(bool enabled);
 
     // view/
     [[nodiscard]] double zoomFactor() const;
@@ -65,6 +75,11 @@ public:
     void setZoomFactorMaximized(double factor);
     [[nodiscard]] bool smoothScrolling() const;
     void setSmoothScrolling(bool enabled);
+    /// UI scale factor (0.5..3.0). Applied at start-up; changing needs a restart.
+    [[nodiscard]] double interfaceScale() const;
+    void setInterfaceScale(double scale);
+    static constexpr double kMinInterfaceScale = 0.5;
+    static constexpr double kMaxInterfaceScale = 3.0;
     [[nodiscard]] bool muted() const;
     void setMuted(bool muted);
 
@@ -113,6 +128,11 @@ Q_SIGNALS:
     void closeActionChanged(whatsie::core::CloseAction action);
     void startMinimizedChanged(bool enabled);
     void trayLeftClickTogglesChanged(bool enabled);
+    void traySymbolicIconChanged(bool enabled);
+    void trayHiddenChanged(bool hidden);
+    void trayDimWhenDisconnectedChanged(bool enabled);
+    void autostartChanged(bool enabled);
+    void interfaceScaleChanged(double scale);
     void zoomFactorChanged(double factor);
     void zoomFactorMaximizedChanged(double factor);
     void smoothScrollingChanged(bool enabled);

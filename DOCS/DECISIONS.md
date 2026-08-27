@@ -212,6 +212,47 @@ listeners and its CSS `@media` rules follow). `theme-preload.js` was removed. `T
 ignores `colorSchemeChanged` while an explicit theme is set (the signal is our own override).
 A pure `matchMedia` shim was tried and rejected: it only moves the JS-driven parts.
 
+## ADR-024 — Interface scale, tray-less Settings access, and the expert flags hatch (2026-08-27)
+
+**Context.** M5 added three things that touch startup and window chrome. (1) Interface scale
+(A7) must reach Qt through `QT_SCALE_FACTOR`, which is only read during `QApplication`
+construction. (2) Users without a system tray had no in-app route to Settings — the tray menu
+was the only one (A11 was originally DROP because whatly injected buttons into WhatsApp's own
+nav rail, which ADR-006 forbids). (3) whatsie's "remaining perf knobs" (P7) were also DROP.
+
+**Decision.**
+- **A7:** `main()` peeks at the stored `view/interfaceScale` with a bare `QSettings` *before*
+  constructing `Application`, and sets `QT_SCALE_FACTOR` (unless the env var is already set).
+  `Application::applyChromiumFlags()` mirrors the same factor to Chromium via
+  `--force-device-scale-factor` so page rendering stays crisp. Changing it needs a restart.
+  The early read targets the default profile only; a per-profile scale would need argv parsed
+  in `main`, not worth it for a global appearance preference.
+- **A11 (reinterpreted, DROP→KEEP):** a small `QToolButton` floating over our own web-view
+  widget — **not** injected into WhatsApp's DOM — opens Settings. It is visible only when the
+  tray is unavailable, so tray users see no extra chrome. This honours the owner's need
+  (tray-less Settings access) without violating ADR-006's "no fragile DOM anchors" rule.
+- **P7 (reinterpreted, DROP→KEEP):** rather than bespoke perf toggles, we simply document that
+  `mergeChromiumFlags()` already *merges* (never overwrites) a user-provided
+  `QTWEBENGINE_CHROMIUM_FLAGS`, giving experts a supported escape hatch.
+
+**Consequences.** Scale is a restart-required setting (noted in the UI). The overlay button is
+theme-agnostic (translucent, `QIcon::fromTheme("configure")` with a stock fallback). No new
+store permissions. Version bumped to **6.0.0** since the original whatsie is already at 5.1.0.
+
+## ADR-025 — Tray icon options: symbolic, hidden, connection-dimmed (2026-08-27)
+
+**Context.** T3/T5/T6 asked for a monochrome tray icon, a way to hide the tray entirely, and a
+dimmed icon while WhatsApp is disconnected.
+
+**Decision.** `TrayController` chooses its base image from `traySymbolicIcon()` (the
+`whatsie-symbolic.svg` rendered to a bitmap vs the colour PNG); honours `trayHidden()` by not
+creating — or live-destroying — the `QSystemTrayIcon`; and dims via the pure, tested
+`core::dimImage()` when `trayDimWhenDisconnected()` and the web layer reports the socket down
+(new `WebView::connectionChanged` signal, sourced from the existing S13 watchdog bridge). All
+three react to live settings changes. Because the same composed icon feeds the window/taskbar
+icon, the options remain meaningful even with no system tray — which also avoids the trap of
+`trayHidden` disabling the very control that un-hides it.
+
 ## ADR-023 — Screen sharing: the portal is the picker on Wayland (2026-08-27)
 
 **Context.** Owner testing on KDE Wayland: starting a screen share showed THREE dialogs — the

@@ -48,7 +48,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | S23 | Global hotkey to raise window (portal only) | no | yes (330 LOC) | LATER | W#10, 14. | **LATER** | — |
 | S24 | Configurable local shortcuts with conflict detection | no | yes | NICE | | **DROP** | dropped |
 | S25 | Command palette (Ctrl+K) | no | yes | DROP | | **DROP** | dropped |
-| S26 | Shortcuts cheat-sheet (Help → Shortcuts) | text popup | yes | NICE | W#319. Generated from `QAction` list. | **KEEP** | — |
+| S26 | Shortcuts cheat-sheet (Help → Shortcuts) | text popup | yes | NICE | W#319. Generated from `QAction` list. | **KEEP** | done |
 | S27 | Interface translations (`.ts`) + language picker | never loaded | 22 languages, MT | NICE | | **DROP** | dropped (English only) |
 
 ## 2. Tray
@@ -57,10 +57,10 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 |---|---|---|---|---|---|---|---|
 | T1 | Tray icon with context menu | yes | yes | CORE | | **KEEP** | done |
 | T2 | Unread badge on tray + window icon | title parsing, 10 PNGs | composed image, tested | CORE | Compose in code; count from bridge with title fallback. | **KEEP** | done (title-based — the stable tier; ADR-019) |
-| T3 | Monochrome / symbolic tray icon option | no (W#93, 128) | yes (Y#14) | NICE | SVG symbolic variant. | **KEEP** | — |
+| T3 | Monochrome / symbolic tray icon option | no (W#93, 128) | yes (Y#14) | NICE | SVG symbolic variant. | **KEEP** | done |
 | T4 | Left-click toggles window (setting) | yes | yes + Windows focus grace | CORE | W#274 | **KEEP** | done |
-| T5 | Hide tray icon entirely (setting) | no (W#127, 193) | no | NICE | Requires S5. | **KEEP** | — |
-| T6 | Connection-state dimmed icon | no (W#108) | yes | NICE | Needs S13. | **KEEP** | — |
+| T5 | Hide tray icon entirely (setting) | no (W#127, 193) | no | NICE | Requires S5. | **KEEP** | done |
+| T6 | Connection-state dimmed icon | no (W#108) | yes | NICE | Needs S13. | **KEEP** | done |
 | T7 | Recent-unread submenu / open chat by name | no | yes (IndexedDB) | DROP | WA private schema. | **DROP** | dropped |
 | T8 | Launcher/dock unread badge (Unity LauncherEntry, Windows taskbar) | no (W#122, 165) | yes | LATER | Cheap once T2 exists. | **LATER** | — |
 
@@ -92,11 +92,11 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | A4 | Automatic sunrise/sunset theme | yes (bugs) | yes (680 LOC) | DROP | | **DROP** | dropped |
 | A5 | Widget style selector | yes | yes | DROP | Fusion + palette. | **DROP** | dropped |
 | A6 | Zoom: normal vs maximized, Ctrl+/-/0, Ctrl+wheel blocked, min-size scales | yes (W#192) | yes | CORE | Most-requested #3. | **KEEP** | done |
-| A7 | Interface scale / font size setting | no (W#276) | yes | NICE | `QT_SCALE_FACTOR` mirror; restart. | **KEEP** | — |
+| A7 | Interface scale / font size setting | no (W#276) | yes | NICE | `QT_SCALE_FACTOR` + Chromium `--force-device-scale-factor`; restart. | **KEEP** | done |
 | A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | done |
 | A9 | Custom CSS file (covers wallpaper / font override) | no (W#182, 277, 219) | yes | LATER | | **DROP** | dropped |
 | A10 | Chat colour themes (14) | no | yes | DROP | | **DROP** | dropped |
-| A11 | Buttons injected into WA nav rail | no | yes | DROP | | **DROP** | dropped |
+| A11 | In-window Settings button (tray-less access) | no | yes | DROP→KEEP | Owner 2026-08-27: app-chrome overlay button, **not** DOM nav-rail injection. Shows when no tray. | **KEEP** | done |
 | A12 | Chat-list collapse to avatar strip | no (W#159, 331) | yes (800 LOC) | DROP | | **DROP** | dropped |
 | A13 | Muted-updates hide / focus mode / HD AB flag / linked-device name patch | no | yes | DROP | | **DROP** | dropped |
 | A14 | Smooth scrolling (`ScrollAnimatorEnabled`) — **setting, default OFF** | no (W#178) | yes | NICE | Owner: expose as option, off by default. | **KEEP** | — (attr default off in skeleton) |
@@ -130,10 +130,10 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | P1 | App lock, **hardened**: PBKDF2 passcode, covers every window, notifications suppressed + page hidden while locked, attempt throttling; lock on start / hide / idle | base64 `asdfg`, overlay | PBKDF2, overlay, bypassable | NICE | ADR-015. | **KEEP** (M5) | — |
 | P2 | WebRTC IP handling policy | no | yes | NICE | One flag. | **KEEP** | — |
 | P3 | Network proxy (system / none / HTTP / SOCKS5 + auth) | system only (W#75, 223) | yes | NICE | Password via keychain or not stored. | **KEEP** | — |
-| P4 | Autostart at login (XDG / registry), sandbox-aware, starts minimized | no | yes (buggy) | NICE | | **KEEP** | — |
+| P4 | Autostart at login (XDG / registry), sandbox-aware, starts minimized | no | yes (buggy) | NICE | XDG entry; Windows registry in M6. | **KEEP** | done (Linux) |
 | P5 | Storage manager with safe-delete guard | yes (W#230) | yes | CORE | | **KEEP** | done |
 | P6 | Hardware acceleration: auto / on / off | global flag | 18 knobs | CORE (1 setting) | Lesson B4. | **KEEP** | done |
-| P7 | Remaining perf knobs | no | yes | DROP | Env var for experts. | **DROP** | dropped |
+| P7 | Expert Chromium flags via `QTWEBENGINE_CHROMIUM_FLAGS` | no | yes | DROP→KEEP | Owner 2026-08-27: honour user-set env var (merged, not overwritten); documented escape hatch. | **KEEP** | done |
 | P8 | Unload page when hidden for N minutes | no (W#255, 194) | dormancy | LATER | Measure first. | **LATER** | — |
 | P9 | Profile export/import | no | yes | DROP | | **DROP** | dropped |
 | P10 | Log file + ring buffer + Chromium stderr + "Copy diagnostics" | no | yes | CORE | Lesson B1. | **KEEP** | done |

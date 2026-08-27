@@ -4,6 +4,7 @@
 #include <QPointer>
 
 class QWebEngineDesktopMediaRequest;
+class QToolButton;
 
 namespace whatsie::core {
 class DndController;
@@ -45,10 +46,12 @@ public Q_SLOTS:
     void openChat(const QString& target);
     void promptNewChat();
     void showSettings();
+    void showShortcuts();
     void showAbout();
     void quit();
 
 protected:
+    bool eventFilter(QObject* watched, QEvent* event) override;
     void closeEvent(QCloseEvent* event) override;
     void changeEvent(QEvent* event) override;
     void showEvent(QShowEvent* event) override;
@@ -66,6 +69,9 @@ private:
     void handleUnread(int count);
     void handleRenderProcessGaveUp();
     void handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request);
+    void createSettingsButton();
+    void repositionSettingsButton();
+    void syncAutostart();
     void clearCache();
     void confirmClearSession();
 
@@ -79,6 +85,7 @@ private:
     DownloadsHub* m_downloads = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     QPointer<SettingsDialog> m_settingsDialog;
+    QToolButton* m_settingsButton = nullptr;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     bool m_quitting = false;
 };

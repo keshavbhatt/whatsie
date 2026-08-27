@@ -15,6 +15,7 @@ icon: snap/gui/icon.svg
 
 platforms:
   amd64:
+  arm64:
 
 apps:
   whatsie:
