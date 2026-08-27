@@ -22,4 +22,9 @@ namespace whatsie::core {
 /// symbolic-icon glyph into a visible foreground for the tray (FEATURES T3).
 [[nodiscard]] QImage tintImage(const QImage& image, const QColor& color);
 
+/// Turns a glyph into a monochrome tray icon: a white fill with a thin dark
+/// halo, so it stays visible whatever the panel colour (FEATURES T3). The panel
+/// colour is not knowable and is independent of the app theme.
+[[nodiscard]] QImage monochromeIcon(const QImage& glyph);
+
 } // namespace whatsie::core

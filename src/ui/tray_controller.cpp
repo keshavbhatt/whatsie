@@ -2,7 +2,6 @@
 
 #include "core/notifications/dnd_controller.h"
 #include "core/settings/settings.h"
-#include "core/theme/theme_service.h"
 #include "core/unread_badge.h"
 #include "ui/actions.h"
 #include "ui/logging.h"
@@ -19,11 +18,10 @@ using namespace std::chrono_literals;
 
 namespace whatsie::ui {
 
-TrayController::TrayController(core::Settings& settings, core::ThemeService& theme, core::DndController& dnd,
-                               Actions& actions, QObject* parent)
+TrayController::TrayController(core::Settings& settings, core::DndController& dnd, Actions& actions,
+                               QObject* parent)
     : QObject(parent)
     , m_settings(settings)
-    , m_theme(theme)
     , m_dnd(dnd)
     , m_actions(actions)
 {
@@ -138,12 +136,12 @@ void TrayController::setWindowVisible(bool visible)
 void TrayController::reloadBaseImage()
 {
     if (m_settings.traySymbolicIcon()) {
-        // The symbolic SVG is a solid-black glyph on transparency, which is all
-        // but invisible on a dark panel. Recolour it to the current scheme's
-        // foreground (light glyph in dark mode, dark glyph in light mode).
+        // The symbolic SVG is a solid-black glyph on transparency — invisible on
+        // a dark panel. Panel colour is independent of the app theme, so render a
+        // white glyph with a thin dark halo: visible on dark panels (white fill)
+        // and light ones (dark outline).
         const QImage glyph = QIcon(u":/icons/whatsie-symbolic.svg"_s).pixmap(QSize(128, 128)).toImage();
-        const QColor fg = m_theme.isDark() ? QColor(0xED, 0xED, 0xED) : QColor(0x2B, 0x2B, 0x2B);
-        m_baseImage = core::tintImage(glyph, fg);
+        m_baseImage = core::monochromeIcon(glyph);
     } else {
         m_baseImage = QImage(u":/icons/hicolor/128x128/apps/com.ktechpit.whatsie.png"_s);
     }

@@ -78,7 +78,7 @@ void MainWindow::setupUi()
     m_themeApplier = new ThemeApplier(m_theme, this);
     m_actions = new Actions(this);
     m_dnd = new core::DndController(this);
-    m_tray = new TrayController(m_settings, m_theme, *m_dnd, *m_actions, this);
+    m_tray = new TrayController(m_settings, *m_dnd, *m_actions, this);
     setWindowIcon(m_tray->currentIcon());
 
     m_webView = new web::WebView(m_settings, m_theme, this);

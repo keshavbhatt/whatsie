@@ -1,6 +1,7 @@
 #include "core/unread_badge.h"
 
 #include <QColor>
+#include <QPainter>
 #include <QTest>
 
 using namespace Qt::StringLiterals;
@@ -103,6 +104,25 @@ private Q_SLOTS:
     }
 
     void tintImageNullPassesThrough() { QVERIFY(tintImage(QImage(), Qt::white).isNull()); }
+
+    void monochromeIconIsWhiteWithDarkHalo()
+    {
+        // A small opaque square glyph -> white centre, dark halo just outside it.
+        QImage glyph(64, 64, QImage::Format_ARGB32);
+        glyph.fill(Qt::transparent);
+        QPainter p(&glyph);
+        p.fillRect(QRect(20, 20, 24, 24), Qt::black); // opaque glyph body
+        p.end();
+        const QImage out = monochromeIcon(glyph);
+        QCOMPARE(out.size(), glyph.size());
+        QCOMPARE(out.pixelColor(32, 32), QColor(Qt::white)); // fill is white
+        // Just outside the body, the halo is dark and semi-opaque.
+        const QColor halo = out.pixelColor(19, 32);
+        QVERIFY(halo.alpha() > 0);
+        QVERIFY(halo.red() < 80 && halo.green() < 80 && halo.blue() < 80);
+    }
+
+    void monochromeIconNullPassesThrough() { QVERIFY(monochromeIcon(QImage()).isNull()); }
 
 private:
     static QImage solid(int size, const QColor& color)

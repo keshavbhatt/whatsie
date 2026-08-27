@@ -5,6 +5,17 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Monochrome tray icon made visible
+
+Owner: symbolic tray icon "still looks ugly and invisible". Cause: it was tinted to the *app*
+theme's foreground, so app-Light + dark-panel = dark glyph on dark panel. Panel colour is
+independent of the app theme. `core::monochromeIcon()` now renders a white glyph with a thin dark
+halo (visible on any panel); `TrayController` no longer depends on `ThemeService`. Verified by
+screenshot: a white WhatsApp bubble+W with the unread badge, clearly visible on the dark panel.
+Tests 19/19 (adds monochromeIcon coverage). ADR-025 revised.
+
+---
+
 ## 2026-08-28 — A11 Settings button moved into WhatsApp's nav rail
 
 Owner: "the settings icon in nav is not working." Diagnosed with a screenshot — the floating

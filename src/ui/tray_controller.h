@@ -12,7 +12,6 @@ class QSystemTrayIcon;
 namespace whatsie::core {
 class DndController;
 class Settings;
-class ThemeService;
 } // namespace whatsie::core
 
 namespace whatsie::ui {
@@ -28,8 +27,8 @@ class TrayController : public QObject
     Q_DISABLE_COPY_MOVE(TrayController)
 
 public:
-    TrayController(core::Settings& settings, core::ThemeService& theme, core::DndController& dnd,
-                   Actions& actions, QObject* parent = nullptr);
+    TrayController(core::Settings& settings, core::DndController& dnd, Actions& actions,
+                   QObject* parent = nullptr);
     ~TrayController() override;
 
     [[nodiscard]] bool isAvailable() const;
@@ -60,7 +59,6 @@ private:
     void watchSettings();
 
     core::Settings& m_settings;
-    core::ThemeService& m_theme;
     core::DndController& m_dnd;
     Actions& m_actions;
     QSystemTrayIcon* m_tray = nullptr;

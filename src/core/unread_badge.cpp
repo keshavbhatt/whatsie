@@ -82,6 +82,31 @@ QImage dimImage(const QImage& image, qreal amount)
     return out;
 }
 
+QImage monochromeIcon(const QImage& glyph)
+{
+    if (glyph.isNull()) {
+        return glyph;
+    }
+    const int offset = std::max(1, glyph.width() / 64);
+    const QImage halo = tintImage(glyph, QColor(0, 0, 0, 150));
+    const QImage fill = tintImage(glyph, Qt::white);
+
+    QImage out(glyph.size(), QImage::Format_ARGB32_Premultiplied);
+    out.fill(Qt::transparent);
+    QPainter painter(&out);
+    for (int dx = -offset; dx <= offset; dx += offset) {
+        for (int dy = -offset; dy <= offset; dy += offset) {
+            if (dx == 0 && dy == 0) {
+                continue;
+            }
+            painter.drawImage(QPoint(dx, dy), halo);
+        }
+    }
+    painter.drawImage(0, 0, fill);
+    painter.end();
+    return out;
+}
+
 QImage tintImage(const QImage& image, const QColor& color)
 {
     if (image.isNull()) {

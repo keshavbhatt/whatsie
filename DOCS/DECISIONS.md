@@ -332,6 +332,13 @@ three react to live settings changes. Because the same composed icon feeds the w
 icon, the options remain meaningful even with no system tray — which also avoids the trap of
 `trayHidden` disabling the very control that un-hides it.
 
+**Symbolic icon colour (revised 2026-08-28).** A first cut tinted the symbolic glyph to the *app*
+theme's foreground; with the app on Light but the panel dark, that rendered a dark glyph on a dark
+panel — invisible (owner report, verified by screenshot). The panel colour is not knowable and is
+independent of the app theme, so `core::monochromeIcon()` now renders a **white glyph with a thin
+dark halo** — visible on dark panels (white fill) and light ones (dark outline). No theme
+dependency; `TrayController` no longer takes `ThemeService`.
+
 ## ADR-023 — Screen sharing: the portal is the picker on Wayland (2026-08-27)
 
 **Context.** Owner testing on KDE Wayland: starting a screen share showed THREE dialogs — the
