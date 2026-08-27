@@ -23,6 +23,9 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     configureStorage();
     configureUserAgent();
     configureAttributes();
+    connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
+        this->settings()->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, enabled);
+    });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
 
@@ -58,9 +61,10 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::ScreenCaptureEnabled, true);
     s->setAttribute(QWebEngineSettings::PlaybackRequiresUserGesture, false);
     s->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
-    // FEATURES A14: user option, off by default (wired to Settings in M1).
-    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, false);
     s->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
+    s->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+    // FEATURES A14: user option, off by default.
+    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
 }
 
 } // namespace whatsie::web

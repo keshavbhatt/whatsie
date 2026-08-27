@@ -50,4 +50,6 @@ whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_cor
 # web
 whatsie_add_test(tst_user_agent          tst_user_agent.cpp          whatsie_web)
 # app / ui
-whatsie_add_test(tst_smoke               tst_smoke.cpp               whatsie_app GUI)
+whatsie_add_test(tst_cli_options         tst_cli_options.cpp         whatsie_app)
+whatsie_add_test(tst_single_instance     tst_single_instance.cpp     whatsie_app)
+whatsie_add_test(tst_smoke               tst_smoke.cpp               whatsie_ui  GUI)

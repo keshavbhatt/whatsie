@@ -19,9 +19,11 @@ Rows marked **NICE** are included only after the owner marks them `KEEP` in `FEA
   reference analyses + GitHub issue digest.
 - **Exit:** `scripts/dev-build.sh --tests` green; app shows WhatsApp Web login on Wayland. ✅
 
-## M1 — Usable shell (Linux)
+## M1 — Usable shell (Linux) ✅ (2026-08-27)
 
 Goal: replaces whatsie for daily use *without* notifications yet.
+Delivered: see `PROGRESS.md` 2026-08-27 M1 entry. Deferred into M3 as planned: page-side theme
+sync, bridge-based unread count, in-app call pop-out.
 
 | Rows | Work |
 |---|---|

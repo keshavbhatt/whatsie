@@ -6,6 +6,12 @@ configure_file(version.h.in "${CMAKE_CURRENT_BINARY_DIR}/generated/app/version.h
 qt_add_library(whatsie_app STATIC
     application.cpp
     application.h
+    cli_options.cpp
+    cli_options.h
+    logging.cpp
+    logging.h
+    single_instance.cpp
+    single_instance.h
 )
 whatsie_set_warnings(whatsie_app)
 
@@ -13,4 +19,5 @@ target_include_directories(whatsie_app PUBLIC "${CMAKE_CURRENT_BINARY_DIR}/gener
 target_link_libraries(whatsie_app
     PUBLIC
         whatsie_ui
+        Qt6::Network
 )

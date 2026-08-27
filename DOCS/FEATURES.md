@@ -23,18 +23,18 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| S1 | Persistent WhatsApp Web session (named profile, disk cache/cookies/permissions) | yes (singleton destroyed after QApplication) | yes, per-account | CORE | The product. Profile owned by the view (ADR-003). | **KEEP** | done (skeleton) |
-| S2 | Window geometry/state persistence (Wayland-safe, screen-aware) | yes, but re-centres on cursor screen every start | yes, tracks normal geometry by hand | CORE | W#103, 135 | **KEEP** | done (basic) |
-| S3 | Close button → minimize to tray *or* quit (setting) | yes | yes | CORE | | **KEEP** | — |
-| S4 | Start minimized (setting + `--minimized`) | yes | yes | CORE | | **KEEP** | — |
-| S5 | Never hide window when no tray is available | no (W#292) | yes | CORE | Lesson B7 | **KEEP** | — |
-| S6 | Honour session logout/shutdown (`commitDataRequest`) | no (W#66) | yes | CORE | | **KEEP** | — |
-| S7 | Fullscreen F11 + page-requested fullscreen with reliable exit | yes, flickers; exit broken (W#169, 333) | yes, flickers | CORE | Must honour `fullScreenRequested(false)` | **KEEP** | — |
-| S8 | Single instance + IPC (raise, open URL, settings, lock, …) | vendored SingleApplication | same, lossy `split(" ")` | CORE | ADR-010: `QLocalServer` + JSON, profile-aware key | **KEEP** | — |
-| S9 | CLI options (`--minimized`, `--profile`, `--log-file`, `--new-chat`, …) | 9 options | ~20 incl. automation | CORE (small set) | Only what maps to a UI action. | **KEEP** | — |
-| S10 | `whatsapp://send?phone=` scheme handler + desktop actions | yes (`?`→`&` hack) | yes | CORE | Build `/send?phone=` URL in C++ and `load()` it — no JS. | **KEEP** | — |
-| S11 | `https://wa.me/`, `api.whatsapp.com`, `chat.whatsapp.com` invite links | no (W#3, 172, 186) | yes | NICE | Cheap once S10 exists. | **KEEP** | — |
-| S12 | Render-process crash recovery with back-off | dialog per crash | loop breaker | CORE | W#102, Y#28 | **KEEP** | — |
+| S1 | Persistent WhatsApp Web session (named profile, disk cache/cookies/permissions) | yes (singleton destroyed after QApplication) | yes, per-account | CORE | The product. Profile owned by the view (ADR-003). | **KEEP** | done |
+| S2 | Window geometry/state persistence (Wayland-safe, screen-aware) | yes, but re-centres on cursor screen every start | yes, tracks normal geometry by hand | CORE | W#103, 135 | **KEEP** | done |
+| S3 | Close button → minimize to tray *or* quit (setting) | yes | yes | CORE | | **KEEP** | done |
+| S4 | Start minimized (setting + `--minimized`) | yes | yes | CORE | | **KEEP** | done |
+| S5 | Never hide window when no tray is available | no (W#292) | yes | CORE | Lesson B7 | **KEEP** | done |
+| S6 | Honour session logout/shutdown (`commitDataRequest`) | no (W#66) | yes | CORE | | **KEEP** | done |
+| S7 | Fullscreen F11 + page-requested fullscreen with reliable exit | yes, flickers; exit broken (W#169, 333) | yes, flickers | CORE | Must honour `fullScreenRequested(false)` | **KEEP** | done |
+| S8 | Single instance + IPC (raise, open URL, settings, lock, …) | vendored SingleApplication | same, lossy `split(" ")` | CORE | ADR-010: `QLocalServer` + JSON, profile-aware key | **KEEP** | done |
+| S9 | CLI options (`--minimized`, `--profile`, `--log-file`, `--new-chat`, …) | 9 options | ~20 incl. automation | CORE (small set) | Only what maps to a UI action. | **KEEP** | done |
+| S10 | `whatsapp://send?phone=` scheme handler + desktop actions | yes (`?`→`&` hack) | yes | CORE | Build `/send?phone=` URL in C++ and `load()` it — no JS. | **KEEP** | done |
+| S11 | `https://wa.me/`, `api.whatsapp.com`, `chat.whatsapp.com` invite links | no (W#3, 172, 186) | yes | NICE | Cheap once S10 exists. | **KEEP** | done (parse; handler registration in M4) |
+| S12 | Render-process crash recovery with back-off | dialog per crash | loop breaker | CORE | W#102, Y#28 | **KEEP** | done |
 | S13 | Connection watchdog (WebSocket monkey-patch, reload after resume) | no (W#208) | yes, 2 strikes / 3 reloads | NICE | Policy pure and tested; reload only, never wipe. | **KEEP** | — |
 | S14 | Auto-reload when network returns (`QNetworkInformation`) | no | no | NICE | Complements S13. | **KEEP** | — |
 | S15 | "Loading quirk" / "Error" title → wipe storage + quit | yes | yes | DROP | ADR-011. Diagnostic page with explicit buttons instead. | **DROP** | dropped |
@@ -55,10 +55,10 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| T1 | Tray icon with context menu | yes | yes | CORE | | **KEEP** | — |
-| T2 | Unread badge on tray + window icon | title parsing, 10 PNGs | composed image, tested | CORE | Compose in code; count from bridge with title fallback. | **KEEP** | — |
+| T1 | Tray icon with context menu | yes | yes | CORE | | **KEEP** | done |
+| T2 | Unread badge on tray + window icon | title parsing, 10 PNGs | composed image, tested | CORE | Compose in code; count from bridge with title fallback. | **KEEP** | done (title-based; bridge count in M3) |
 | T3 | Monochrome / symbolic tray icon option | no (W#93, 128) | yes (Y#14) | NICE | SVG symbolic variant. | **KEEP** | — |
-| T4 | Left-click toggles window (setting) | yes | yes + Windows focus grace | CORE | W#274 | **KEEP** | — |
+| T4 | Left-click toggles window (setting) | yes | yes + Windows focus grace | CORE | W#274 | **KEEP** | done |
 | T5 | Hide tray icon entirely (setting) | no (W#127, 193) | no | NICE | Requires S5. | **KEEP** | — |
 | T6 | Connection-state dimmed icon | no (W#108) | yes | NICE | Needs S13. | **KEEP** | — |
 | T7 | Recent-unread submenu / open chat by name | no | yes (IndexedDB) | DROP | WA private schema. | **DROP** | dropped |
@@ -86,12 +86,12 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done (setting) |
-| A2 | Live follow-system-theme | no (W#157) | portal | CORE | `QStyleHints::colorSchemeChanged`; portal fallback. | **KEEP** | — |
+| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done (Qt side; page theme in M3) |
+| A2 | Live follow-system-theme | no (W#157) | portal | CORE | `QStyleHints::colorSchemeChanged`; portal fallback. | **KEEP** | done |
 | A3 | Push theme into running page (React fiber, WA modules) | yes | yes | DROP | Reload on theme change instead. | **DROP** | dropped |
 | A4 | Automatic sunrise/sunset theme | yes (bugs) | yes (680 LOC) | DROP | | **DROP** | dropped |
 | A5 | Widget style selector | yes | yes | DROP | Fusion + palette. | **DROP** | dropped |
-| A6 | Zoom: normal vs maximized, Ctrl+/-/0, Ctrl+wheel blocked, min-size scales | yes (W#192) | yes | CORE | Most-requested #3. | **KEEP** | done (factor) |
+| A6 | Zoom: normal vs maximized, Ctrl+/-/0, Ctrl+wheel blocked, min-size scales | yes (W#192) | yes | CORE | Most-requested #3. | **KEEP** | done |
 | A7 | Interface scale / font size setting | no (W#276) | yes | NICE | `QT_SCALE_FACTOR` mirror; restart. | **KEEP** | — |
 | A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | — |
 | A9 | Custom CSS file (covers wallpaper / font override) | no (W#182, 277, 219) | yes | LATER | | **DROP** | dropped |
@@ -111,7 +111,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | M1 | Camera / mic / notification / geolocation permissions (`QWebEnginePermission`), persisted, reviewable | dialog inert | works | CORE | Calls (W#287). | **KEEP** | — |
 | M2 | Screen-share picker + PipeWire flag | no | yes | CORE | | **KEEP** | — |
 | M3 | Call pop-out window kept in-app, closable | orphan page | yes | CORE | W#333. | **KEEP** | — |
-| M4 | External links → system browser | yes | yes | CORE | | **KEEP** | — |
+| M4 | External links → system browser | yes | yes | CORE | | **KEEP** | done |
 | M5 | Native file chooser (portal-aware), last dir | Qt dialog | yes | CORE | W#296, 285. | **KEEP** | — |
 | M6 | Drag-and-drop file attach (portal path resolution, threaded read, synthetic paste) | broken (W#111, 285) | yes (520 LOC) | NICE | Cap complexity; Y#32 lesson. | **KEEP** | — |
 | M7 | Clipboard image paste rescue | no (W#33, 311) | yes (45 LOC) | CORE | | **KEEP** | — |
@@ -121,7 +121,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | M11 | Missing-codec / media-stuck notice | no | yes | LATER | Snap/Flatpak runtimes have codecs. | **DROP** | dropped |
 | M12a | Certificate-error override dialog | Qt example | same | DROP | Single-origin app: hard fail with message. | **DROP** | dropped |
 | M12b | Proxy-auth dialog | Qt example | same | NICE | Needed with P3. | **KEEP** | — |
-| M13 | Context-menu filtering | yes | yes | CORE | | **KEEP** | — |
+| M13 | Context-menu filtering | yes | yes | CORE | | **KEEP** | done |
 
 ## 6. Privacy, lock, network, performance
 
@@ -136,7 +136,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | P7 | Remaining perf knobs | no | yes | DROP | Env var for experts. | **DROP** | dropped |
 | P8 | Unload page when hidden for N minutes | no (W#255, 194) | dormancy | LATER | Measure first. | **LATER** | — |
 | P9 | Profile export/import | no | yes | DROP | | **DROP** | dropped |
-| P10 | Log file + ring buffer + Chromium stderr + "Copy diagnostics" | no | yes | CORE | Lesson B1. | **KEEP** | — |
+| P10 | Log file + ring buffer + Chromium stderr + "Copy diagnostics" | no | yes | CORE | Lesson B1. | **KEEP** | done |
 | P11 | Update checker | none | yes | LATER | | **DROP** | dropped |
 | P12 | AppImage self-update | no | never invoked (Y#85) | DROP | | **DROP** | dropped |
 
@@ -144,7 +144,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| X1 | `--profile <name>`: separate storage, settings, instance key | no (W#176) | yes | CORE (plumbing) | Lesson B15. | **KEEP** | — |
+| X1 | `--profile <name>`: separate storage, settings, instance key | no (W#176) | yes | CORE (plumbing) | Lesson B15. | **KEEP** | done |
 | X2 | In-window account tabs (simple strip, ≤ 400 LOC) | no | yes (600 LOC) | LATER | Most-requested #4. | **LATER** | — |
 | X3 | Tab tear-off / detached windows / grid view | no | yes (~1 500 LOC) | DROP | | **DROP** | dropped |
 | X4 | Per-account unread via IndexedDB | no | yes | DROP | | **DROP** | dropped |
@@ -176,10 +176,10 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| D1 | About dialog (version, Qt/Chromium, install type, "Copy diagnostics") | yes | yes | CORE | W#257. | **KEEP** | — |
+| D1 | About dialog (version, Qt/Chromium, install type, "Copy diagnostics") | yes | yes | CORE | W#257. | **KEEP** | done |
 | D2 | Rate-app nag | yes | yes | DROP | | **DROP** | dropped |
 | D3 | "More apps" carousel | yes | dead | DROP | | **DROP** | dropped |
-| D4 | One donate/support link in About | 2 | 3 | NICE | Single link, no nag. | **KEEP** | — |
+| D4 | One donate/support link in About | 2 | 3 | NICE | Single link, no nag. | **KEEP** | done |
 | D5 | Identicon avatars for notifications (stable hash) | yes | yes | CORE | Part of N1. | **KEEP** | — |
 
 ---
