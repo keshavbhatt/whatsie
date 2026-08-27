@@ -4,27 +4,31 @@
 #include "core/render_crash_policy.h"
 
 #include <QElapsedTimer>
+#include <QWebEngineDesktopMediaRequest>
+#include <QWebEnginePermission>
 #include <QWebEngineView>
 
 namespace whatsie::core {
 class Settings;
-}
+class ThemeService;
+} // namespace whatsie::core
 
 namespace whatsie::web {
 
+class PermissionController;
 class WebPage;
 class WebProfile;
 
 /// The widget that shows WhatsApp Web. Owns the profile and page; exposes
 /// only what the UI layer needs (zoom mode, unread count, chat links, crash
-/// recovery, fullscreen requests).
+/// recovery, fullscreen, permission prompts, screen-share picks).
 class WebView : public QWebEngineView
 {
     Q_OBJECT
     Q_DISABLE_COPY_MOVE(WebView)
 
 public:
-    explicit WebView(core::Settings& settings, QWidget* parent = nullptr);
+    WebView(core::Settings& settings, core::ThemeService& theme, QWidget* parent = nullptr);
     ~WebView() override = default;
 
     /// Navigates to WhatsApp Web (idempotent).
@@ -40,13 +44,15 @@ public:
     [[nodiscard]] int unreadCount() const { return m_unread; }
     [[nodiscard]] QString userAgent() const;
     [[nodiscard]] WebProfile& profile() { return *m_profile; }
+    [[nodiscard]] WebPage& webPage() { return *m_page; }
 
 Q_SIGNALS:
     void unreadCountChanged(int count);
     void fullScreenRequested(bool on);
     /// The render process died repeatedly; the UI should ask the user.
     void renderProcessGaveUp();
-    void inAppPopupRequested(const QUrl& url);
+    void permissionPromptRequested(QWebEnginePermission permission);
+    void desktopMediaRequested(QWebEngineDesktopMediaRequest request);
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
@@ -61,6 +67,7 @@ private:
     core::Settings& m_settings;
     WebProfile* m_profile = nullptr;
     WebPage* m_page = nullptr;
+    PermissionController* m_permissions = nullptr;
     core::RenderCrashPolicy m_crashPolicy;
     QElapsedTimer m_clock;
     bool m_maximizedMode = false;

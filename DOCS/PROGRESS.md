@@ -5,6 +5,54 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M3 part A: web integration + downloads
+
+**Owner input at kick-off:** "I am not satisfied with the current download feature. It does
+not look good nor persist." → ADR-018; M8 upgraded from "minimal UI" to a persistent history
+with a proper window.
+
+**Done** (rows A1, M1, M2, M3, M5, M7, M8, M9, M12b, P5, P6 marked `done`)
+- Script bundle (ADR-006): `web::ScriptBundle` installs one DocumentCreation bootstrap on the
+  profile = JSON config + `qwebchannel.js` + `bootstrap.js` + `storage-persist.js` +
+  `theme-preload.js`; `web::Bridge` exposed via QWebChannel for `scriptFailed`/`log`. Scripts
+  are syntax-checked and the bundle is tested on a real profile.
+- Page-side theme (A1): WhatsApp's own `localStorage.theme` written before boot from the
+  effective scheme; a theme change reinstalls the bundle and reloads (A3 dropped as decided).
+- Permissions (M1): `web::PermissionController` policy (grant notifications/screen-share/
+  clipboard/mouse-lock, deny fonts, ask camera/mic/location) → non-blocking Allow/Deny prompt;
+  Settings → Privacy "Reset permissions" via `profile.listAllPermissions()`.
+- Screen share (M2): `ScreenPickerDialog` over `QWebEngineDesktopMediaRequest` (screens/windows
+  tabs); PipeWire capturer flag on Linux.
+- Call pop-out (M3): `web::PopupWindow` hosts `window.open()` targets; first navigation decides
+  (WA → stays, external → browser + close); Esc/close/fullscreen exit work (W#333).
+- File chooser (M5): native dialogs with last-dir memory and MIME-derived filters. Clipboard
+  paste (M7): images re-exported as `image/png` before Ctrl+V (W#33/311).
+- **Downloads (M8)**: `core::DownloadModel` (persisted JSON, bounded, interrupted-on-restart),
+  `file_naming` (unique names, sanitising, human sizes), `web::DownloadController` (folder or
+  ask, speed sampling, cancel), `ui::DownloadsDialog` + `DownloadsDelegate` (icon, name,
+  status/progress, hover actions, context menu, empty state, "Open folder", "Clear finished"),
+  `ui::DownloadsHub` (auto-show, completion/failure notification → click opens file, reveal via
+  `org.freedesktop.FileManager1`). Ctrl+J and tray entry. Settings: folder, ask, auto-show.
+- Mute (M9): Ctrl+M / tray toggle persisted. Storage (P5): sizes computed off-thread, clear
+  cache, "Log out & clear session" via a marker honoured at next start behind
+  `isSafeToDelete` (W#230). Hardware acceleration (P6): Auto/On/Off → Chromium flags merged
+  with the user's `QTWEBENGINE_CHROMIUM_FLAGS`.
+- Tests: `tst_download_model`, `tst_storage_and_flags`, `tst_web_scripts` (+ smoke covers
+  theme reload and mute). 17/17 pass.
+
+**Verified**
+- Real session: `chromium flags: … --enable-features=WebRTCPipeWireCapturer`, `installed script
+  "whatsie:bootstrap" at DocumentCreation`, no `script … failed` reports, WhatsApp loads.
+
+**Not yet verified by hand** (needs a logged-in session): dark theme actually applied by
+WhatsApp from the preload key; call pop-out; screen-share picker during a call; a real download
+through the new window. Please try these and report.
+
+**Next (M3 part B):** S13 connection watchdog, S14 network-resume reload, S16 service-worker
+recovery, A8 privacy blur, M6 drag-and-drop attach.
+
+---
+
 ## 2026-08-27 — M2 Notifications
 
 **Done** (rows N1, N2, N3, N5, N6, N7, N10, N11, D5 marked `done`)
@@ -141,7 +189,7 @@ what is blocked. Milestone status table at the bottom.
 | M0 Foundation | ✅ done | 2026-08-27 |
 | M1 Usable shell | ✅ done | 2026-08-27 |
 | M2 Notifications | ✅ done | 2026-08-27 |
-| M3 Web integration | — | |
+| M3 Web integration | ◐ part A done | part B: S13, S14, S16, A8, M6 |
 | M4 Packaging & CI | — | |
 | M5 Approved extras | — | list fixed in `ROADMAP.md` |
 | M6 Windows | — | ADR-016 |

@@ -19,6 +19,7 @@ inline constexpr QLatin1StringView kTrayLeftClickToggles{"tray/leftClickToggles"
 inline constexpr QLatin1StringView kZoomFactor{"view/zoomFactor"};
 inline constexpr QLatin1StringView kZoomFactorMaximized{"view/zoomFactorMaximized"};
 inline constexpr QLatin1StringView kSmoothScrolling{"view/smoothScrolling"};
+inline constexpr QLatin1StringView kMuted{"view/muted"};
 
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};
@@ -27,5 +28,16 @@ inline constexpr QLatin1StringView kTheme{"appearance/theme"};
 inline constexpr QLatin1StringView kNotificationsEnabled{"notifications/enabled"};
 inline constexpr QLatin1StringView kNotificationSound{"notifications/sound"};
 inline constexpr QLatin1StringView kNotificationTimeoutSec{"notifications/timeoutSec"};
+
+// downloads/
+inline constexpr QLatin1StringView kDownloadDirectory{"downloads/directory"};
+inline constexpr QLatin1StringView kAskWhereToSave{"downloads/askWhereToSave"};
+inline constexpr QLatin1StringView kShowDownloadsOnStart{"downloads/showWindowOnStart"};
+
+// files/
+inline constexpr QLatin1StringView kLastOpenDirectory{"files/lastOpenDirectory"};
+
+// advanced/
+inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};
 
 } // namespace whatsie::core::keys

@@ -166,6 +166,30 @@ the system locale; other languages are downloadable from a fixed-tag GitHub rele
 SHA-256 manifest, listed in a plain `QListWidget`. A missing dictionary is a visible error, never
 silent. Windows builds ship the same mechanism.
 
+## ADR-018 — Downloads: persistent history and a real Downloads window (owner, 2026-08-27)
+
+**Context.** FEATURES M8 proposed "Chromium flow + minimal UI". At the start of M3 the owner
+asked for more: the original download feature "does not look good neither persists".
+
+**Decision.** `core::DownloadModel` (QAbstractListModel) persists the last 200 downloads to
+`<AppData>/downloads.json` via `QSaveFile`; entries still in progress at start-up are marked
+*Interrupted*. `web::DownloadController` accepts Chromium downloads into the configured folder
+with unique names (never overwrites, W#110) or asks where to save; speed is sampled every
+500 ms. `ui::DownloadsDialog` renders rows with a custom delegate (file icon, name, size/speed/
+relative time, progress bar, hover actions Open / Show in folder / Cancel / Remove, context
+menu, double-click to open), with "Open folder" and "Clear finished". Completion raises a
+notification whose click opens the file; "Show in folder" uses `org.freedesktop.FileManager1`
+with a folder-open fallback. Settings: folder, ask-where-to-save, show-window-on-start.
+
+## ADR-019 — Unread count stays title-based (2026-08-27)
+
+**Context.** T2 planned a bridge-based count from the DOM. WhatsApp's chat-list badges carry
+localised `aria-label`s and obfuscated classes — the fragile tier ADR-006 forbids.
+
+**Decision.** The unread count comes from `document.title` ("(N) WhatsApp"), which WhatsApp
+maintains itself and which has been stable for years. The bridge is used for script-failure
+reporting only until a stable-tier source appears.
+
 ---
 
 ## Open questions

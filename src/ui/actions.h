@@ -23,6 +23,8 @@ public:
     QAction* showHide = nullptr;
     QAction* newChat = nullptr;
     QAction* reload = nullptr;
+    QAction* downloads = nullptr;
+    QAction* mute = nullptr;
     QAction* zoomIn = nullptr;
     QAction* zoomOut = nullptr;
     QAction* zoomReset = nullptr;

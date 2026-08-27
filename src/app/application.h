@@ -50,6 +50,8 @@ Q_SIGNALS:
 private:
     void applyIdentity();
     void setupLogging();
+    void applyChromiumFlags();
+    void honourClearSessionMarker();
     [[nodiscard]] bool forwardToPrimary();
 
     CliOptions m_cli;

@@ -2,6 +2,12 @@
 # MUST NOT link Widgets, WebEngine, Network UI, or anything in ui/web/platform.
 
 qt_add_library(whatsie_core STATIC
+    chromium_flags.cpp
+    chromium_flags.h
+    downloads/download_model.cpp
+    downloads/download_model.h
+    downloads/file_naming.cpp
+    downloads/file_naming.h
     log_sink.cpp
     log_sink.h
     logging.cpp
@@ -20,6 +26,8 @@ qt_add_library(whatsie_core STATIC
     settings/settings.cpp
     settings/settings.h
     settings/settings_keys.h
+    storage_policy.cpp
+    storage_policy.h
     theme/theme_service.cpp
     theme/theme_service.h
     unread_badge.cpp

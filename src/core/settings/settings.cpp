@@ -4,6 +4,9 @@
 #include "core/settings/settings_keys.h"
 #include "core/zoom_policy.h"
 
+#include <QDir>
+#include <QStandardPaths>
+
 #include <algorithm>
 
 namespace whatsie::core {
@@ -22,6 +25,22 @@ constexpr bool kDefaultNotificationsEnabled = true;
 constexpr bool kDefaultNotificationSound = true;
 constexpr int kDefaultNotificationTimeoutSec = 0; // desktop default
 constexpr int kMaxNotificationTimeoutSec = 120;
+constexpr bool kDefaultMuted = false;
+constexpr bool kDefaultAskWhereToSave = false;
+constexpr bool kDefaultShowDownloadsOnStart = true;
+constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
+
+HardwareAcceleration hardwareAccelerationFromInt(int value)
+{
+    switch (value) {
+    case static_cast<int>(HardwareAcceleration::On):
+        return HardwareAcceleration::On;
+    case static_cast<int>(HardwareAcceleration::Off):
+        return HardwareAcceleration::Off;
+    default:
+        return HardwareAcceleration::Auto;
+    }
+}
 
 Theme themeFromInt(int value)
 {
@@ -182,6 +201,94 @@ void Settings::setSmoothScrolling(bool enabled)
     if (storeBool(keys::kSmoothScrolling, kDefaultSmoothScrolling, enabled)) {
         Q_EMIT smoothScrollingChanged(enabled);
     }
+}
+
+bool Settings::muted() const
+{
+    return boolValue(keys::kMuted, kDefaultMuted);
+}
+
+void Settings::setMuted(bool muted)
+{
+    if (storeBool(keys::kMuted, kDefaultMuted, muted)) {
+        Q_EMIT mutedChanged(muted);
+    }
+}
+
+// ---- downloads/ ------------------------------------------------------------
+
+QString Settings::downloadDirectory() const
+{
+    const QString stored = m_store->value(keys::kDownloadDirectory).toString();
+    if (!stored.isEmpty() && QDir(stored).isAbsolute()) {
+        return QDir::cleanPath(stored);
+    }
+    const QString fallback = QStandardPaths::writableLocation(QStandardPaths::DownloadLocation);
+    return fallback.isEmpty() ? QDir::homePath() : fallback;
+}
+
+void Settings::setDownloadDirectory(const QString& directory)
+{
+    const QString clean = QDir::cleanPath(directory.trimmed());
+    if (clean == downloadDirectory()) {
+        return;
+    }
+    m_store->setValue(keys::kDownloadDirectory, clean);
+    Q_EMIT downloadDirectoryChanged(downloadDirectory());
+}
+
+bool Settings::askWhereToSave() const
+{
+    return boolValue(keys::kAskWhereToSave, kDefaultAskWhereToSave);
+}
+
+void Settings::setAskWhereToSave(bool ask)
+{
+    if (storeBool(keys::kAskWhereToSave, kDefaultAskWhereToSave, ask)) {
+        Q_EMIT askWhereToSaveChanged(ask);
+    }
+}
+
+bool Settings::showDownloadsOnStart() const
+{
+    return boolValue(keys::kShowDownloadsOnStart, kDefaultShowDownloadsOnStart);
+}
+
+void Settings::setShowDownloadsOnStart(bool show)
+{
+    if (storeBool(keys::kShowDownloadsOnStart, kDefaultShowDownloadsOnStart, show)) {
+        Q_EMIT showDownloadsOnStartChanged(show);
+    }
+}
+
+// ---- files/ ----------------------------------------------------------------
+
+QString Settings::lastOpenDirectory() const
+{
+    const QString stored = m_store->value(keys::kLastOpenDirectory).toString();
+    return (!stored.isEmpty() && QDir(stored).exists()) ? stored : QDir::homePath();
+}
+
+void Settings::setLastOpenDirectory(const QString& directory)
+{
+    m_store->setValue(keys::kLastOpenDirectory, directory);
+}
+
+// ---- advanced/ -------------------------------------------------------------
+
+HardwareAcceleration Settings::hardwareAcceleration() const
+{
+    return hardwareAccelerationFromInt(
+        m_store->value(keys::kHardwareAcceleration, static_cast<int>(kDefaultHardwareAcceleration)).toInt());
+}
+
+void Settings::setHardwareAcceleration(HardwareAcceleration mode)
+{
+    if (mode == hardwareAcceleration()) {
+        return;
+    }
+    m_store->setValue(keys::kHardwareAcceleration, static_cast<int>(mode));
+    Q_EMIT hardwareAccelerationChanged(mode);
 }
 
 // ---- appearance/ -----------------------------------------------------------

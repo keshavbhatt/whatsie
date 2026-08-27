@@ -2,10 +2,22 @@
 # Injected JavaScript lives in scripts/ as resource files — never as C++ strings.
 
 qt_add_library(whatsie_web STATIC
+    bridge.cpp
+    bridge.h
+    clipboard_fix.cpp
+    clipboard_fix.h
+    download_controller.cpp
+    download_controller.h
     logging.cpp
     logging.h
     notification_presenter.cpp
     notification_presenter.h
+    permission_controller.cpp
+    permission_controller.h
+    popup_window.cpp
+    popup_window.h
+    script_bundle.cpp
+    script_bundle.h
     user_agent.cpp
     user_agent.h
     web_page.cpp
@@ -17,12 +29,15 @@ qt_add_library(whatsie_web STATIC
 )
 whatsie_set_warnings(whatsie_web)
 
-# Script bundle. Files are added here as features land (see DOCS/FEATURES.md).
-# qt_add_resources(whatsie_web "scripts"
-#     PREFIX "/scripts"
-#     BASE   "scripts"
-#     FILES  scripts/bridge.js
-# )
+# Script bundle (see scripts/README.md). Added as features are approved.
+qt_add_resources(whatsie_web "scripts"
+    PREFIX "/scripts"
+    BASE "scripts"
+    FILES
+        scripts/bootstrap.js
+        scripts/storage-persist.js
+        scripts/theme-preload.js
+)
 
 target_link_libraries(whatsie_web
     PUBLIC

@@ -15,6 +15,7 @@ class WebView;
 namespace whatsie::ui {
 
 class Actions;
+class DownloadsHub;
 class NotificationHub;
 class SettingsDialog;
 class ThemeApplier;
@@ -22,7 +23,7 @@ class TrayController;
 
 /// Top-level window: lays out the web view, owns the tray and actions, and
 /// implements the window-level behaviours of FEATURES S2–S7. Everything else
-/// is delegated.
+/// is delegated to hubs/controllers.
 class MainWindow : public QMainWindow
 {
     Q_OBJECT
@@ -62,6 +63,9 @@ private:
     void setFullScreenMode(bool on);
     void handleUnread(int count);
     void handleRenderProcessGaveUp();
+    void resetSitePermissions();
+    void clearCache();
+    void confirmClearSession();
 
     core::Settings& m_settings;
     core::ThemeService& m_theme;
@@ -70,6 +74,7 @@ private:
     core::DndController* m_dnd = nullptr;
     TrayController* m_tray = nullptr;
     NotificationHub* m_notifications = nullptr;
+    DownloadsHub* m_downloads = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;

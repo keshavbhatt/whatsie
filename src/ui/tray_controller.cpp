@@ -66,7 +66,9 @@ void TrayController::buildMenu()
     m_menu->addAction(m_actions.showHide);
     m_menu->addAction(m_actions.newChat);
     m_menu->addAction(m_actions.reload);
+    m_menu->addAction(m_actions.downloads);
     m_menu->addSeparator();
+    m_menu->addAction(m_actions.mute);
     m_menu->addMenu(buildDndMenu());
     m_menu->addSeparator();
     m_menu->addAction(m_actions.settings);

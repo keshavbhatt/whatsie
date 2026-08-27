@@ -1,8 +1,9 @@
 # platform: OS-specific backends behind interfaces declared in core/.
 # Implementations are selected here per OS — never with #ifdef inside classes
-# (the factory is the one sanctioned switch).
+# (the notifier factory is the one sanctioned switch).
 
 qt_add_library(whatsie_platform STATIC
+    file_manager.h
     logging.cpp
     logging.h
     notifier_factory.cpp
@@ -22,10 +23,13 @@ if(LINUX)
     target_sources(whatsie_platform PRIVATE
         linux/dbus_image.cpp
         linux/dbus_image.h
+        linux/file_manager_dbus.cpp
         linux/freedesktop_notifier.cpp
         linux/freedesktop_notifier.h
         linux/portal_notifier.cpp
         linux/portal_notifier.h
     )
     target_link_libraries(whatsie_platform PUBLIC Qt6::DBus)
+else()
+    target_sources(whatsie_platform PRIVATE file_manager_generic.cpp)
 endif()

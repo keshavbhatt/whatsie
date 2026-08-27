@@ -28,6 +28,8 @@ Actions::Actions(QWidget* owner)
     showHide = make(owner, tr("Hide to tray"), QKeySequence::Close); // Ctrl+W
     newChat = make(owner, tr("New chat…"), QKeySequence::New);       // Ctrl+N
     reload = make(owner, tr("Reload"), QKeySequence::Refresh);       // F5
+    downloads = make(owner, tr("Downloads…"), QKeySequence(Qt::CTRL | Qt::Key_J));
+    mute = make(owner, tr("Mute sounds"), QKeySequence(Qt::CTRL | Qt::Key_M));
     zoomIn = make(owner, tr("Zoom in"), QKeySequence::ZoomIn);
     zoomOut = make(owner, tr("Zoom out"), QKeySequence::ZoomOut);
     zoomReset = make(owner, tr("Reset zoom"), QKeySequence(Qt::CTRL | Qt::Key_0));
@@ -36,6 +38,7 @@ Actions::Actions(QWidget* owner)
     about = make(owner, tr("About Whatsie"));
     quit = make(owner, tr("Quit"), QKeySequence::Quit); // Ctrl+Q
 
+    mute->setCheckable(true);
     fullScreen->setCheckable(true);
     quit->setMenuRole(QAction::QuitRole);
     about->setMenuRole(QAction::AboutRole);
@@ -44,7 +47,8 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {showHide, newChat, reload, zoomIn, zoomOut, zoomReset, fullScreen, settings, about, quit};
+    return {showHide, newChat,   reload,     downloads, mute,  zoomIn,
+            zoomOut,  zoomReset, fullScreen, settings,  about, quit};
 }
 
 } // namespace whatsie::ui

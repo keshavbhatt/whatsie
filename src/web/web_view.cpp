@@ -3,17 +3,25 @@
 #include "core/settings/settings.h"
 #include "core/unread_badge.h"
 #include "core/zoom_policy.h"
+#include "web/bridge.h"
+#include "web/clipboard_fix.h"
 #include "web/logging.h"
+#include "web/permission_controller.h"
 #include "web/web_page.h"
 #include "web/web_profile.h"
 
+#include <QApplication>
 #include <QChildEvent>
+#include <QClipboard>
 #include <QContextMenuEvent>
+#include <QKeyEvent>
 #include <QMenu>
 #include <QTimer>
 #include <QUrl>
+#include <QWebChannel>
 #include <QWebEngineContextMenuRequest>
 #include <QWebEngineFullScreenRequest>
+#include <QWebEngineScript>
 #include <QWheelEvent>
 
 using namespace Qt::StringLiterals;
@@ -24,18 +32,32 @@ namespace {
 const QUrl kWhatsAppUrl(u"https://web.whatsapp.com/"_s);
 } // namespace
 
-WebView::WebView(core::Settings& settings, QWidget* parent)
+WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* parent)
     : QWebEngineView(parent)
     , m_settings(settings)
-    , m_profile(new WebProfile(settings, this))
+    , m_profile(new WebProfile(settings, theme, this))
     , m_page(new WebPage(*m_profile, this))
+    , m_permissions(new PermissionController(this))
 {
     m_clock.start();
+    m_page->setHostWidget(this);
     setPage(m_page);
     applyZoom();
 
+    // One channel per page exposing the profile's bridge object (ADR-006).
+    auto* channel = new QWebChannel(m_page);
+    channel->registerObject(u"bridge"_s, &m_profile->bridge());
+    m_page->setWebChannel(channel, QWebEngineScript::MainWorld);
+
+    m_permissions->attach(*m_page);
+    connect(m_permissions, &PermissionController::promptRequested, this, &WebView::permissionPromptRequested);
+    connect(m_page, &QWebEnginePage::desktopMediaRequested, this, &WebView::desktopMediaRequested);
+
     connect(&m_settings, &core::Settings::zoomFactorChanged, this, [this](double) { applyZoom(); });
     connect(&m_settings, &core::Settings::zoomFactorMaximizedChanged, this, [this](double) { applyZoom(); });
+    connect(&m_settings, &core::Settings::mutedChanged, m_page, &QWebEnginePage::setAudioMuted);
+    m_page->setAudioMuted(m_settings.muted());
+
     connect(m_page, &QWebEnginePage::titleChanged, this, &WebView::handleTitleChanged);
     connect(m_page, &QWebEnginePage::renderProcessTerminated, this, &WebView::handleRenderProcessTerminated);
     connect(m_page, &QWebEnginePage::loadFinished, this, [this](bool ok) {
@@ -47,7 +69,11 @@ WebView::WebView(core::Settings& settings, QWidget* parent)
         request.accept();
         Q_EMIT fullScreenRequested(request.toggleOn());
     });
-    connect(m_page, &WebPage::inAppPopupRequested, this, &WebView::inAppPopupRequested);
+    // Theme flipped: the page theme is applied at DocumentCreation, so reload.
+    connect(m_profile, &WebProfile::bootstrapChanged, this, [this] {
+        qCInfo(lcWeb) << "reloading for theme change";
+        reload();
+    });
 }
 
 void WebView::loadWhatsApp()
@@ -109,9 +135,8 @@ void WebView::zoomReset()
     applyZoom();
 }
 
-// Ctrl+wheel arrives at Chromium's child render widget, not at the view, so
-// the filter is installed on every child (W: "Ctrl+wheel cannot be blocked at
-// the view level").
+// Input arrives at Chromium's child render widget, not at the view, so the
+// filter is installed on every child.
 void WebView::childEvent(QChildEvent* event)
 {
     QWebEngineView::childEvent(event);
@@ -130,6 +155,12 @@ bool WebView::eventFilter(QObject* watched, QEvent* event)
                 zoomStep(delta > 0 ? 1 : -1);
             }
             return true;
+        }
+    } else if (event->type() == QEvent::KeyPress) {
+        // FEATURES M7: make clipboard images pasteable before Chromium reads them.
+        auto* key = static_cast<QKeyEvent*>(event);
+        if (key->matches(QKeySequence::Paste)) {
+            ensureClipboardImageIsPng(*QApplication::clipboard());
         }
     }
     return QWebEngineView::eventFilter(watched, event);

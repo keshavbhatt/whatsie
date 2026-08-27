@@ -29,8 +29,9 @@ private Q_SLOTS:
         QTest::qWait(200);
 
         // Exercise a few window-level paths that need no network.
-        settings.setTheme(whatsie::core::Theme::Dark);
+        settings.setTheme(whatsie::core::Theme::Dark); // triggers bootstrap reinstall + reload
         settings.setZoomFactor(1.5);
+        settings.setMuted(true);
         window.toggleVisibility();
         window.showAndRaise();
         QTest::qWait(50);

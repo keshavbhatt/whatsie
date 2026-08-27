@@ -1,61 +1,64 @@
 #include "web/web_page.h"
 
 #include "core/navigation_policy.h"
+#include "core/settings/settings.h"
 #include "web/logging.h"
+#include "web/popup_window.h"
 #include "web/web_profile.h"
 
+#include <QCoreApplication>
 #include <QDesktopServices>
-#include <QWebEnginePermission>
+#include <QFileDialog>
+#include <QFileInfo>
+#include <QMimeDatabase>
+#include <QSet>
+
+using namespace Qt::StringLiterals;
 
 namespace whatsie::web {
 
-namespace {
-
-/// Temporary page handed to Chromium for window.open()/target=_blank. It
-/// never renders: the first navigation is inspected and either sent to the
-/// system browser or reported back, then the page deletes itself.
-class PopupPage : public QWebEnginePage
+QString nameFilterFor(const QStringList& acceptedMimeTypes)
 {
-public:
-    PopupPage(QWebEngineProfile* profile, WebPage* owner)
-        : QWebEnginePage(profile, owner)
-        , m_owner(owner)
-    {}
-
-protected:
-    bool acceptNavigationRequest(const QUrl& url, NavigationType, bool) override
-    {
-        if (core::shouldOpenExternally(url)) {
-            qCInfo(lcWeb) << "popup → system browser:" << url;
-            QDesktopServices::openUrl(url);
-        } else if (core::isWhatsAppWebUrl(url)) {
-            qCInfo(lcWeb) << "popup stays in app:" << url;
-            Q_EMIT m_owner->inAppPopupRequested(url);
-        } else {
-            qCDebug(lcWeb) << "popup navigation ignored:" << url;
-        }
-        deleteLater();
-        return false;
+    const QString all = QCoreApplication::translate("FileChooser", "All files") + u" (*)"_s;
+    if (acceptedMimeTypes.isEmpty()) {
+        return all;
     }
-
-private:
-    WebPage* m_owner;
-};
-
-} // namespace
+    QMimeDatabase db;
+    QSet<QString> patterns;
+    for (const QString& accepted : acceptedMimeTypes) {
+        if (accepted.startsWith(u'.')) {
+            patterns.insert(u"*"_s + accepted);
+            continue;
+        }
+        if (accepted.endsWith(u"/*"_s)) {
+            const QString prefix = accepted.chopped(1);
+            for (const QMimeType& type : db.allMimeTypes()) {
+                if (type.name().startsWith(prefix)) {
+                    for (const QString& glob : type.globPatterns()) {
+                        patterns.insert(glob);
+                    }
+                }
+            }
+            continue;
+        }
+        const QMimeType type = db.mimeTypeForName(accepted);
+        for (const QString& glob : type.globPatterns()) {
+            patterns.insert(glob);
+        }
+    }
+    if (patterns.isEmpty()) {
+        return all;
+    }
+    QStringList sorted(patterns.cbegin(), patterns.cend());
+    sorted.sort();
+    return QCoreApplication::translate("FileChooser", "Supported files") + u" ("_s + sorted.join(u' ') +
+           u");;"_s + all;
+}
 
 WebPage::WebPage(WebProfile& profile, QObject* parent)
     : QWebEnginePage(&profile, parent)
-{
-    connect(this, &QWebEnginePage::permissionRequested, this, [](QWebEnginePermission permission) {
-        // FEATURES N11: notifications are the point of the app — always allow.
-        // Other permission types are decided by the M3 permission controller.
-        if (permission.permissionType() == QWebEnginePermission::PermissionType::Notifications) {
-            qCInfo(lcWeb) << "granting notification permission for" << permission.origin();
-            permission.grant();
-        }
-    });
-}
+    , m_profile(profile)
+{}
 
 bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame)
 {
@@ -70,7 +73,43 @@ bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool
 QWebEnginePage* WebPage::createWindow(WebWindowType type)
 {
     Q_UNUSED(type)
-    return new PopupPage(profile(), this);
+    // The window decides on its first navigation whether it stays (call
+    // pop-out) or hands the URL to the browser and closes.
+    auto* window = new PopupWindow(m_profile, m_host);
+    window->show();
+    Q_EMIT popupOpened(window);
+    return window->page();
+}
+
+QStringList WebPage::chooseFiles(FileSelectionMode mode, const QStringList& oldFiles,
+                                 const QStringList& acceptedMimeTypes)
+{
+    core::Settings& settings = m_profile.appSettings();
+    const QString startDir =
+        oldFiles.isEmpty() ? settings.lastOpenDirectory() : QFileInfo(oldFiles.first()).absolutePath();
+    QStringList chosen;
+    switch (mode) {
+    case FileSelectOpen:
+        chosen = {QFileDialog::getOpenFileName(m_host, tr("Choose a file"), startDir,
+                                               nameFilterFor(acceptedMimeTypes))};
+        break;
+    case FileSelectOpenMultiple:
+        chosen = QFileDialog::getOpenFileNames(m_host, tr("Choose files"), startDir,
+                                               nameFilterFor(acceptedMimeTypes));
+        break;
+    case FileSelectUploadFolder:
+        chosen = {QFileDialog::getExistingDirectory(m_host, tr("Choose a folder"), startDir)};
+        break;
+    case FileSelectSave:
+        chosen = {QFileDialog::getSaveFileName(m_host, tr("Save file"), startDir,
+                                               nameFilterFor(acceptedMimeTypes))};
+        break;
+    }
+    chosen.removeAll(QString());
+    if (!chosen.isEmpty()) {
+        settings.setLastOpenDirectory(QFileInfo(chosen.first()).absolutePath());
+    }
+    return chosen;
 }
 
 void WebPage::javaScriptConsoleMessage(JavaScriptConsoleMessageLevel level, const QString& message,

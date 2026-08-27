@@ -1,7 +1,9 @@
 #include "ui/settings_dialog.h"
 
+#include "core/downloads/file_naming.h"
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
+#include "core/storage_policy.h"
 #include "core/zoom_policy.h"
 
 #include <QCheckBox>
@@ -9,28 +11,38 @@
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QFormLayout>
+#include <QFutureWatcher>
+#include <QGroupBox>
+#include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPushButton>
 #include <QSpinBox>
 #include <QTabWidget>
 #include <QUrl>
 #include <QVBoxLayout>
+#include <QtConcurrent>
 
 using namespace Qt::StringLiterals;
 using whatsie::core::CloseAction;
+using whatsie::core::HardwareAcceleration;
 using whatsie::core::Theme;
 
 namespace whatsie::ui {
 
-SettingsDialog::SettingsDialog(core::Settings& settings, bool trayAvailable, QWidget* parent)
+SettingsDialog::SettingsDialog(core::Settings& settings, bool trayAvailable, StoragePaths storage,
+                               QWidget* parent)
     : QDialog(parent)
     , m_settings(settings)
     , m_trayAvailable(trayAvailable)
+    , m_storage(std::move(storage))
 {
     setupUi();
     loadValues();
+    refreshStorageSizes();
 }
 
 void SettingsDialog::setupUi()
@@ -42,7 +54,7 @@ void SettingsDialog::setupUi()
     m_tabs->addTab(buildGeneralTab(), tr("General"));
     m_tabs->addTab(buildAppearanceTab(), tr("Appearance"));
     m_tabs->addTab(buildNotificationsTab(), tr("Notifications"));
-    m_tabs->addTab(buildAdvancedTab(), tr("Advanced"));
+    m_tabs->addTab(buildPrivacyTab(), tr("Privacy && Advanced"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::close);
@@ -50,34 +62,34 @@ void SettingsDialog::setupUi()
     auto* layout = new QVBoxLayout(this);
     layout->addWidget(m_tabs, 1);
     layout->addWidget(buttons);
-    resize(520, 400);
+    resize(560, 460);
 }
 
 QWidget* SettingsDialog::buildGeneralTab()
 {
     auto* page = new QWidget(this);
-    auto* form = new QFormLayout(page);
+    auto* outer = new QVBoxLayout(page);
 
-    m_closeAction = new QComboBox(page);
+    auto* windowBox = new QGroupBox(tr("Window"), page);
+    auto* form = new QFormLayout(windowBox);
+    m_closeAction = new QComboBox(windowBox);
     m_closeAction->addItem(tr("Minimize to tray"), static_cast<int>(CloseAction::MinimizeToTray));
     m_closeAction->addItem(tr("Quit"), static_cast<int>(CloseAction::Quit));
     connect(m_closeAction, &QComboBox::currentIndexChanged, this, [this](int index) {
         m_settings.setCloseAction(static_cast<CloseAction>(m_closeAction->itemData(index).toInt()));
     });
     form->addRow(tr("When closing the window:"), m_closeAction);
-
-    m_startMinimized = new QCheckBox(tr("Start hidden in the system tray"), page);
+    m_startMinimized = new QCheckBox(tr("Start hidden in the system tray"), windowBox);
     connect(m_startMinimized, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setStartMinimized(on); });
     form->addRow(QString(), m_startMinimized);
-
-    m_trayLeftClick = new QCheckBox(tr("Left-clicking the tray icon shows/hides the window"), page);
+    m_trayLeftClick = new QCheckBox(tr("Left-clicking the tray icon shows/hides the window"), windowBox);
     connect(m_trayLeftClick, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setTrayLeftClickToggles(on); });
     form->addRow(QString(), m_trayLeftClick);
-
     if (!m_trayAvailable) {
-        auto* note = new QLabel(tr("No system tray was detected: the window will never be hidden."), page);
+        auto* note =
+            new QLabel(tr("No system tray was detected: the window will never be hidden."), windowBox);
         note->setWordWrap(true);
         note->setStyleSheet(u"color: palette(placeholder-text);"_s);
         form->addRow(QString(), note);
@@ -85,6 +97,35 @@ QWidget* SettingsDialog::buildGeneralTab()
         m_startMinimized->setEnabled(false);
         m_trayLeftClick->setEnabled(false);
     }
+    outer->addWidget(windowBox);
+
+    auto* downloadsBox = new QGroupBox(tr("Downloads"), page);
+    auto* dform = new QFormLayout(downloadsBox);
+    m_downloadDir = new QLineEdit(downloadsBox);
+    m_downloadDir->setReadOnly(true);
+    auto* browse = new QPushButton(tr("Change…"), downloadsBox);
+    connect(browse, &QPushButton::clicked, this, [this] {
+        const QString dir =
+            QFileDialog::getExistingDirectory(this, tr("Download folder"), m_settings.downloadDirectory());
+        if (!dir.isEmpty()) {
+            m_settings.setDownloadDirectory(dir);
+            m_downloadDir->setText(m_settings.downloadDirectory());
+        }
+    });
+    auto* dirRow = new QHBoxLayout;
+    dirRow->addWidget(m_downloadDir, 1);
+    dirRow->addWidget(browse);
+    dform->addRow(tr("Save files to:"), dirRow);
+    m_askWhereToSave = new QCheckBox(tr("Always ask where to save"), downloadsBox);
+    connect(m_askWhereToSave, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setAskWhereToSave(on); });
+    dform->addRow(QString(), m_askWhereToSave);
+    m_showDownloads = new QCheckBox(tr("Show the Downloads window when a download starts"), downloadsBox);
+    connect(m_showDownloads, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setShowDownloadsOnStart(on); });
+    dform->addRow(QString(), m_showDownloads);
+    outer->addWidget(downloadsBox);
+    outer->addStretch();
     return page;
 }
 
@@ -100,6 +141,9 @@ QWidget* SettingsDialog::buildAppearanceTab()
     connect(m_theme, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_settings.setTheme(static_cast<Theme>(m_theme->itemData(index).toInt())); });
     form->addRow(tr("Theme:"), m_theme);
+    auto* themeNote = new QLabel(tr("Changing the theme reloads WhatsApp Web."), page);
+    themeNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    form->addRow(QString(), themeNote);
 
     auto makeZoom = [page] {
         auto* spin = new QDoubleSpinBox(page);
@@ -165,28 +209,90 @@ QWidget* SettingsDialog::buildNotificationsTab()
     return page;
 }
 
-QWidget* SettingsDialog::buildAdvancedTab()
+QWidget* SettingsDialog::buildPrivacyTab()
 {
     auto* page = new QWidget(this);
-    auto* form = new QFormLayout(page);
+    auto* outer = new QVBoxLayout(page);
+
+    auto* permBox = new QGroupBox(tr("Site permissions"), page);
+    auto* pl = new QVBoxLayout(permBox);
+    auto* permNote = new QLabel(tr("Camera, microphone and location decisions are remembered. "
+                                   "Reset them to be asked again."),
+                                permBox);
+    permNote->setWordWrap(true);
+    auto* resetPerms = new QPushButton(tr("Reset permissions"), permBox);
+    connect(resetPerms, &QPushButton::clicked, this, &SettingsDialog::resetPermissionsRequested);
+    pl->addWidget(permNote);
+    pl->addWidget(resetPerms, 0, Qt::AlignLeft);
+    outer->addWidget(permBox);
+
+    auto* storageBox = new QGroupBox(tr("Storage"), page);
+    auto* sform = new QFormLayout(storageBox);
+    m_cacheSize = new QLabel(tr("calculating…"), storageBox);
+    m_sessionSize = new QLabel(tr("calculating…"), storageBox);
+    sform->addRow(tr("Cache:"), m_cacheSize);
+    sform->addRow(tr("Session data:"), m_sessionSize);
+    auto* clearCache = new QPushButton(tr("Clear cache"), storageBox);
+    clearCache->setToolTip(tr("Removes cached web content. You stay logged in."));
+    connect(clearCache, &QPushButton::clicked, this, [this] {
+        Q_EMIT clearCacheRequested();
+        refreshStorageSizes();
+    });
+    auto* clearSession = new QPushButton(tr("Log out && clear session…"), storageBox);
+    clearSession->setToolTip(
+        tr("Removes the WhatsApp session. Whatsie quits and you link your phone again."));
+    connect(clearSession, &QPushButton::clicked, this, &SettingsDialog::clearSessionRequested);
+    auto* buttons = new QHBoxLayout;
+    buttons->addWidget(clearCache);
+    buttons->addWidget(clearSession);
+    buttons->addStretch();
+    sform->addRow(QString(), buttons);
+    outer->addWidget(storageBox);
+
+    auto* advBox = new QGroupBox(tr("Advanced"), page);
+    auto* aform = new QFormLayout(advBox);
+    m_hardwareAcceleration = new QComboBox(advBox);
+    m_hardwareAcceleration->addItem(tr("Automatic"), static_cast<int>(HardwareAcceleration::Auto));
+    m_hardwareAcceleration->addItem(tr("Always on (ignore GPU blocklist)"),
+                                    static_cast<int>(HardwareAcceleration::On));
+    m_hardwareAcceleration->addItem(tr("Off"), static_cast<int>(HardwareAcceleration::Off));
+    connect(m_hardwareAcceleration, &QComboBox::currentIndexChanged, this, [this](int index) {
+        m_settings.setHardwareAcceleration(
+            static_cast<HardwareAcceleration>(m_hardwareAcceleration->itemData(index).toInt()));
+    });
+    aform->addRow(tr("Hardware acceleration:"), m_hardwareAcceleration);
+    auto* hwNote =
+        new QLabel(tr("Takes effect after restarting Whatsie. Turn off if the window stays blank."), advBox);
+    hwNote->setWordWrap(true);
+    hwNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    aform->addRow(QString(), hwNote);
 
     const QString logPath = core::LogSink::logFilePath();
-    auto* logLabel = new QLabel(logPath.isEmpty() ? tr("disabled (--no-log-file)") : logPath, page);
+    auto* logLabel = new QLabel(logPath.isEmpty() ? tr("disabled (--no-log-file)") : logPath, advBox);
     logLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
     logLabel->setWordWrap(true);
-    form->addRow(tr("Log file:"), logLabel);
-
-    auto* openLog = new QPushButton(tr("Open log folder"), page);
+    aform->addRow(tr("Log file:"), logLabel);
+    auto* openLog = new QPushButton(tr("Open log folder"), advBox);
     openLog->setEnabled(!logPath.isEmpty());
     connect(openLog, &QPushButton::clicked, this,
             [logPath] { QDesktopServices::openUrl(QUrl::fromLocalFile(QFileInfo(logPath).absolutePath())); });
-    form->addRow(QString(), openLog);
-
-    auto* settingsLabel = new QLabel(m_settings.fileName(), page);
-    settingsLabel->setTextInteractionFlags(Qt::TextSelectableByMouse);
-    settingsLabel->setWordWrap(true);
-    form->addRow(tr("Settings file:"), settingsLabel);
+    aform->addRow(QString(), openLog);
+    outer->addWidget(advBox);
+    outer->addStretch();
     return page;
+}
+
+void SettingsDialog::refreshStorageSizes()
+{
+    for (const auto& [label, path] :
+         {std::pair{m_cacheSize, m_storage.cacheDir}, std::pair{m_sessionSize, m_storage.sessionDir}}) {
+        auto* watcher = new QFutureWatcher<qint64>(this);
+        connect(watcher, &QFutureWatcher<qint64>::finished, this, [watcher, label] {
+            label->setText(core::humanSize(watcher->result()));
+            watcher->deleteLater();
+        });
+        watcher->setFuture(QtConcurrent::run([path] { return core::directorySize(path); }));
+    }
 }
 
 void SettingsDialog::loadValues()
@@ -194,6 +300,9 @@ void SettingsDialog::loadValues()
     m_closeAction->setCurrentIndex(m_closeAction->findData(static_cast<int>(m_settings.closeAction())));
     m_startMinimized->setChecked(m_settings.startMinimized());
     m_trayLeftClick->setChecked(m_settings.trayLeftClickToggles());
+    m_downloadDir->setText(m_settings.downloadDirectory());
+    m_askWhereToSave->setChecked(m_settings.askWhereToSave());
+    m_showDownloads->setChecked(m_settings.showDownloadsOnStart());
     m_theme->setCurrentIndex(m_theme->findData(static_cast<int>(m_settings.theme())));
     m_zoom->setValue(m_settings.zoomFactor());
     m_zoomMaximized->setValue(m_settings.zoomFactorMaximized());
@@ -203,6 +312,8 @@ void SettingsDialog::loadValues()
     m_notificationSound->setEnabled(m_settings.notificationsEnabled());
     m_notificationTimeout->setValue(m_settings.notificationTimeoutSec());
     m_notificationTimeout->setEnabled(m_settings.notificationsEnabled());
+    m_hardwareAcceleration->setCurrentIndex(
+        m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
 }
 
 } // namespace whatsie::ui

@@ -1,4 +1,4 @@
-find_package(Qt6 6.11 REQUIRED COMPONENTS Test)
+find_package(Qt6 6.11 REQUIRED COMPONENTS Test Qml)
 
 # Environment every test runs with. Offscreen so the suite works headless and
 # in CI; GPU off because WebEngine has nothing to draw to.
@@ -47,6 +47,8 @@ whatsie_add_test(tst_navigation_policy   tst_navigation_policy.cpp   whatsie_cor
 whatsie_add_test(tst_render_crash_policy tst_render_crash_policy.cpp whatsie_core)
 whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_core)
 whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
+whatsie_add_test(tst_download_model      tst_download_model.cpp      whatsie_core)
+whatsie_add_test(tst_storage_and_flags   tst_storage_and_flags.cpp   whatsie_core)
 whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_core GUI)
 whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
 # platform
@@ -55,6 +57,8 @@ if(LINUX)
 endif()
 # web
 whatsie_add_test(tst_user_agent          tst_user_agent.cpp          whatsie_web)
+whatsie_add_test(tst_web_scripts         tst_web_scripts.cpp         whatsie_web  GUI)
+target_link_libraries(tst_web_scripts PRIVATE Qt6::Qml)
 # app / ui
 whatsie_add_test(tst_cli_options         tst_cli_options.cpp         whatsie_app)
 whatsie_add_test(tst_single_instance     tst_single_instance.cpp     whatsie_app)

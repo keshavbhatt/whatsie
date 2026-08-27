@@ -54,7 +54,13 @@ Delivered: see `PROGRESS.md` 2026-08-27 M2 entry.
 **Exit:** GNOME + KDE show native notifications with avatar; clicking raises the window;
 unrelated notification clicks do nothing (regression test on id matching).
 
-## M3 — Web integration layer
+## M3 — Web integration layer — part A ✅ (2026-08-27), part B open
+
+Part A delivered (see `PROGRESS.md`): script bundle + bridge, page-side theme, permissions,
+screen-share picker, call pop-out windows, file chooser, clipboard paste fix, **persistent
+downloads with a Downloads window** (owner request), mute, storage manager with safe-delete,
+hardware-acceleration setting. Part B (next): S13 connection watchdog, S14 network-resume
+reload, S16 service-worker recovery, A8 privacy blur, M6 drag-and-drop attach.
 
 | Rows | Work |
 |---|---|

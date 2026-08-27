@@ -7,20 +7,27 @@
 #include "core/zoom_policy.h"
 #include "ui/about_dialog.h"
 #include "ui/actions.h"
+#include "ui/downloads_hub.h"
 #include "ui/logging.h"
 #include "ui/notification_hub.h"
+#include "ui/permission_prompt.h"
+#include "ui/screen_picker_dialog.h"
 #include "ui/settings_dialog.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "web/web_profile.h"
 #include "web/web_view.h"
 
 #include <QAction>
 #include <QApplication>
 #include <QCloseEvent>
+#include <QFile>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSessionManager>
+#include <QStandardPaths>
 #include <QWebEnginePage>
+#include <QWebEnginePermission>
 
 using namespace Qt::StringLiterals;
 
@@ -68,7 +75,7 @@ void MainWindow::setupUi()
     m_tray = new TrayController(m_settings, *m_dnd, *m_actions, this);
     setWindowIcon(m_tray->currentIcon());
 
-    m_webView = new web::WebView(m_settings, this);
+    m_webView = new web::WebView(m_settings, m_theme, this);
     setCentralWidget(m_webView);
     m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
@@ -77,6 +84,7 @@ void MainWindow::setupUi()
 
     m_notifications = new NotificationHub(m_settings, *m_dnd, *m_tray, *m_webView, this);
     connect(m_notifications, &NotificationHub::activated, this, &MainWindow::showAndRaise);
+    m_downloads = new DownloadsHub(m_settings, m_notifications->service(), *m_webView, this, this);
 }
 
 void MainWindow::connectActions()
@@ -84,6 +92,10 @@ void MainWindow::connectActions()
     connect(m_actions->showHide, &QAction::triggered, this, &MainWindow::toggleVisibility);
     connect(m_actions->newChat, &QAction::triggered, this, &MainWindow::promptNewChat);
     connect(m_actions->reload, &QAction::triggered, this, [this] { m_webView->reload(); });
+    connect(m_actions->downloads, &QAction::triggered, m_downloads, &DownloadsHub::showWindow);
+    m_actions->mute->setChecked(m_settings.muted());
+    connect(m_actions->mute, &QAction::toggled, this, [this](bool on) { m_settings.setMuted(on); });
+    connect(&m_settings, &core::Settings::mutedChanged, m_actions->mute, &QAction::setChecked);
     connect(m_actions->zoomIn, &QAction::triggered, this, [this] { m_webView->zoomStep(+1); });
     connect(m_actions->zoomOut, &QAction::triggered, this, [this] { m_webView->zoomStep(-1); });
     connect(m_actions->zoomReset, &QAction::triggered, this, [this] { m_webView->zoomReset(); });
@@ -105,10 +117,14 @@ void MainWindow::connectWebView()
     connect(m_webView, &web::WebView::renderProcessGaveUp, this, &MainWindow::handleRenderProcessGaveUp);
     connect(m_webView, &QWebEngineView::titleChanged, this,
             [this](const QString& title) { setWindowTitle(title.isEmpty() ? u"WhatsApp"_s : title); });
-    connect(m_webView, &web::WebView::inAppPopupRequested, this, [](const QUrl& url) {
-        // In-app pop-outs (calls) land in M3; until then just record it.
-        qCWarning(lcUi) << "in-app popup not yet supported:" << url;
-    });
+    connect(m_webView, &web::WebView::permissionPromptRequested, this,
+            [this](QWebEnginePermission permission) { askPermission(this, std::move(permission)); });
+    connect(m_webView, &web::WebView::desktopMediaRequested, this,
+            [this](QWebEngineDesktopMediaRequest request) {
+                auto* picker = new ScreenPickerDialog(std::move(request), this);
+                picker->setAttribute(Qt::WA_DeleteOnClose);
+                picker->open();
+            });
 }
 
 // ---- lifecycle -------------------------------------------------------------
@@ -262,10 +278,17 @@ void MainWindow::promptNewChat()
 void MainWindow::showSettings()
 {
     if (!m_settingsDialog) {
-        m_settingsDialog = new SettingsDialog(m_settings, m_tray->isAvailable(), this);
+        const StoragePaths storage{m_webView->profile().cachePath(),
+                                   m_webView->profile().persistentStoragePath()};
+        m_settingsDialog = new SettingsDialog(m_settings, m_tray->isAvailable(), storage, this);
         m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_settingsDialog, &SettingsDialog::testNotificationRequested, m_notifications,
                 &NotificationHub::sendTest);
+        connect(m_settingsDialog, &SettingsDialog::resetPermissionsRequested, this,
+                &MainWindow::resetSitePermissions);
+        connect(m_settingsDialog, &SettingsDialog::clearCacheRequested, this, &MainWindow::clearCache);
+        connect(m_settingsDialog, &SettingsDialog::clearSessionRequested, this,
+                &MainWindow::confirmClearSession);
     }
     m_settingsDialog->show();
     m_settingsDialog->raise();
@@ -287,16 +310,65 @@ void MainWindow::handleUnread(int count)
 void MainWindow::handleRenderProcessGaveUp()
 {
     showAndRaise();
-    const auto choice = QMessageBox::critical(
-        this, tr("WhatsApp Web keeps crashing"),
-        tr("The page's render process has crashed several times in a row.\n\n"
-           "Reload to try again, or quit. If this keeps happening, use Settings → Advanced to find the log."),
-        QMessageBox::Retry | QMessageBox::Close, QMessageBox::Retry);
+    const auto choice =
+        QMessageBox::critical(this, tr("WhatsApp Web keeps crashing"),
+                              tr("The page's render process has crashed several times in a row.\n\n"
+                                 "Reload to try again, or quit. If this keeps happening, use Settings → "
+                                 "Privacy & Advanced to find the log."),
+                              QMessageBox::Retry | QMessageBox::Close, QMessageBox::Retry);
     if (choice == QMessageBox::Retry) {
         m_webView->reload();
     } else {
         quit();
     }
+}
+
+// ---- privacy & storage (FEATURES M1, P5) ----------------------------------
+
+void MainWindow::resetSitePermissions()
+{
+    int count = 0;
+    for (QWebEnginePermission permission : m_webView->profile().listAllPermissions()) {
+        if (permission.permissionType() != QWebEnginePermission::PermissionType::Notifications) {
+            permission.reset();
+            ++count;
+        }
+    }
+    qCInfo(lcUi) << "reset" << count << "site permissions";
+    QMessageBox::information(
+        this, tr("Permissions reset"),
+        tr("WhatsApp will ask again the next time it needs your camera, microphone or location."));
+}
+
+void MainWindow::clearCache()
+{
+    m_webView->profile().clearHttpCache();
+    qCInfo(lcUi) << "http cache cleared";
+}
+
+void MainWindow::confirmClearSession()
+{
+    const auto choice = QMessageBox::warning(
+        this, tr("Log out and clear session?"),
+        tr("This removes the WhatsApp session and all cached data from this computer. "
+           "Whatsie will quit; when you start it again you link your phone with the QR code.\n\n"
+           "Your downloaded files are kept."),
+        QMessageBox::Yes | QMessageBox::Cancel, QMessageBox::Cancel);
+    if (choice != QMessageBox::Yes) {
+        return;
+    }
+    // Deleting the profile while the engine runs is unsafe: leave a marker
+    // that Application honours on the next start (ADR-011: explicit action).
+    const QString marker =
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation) + u"/clear-session"_s;
+    QFile file(marker);
+    if (!file.open(QIODevice::WriteOnly)) {
+        QMessageBox::critical(this, tr("Cannot clear session"), tr("Could not write %1.").arg(marker));
+        return;
+    }
+    file.close();
+    qCInfo(lcUi) << "session clear scheduled for next start";
+    quit();
 }
 
 } // namespace whatsie::ui

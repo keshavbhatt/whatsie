@@ -1,6 +1,8 @@
 # ui: QtWidgets layer. May use everything. Nothing depends on it except app/.
 # No .ui files — widgets are built in code (see CODING_STANDARDS.md §5).
 
+find_package(Qt6 6.11 REQUIRED COMPONENTS Concurrent)
+
 qt_add_library(whatsie_ui STATIC
     about_dialog.cpp
     about_dialog.h
@@ -8,12 +10,22 @@ qt_add_library(whatsie_ui STATIC
     actions.h
     diagnostics.cpp
     diagnostics.h
+    downloads_delegate.cpp
+    downloads_delegate.h
+    downloads_dialog.cpp
+    downloads_dialog.h
+    downloads_hub.cpp
+    downloads_hub.h
     logging.cpp
     logging.h
     main_window.cpp
     main_window.h
     notification_hub.cpp
     notification_hub.h
+    permission_prompt.cpp
+    permission_prompt.h
+    screen_picker_dialog.cpp
+    screen_picker_dialog.h
     settings_dialog.cpp
     settings_dialog.h
     theme_applier.cpp
@@ -43,4 +55,5 @@ target_link_libraries(whatsie_ui
         whatsie_platform
         Qt6::Widgets
         Qt6::Svg
+        Qt6::Concurrent
 )

@@ -1,7 +1,10 @@
 #include "web/web_profile.h"
 
 #include "core/settings/settings.h"
+#include "core/theme/theme_service.h"
+#include "web/bridge.h"
 #include "web/logging.h"
+#include "web/script_bundle.h"
 #include "web/user_agent.h"
 
 #include <QDir>
@@ -17,18 +20,29 @@ namespace {
 constexpr auto kProfileName = "whatsie";
 } // namespace
 
-WebProfile::WebProfile(core::Settings& settings, QObject* parent)
+WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObject* parent)
     : QWebEngineProfile(QString::fromLatin1(kProfileName), parent)
     , m_settings(settings)
+    , m_theme(theme)
+    , m_bridge(std::make_unique<Bridge>())
+    , m_scripts(std::make_unique<ScriptBundle>(*this))
 {
     configureStorage();
     configureUserAgent();
     configureAttributes();
+    installBootstrap();
+
     connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
         this->settings()->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, enabled);
     });
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
+        installBootstrap();
+        Q_EMIT bootstrapChanged();
+    });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
+
+WebProfile::~WebProfile() = default;
 
 void WebProfile::configureStorage()
 {
@@ -48,6 +62,12 @@ void WebProfile::configureStorage()
     // off" banner (W#307).
     queryPermission(QUrl(u"https://web.whatsapp.com"_s), QWebEnginePermission::PermissionType::Notifications)
         .grant();
+}
+
+QStringList WebProfile::storageRoots() const
+{
+    return {QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
+            QStandardPaths::writableLocation(QStandardPaths::CacheLocation)};
 }
 
 void WebProfile::configureUserAgent()
@@ -71,6 +91,14 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
     // FEATURES A14: user option, off by default.
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
+}
+
+void WebProfile::installBootstrap()
+{
+    const QJsonObject config{
+        {u"theme"_s, m_theme.isDark() ? u"dark"_s : u"light"_s},
+    };
+    m_scripts->installBootstrap(config);
 }
 
 } // namespace whatsie::web

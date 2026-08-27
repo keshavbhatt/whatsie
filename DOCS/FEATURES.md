@@ -56,7 +56,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
 | T1 | Tray icon with context menu | yes | yes | CORE | | **KEEP** | done |
-| T2 | Unread badge on tray + window icon | title parsing, 10 PNGs | composed image, tested | CORE | Compose in code; count from bridge with title fallback. | **KEEP** | done (title-based; bridge count in M3) |
+| T2 | Unread badge on tray + window icon | title parsing, 10 PNGs | composed image, tested | CORE | Compose in code; count from bridge with title fallback. | **KEEP** | done (title-based — the stable tier; ADR-019) |
 | T3 | Monochrome / symbolic tray icon option | no (W#93, 128) | yes (Y#14) | NICE | SVG symbolic variant. | **KEEP** | — |
 | T4 | Left-click toggles window (setting) | yes | yes + Windows focus grace | CORE | W#274 | **KEEP** | done |
 | T5 | Hide tray icon entirely (setting) | no (W#127, 193) | no | NICE | Requires S5. | **KEEP** | — |
@@ -86,7 +86,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done (Qt side; page theme in M3) |
+| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done |
 | A2 | Live follow-system-theme | no (W#157) | portal | CORE | `QStyleHints::colorSchemeChanged`; portal fallback. | **KEEP** | done |
 | A3 | Push theme into running page (React fiber, WA modules) | yes | yes | DROP | Reload on theme change instead. | **DROP** | dropped |
 | A4 | Automatic sunrise/sunset theme | yes (bugs) | yes (680 LOC) | DROP | | **DROP** | dropped |
@@ -108,19 +108,19 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| M1 | Camera / mic / notification / geolocation permissions (`QWebEnginePermission`), persisted, reviewable | dialog inert | works | CORE | Calls (W#287). | **KEEP** | — |
-| M2 | Screen-share picker + PipeWire flag | no | yes | CORE | | **KEEP** | — |
-| M3 | Call pop-out window kept in-app, closable | orphan page | yes | CORE | W#333. | **KEEP** | — |
+| M1 | Camera / mic / notification / geolocation permissions (`QWebEnginePermission`), persisted, reviewable | dialog inert | works | CORE | Calls (W#287). | **KEEP** | done |
+| M2 | Screen-share picker + PipeWire flag | no | yes | CORE | | **KEEP** | done |
+| M3 | Call pop-out window kept in-app, closable | orphan page | yes | CORE | W#333. | **KEEP** | done |
 | M4 | External links → system browser | yes | yes | CORE | | **KEEP** | done |
-| M5 | Native file chooser (portal-aware), last dir | Qt dialog | yes | CORE | W#296, 285. | **KEEP** | — |
+| M5 | Native file chooser (portal-aware), last dir | Qt dialog | yes | CORE | W#296, 285. | **KEEP** | done |
 | M6 | Drag-and-drop file attach (portal path resolution, threaded read, synthetic paste) | broken (W#111, 285) | yes (520 LOC) | NICE | Cap complexity; Y#32 lesson. | **KEEP** | — |
-| M7 | Clipboard image paste rescue | no (W#33, 311) | yes (45 LOC) | CORE | | **KEEP** | — |
-| M8 | Downloads: Chromium flow + minimal UI (dir setting, notification with "open folder") | manager window (bugs) | same | CORE (minimal) | Lesson B13. | **KEEP** | — |
-| M9 | Mute page audio toggle | yes | yes | CORE | | **KEEP** | — |
+| M7 | Clipboard image paste rescue | no (W#33, 311) | yes (45 LOC) | CORE | | **KEEP** | done |
+| M8 | Downloads: Chromium flow + minimal UI (dir setting, notification with "open folder") | manager window (bugs) | same | CORE (minimal) | Lesson B13. | **KEEP** | done (persistent history + Downloads window, per owner 2026-08-27) |
+| M9 | Mute page audio toggle | yes | yes | CORE | | **KEEP** | done |
 | M10 | Media autoplay toggle | inverted | inverted | DROP | `PlaybackRequiresUserGesture=false`. | **DROP** | dropped |
 | M11 | Missing-codec / media-stuck notice | no | yes | LATER | Snap/Flatpak runtimes have codecs. | **DROP** | dropped |
 | M12a | Certificate-error override dialog | Qt example | same | DROP | Single-origin app: hard fail with message. | **DROP** | dropped |
-| M12b | Proxy-auth dialog | Qt example | same | NICE | Needed with P3. | **KEEP** | — |
+| M12b | Proxy-auth dialog | Qt example | same | NICE | Needed with P3. | **KEEP** | done (WebEngine default auth dialog; proxy in M5) |
 | M13 | Context-menu filtering | yes | yes | CORE | | **KEEP** | done |
 
 ## 6. Privacy, lock, network, performance
@@ -131,8 +131,8 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | P2 | WebRTC IP handling policy | no | yes | NICE | One flag. | **KEEP** | — |
 | P3 | Network proxy (system / none / HTTP / SOCKS5 + auth) | system only (W#75, 223) | yes | NICE | Password via keychain or not stored. | **KEEP** | — |
 | P4 | Autostart at login (XDG / registry), sandbox-aware, starts minimized | no | yes (buggy) | NICE | | **KEEP** | — |
-| P5 | Storage manager with safe-delete guard | yes (W#230) | yes | CORE | | **KEEP** | — |
-| P6 | Hardware acceleration: auto / on / off | global flag | 18 knobs | CORE (1 setting) | Lesson B4. | **KEEP** | — |
+| P5 | Storage manager with safe-delete guard | yes (W#230) | yes | CORE | | **KEEP** | done |
+| P6 | Hardware acceleration: auto / on / off | global flag | 18 knobs | CORE (1 setting) | Lesson B4. | **KEEP** | done |
 | P7 | Remaining perf knobs | no | yes | DROP | Env var for experts. | **DROP** | dropped |
 | P8 | Unload page when hidden for N minutes | no (W#255, 194) | dormancy | LATER | Measure first. | **LATER** | — |
 | P9 | Profile export/import | no | yes | DROP | | **DROP** | dropped |
