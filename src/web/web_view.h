@@ -45,6 +45,7 @@ public:
     [[nodiscard]] QString userAgent() const;
     [[nodiscard]] WebProfile& profile() { return *m_profile; }
     [[nodiscard]] WebPage& webPage() { return *m_page; }
+    [[nodiscard]] PermissionController& permissions() { return *m_permissions; }
 
 Q_SIGNALS:
     void unreadCountChanged(int count);

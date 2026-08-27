@@ -5,6 +5,24 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Call permissions: persisted and asked once
+
+**Reported:** theme works; "call permissions are still messy". Logs showed the camera/mic grant
+was never stored (`permissions.json` held only Notifications; "reset 0 site permissions") and
+WhatsApp asks for *camera* then *camera+microphone* — two different Qt permission types → two
+prompts per call, again after every restart.
+
+**Cause.** In Qt WebEngine the answer to a media `permissionRequested` is session-scoped; only
+`QWebEngineProfile::queryPermission(origin, type).grant()` reaches the on-disk store.
+
+**Fixed.** `PermissionController` now (a) answers camera/mic requests from the store when any
+member of the camera/mic family was decided (denial wins), (b) persists the user's answer for
+the whole family, (c) `answer()` replaces direct `grant()` in the prompt. New integration test
+`tst_permissions` drives a real `getUserMedia()` through a local `wtest://` scheme: one prompt,
+answer stored for all three types, reload → no second prompt; denial stored too. 18/18 pass.
+
+---
+
 ## 2026-08-27 — Fixes from owner testing (theme, calls)
 
 **Reported:** downloads look good; theme setting not working (and the original toggled

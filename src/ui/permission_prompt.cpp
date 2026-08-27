@@ -1,6 +1,5 @@
 #include "ui/permission_prompt.h"
 
-#include "ui/logging.h"
 #include "web/permission_controller.h"
 
 #include <QMessageBox>
@@ -8,7 +7,7 @@
 
 namespace whatsie::ui {
 
-void askPermission(QWidget* parent, QWebEnginePermission permission)
+void askPermission(QWidget* parent, const QWebEnginePermission& permission, std::function<void(bool)> answer)
 {
     auto* box = new QMessageBox(parent);
     box->setAttribute(Qt::WA_DeleteOnClose);
@@ -16,19 +15,13 @@ void askPermission(QWidget* parent, QWebEnginePermission permission)
     box->setWindowTitle(QObject::tr("Permission request"));
     box->setText(QObject::tr("WhatsApp wants to %1.")
                      .arg(web::PermissionController::describe(permission.permissionType())));
-    box->setInformativeText(QObject::tr("You can change this later in Settings → Privacy."));
+    box->setInformativeText(
+        QObject::tr("Your choice is remembered. Change it in Settings → Privacy & Advanced."));
     QPushButton* allow = box->addButton(QObject::tr("Allow"), QMessageBox::AcceptRole);
     box->addButton(QObject::tr("Deny"), QMessageBox::RejectRole);
     box->setDefaultButton(allow);
-    QObject::connect(box, &QMessageBox::finished, box, [box, allow, permission]() mutable {
-        if (box->clickedButton() == allow) {
-            qCInfo(lcUi) << "user allowed" << permission.permissionType();
-            permission.grant();
-        } else {
-            qCInfo(lcUi) << "user denied" << permission.permissionType();
-            permission.deny();
-        }
-    });
+    QObject::connect(box, &QMessageBox::finished, box,
+                     [box, allow, answer = std::move(answer)] { answer(box->clickedButton() == allow); });
     box->open();
 }
 

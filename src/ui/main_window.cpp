@@ -15,6 +15,7 @@
 #include "ui/settings_dialog.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "web/permission_controller.h"
 #include "web/web_profile.h"
 #include "web/web_view.h"
 
@@ -118,7 +119,11 @@ void MainWindow::connectWebView()
     connect(m_webView, &QWebEngineView::titleChanged, this,
             [this](const QString& title) { setWindowTitle(title.isEmpty() ? u"WhatsApp"_s : title); });
     connect(m_webView, &web::WebView::permissionPromptRequested, this,
-            [this](QWebEnginePermission permission) { askPermission(this, std::move(permission)); });
+            [this](const QWebEnginePermission& permission) {
+                askPermission(this, permission, [this, permission](bool allow) {
+                    m_webView->permissions().answer(permission, allow);
+                });
+            });
     connect(m_webView, &web::WebView::desktopMediaRequested, this,
             [this](QWebEngineDesktopMediaRequest request) {
                 auto* picker = new ScreenPickerDialog(std::move(request), this);
