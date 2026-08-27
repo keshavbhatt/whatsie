@@ -21,10 +21,13 @@ public Q_SLOTS:
     void log(const QString& message);
     /// The WhatsApp WebSocket connection came up / went down (FEATURES S13).
     void connectionChanged(bool up);
+    /// The injected nav-rail button was clicked (FEATURES A11).
+    void openSettings();
 
 Q_SIGNALS:
     void scriptFailure(const QString& name, const QString& message);
     void connectionStateChanged(bool up);
+    void settingsRequested();
 };
 
 } // namespace whatsie::web

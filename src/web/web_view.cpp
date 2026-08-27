@@ -89,6 +89,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     m_watchdogTimer->setInterval(5000);
     connect(m_watchdogTimer, &QTimer::timeout, this, &WebView::checkWatchdog);
     connect(&m_profile->bridge(), &Bridge::connectionStateChanged, this, &WebView::handleConnectionChanged);
+    connect(&m_profile->bridge(), &Bridge::settingsRequested, this, &WebView::settingsRequested);
 
     // Network came back (FEATURES S14): force a reload attempt if we are down.
     if (QNetworkInformation::loadDefaultBackend()) {

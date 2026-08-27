@@ -57,6 +57,8 @@ Q_SIGNALS:
     void desktopMediaRequested(QWebEngineDesktopMediaRequest request);
     /// WhatsApp Web socket up (true) or down (false), for tray dimming (T6).
     void connectionChanged(bool up);
+    /// The injected in-page settings button was clicked (FEATURES A11).
+    void settingsRequested();
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;

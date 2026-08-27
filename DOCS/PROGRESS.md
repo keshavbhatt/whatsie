@@ -5,6 +5,26 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — A11 Settings button moved into WhatsApp's nav rail
+
+Owner: "the settings icon in nav is not working." Diagnosed with a screenshot — the floating
+`QToolButton` (ADR-024) never rendered: Qt widgets do not paint over a `QWebEngineView`, and a
+floating window cannot track it on Wayland. Replaced with a DOM-injected rail entry (whatly's
+proven technique), which is the only thing that can sit over the web content.
+
+- `nav-settings.js`: finds the rail buttons by shape (not obfuscated class), clones a neighbour so
+  it looks native, swaps in a gear glyph, inserts above the avatar, and re-places itself every 1 s
+  (WhatsApp rebuilds the rail). Click → `bridge.openSettings()` → `Bridge::settingsRequested` →
+  `WebView::settingsRequested` → `MainWindow::showSettings`.
+- Removed the dead overlay button (createSettingsButton/reposition/eventFilter) from MainWindow.
+- Scoped exception to ADR-006 documented (ADR-028); it stays the *only* injected rail control and
+  degrades gracefully (tray + Ctrl+, still open Settings).
+
+**Verified live** (CDP + screenshot): the gear appears in the rail, and clicking it opens the
+Settings dialog. Tests 19/19; clang-format clean.
+
+---
+
 ## 2026-08-27 — Theme (real fix) + open-log-folder
 
 Owner: theme toggle still broken; "you already fixed it before". Honest cause: the M3 fix was

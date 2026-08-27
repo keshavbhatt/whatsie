@@ -38,6 +38,7 @@ qt_add_resources(whatsie_web "scripts"
     FILES
         scripts/bootstrap.js
         scripts/theme-control.js
+        scripts/nav-settings.js
         scripts/storage-persist.js
         scripts/connection-watchdog.js
         scripts/sw-recovery.js

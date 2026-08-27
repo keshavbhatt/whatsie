@@ -96,7 +96,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | A8 | Privacy blur (CSS levels, toggle) | no (W#247, 267) | yes (170 LOC) | NICE | One script, stable tier. | **KEEP** | done |
 | A9 | Custom CSS file (covers wallpaper / font override) | no (W#182, 277, 219) | yes | LATER | | **DROP** | dropped |
 | A10 | Chat colour themes (14) | no | yes | DROP | | **DROP** | dropped |
-| A11 | In-window Settings button | no | yes | DROP→KEEP | Owner 2026-08-27: app-chrome overlay button, **not** DOM nav-rail injection. Always shown (owner). | **KEEP** | done |
+| A11 | Settings button in WhatsApp nav rail | no | yes | DROP→KEEP | Owner: a Qt overlay cannot render over the web view, so inject one Settings entry in the rail (bridge callback). ADR-028. | **KEEP** | done |
 | A12 | Chat-list collapse to avatar strip | no (W#159, 331) | yes (800 LOC) | DROP | | **DROP** | dropped |
 | A13 | Muted-updates hide / focus mode / HD AB flag / linked-device name patch | no | yes | DROP | | **DROP** | dropped |
 | A14 | Smooth scrolling (`ScrollAnimatorEnabled`) — **setting, default OFF** | no (W#178) | yes | NICE | Owner: expose as option, off by default. | **KEEP** | — (attr default off in skeleton) |

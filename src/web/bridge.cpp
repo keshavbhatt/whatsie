@@ -25,4 +25,10 @@ void Bridge::connectionChanged(bool up)
     Q_EMIT connectionStateChanged(up);
 }
 
+void Bridge::openSettings()
+{
+    qCDebug(lcWebJs) << "nav settings button clicked";
+    Q_EMIT settingsRequested();
+}
+
 } // namespace whatsie::web

@@ -77,6 +77,12 @@ No `runJavaScript` string templating. Every script is a no-op on failure and rep
 **Consequences.** Breakage in WhatsApp Web shows up in the log, never as a silent regression;
 scripts are testable for syntax; per-load injection races are avoided.
 
+**Scope of DOM anchors.** Scripts stick to the stable tier — standard APIs, own CSS, structural
+anchors (`#pane-side`, `#main`, `footer [contenteditable]`) — never obfuscated classes. The single
+sanctioned exception is `nav-settings.js` (ADR-028), which injects one Settings button into the nav
+rail because nothing else can render over the web view; it matches entries by shape, not class, and
+degrades to a no-op.
+
 ## ADR-007 — User agent derived from the engine default (2026-08-27)
 
 **Context.** Lesson A7.
@@ -262,6 +268,29 @@ already used `FileManager1.ShowItems` for selecting a file; folders now match.
 **Consequences.** The button works on the desktop and stays correct under confinement via the fd
 path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
+## ADR-028 — The in-page Settings button lives in WhatsApp's nav rail (2026-08-28)
+
+**Context.** A11 wanted a Settings entry point that does not depend on a system tray. The first
+attempt (ADR-024) put a `QToolButton` over the web view; it never rendered — Qt widgets do not
+paint over a `QWebEngineView`, and a separate floating window cannot be positioned to track it on
+Wayland (confirmed by screenshot). The only place a control can visibly sit over the web content is
+*inside the page*.
+
+**Decision.** Inject one Settings entry into WhatsApp's left nav rail from `nav-settings.js`,
+adapting the original whatly's proven technique: find the rail's buttons by shape (small, far-left)
+rather than by their obfuscated classes, clone a neighbouring entry so it looks native, swap in a
+gear glyph, and insert it above the avatar. A click calls back through the QWebChannel `bridge`
+(`Bridge::openSettings` → `settingsRequested` → `MainWindow::showSettings`). WhatsApp rebuilds the
+rail on navigation, so a 1 s `setInterval` re-places the button if it is gone (whatly's lesson: a
+MutationObserver over WA's constantly-mutating DOM forces layout far too often). Verified live via
+CDP + screenshot: the gear appears in the rail and opening it shows the Settings dialog.
+
+**Consequences.** This is a deliberate, *scoped* exception to ADR-006's "stable tier only" rule —
+the one place fragile rail injection is justified, because there is no alternative that renders over
+the web view, and it degrades gracefully (the tray and Ctrl+, still open Settings; the script is
+fully guarded and never throws into the page). It is the only injected control; the multi-button
+rail sprawl that ADR-006 warned about (whatly's theme/blur/zoom/strip buttons) stays dropped.
+
 ## ADR-024 — Interface scale, tray-less Settings access, and the expert flags hatch (2026-08-27)
 
 **Context.** M5 added three things that touch startup and window chrome. (1) Interface scale
@@ -277,17 +306,17 @@ nav rail, which ADR-006 forbids). (3) whatsie's "remaining perf knobs" (P7) were
   `--force-device-scale-factor` so page rendering stays crisp. Changing it needs a restart.
   The early read targets the default profile only; a per-profile scale would need argv parsed
   in `main`, not worth it for a global appearance preference.
-- **A11 (reinterpreted, DROP→KEEP):** a small `QToolButton` floating over our own web-view
-  widget — **not** injected into WhatsApp's DOM — opens Settings. It is visible only when the
-  tray is unavailable, so tray users see no extra chrome. This honours the owner's need
-  (tray-less Settings access) without violating ADR-006's "no fragile DOM anchors" rule.
+- **A11 (reinterpreted, DROP→KEEP; revised by ADR-028):** originally a `QToolButton` floating
+  over the web view. That does not render — a Qt widget cannot paint over the `QWebEngineView`,
+  and a floating top-level window cannot track it on Wayland (verified with a screenshot: the
+  button was absent). Replaced by a Settings entry injected into WhatsApp's nav rail — see
+  ADR-028.
 - **P7 (reinterpreted, DROP→KEEP):** rather than bespoke perf toggles, we simply document that
   `mergeChromiumFlags()` already *merges* (never overwrites) a user-provided
   `QTWEBENGINE_CHROMIUM_FLAGS`, giving experts a supported escape hatch.
 
-**Consequences.** Scale is a restart-required setting (noted in the UI). The overlay button is
-theme-agnostic (translucent, `QIcon::fromTheme("configure")` with a stock fallback). No new
-store permissions. Version bumped to **6.0.0** since the original whatsie is already at 5.1.0.
+**Consequences.** Scale is a restart-required setting (noted in the UI). No new store
+permissions. Version bumped to **6.0.0** since the original whatsie is already at 5.1.0.
 
 ## ADR-025 — Tray icon options: symbolic, hidden, connection-dimmed (2026-08-27)
 
