@@ -67,6 +67,7 @@ private Q_SLOTS:
         QVERIFY(autoFlags.contains(u"--disable-extensions"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::Off).contains(u"--disable-gpu"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--ignore-gpu-blocklist"_s));
+        QVERIFY(autoFlags.join(u' ').contains(u"--enable-features=SharedArrayBuffer"_s));
 #ifdef Q_OS_LINUX
         QVERIFY(autoFlags.join(u' ').contains(u"WebRTCPipeWireCapturer"_s));
 #endif
@@ -78,6 +79,10 @@ private Q_SLOTS:
             mergeChromiumFlags(u"--foo=1  --disable-gpu"_s, {u"--disable-gpu"_s, u"--bar"_s});
         QCOMPARE(merged, u"--foo=1 --disable-gpu --bar"_s);
         QCOMPARE(mergeChromiumFlags(QString(), {u"--x"_s}), u"--x"_s);
+        // Feature lists are merged, not overridden (Chromium keeps only the last switch).
+        QCOMPARE(mergeChromiumFlags(u"--enable-features=A,B --disable-features=X"_s,
+                                    {u"--enable-features=B,C"_s, u"--y"_s}),
+                 u"--y --enable-features=A,B,C --disable-features=X"_s);
     }
 
     void downloadDirectorySettingFallsBack()

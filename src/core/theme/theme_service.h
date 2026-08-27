@@ -21,6 +21,7 @@ public:
 
     [[nodiscard]] Qt::ColorScheme effectiveScheme() const;
     [[nodiscard]] bool isDark() const { return effectiveScheme() == Qt::ColorScheme::Dark; }
+    [[nodiscard]] bool followsSystem() const;
 
     [[nodiscard]] static QPalette lightPalette();
     [[nodiscard]] static QPalette darkPalette();

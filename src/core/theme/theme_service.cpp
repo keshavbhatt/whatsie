@@ -42,13 +42,22 @@ ThemeService::ThemeService(Settings& settings, QObject* parent)
     connect(&m_settings, &Settings::themeChanged, this, [this](Theme) { reevaluate(); });
     if (QGuiApplication::instance() != nullptr) {
         connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this,
-                [this](Qt::ColorScheme) { reevaluate(); });
+                [this](Qt::ColorScheme) {
+                    if (followsSystem()) {
+                        reevaluate();
+                    }
+                });
     }
 }
 
 Qt::ColorScheme ThemeService::effectiveScheme() const
 {
     return m_current;
+}
+
+bool ThemeService::followsSystem() const
+{
+    return m_settings.theme() == Theme::System;
 }
 
 void ThemeService::reevaluate()

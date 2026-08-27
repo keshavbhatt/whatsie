@@ -46,7 +46,7 @@ private Q_SLOTS:
         QCOMPARE(first.worldId(), static_cast<quint32>(QWebEngineScript::MainWorld));
         QVERIFY(first.sourceCode().startsWith(u"window.__whatsieConfig = {\"theme\":\"dark\"};"_s));
         QVERIFY(first.sourceCode().contains(u"QWebChannel"_s));
-        QVERIFY(first.sourceCode().contains(u"theme-preload"_s));
+        QVERIFY(first.sourceCode().contains(u"storage-persist"_s));
 
         bundle.installBootstrap({{u"theme"_s, u"light"_s}});
         QCOMPARE(profile.scripts()->find(ScriptBundle::scriptName(u"bootstrap"_s)).size(), 1);

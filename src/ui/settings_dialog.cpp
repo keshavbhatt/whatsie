@@ -141,9 +141,6 @@ QWidget* SettingsDialog::buildAppearanceTab()
     connect(m_theme, &QComboBox::currentIndexChanged, this,
             [this](int index) { m_settings.setTheme(static_cast<Theme>(m_theme->itemData(index).toInt())); });
     form->addRow(tr("Theme:"), m_theme);
-    auto* themeNote = new QLabel(tr("Changing the theme reloads WhatsApp Web."), page);
-    themeNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
-    form->addRow(QString(), themeNote);
 
     auto makeZoom = [page] {
         auto* spin = new QDoubleSpinBox(page);

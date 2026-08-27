@@ -6,8 +6,7 @@
 
 namespace whatsie::core {
 class Settings;
-class ThemeService;
-} // namespace whatsie::core
+}
 
 namespace whatsie::web {
 
@@ -23,7 +22,7 @@ class WebProfile : public QWebEngineProfile
     Q_DISABLE_COPY_MOVE(WebProfile)
 
 public:
-    WebProfile(core::Settings& settings, core::ThemeService& theme, QObject* parent = nullptr);
+    explicit WebProfile(core::Settings& settings, QObject* parent = nullptr);
     ~WebProfile() override;
 
     [[nodiscard]] core::Settings& appSettings() { return m_settings; }
@@ -33,10 +32,6 @@ public:
     /// Directory roots that storage clean-up is allowed to touch.
     [[nodiscard]] QStringList storageRoots() const;
 
-Q_SIGNALS:
-    /// The bootstrap bundle changed (theme flipped); pages should reload.
-    void bootstrapChanged();
-
 private:
     void configureStorage();
     void configureUserAgent();
@@ -44,7 +39,6 @@ private:
     void installBootstrap();
 
     core::Settings& m_settings;
-    core::ThemeService& m_theme;
     std::unique_ptr<Bridge> m_bridge;
     std::unique_ptr<ScriptBundle> m_scripts;
 };

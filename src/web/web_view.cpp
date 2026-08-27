@@ -1,6 +1,7 @@
 #include "web/web_view.h"
 
 #include "core/settings/settings.h"
+#include "core/theme/theme_service.h"
 #include "core/unread_badge.h"
 #include "core/zoom_policy.h"
 #include "web/bridge.h"
@@ -22,6 +23,7 @@
 #include <QWebEngineContextMenuRequest>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineScript>
+#include <QWebEngineSettings>
 #include <QWheelEvent>
 
 using namespace Qt::StringLiterals;
@@ -35,7 +37,7 @@ const QUrl kWhatsAppUrl(u"https://web.whatsapp.com/"_s);
 WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* parent)
     : QWebEngineView(parent)
     , m_settings(settings)
-    , m_profile(new WebProfile(settings, theme, this))
+    , m_profile(new WebProfile(settings, this))
     , m_page(new WebPage(*m_profile, this))
     , m_permissions(new PermissionController(this))
 {
@@ -69,11 +71,23 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
         request.accept();
         Q_EMIT fullScreenRequested(request.toggleOn());
     });
-    // Theme flipped: the page theme is applied at DocumentCreation, so reload.
-    connect(m_profile, &WebProfile::bootstrapChanged, this, [this] {
-        qCInfo(lcWeb) << "reloading for theme change";
-        reload();
-    });
+    // Queued so ui::ThemeApplier (a direct listener) has updated QStyleHints first.
+    connect(
+        &theme, &core::ThemeService::effectiveSchemeChanged, this,
+        [this](Qt::ColorScheme) { refreshColorScheme(); }, Qt::QueuedConnection);
+}
+
+// Qt WebEngine copies QStyleHints::colorScheme() into Blink's preferences only
+// when web settings are applied. Toggling an attribute re-applies them, which
+// updates prefers-color-scheme in the running page — WhatsApp then switches
+// its theme instantly (ADR-020).
+void WebView::refreshColorScheme()
+{
+    QWebEngineSettings* s = m_page->settings();
+    const bool smooth = s->testAttribute(QWebEngineSettings::ScrollAnimatorEnabled);
+    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, !smooth);
+    s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, smooth);
+    qCInfo(lcWeb) << "colour scheme pushed to the page";
 }
 
 void WebView::loadWhatsApp()

@@ -86,7 +86,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done |
+| A1 | Theme: System / Light / Dark, persisted | light/dark, reverts (fixed 4×) | + follow system | CORE | Lesson B9. Page theme via WA `localStorage.theme` before load. | **KEEP** | done (via QStyleHints → prefers-color-scheme, instant; ADR-020) |
 | A2 | Live follow-system-theme | no (W#157) | portal | CORE | `QStyleHints::colorSchemeChanged`; portal fallback. | **KEEP** | done |
 | A3 | Push theme into running page (React fiber, WA modules) | yes | yes | DROP | Reload on theme change instead. | **DROP** | dropped |
 | A4 | Automatic sunrise/sunset theme | yes (bugs) | yes (680 LOC) | DROP | | **DROP** | dropped |

@@ -190,6 +190,35 @@ localised `aria-label`s and obfuscated classes — the fragile tier ADR-006 forb
 maintains itself and which has been stable for years. The bridge is used for script-failure
 reporting only until a stable-tier source appears.
 
+## ADR-020 — Page theme via the application colour scheme, not localStorage (2026-08-27)
+
+**Context.** Owner report: "theme setting is not working" and the original toggled instantly.
+Live inspection (CDP) showed WhatsApp Web ignores `localStorage.theme` at boot and follows
+`prefers-color-scheme` *live* — emulating the media query flipped the page instantly.
+
+**Decision.** `ui::ThemeApplier` calls `QStyleHints::setColorScheme()` (Qt ≥ 6.8) for an explicit
+Light/Dark choice and `unsetColorScheme()` for System. Qt WebEngine copies that scheme into
+Blink's web preferences only when settings are applied (at start-up — verified: neither a
+platform change nor a reload updates it), so `web::WebView::refreshColorScheme()` toggles a
+`QWebEngineSettings` attribute after every scheme change to force a re-apply. Result: WhatsApp
+switches instantly, no reload, no script touches its storage (both its JS `matchMedia`
+listeners and its CSS `@media` rules follow). `theme-preload.js` was removed. `ThemeService`
+ignores `colorSchemeChanged` while an explicit theme is set (the signal is our own override).
+A pure `matchMedia` shim was tried and rejected: it only moves the JS-driven parts.
+
+## ADR-021 — SharedArrayBuffer enabled for WhatsApp calls (2026-08-27)
+
+**Context.** "Your browser doesn't support calling" (also whatly Y#97). WhatsApp's
+`WAWebVoipGatingUtils.getUnsupportedBrowserReason()` requires `SharedArrayBuffer`, `Atomics`
+and `RTCPeerConnection`. The page is not cross-origin isolated (COOP
+`same-origin-allow-popups`), so Chromium only exposes SAB there through a Chrome-specific
+origin trial that QtWebEngine does not honour. whatsie's hard-coded Chrome/125 UA was a
+coincidence, not the cause.
+
+**Decision.** `core::chromiumFlags()` always passes `--enable-features=SharedArrayBuffer`
+(merged with `WebRTCPipeWireCapturer`); `mergeChromiumFlags()` merges feature lists because
+Chromium keeps only the last `--enable-features` switch. No UA pinning (ADR-007 stands).
+
 ---
 
 ## Open questions

@@ -1,7 +1,6 @@
 #include "web/web_profile.h"
 
 #include "core/settings/settings.h"
-#include "core/theme/theme_service.h"
 #include "web/bridge.h"
 #include "web/logging.h"
 #include "web/script_bundle.h"
@@ -20,10 +19,9 @@ namespace {
 constexpr auto kProfileName = "whatsie";
 } // namespace
 
-WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObject* parent)
+WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     : QWebEngineProfile(QString::fromLatin1(kProfileName), parent)
     , m_settings(settings)
-    , m_theme(theme)
     , m_bridge(std::make_unique<Bridge>())
     , m_scripts(std::make_unique<ScriptBundle>(*this))
 {
@@ -34,10 +32,6 @@ WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObj
 
     connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
         this->settings()->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, enabled);
-    });
-    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
-        installBootstrap();
-        Q_EMIT bootstrapChanged();
     });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
@@ -95,10 +89,9 @@ void WebProfile::configureAttributes()
 
 void WebProfile::installBootstrap()
 {
-    const QJsonObject config{
-        {u"theme"_s, m_theme.isDark() ? u"dark"_s : u"light"_s},
-    };
-    m_scripts->installBootstrap(config);
+    // Config keys are added as scripts need them; the theme is NOT one of
+    // them (WhatsApp follows prefers-color-scheme, see ThemeApplier / ADR-020).
+    m_scripts->installBootstrap(QJsonObject{});
 }
 
 } // namespace whatsie::web

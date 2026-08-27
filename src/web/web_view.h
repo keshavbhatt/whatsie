@@ -61,6 +61,7 @@ protected:
 
 private:
     void applyZoom();
+    void refreshColorScheme();
     void handleTitleChanged(const QString& title);
     void handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status, int exitCode);
 

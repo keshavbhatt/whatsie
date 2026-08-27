@@ -18,4 +18,3 @@ JavaScript injected into WhatsApp Web. Rules (see `DOCS/CODING_STANDARDS.md` §7
 |---|---|---|
 | `bootstrap.js` | DocumentCreation (bundled with config + qwebchannel.js) | infrastructure |
 | `storage-persist.js` | DocumentCreation (bundled) | S1 |
-| `theme-preload.js` | DocumentCreation (bundled) | A1 |

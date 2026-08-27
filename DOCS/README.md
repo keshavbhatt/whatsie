@@ -30,6 +30,10 @@ sudo snap install kde-qt6-core24-sdk kf6-core24   # once
 scripts/dev-build.sh --tests                       # configure + build + ctest
 scripts/dev-run.sh                                 # launch
 QT_LOGGING_RULES="whatsie.*.debug=true" scripts/dev-run.sh
+
+# Inspect the live WhatsApp page (Chromium remote debugging + scripts/cdp-eval.mjs)
+QTWEBENGINE_REMOTE_DEBUGGING=9222 scripts/dev-run.sh &
+scripts/cdp-eval.mjs 'document.title'
 ```
 
 `scripts/dev-build.sh` targets the same Qt 6.11 that the snap and Flathub runtimes ship

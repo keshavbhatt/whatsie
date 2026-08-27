@@ -5,6 +5,31 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Fixes from owner testing (theme, calls)
+
+**Reported:** downloads look good; theme setting not working (and the original toggled
+instantly); calls say "not available in your version of browser".
+
+**Diagnosis** (live page via `scripts/cdp-eval.mjs`, new dev tool over Chromium remote
+debugging):
+- WhatsApp ignores `localStorage.theme` at boot and follows `prefers-color-scheme` live.
+- Calls: `WAWebVoipGatingUtils` needs `SharedArrayBuffer`; it was `undefined` because the page
+  is not cross-origin isolated and QtWebEngine lacks Chrome's origin trial. Client hints /
+  UA version were red herrings (whatly Y#97 has the same root cause).
+
+**Fixed** (ADR-020, ADR-021)
+- `ThemeApplier` pushes the effective scheme into `QStyleHints::setColorScheme()` and
+  `WebView::refreshColorScheme()` re-applies web preferences (WebEngine only samples the scheme
+  when preferences are applied — not on platform change, not on reload). Page theme follows
+  **instantly, no reload**; `theme-preload.js` removed. Verified live: KDE scheme flipped
+  light/dark → WhatsApp followed within a second (`prefers-color-scheme`, body class, pane
+  colour); explicit Light setting → page light at boot.
+- `--enable-features=SharedArrayBuffer` always on; feature-list merging fixed
+  (`--enable-features` from the user is no longer overridden). Verified: `typeof
+  SharedArrayBuffer === "function"`. **Owner to confirm a real call.**
+
+---
+
 ## 2026-08-27 — M3 part A: web integration + downloads
 
 **Owner input at kick-off:** "I am not satisfied with the current download feature. It does

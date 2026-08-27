@@ -28,6 +28,8 @@ Legend: **W#** = keshavbhatt/whatsie issue, **Y#** = shakaran/whatly issue.
 | A14 | Advertised features that did not exist (spell check: 59 MB of dead dictionaries + 250 flag icons; full-width mode; Italian i18n never loaded) | Trust erosion (W#262, 235, 304) | `FEATURES.md` is the contract: a feature is listed as shipped only when it has a test and a row. Dead code is deleted, not kept. |
 | A15 | Three sources of truth for the version (CMake, appdata, changelog); `BUILD_TIMESTAMP` breaks reproducible builds | Version mismatches (W#60) | Version from `project(VERSION)` only; appdata generated; no timestamps. |
 | A16 | `#ifdef Q_OS_*` sprinkled inside classes for the Windows port | Untestable branches | Platform backends behind interfaces, chosen in CMake. |
+| A17 | Theme forced through WhatsApp internals (React fiber, `localStorage.theme`) — and it stopped working anyway | Fragile; WhatsApp actually follows `prefers-color-scheme` | Drive the browser's colour scheme (`QStyleHints::setColorScheme`), verified live with CDP (ADR-020). |
+| A18 | "Calls unsupported" blamed on the UA string for years (hard-coded Chrome/125) | The real gate was `SharedArrayBuffer` availability | Read the page's own check (`scripts/cdp-eval.mjs`) before guessing (ADR-021). |
 
 ## B. What the issue tracker teaches (297 + 39 issues)
 

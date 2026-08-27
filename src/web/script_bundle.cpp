@@ -40,7 +40,6 @@ QStringList ScriptBundle::bootstrapResources()
         u":/qtwebchannel/qwebchannel.js"_s,
         u":/scripts/bootstrap.js"_s,
         u":/scripts/storage-persist.js"_s,
-        u":/scripts/theme-preload.js"_s,
     };
 }
 

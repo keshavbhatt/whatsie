@@ -36,7 +36,6 @@ qt_add_resources(whatsie_web "scripts"
     FILES
         scripts/bootstrap.js
         scripts/storage-persist.js
-        scripts/theme-preload.js
 )
 
 target_link_libraries(whatsie_web
