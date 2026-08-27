@@ -87,12 +87,18 @@ for emergencies. No per-OS hard-coded UA strings.
 
 **Consequences.** Upgrading Qt upgrades the advertised browser automatically.
 
-## ADR-008 — Chromium sandbox stays on (2026-08-27)
+## ADR-008 — Chromium sandbox on for native/flatpak; snap uses --no-sandbox (2026-08-27)
 
-**Context.** Lesson A8.
+**Context.** Lesson A8 (whatsie's `--no-sandbox` in release was a regression). But keeping the
+Chromium sandbox in a snap needs `browser-support` with `allow-sandbox: true`, which requires a
+store snap-declaration (manual reviewer approval) to auto-connect. Owner decision (2026-08-27):
+match the original whatsie snap so no reviewer declaration is needed.
 
-**Decision.** Never pass `--no-sandbox`. Snap: `browser-support` with `allow-sandbox: true`.
-Flatpak: default. User can still override via `QTWEBENGINE_CHROMIUM_FLAGS`.
+**Decision.** Native and Flatpak builds keep the Chromium sandbox (we never hard-code
+`--no-sandbox`). The **snap** uses plain `browser-support` and passes `--no-sandbox` via the app
+`environment` (`QTWEBENGINE_CHROMIUM_FLAGS`), which `core::mergeChromiumFlags` preserves —
+isolation there comes from strict snap confinement (AppArmor + seccomp). No allow-sandbox, no
+store declaration. Users can still override `QTWEBENGINE_CHROMIUM_FLAGS`.
 
 ## ADR-009 — Notifications over `org.freedesktop.Notifications` via QDBus, no libnotify-qt (2026-08-27)
 

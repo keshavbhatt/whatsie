@@ -1,9 +1,5 @@
-# Whatsie snap. Qt 6.11 comes from the kde-neon-6 extension (kf6-core24
-# content snap) — the same runtime the dev scripts target, so what builds
-# here is what we test locally. The GPU/audio/PipeWire wiring the dev-run
-# scripts add by hand is provided natively by the extension here.
 name: whatsie
-adopt-info: whatsie          # version/summary/description from the AppStream file
+adopt-info: whatsie
 grade: stable
 confinement: strict
 base: core24
@@ -20,18 +16,11 @@ icon: snap/gui/icon.svg
 platforms:
   amd64:
 
-# The Chromium sandbox stays ON (ADR-008): we never pass --no-sandbox, and
-# allow-sandbox lets Chromium create the user namespaces its sandbox needs.
-# Auto-connect in the store needs a snap declaration; a local install with
-# `snap connect` works without one.
-plugs:
-  browser-sandbox:
-    interface: browser-support
-    allow-sandbox: true
-
 apps:
   whatsie:
     command: usr/bin/whatsie
+    environment:
+      QTWEBENGINE_CHROMIUM_FLAGS: "--no-sandbox"
     desktop: usr/share/applications/com.ktechpit.whatsie.desktop
     common-id: com.ktechpit.whatsie
     extensions:
@@ -44,17 +33,18 @@ apps:
       - x11
       - wayland
       - network
-      - network-bind
+      - unity7
+      - browser-support
       - network-status
-      - network-observe
-      - browser-sandbox
       - camera
       - audio-playback
       - audio-record
       - removable-media
       - screen-inhibit-control
       - hardware-observe
-      - unity7
+      - network-observe
+      - network-bind
+      - mount-observe
 
 parts:
   whatsie:
@@ -69,7 +59,7 @@ parts:
       - libdrm-dev
     stage-packages:
       - libdrm2
-      # libqxcb needs it; without it the snap does not start (W#320-class).
+      # libqxcb links against it; without it the snap does not start (W#320).
       - libxcb-shape0
       # OpenType coverage for confined Qt (the snap ships no host fonts).
       - fonts-noto-core
@@ -79,7 +69,6 @@ parts:
       - -DWHATSIE_BUILD_TESTS=OFF
     override-build: |
       craftctl default
-      # The snap's tray/desktop icon: an absolute path into the snap.
       mkdir -p ${CRAFT_PART_INSTALL}/meta/gui
       cp ${CRAFT_PART_INSTALL}/usr/share/icons/hicolor/256x256/apps/com.ktechpit.whatsie.png \
         ${CRAFT_PART_INSTALL}/meta/gui/icon.png

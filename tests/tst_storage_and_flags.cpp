@@ -79,6 +79,9 @@ private Q_SLOTS:
             mergeChromiumFlags(u"--foo=1  --disable-gpu"_s, {u"--disable-gpu"_s, u"--bar"_s});
         QCOMPARE(merged, u"--foo=1 --disable-gpu --bar"_s);
         QCOMPARE(mergeChromiumFlags(QString(), {u"--x"_s}), u"--x"_s);
+        // The snap sets QTWEBENGINE_CHROMIUM_FLAGS=--no-sandbox; it must survive the merge.
+        QVERIFY(mergeChromiumFlags(u"--no-sandbox"_s, chromiumFlags(HardwareAcceleration::Auto))
+                    .contains(u"--no-sandbox"_s));
         // Feature lists are merged, not overridden (Chromium keeps only the last switch).
         QCOMPARE(mergeChromiumFlags(u"--enable-features=A,B --disable-features=X"_s,
                                     {u"--enable-features=B,C"_s, u"--y"_s}),

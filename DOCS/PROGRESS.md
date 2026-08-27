@@ -12,7 +12,9 @@ multi-GB KDE SDK into LXD).
 - `snap/snapcraft.yaml`: core24, **kde-neon-6** extension (Qt 6.11 from `kf6-core24`), strict,
   amd64. Plugs: home, desktop(-legacy), opengl, x11, wayland, network(+bind/status/observe),
   camera, audio-playback, audio-record, removable-media, screen-inhibit-control, hardware-observe,
-  unity7, and `browser-sandbox` (`browser-support` allow-sandbox: true, ADR-008).
+  unity7, and plain `browser-support`. To match the original whatsie snap and avoid a store
+  reviewer declaration, the snap uses `--no-sandbox` (app `environment`, merged by
+  `mergeChromiumFlags`); native/flatpak keep the real Chromium sandbox (ADR-008, owner decision).
 - `dist/linux/com.ktechpit.whatsie.desktop` + `.metainfo.xml`; top-level CMake `install()` rules
   stage the binary, desktop file, metainfo and hicolor icons. `adopt-info` takes the version from
   the metainfo. Verified the install tree stages correctly into a `/usr` prefix.
@@ -20,6 +22,7 @@ multi-GB KDE SDK into LXD).
   behind `PUBLISH_TO_STORE`.
 - The kde-neon-6 runtime provides GPU/audio/PipeWire/portal wiring natively, so the shipped snap
   needs none of the dev-run workarounds.
+- Snapcraft file trimmed to essentials; comments kept only on stage-packages for future reference.
 
 Local snap build attempt was cancelled and the LXD build containers cleaned (recovered ~9 GB).
 Flatpak deferred (owner). **Owner to confirm** the CI snap build once pushed.
