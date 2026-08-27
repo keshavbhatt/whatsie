@@ -94,3 +94,12 @@ From §6.2 and §9.2 of the same report; see `FEATURES.md` for the row-by-row DR
 | Seven packaging formats, several unproofed; three-phase Windows codec CI producing artefacts that never ship | Maintenance | Snap + Flatpak first (M4). |
 | Legacy migration code, RateApp, MoreApps, 250 flag PNGs, `.dic_delta` files | Dead weight | A new app has no legacy. |
 | 6 059-line test file with `QVERIFY(true)` coverage sweeps and `contains("token")` JS checks | False confidence | One test file per module; assert behaviour. |
+
+## E. Our own lessons (this rewrite)
+
+| Lesson | Where | Rule |
+|---|---|---|
+| The M3 theme "fix" (QStyleHints → prefers-color-scheme) was verified only by flipping the **system** scheme; the **explicit** Light/Dark toggle was never actually exercised and silently failed (the portal/KDE platform theme overrides `setColorScheme` before Blink sees it). Reported "fixed", regressed on the owner's first real toggle. | ADR-020 → ADR-026 | Verify the *exact* user action, each branch (system **and** explicit), not a proxy that happens to pass. A fix isn't done until the failing case is reproduced fixed. |
+| WhatsApp's theme is best driven through its **own** state (WAWeb modules + React store + DOM/localStorage), as the original whatsie did — toggling `body.dark` alone can be re-derived away on re-render. | `theme-control.js`, ADR-026 | For WA integration, reuse the original's proven page JS before inventing a lighter shim. |
+| Portal `OpenURI` on a local `file://` returns a Request handle (async) so the D-Bus reply is always success, while the backend no-ops it — "open folder" looked wired but did nothing. | `file_manager_dbus.cpp`, ADR-027 | A `ReplyMessage` from an async portal call is *not* proof the action happened; prefer `FileManager1.ShowFolders` / fd-based `OpenDirectory` and check a typed reply. |
+| CDP against a live page (`scripts/cdp-eval.mjs` + `plasma-apply-colorscheme`) turned two "can't reproduce" theme guesses into a root cause in minutes. | `scripts/` | Diagnose page behaviour by observing the running page, not by reasoning about Qt signals. |

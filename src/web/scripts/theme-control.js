@@ -1,101 +1,129 @@
 // name:     theme-control
-// purpose:  make WhatsApp follow the app's theme setting (FEATURES A1). System
-//           mode passes the OS scheme straight through; an explicit Light/Dark
-//           forces it at the page level, because QStyleHints::setColorScheme is
-//           overridden by the portal/KDE platform theme and never reaches Blink
-//           (verified 2026-08-27 via CDP: explicit override left the page dark).
-// depends:  window.__whatsie.config.colorScheme; WhatsApp's `dark` body class,
-//           which its CSS is keyed on (removing it themes the page instantly).
+// purpose:  make WhatsApp follow the app's theme setting (FEATURES A1). Drives
+//           WhatsApp's own theme state — its WAWeb modules, the React store, and
+//           the DOM/localStorage it persists to — rather than QStyleHints, which
+//           the portal/KDE platform theme overrides before it reaches Blink
+//           (verified 2026-08-27 via CDP). Sequence adapted from the original
+//           whatsie (mainwindow_webengine.cpp), proven against live WhatsApp Web.
+// depends:  window.__whatsie.config.colorScheme; WhatsApp's require() modules,
+//           .app-wrapper-web React fiber, and `dark` body class (all optional —
+//           each step is guarded and degrades to a no-op).
 // verified: 2026-08-27 against WhatsApp Web 2.3000.x
-// on-fail:  no-op; falls back to the OS prefers-color-scheme
+// on-fail:  no-op; falls back to WhatsApp's own OS-following behaviour
+// live-api: window.__whatsieSetTheme('system'|'light'|'dark'); called from
+//           WebView::applyThemeLive() on theme change and every page load.
 (function () {
     'use strict';
     var api = window.__whatsie || {};
-    var realMatchMedia = window.matchMedia ? window.matchMedia.bind(window) : null;
-    if (!realMatchMedia) { return; }
 
-    var forced = null; // null (=system) | 'dark' | 'light'
-    var wrappers = [];
-
-    function isSchemeQuery(q) {
-        return typeof q === 'string' && q.indexOf('prefers-color-scheme') >= 0;
-    }
-    function osDark() {
-        try { return realMatchMedia('(prefers-color-scheme: dark)').matches; }
-        catch (e) { return false; }
-    }
-    function schemeIsDark() {
-        return forced ? forced === 'dark' : osDark();
-    }
-
-    // Replace matchMedia so WhatsApp's own theme logic reads our forced value,
-    // while non-scheme queries pass straight through.
-    window.matchMedia = function (query) {
-        var real = realMatchMedia(query);
-        if (!isSchemeQuery(query)) { return real; }
-        var wantsDark = query.indexOf('dark') >= 0;
-        var listeners = [];
-        var onchange = null;
-        function matches() { return wantsDark ? schemeIsDark() : !schemeIsDark(); }
-        function fire() {
-            var ev = { matches: matches(), media: query };
-            listeners.slice().forEach(function (cb) {
-                try { typeof cb === 'function' ? cb(ev) : (cb.handleEvent && cb.handleEvent(ev)); }
-                catch (e) { /* ignore listener errors */ }
-            });
-            if (onchange) { try { onchange(ev); } catch (e) { /* ignore */ } }
+    function osTheme() {
+        try {
+            return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+        } catch (e) {
+            return 'light';
         }
-        try {
-            // Forward real OS changes only while not forced.
-            real.addEventListener('change', function () { if (!forced) { fire(); } });
-        } catch (e) { /* older engines: ignore */ }
-        wrappers.push(fire);
-        return {
-            media: query,
-            get matches() { return matches(); },
-            addEventListener: function (t, cb) { if (t === 'change' && cb) { listeners.push(cb); } },
-            removeEventListener: function (t, cb) {
-                listeners = listeners.filter(function (f) { return f !== cb; });
-            },
-            addListener: function (cb) { if (cb) { listeners.push(cb); } },
-            removeListener: function (cb) {
-                listeners = listeners.filter(function (f) { return f !== cb; });
-            },
-            dispatchEvent: function () { return true; },
-            get onchange() { return onchange; },
-            set onchange(cb) { onchange = cb; }
-        };
-    };
+    }
 
-    function applyToDom() {
+    function applyTheme(mode) {
+        var system = mode === 'system';
+        var theme = system ? osTheme() : (mode === 'dark' ? 'dark' : 'light');
+        var isDark = theme === 'dark';
+
+        // 1. WhatsApp's own preference + theme modules.
         try {
-            if (document.body) {
-                document.body.classList.toggle('dark', schemeIsDark());
+            if (typeof require === 'function') {
+                try {
+                    var up = require('WAWebUserPrefsGeneral');
+                    if (up) {
+                        if (typeof up.setSystemThemeMode === 'function') { up.setSystemThemeMode(system); }
+                        if (typeof up.setTheme === 'function') { up.setTheme(theme); }
+                    }
+                } catch (e) { /* module absent */ }
+                try {
+                    var tc = require('WAWebThemeContext');
+                    if (tc && typeof tc.applyThemeToUI === 'function') { tc.applyThemeToUI(theme); }
+                } catch (e) { /* module absent */ }
+                try {
+                    var st = require('WAWebSystemTheme');
+                    if (st) { st.theme = theme; }
+                } catch (e) { /* module absent */ }
             }
-            if (forced) {
-                localStorage.setItem('theme', JSON.stringify(forced));
+        } catch (e) { /* require unavailable */ }
+
+        // 2. React store: walk the fiber ancestors for the component holding
+        //    { theme, systemThemeMode } and setState; else forceUpdate upward.
+        try {
+            var wrapper = document.querySelector('.app-wrapper-web');
+            var key = wrapper && Object.keys(wrapper).find(function (k) {
+                return k.indexOf('__reactFiber') === 0 || k.indexOf('__reactInternalInstance') === 0;
+            });
+            if (key) {
+                var fiber = wrapper[key];
+                var found = false;
+                while (fiber) {
+                    var sn = fiber.stateNode;
+                    if (sn && sn.state && sn.state.theme !== undefined &&
+                        sn.state.systemThemeMode !== undefined && typeof sn.setState === 'function') {
+                        sn.setState({ theme: theme, systemThemeMode: system });
+                        found = true;
+                        break;
+                    }
+                    fiber = fiber.return;
+                }
+                if (!found) {
+                    fiber = wrapper[key];
+                    var count = 0;
+                    while (fiber && count < 10) {
+                        if (fiber.stateNode && typeof fiber.stateNode.forceUpdate === 'function') {
+                            try { fiber.stateNode.forceUpdate(); } catch (e) { /* ignore */ }
+                            count++;
+                        }
+                        fiber = fiber.return;
+                    }
+                }
             }
+        } catch (e) { /* React internals changed */ }
+
+        // 3. DOM attributes + localStorage — persists across reloads, covers any
+        //    CSS-only observers and WhatsApp's own startup read.
+        try {
+            var root = document.documentElement;
+            root.setAttribute('data-theme', theme);
+            root.setAttribute('data-color-mode', theme);
+            root.style.colorScheme = theme;
+            if (document.body) { document.body.classList.toggle('dark', isDark); }
+            localStorage.setItem('theme', theme);
+            if (system) {
+                localStorage.setItem('system-theme-mode', 'true');
+            } else {
+                localStorage.removeItem('system-theme-mode');
+            }
+            try {
+                window.dispatchEvent(new StorageEvent('storage', {
+                    key: 'theme', newValue: theme, storageArea: localStorage, url: location.href
+                }));
+            } catch (e) { /* StorageEvent ctor unsupported */ }
         } catch (e) {
             api.report && api.report('theme-control', e);
         }
     }
-    function apply() {
-        applyToDom();
-        wrappers.slice().forEach(function (fire) { fire(); });
+
+    window.__whatsieSetTheme = function (mode) { applyTheme(mode); };
+
+    // First paint: apply the configured theme, retrying briefly until WhatsApp's
+    // modules are up (C++ also re-applies on every loadFinished).
+    var initial = (api.config && api.config.colorScheme) || 'system';
+    var tries = 0;
+    function seed() {
+        applyTheme(initial);
+        tries++;
+        if (tries < 20 && typeof require !== 'function') {
+            setTimeout(seed, 250);
+        }
     }
-
-    // Live updates from C++ (settings change). 'system' clears the override.
-    window.__whatsieSetTheme = function (mode) {
-        forced = (mode === 'dark' || mode === 'light') ? mode : null;
-        apply();
-    };
-
-    var initial = api.config && api.config.colorScheme;
-    forced = (initial === 'dark' || initial === 'light') ? initial : null;
-
     if (document.readyState === 'loading') {
-        document.addEventListener('DOMContentLoaded', applyToDom);
+        document.addEventListener('DOMContentLoaded', seed);
     } else {
-        applyToDom();
+        seed();
     }
 })();

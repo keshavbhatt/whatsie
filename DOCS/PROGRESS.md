@@ -5,6 +5,30 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — Theme (real fix) + open-log-folder
+
+Owner: theme toggle still broken; "you already fixed it before". Honest cause: the M3 fix was
+verified only via the **system** scheme flip; the **explicit** Light/Dark path never worked (the
+portal/KDE platform theme overrides `QStyleHints::setColorScheme` before Blink sees it) and my
+earlier check didn't exercise it. Now root-caused with CDP and fixed for real.
+
+- **Theme:** `theme-control.js` rewritten to drive WhatsApp's own state — its `require()` theme
+  modules, the React `.app-wrapper-web` store (`setState({theme, systemThemeMode})`), and DOM +
+  localStorage + a synthetic storage event — the sequence proven in the original whatsie. Config
+  carries `colorScheme`; `WebView::applyThemeLive()` pushes it on `themeChanged`,
+  `effectiveSchemeChanged` and every `loadFinished`. **Verified live via CDP** (build 8): explicit
+  Light stays light on a Dark desktop; live light/dark/system flip `data-theme`, `body.dark` and
+  background instantly, no reload. Qt widgets still themed via QStyleHints. ADR-026.
+- **Open log folder did nothing:** portal `OpenURI` on a local `file://` returns an async Request
+  handle so the reply is always "success" while the backend no-ops it. `openDirectory` now uses
+  `FileManager1.ShowFolders` (verified: opens Dolphin at the folder), then fd-based portal
+  `OpenDirectory` for confinement, then fallbacks. ADR-027.
+- Symbolic tray icon recolour and always-on A11 button (previous round) unchanged.
+
+Tests 19/19. New LESSONS §E (verify the exact failing case; async portal replies aren't proof).
+
+---
+
 ## 2026-08-27 — M5 batch A fixes: page-level theme, symbolic icon, always-on Settings button
 
 Owner test feedback on batch A, all fixed and verified live via CDP:

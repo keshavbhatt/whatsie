@@ -110,7 +110,11 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     // Queued so ui::ThemeApplier (a direct listener) has updated QStyleHints first.
     connect(
         &theme, &core::ThemeService::effectiveSchemeChanged, this,
-        [this](Qt::ColorScheme) { refreshColorScheme(); }, Qt::QueuedConnection);
+        [this](Qt::ColorScheme) {
+            refreshColorScheme();
+            applyThemeLive(); // repaint WhatsApp when the OS scheme changes in System mode
+        },
+        Qt::QueuedConnection);
 }
 
 // Qt WebEngine copies QStyleHints::colorScheme() into Blink's preferences only
@@ -262,6 +266,7 @@ void WebView::applyThemeLive()
     }
     m_page->runJavaScript(u"window.__whatsieSetTheme && window.__whatsieSetTheme('%1')"_s.arg(mode),
                           QWebEngineScript::MainWorld);
+    qCDebug(lcWeb) << "theme pushed to page:" << mode;
 }
 
 void WebView::loadWhatsApp()

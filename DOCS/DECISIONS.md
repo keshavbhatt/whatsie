@@ -223,20 +223,44 @@ run forces `QT_QPA_PLATFORMTHEME=xdgdesktopportal`; the shipped snap's KDE platf
 same.) CDP also showed WhatsApp's dark styling is keyed on a **`dark` class on `<body>`** (removing
 it themes the page instantly, and WA does not re-add it), set from its own `matchMedia` read.
 
-**Decision.** Theme the page directly. `theme-control.js` (a DocumentCreation bootstrap script)
-replaces `window.matchMedia` so `prefers-color-scheme` queries return the app's chosen scheme,
-and toggles the `body.dark` class (plus `localStorage.theme`) to match. Config arrives as
+**Decision.** Drive WhatsApp's own theme state from `theme-control.js` (a DocumentCreation
+bootstrap script), reusing the sequence proven in the original whatsie: (1) its `require()`
+modules — `WAWebUserPrefsGeneral.setSystemThemeMode`/`setTheme`, `WAWebThemeContext.applyThemeToUI`,
+`WAWebSystemTheme.theme`; (2) the React store — walk the `.app-wrapper-web` fiber for the component
+holding `{theme, systemThemeMode}` and `setState`, else `forceUpdate` upward; (3) DOM +
+`localStorage` — `data-theme`/`data-color-mode`/`style.colorScheme`, the `dark` body class, the
+`theme` key and a synthetic `storage` event. Every step is individually guarded. Config arrives as
 `__whatsie.config.colorScheme` (`system`/`light`/`dark`); `window.__whatsieSetTheme(mode)` applies
-live changes, called from `WebView::applyThemeLive()` on `Settings::themeChanged` and on every
-`loadFinished`. `system` clears the override so WA follows the real OS scheme — the one path that
-already worked. `ThemeService` + `ThemeApplier` still drive the **Qt widgets** (settings dialog,
-tray, dialogs) via `setColorScheme`; only the web page moved to script control.
+live changes, called from `WebView::applyThemeLive()` on `Settings::themeChanged`,
+`effectiveSchemeChanged`, and every `loadFinished`. `system` sets `systemThemeMode` true so WA
+follows the OS. `ThemeService`/`ThemeApplier` still theme the **Qt widgets** via `setColorScheme`;
+only the web page moved to script control.
 
-**Consequences.** Explicit Light/Dark now works regardless of platform theme, live, no reload
-(verified via CDP: light/dark/system all flip `body.class` and background instantly). The
-`matchMedia` shim that ADR-020 rejected is viable here precisely because WA's CSS is class-driven,
-not `@media`-driven — confirmed empirically. The `ScrollAnimatorEnabled` re-push (ADR-020) stays
-only to update the real `prefers-color-scheme` for System mode.
+**Consequences.** Explicit Light/Dark now works regardless of platform theme, live, no reload —
+verified via CDP: light/dark/system all flip `data-theme`, `body.dark` and background instantly,
+including explicit Light on a Dark desktop (the case ADR-020 silently failed). An earlier attempt
+that only swapped `window.matchMedia` + toggled `body.dark` also passed a direct-call CDP test but
+was replaced with the WA-internal sequence because it does not update WhatsApp's React state, which
+can re-derive the theme on re-render. The `ScrollAnimatorEnabled` re-push (ADR-020) stays only to
+update the real `prefers-color-scheme` for System mode.
+
+## ADR-027 — Opening a local folder uses FileManager1.ShowFolders, not portal OpenURI (2026-08-27)
+
+**Context.** Settings → "Open log folder" did nothing, though the button reported success. Cause:
+`platform::openDirectory` called the portal's `OpenURI` with a `file://` URI. `OpenURI` returns a
+Request object path immediately (async) so the D-Bus reply is always a `ReplyMessage` even when the
+backend refuses the request — and most backends silently no-op a bare local `file://` directory
+(they expect a file descriptor).
+
+**Decision.** `openDirectory` now tries, in order: `org.freedesktop.FileManager1.ShowFolders`
+(D-Bus activated — no spawned process with a dev-broken library path; verified it opens Dolphin at
+the folder), then the portal's **fd-based** `OpenDirectory` (the sanctioned route under snap/flatpak
+confinement), then `portalOpenUri`, then `QDesktopServices::openUrl`. `ShowFolders` returns a typed
+`QDBusReply<void>` whose `isValid()` distinguishes real success from an error. `revealInFileManager`
+already used `FileManager1.ShowItems` for selecting a file; folders now match.
+
+**Consequences.** The button works on the desktop and stays correct under confinement via the fd
+path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
 ## ADR-024 — Interface scale, tray-less Settings access, and the expert flags hatch (2026-08-27)
 
