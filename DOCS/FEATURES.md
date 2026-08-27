@@ -42,7 +42,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | S17 | Session backup/restore of IndexedDB at startup | no | yes, synchronous | DROP | Blocks GUI; unencrypted session copy. | **DROP** | dropped |
 | S18 | Low-disk warning + movable data dir | no | yes | DROP | | **DROP** | dropped |
 | S19 | Restart-in-place (`--restart-wait`) | no | yes | DROP | Aim for ≤ 2 restart-required settings. | **DROP** | dropped |
-| S20 | Wayland RHI failure → one-shot XCB relaunch; start-up crash escalation | no | yes (Y#3, 84) | NICE | Keep ~60 lines, off the happy path. | **KEEP** | — |
+| S20 | Wayland RHI failure → one-shot XCB relaunch; start-up crash escalation | no | yes (Y#3, 84) | NICE | Keep ~60 lines, off the happy path. | **KEEP** | done |
 | S21 | Setup wizard | no | yes | DROP | | **DROP** | dropped |
 | S22 | Custom frameless title bar + resizer | no | yes (400 LOC) | DROP | | **DROP** | dropped |
 | S23 | Global hotkey to raise window (portal only) | no | yes (330 LOC) | LATER | W#10, 14. | **LATER** | — |
