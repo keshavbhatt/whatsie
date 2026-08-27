@@ -5,6 +5,7 @@
 class QCheckBox;
 class QComboBox;
 class QDoubleSpinBox;
+class QSpinBox;
 class QTabWidget;
 
 namespace whatsie::core {
@@ -23,6 +24,9 @@ class SettingsDialog : public QDialog
 public:
     SettingsDialog(core::Settings& settings, bool trayAvailable, QWidget* parent = nullptr);
     ~SettingsDialog() override = default;
+
+Q_SIGNALS:
+    void testNotificationRequested();
 
 private:
     void setupUi();
@@ -43,6 +47,9 @@ private:
     QDoubleSpinBox* m_zoom = nullptr;
     QDoubleSpinBox* m_zoomMaximized = nullptr;
     QCheckBox* m_smoothScrolling = nullptr;
+    QCheckBox* m_notificationsEnabled = nullptr;
+    QCheckBox* m_notificationSound = nullptr;
+    QSpinBox* m_notificationTimeout = nullptr;
 };
 
 } // namespace whatsie::ui

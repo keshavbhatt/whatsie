@@ -4,6 +4,8 @@
 qt_add_library(whatsie_web STATIC
     logging.cpp
     logging.h
+    notification_presenter.cpp
+    notification_presenter.h
     user_agent.cpp
     user_agent.h
     web_page.cpp

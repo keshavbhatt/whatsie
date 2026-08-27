@@ -4,6 +4,8 @@
 #include "core/settings/settings_keys.h"
 #include "core/zoom_policy.h"
 
+#include <algorithm>
+
 namespace whatsie::core {
 
 namespace {
@@ -16,6 +18,10 @@ constexpr CloseAction kDefaultCloseAction = CloseAction::MinimizeToTray;
 constexpr bool kDefaultStartMinimized = false;
 constexpr bool kDefaultTrayLeftClickToggles = true;
 constexpr bool kDefaultSmoothScrolling = false; // FEATURES A14: off by default
+constexpr bool kDefaultNotificationsEnabled = true;
+constexpr bool kDefaultNotificationSound = true;
+constexpr int kDefaultNotificationTimeoutSec = 0; // desktop default
+constexpr int kMaxNotificationTimeoutSec = 120;
 
 Theme themeFromInt(int value)
 {
@@ -192,6 +198,48 @@ void Settings::setTheme(Theme theme)
     }
     m_store->setValue(keys::kTheme, static_cast<int>(theme));
     Q_EMIT themeChanged(theme);
+}
+
+// ---- notifications/ --------------------------------------------------------
+
+bool Settings::notificationsEnabled() const
+{
+    return boolValue(keys::kNotificationsEnabled, kDefaultNotificationsEnabled);
+}
+
+void Settings::setNotificationsEnabled(bool enabled)
+{
+    if (storeBool(keys::kNotificationsEnabled, kDefaultNotificationsEnabled, enabled)) {
+        Q_EMIT notificationsEnabledChanged(enabled);
+    }
+}
+
+bool Settings::notificationSound() const
+{
+    return boolValue(keys::kNotificationSound, kDefaultNotificationSound);
+}
+
+void Settings::setNotificationSound(bool enabled)
+{
+    if (storeBool(keys::kNotificationSound, kDefaultNotificationSound, enabled)) {
+        Q_EMIT notificationSoundChanged(enabled);
+    }
+}
+
+int Settings::notificationTimeoutSec() const
+{
+    const int stored = m_store->value(keys::kNotificationTimeoutSec, kDefaultNotificationTimeoutSec).toInt();
+    return std::clamp(stored, 0, kMaxNotificationTimeoutSec);
+}
+
+void Settings::setNotificationTimeoutSec(int seconds)
+{
+    const int clamped = std::clamp(seconds, 0, kMaxNotificationTimeoutSec);
+    if (clamped == notificationTimeoutSec()) {
+        return;
+    }
+    m_store->setValue(keys::kNotificationTimeoutSec, clamped);
+    Q_EMIT notificationTimeoutSecChanged(clamped);
 }
 
 // ---- misc ------------------------------------------------------------------

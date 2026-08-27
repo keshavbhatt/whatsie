@@ -68,17 +68,17 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
-| N1 | Native Linux notifications via `org.freedesktop.Notifications` (id-tracked, avatar, identicon, click → raise) | libnotify-qt, id-less (W#5, 42, 271, 278) | libnotify-qt | CORE | ADR-009. Fix BGRA/RGBA (W#312, 328). | **KEEP** | — |
-| N2 | Windows notifications via `QSystemTrayIcon::showMessage` | yes | yes | CORE | Windows in scope (ADR-016). | **KEEP** | — |
-| N3 | XDG portal notifications (Flatpak) | no | yes, cannot detect failure | NICE | Fix the `NoBlock` issue. | **KEEP** | — |
+| N1 | Native Linux notifications via `org.freedesktop.Notifications` (id-tracked, avatar, identicon, click → raise) | libnotify-qt, id-less (W#5, 42, 271, 278) | libnotify-qt | CORE | ADR-009. Fix BGRA/RGBA (W#312, 328). | **KEEP** | done |
+| N2 | Windows notifications via `QSystemTrayIcon::showMessage` | yes | yes | CORE | Windows in scope (ADR-016). | **KEEP** | done (tray-balloon backend; used as fallback on Linux too) |
+| N3 | XDG portal notifications (Flatpak) | no | yes, cannot detect failure | NICE | Fix the `NoBlock` issue. | **KEEP** | done (untested outside Flatpak) |
 | N4 | In-app custom popup widget | yes (default, leaks) | yes | DROP | Native everywhere; crash source (W#207/210/212). | **DROP** | dropped |
-| N5 | Notification sound hint | no | yes | NICE | | **KEEP** | — |
-| N6 | Disable notifications toggle + timeout | yes | yes | CORE | | **KEEP** | — |
-| N7 | Do-Not-Disturb, manual (1h / 2h / until off) in tray | no | yes + schedule | NICE | Manual only; no schedule. | **KEEP** | — |
+| N5 | Notification sound hint | no | yes | NICE | | **KEEP** | done |
+| N6 | Disable notifications toggle + timeout | yes | yes | CORE | | **KEEP** | done |
+| N7 | Do-Not-Disturb, manual (1h / 2h / until off) in tray | no | yes + schedule | NICE | Manual only; no schedule. | **KEEP** | done |
 | N8 | Keyword highlights / VIP / muted contacts | no | yes | DROP | | **DROP** | dropped |
 | N9 | Inline reply from notification | no | yes (DOM automation) | DROP | | **DROP** | dropped |
-| N10 | Click notification → open that chat | raise only | JS focus | NICE | Via WA's own `Notification.onclick`; no DOM automation. | **KEEP** | — |
-| N11 | Auto-grant web Notification permission | prompt (W#307) | auto | CORE | | **KEEP** | — |
+| N10 | Click notification → open that chat | raise only | JS focus | NICE | Via WA's own `Notification.onclick`; no DOM automation. | **KEEP** | done |
+| N11 | Auto-grant web Notification permission | prompt (W#307) | auto | CORE | | **KEEP** | done |
 | N12 | "Started minimized" informational popup | every launch | yes | DROP | Lesson B6. | **DROP** | dropped |
 | N13 | Reply reminders | no | yes | DROP | | **DROP** | dropped |
 
@@ -180,7 +180,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | D2 | Rate-app nag | yes | yes | DROP | | **DROP** | dropped |
 | D3 | "More apps" carousel | yes | dead | DROP | | **DROP** | dropped |
 | D4 | One donate/support link in About | 2 | 3 | NICE | Single link, no nag. | **KEEP** | done |
-| D5 | Identicon avatars for notifications (stable hash) | yes | yes | CORE | Part of N1. | **KEEP** | — |
+| D5 | Identicon avatars for notifications (stable hash) | yes | yes | CORE | Part of N1. | **KEEP** | done |
 
 ---
 

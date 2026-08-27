@@ -6,6 +6,7 @@
 
 #include <QDir>
 #include <QStandardPaths>
+#include <QWebEnginePermission>
 #include <QWebEngineSettings>
 
 using namespace Qt::StringLiterals;
@@ -42,6 +43,11 @@ void WebProfile::configureStorage()
     setPersistentCookiesPolicy(QWebEngineProfile::ForcePersistentCookies);
     setHttpCacheType(QWebEngineProfile::DiskHttpCache);
     setPersistentPermissionsPolicy(QWebEngineProfile::PersistentPermissionsPolicy::StoreOnDisk);
+
+    // FEATURES N11: pre-grant so WhatsApp never shows its "notifications are
+    // off" banner (W#307).
+    queryPermission(QUrl(u"https://web.whatsapp.com"_s), QWebEnginePermission::PermissionType::Notifications)
+        .grant();
 }
 
 void WebProfile::configureUserAgent()

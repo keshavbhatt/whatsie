@@ -8,6 +8,13 @@ qt_add_library(whatsie_core STATIC
     logging.h
     navigation_policy.cpp
     navigation_policy.h
+    notifications/dnd_controller.cpp
+    notifications/dnd_controller.h
+    notifications/identicon.cpp
+    notifications/identicon.h
+    notifications/notification.h
+    notifications/notification_service.cpp
+    notifications/notification_service.h
     render_crash_policy.cpp
     render_crash_policy.h
     settings/settings.cpp

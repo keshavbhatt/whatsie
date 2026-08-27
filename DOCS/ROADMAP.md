@@ -40,7 +40,9 @@ sync, bridge-based unread count, in-app call pop-out.
 **Exit:** login, chat, restore from tray, theme switch, zoom, reopen with saved geometry,
 `whatsie --new-chat 123` raises the running instance. Tests for every `core/` class.
 
-## M2 — Notifications
+## M2 — Notifications ✅ (2026-08-27)
+
+Delivered: see `PROGRESS.md` 2026-08-27 M2 entry.
 
 | Rows | Work |
 |---|---|

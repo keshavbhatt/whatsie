@@ -23,4 +23,9 @@ inline constexpr QLatin1StringView kSmoothScrolling{"view/smoothScrolling"};
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};
 
+// notifications/
+inline constexpr QLatin1StringView kNotificationsEnabled{"notifications/enabled"};
+inline constexpr QLatin1StringView kNotificationSound{"notifications/sound"};
+inline constexpr QLatin1StringView kNotificationTimeoutSec{"notifications/timeoutSec"};
+
 } // namespace whatsie::core::keys

@@ -47,6 +47,12 @@ whatsie_add_test(tst_navigation_policy   tst_navigation_policy.cpp   whatsie_cor
 whatsie_add_test(tst_render_crash_policy tst_render_crash_policy.cpp whatsie_core)
 whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_core)
 whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
+whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_core GUI)
+whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
+# platform
+if(LINUX)
+    whatsie_add_test(tst_freedesktop_notifier tst_freedesktop_notifier.cpp whatsie_platform GUI)
+endif()
 # web
 whatsie_add_test(tst_user_agent          tst_user_agent.cpp          whatsie_web)
 # app / ui

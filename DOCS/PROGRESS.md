@@ -5,6 +5,39 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-27 — M2 Notifications
+
+**Done** (rows N1, N2, N3, N5, N6, N7, N10, N11, D5 marked `done`)
+- `core/notifications/`: `Notification` model + `INotifier` interface; `NotificationService`
+  (settings/DND gate, id assignment, identicon substitution, sound/timeout/desktop-entry
+  defaults, primary→fallback retry on `failed`, activation only for known ids); `DndController`
+  (1 h / 2 h / indefinite, timer-expired, not persisted); `identicon` with FNV-1a stable colour
+  and initials. Settings: `notifications/enabled|sound|timeoutSec`.
+- `platform/linux/`: `FreedesktopNotifier` over QtDBus (`Notify` with `desktop-entry`,
+  `category=im.received`, `urgency`, `sound-name`, `image-data` as `(iiibiiay)` RGBA8888 —
+  fixes the inverted-avatar bug W#312/328; `ActionInvoked`/`NotificationClosed` matched by
+  server id — fixes the raise-on-any-click bug W#5/42/271/278); `PortalNotifier` for Flatpak
+  with awaited reply so failure falls back (whatly's silent `NoBlock` bug); `notifier_factory`.
+- `web/NotificationPresenter`: profile presenter → service; click → `QWebEngineNotification::click()`
+  (WhatsApp opens the chat) + window raise. Notification permission auto-granted on request and
+  pre-granted on the profile (W#307).
+- `ui/`: `TrayNotifier` (balloon backend: Windows path and Linux last resort), `NotificationHub`
+  (wires backend/service/presenter), tray "Do not disturb" submenu with tooltip state,
+  Notifications settings tab (enable, sound, hide-after, "Send test notification").
+- Tests: `tst_identicon`, `tst_notification_service` (fake backends: defaults, suppression, id
+  filtering, fallback, DND expiry), `tst_freedesktop_notifier` (private `dbus-daemon`, fake
+  server: hints, wire signature, RGBA bytes, id filtering, close). 14/14 pass.
+
+**Verified**
+- Real session (KDE Wayland): log shows `notification backend: "freedesktop" (fallback: tray)`.
+- Test gotcha: host `dbus-daemon` must be spawned without the runtime-snap `LD_LIBRARY_PATH`.
+
+**Known gaps**
+- Portal backend untested outside Flatpak (M4 will exercise it in the Flatpak build).
+- No per-chat "open this chat" beyond WhatsApp's own `onclick` (by design, N10).
+
+---
+
 ## 2026-08-27 — M1 Usable shell
 
 **Done** (all rows marked `done` in `FEATURES.md`)
@@ -107,7 +140,7 @@ what is blocked. Milestone status table at the bottom.
 |---|---|---|
 | M0 Foundation | ✅ done | 2026-08-27 |
 | M1 Usable shell | ✅ done | 2026-08-27 |
-| M2 Notifications | — | |
+| M2 Notifications | ✅ done | 2026-08-27 |
 | M3 Web integration | — | |
 | M4 Packaging & CI | — | |
 | M5 Approved extras | — | list fixed in `ROADMAP.md` |

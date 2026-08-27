@@ -39,6 +39,7 @@ public:
 
     [[nodiscard]] int unreadCount() const { return m_unread; }
     [[nodiscard]] QString userAgent() const;
+    [[nodiscard]] WebProfile& profile() { return *m_profile; }
 
 Q_SIGNALS:
     void unreadCountChanged(int count);

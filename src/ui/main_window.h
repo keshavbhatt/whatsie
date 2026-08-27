@@ -4,6 +4,7 @@
 #include <QPointer>
 
 namespace whatsie::core {
+class DndController;
 class Settings;
 class ThemeService;
 } // namespace whatsie::core
@@ -14,6 +15,7 @@ class WebView;
 namespace whatsie::ui {
 
 class Actions;
+class NotificationHub;
 class SettingsDialog;
 class ThemeApplier;
 class TrayController;
@@ -65,7 +67,9 @@ private:
     core::ThemeService& m_theme;
     web::WebView* m_webView = nullptr;
     Actions* m_actions = nullptr;
+    core::DndController* m_dnd = nullptr;
     TrayController* m_tray = nullptr;
+    NotificationHub* m_notifications = nullptr;
     ThemeApplier* m_themeApplier = nullptr;
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;

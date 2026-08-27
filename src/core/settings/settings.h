@@ -63,6 +63,15 @@ public:
     [[nodiscard]] Theme theme() const;
     void setTheme(Theme theme);
 
+    // notifications/
+    [[nodiscard]] bool notificationsEnabled() const;
+    void setNotificationsEnabled(bool enabled);
+    [[nodiscard]] bool notificationSound() const;
+    void setNotificationSound(bool enabled);
+    /// 0 = desktop default; otherwise seconds until the notification expires.
+    [[nodiscard]] int notificationTimeoutSec() const;
+    void setNotificationTimeoutSec(int seconds);
+
     /// Flushes pending writes to disk. Normally automatic; explicit before quit.
     void sync();
 
@@ -77,6 +86,9 @@ Q_SIGNALS:
     void zoomFactorMaximizedChanged(double factor);
     void smoothScrollingChanged(bool enabled);
     void themeChanged(whatsie::core::Theme theme);
+    void notificationsEnabledChanged(bool enabled);
+    void notificationSoundChanged(bool enabled);
+    void notificationTimeoutSecChanged(int seconds);
 
 private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;

@@ -12,12 +12,16 @@ qt_add_library(whatsie_ui STATIC
     logging.h
     main_window.cpp
     main_window.h
+    notification_hub.cpp
+    notification_hub.h
     settings_dialog.cpp
     settings_dialog.h
     theme_applier.cpp
     theme_applier.h
     tray_controller.cpp
     tray_controller.h
+    tray_notifier.cpp
+    tray_notifier.h
 )
 whatsie_set_warnings(whatsie_ui)
 

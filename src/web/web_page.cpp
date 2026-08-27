@@ -5,6 +5,7 @@
 #include "web/web_profile.h"
 
 #include <QDesktopServices>
+#include <QWebEnginePermission>
 
 namespace whatsie::web {
 
@@ -45,7 +46,16 @@ private:
 
 WebPage::WebPage(WebProfile& profile, QObject* parent)
     : QWebEnginePage(&profile, parent)
-{}
+{
+    connect(this, &QWebEnginePage::permissionRequested, this, [](QWebEnginePermission permission) {
+        // FEATURES N11: notifications are the point of the app — always allow.
+        // Other permission types are decided by the M3 permission controller.
+        if (permission.permissionType() == QWebEnginePermission::PermissionType::Notifications) {
+            qCInfo(lcWeb) << "granting notification permission for" << permission.origin();
+            permission.grant();
+        }
+    });
+}
 
 bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame)
 {

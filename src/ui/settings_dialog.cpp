@@ -13,6 +13,7 @@
 #include <QFormLayout>
 #include <QLabel>
 #include <QPushButton>
+#include <QSpinBox>
 #include <QTabWidget>
 #include <QUrl>
 #include <QVBoxLayout>
@@ -130,11 +131,37 @@ QWidget* SettingsDialog::buildAppearanceTab()
 QWidget* SettingsDialog::buildNotificationsTab()
 {
     auto* page = new QWidget(this);
-    auto* layout = new QVBoxLayout(page);
-    auto* note = new QLabel(tr("Native notifications arrive in the next milestone (M2)."), page);
+    auto* form = new QFormLayout(page);
+
+    m_notificationsEnabled = new QCheckBox(tr("Show message notifications"), page);
+    connect(m_notificationsEnabled, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setNotificationsEnabled(on); });
+    form->addRow(QString(), m_notificationsEnabled);
+
+    m_notificationSound = new QCheckBox(tr("Play the desktop's message sound"), page);
+    connect(m_notificationSound, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setNotificationSound(on); });
+    form->addRow(QString(), m_notificationSound);
+
+    m_notificationTimeout = new QSpinBox(page);
+    m_notificationTimeout->setRange(0, 120);
+    m_notificationTimeout->setSpecialValueText(tr("Desktop default"));
+    m_notificationTimeout->setSuffix(tr(" s"));
+    connect(m_notificationTimeout, &QSpinBox::valueChanged, this,
+            [this](int v) { m_settings.setNotificationTimeoutSec(v); });
+    form->addRow(tr("Hide after:"), m_notificationTimeout);
+
+    auto* test = new QPushButton(tr("Send test notification"), page);
+    connect(test, &QPushButton::clicked, this, &SettingsDialog::testNotificationRequested);
+    form->addRow(QString(), test);
+
+    auto* note = new QLabel(tr("Temporary Do-not-disturb is in the tray icon menu."), page);
+    note->setStyleSheet(u"color: palette(placeholder-text);"_s);
     note->setWordWrap(true);
-    layout->addWidget(note);
-    layout->addStretch();
+    form->addRow(QString(), note);
+
+    connect(m_notificationsEnabled, &QCheckBox::toggled, m_notificationSound, &QWidget::setEnabled);
+    connect(m_notificationsEnabled, &QCheckBox::toggled, m_notificationTimeout, &QWidget::setEnabled);
     return page;
 }
 
@@ -171,6 +198,11 @@ void SettingsDialog::loadValues()
     m_zoom->setValue(m_settings.zoomFactor());
     m_zoomMaximized->setValue(m_settings.zoomFactorMaximized());
     m_smoothScrolling->setChecked(m_settings.smoothScrolling());
+    m_notificationsEnabled->setChecked(m_settings.notificationsEnabled());
+    m_notificationSound->setChecked(m_settings.notificationSound());
+    m_notificationSound->setEnabled(m_settings.notificationsEnabled());
+    m_notificationTimeout->setValue(m_settings.notificationTimeoutSec());
+    m_notificationTimeout->setEnabled(m_settings.notificationsEnabled());
 }
 
 } // namespace whatsie::ui

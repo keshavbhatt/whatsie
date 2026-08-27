@@ -1,12 +1,14 @@
 #include "ui/main_window.h"
 
 #include "core/navigation_policy.h"
+#include "core/notifications/dnd_controller.h"
 #include "core/settings/settings.h"
 #include "core/theme/theme_service.h"
 #include "core/zoom_policy.h"
 #include "ui/about_dialog.h"
 #include "ui/actions.h"
 #include "ui/logging.h"
+#include "ui/notification_hub.h"
 #include "ui/settings_dialog.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
@@ -62,7 +64,8 @@ void MainWindow::setupUi()
 
     m_themeApplier = new ThemeApplier(m_theme, this);
     m_actions = new Actions(this);
-    m_tray = new TrayController(m_settings, *m_actions, this);
+    m_dnd = new core::DndController(this);
+    m_tray = new TrayController(m_settings, *m_dnd, *m_actions, this);
     setWindowIcon(m_tray->currentIcon());
 
     m_webView = new web::WebView(m_settings, this);
@@ -71,6 +74,9 @@ void MainWindow::setupUi()
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
         m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
     });
+
+    m_notifications = new NotificationHub(m_settings, *m_dnd, *m_tray, *m_webView, this);
+    connect(m_notifications, &NotificationHub::activated, this, &MainWindow::showAndRaise);
 }
 
 void MainWindow::connectActions()
@@ -258,6 +264,8 @@ void MainWindow::showSettings()
     if (!m_settingsDialog) {
         m_settingsDialog = new SettingsDialog(m_settings, m_tray->isAvailable(), this);
         m_settingsDialog->setAttribute(Qt::WA_DeleteOnClose);
+        connect(m_settingsDialog, &SettingsDialog::testNotificationRequested, m_notifications,
+                &NotificationHub::sendTest);
     }
     m_settingsDialog->show();
     m_settingsDialog->raise();
