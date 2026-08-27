@@ -46,6 +46,7 @@ public Q_SLOTS:
     void promptNewChat();
     void showSettings();
     void showShortcuts();
+    void toggleTheme();
     void showAbout();
     void quit();
 

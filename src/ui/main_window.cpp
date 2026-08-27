@@ -107,6 +107,7 @@ void MainWindow::connectActions()
     m_actions->blurMessages->setChecked(m_settings.messageBlurLevel() > 0);
     connect(m_actions->blurMessages, &QAction::toggled, this,
             [this](bool on) { m_settings.setMessageBlurLevel(on ? 2 : 0); });
+    connect(m_actions->toggleTheme, &QAction::triggered, this, &MainWindow::toggleTheme);
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this,
             [this](int level) { m_actions->blurMessages->setChecked(level > 0); });
     connect(m_actions->zoomIn, &QAction::triggered, this, [this] { m_webView->zoomStep(+1); });
@@ -343,6 +344,13 @@ void MainWindow::showShortcuts()
 {
     ShortcutsDialog dialog(*m_actions, this);
     dialog.exec();
+}
+
+// FEATURES A1: flip between Light and Dark based on what is on screen now, so it
+// works even from "Follow system" (old whatsie's Ctrl+T quick action).
+void MainWindow::toggleTheme()
+{
+    m_settings.setTheme(m_theme.isDark() ? core::Theme::Light : core::Theme::Dark);
 }
 
 void MainWindow::showAbout()

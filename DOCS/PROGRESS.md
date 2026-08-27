@@ -5,6 +5,15 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Toggle-theme quick action (Ctrl+T)
+
+Owner: old whatsie had a theme-toggle quick action with a shortcut — add it back. Added
+`Actions::toggleTheme` (Ctrl+T), in the tray menu and the shortcuts sheet, wired to
+`MainWindow::toggleTheme()` which flips to the opposite of the current *effective* scheme (so it
+works from "Follow system" too). Reuses the verified setTheme → applyThemeLive path. Tests 19/19.
+
+---
+
 ## 2026-08-28 — Widgets styled to WhatsApp's design system
 
 Owner: match the settings dialog / widget style with WhatsApp's design system. Added

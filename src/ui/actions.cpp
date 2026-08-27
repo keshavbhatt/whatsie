@@ -31,6 +31,7 @@ Actions::Actions(QWidget* owner)
     downloads = make(owner, tr("Downloads…"), QKeySequence(Qt::CTRL | Qt::Key_J));
     mute = make(owner, tr("Mute sounds"), QKeySequence(Qt::CTRL | Qt::Key_M));
     blurMessages = make(owner, tr("Blur messages"), QKeySequence(Qt::CTRL | Qt::SHIFT | Qt::Key_B));
+    toggleTheme = make(owner, tr("Toggle theme"), QKeySequence(Qt::CTRL | Qt::Key_T));
     zoomIn = make(owner, tr("Zoom in"), QKeySequence::ZoomIn);
     zoomOut = make(owner, tr("Zoom out"), QKeySequence::ZoomOut);
     zoomReset = make(owner, tr("Reset zoom"), QKeySequence(Qt::CTRL | Qt::Key_0));
@@ -50,7 +51,7 @@ Actions::Actions(QWidget* owner)
 
 QList<QAction*> Actions::all() const
 {
-    return {showHide, newChat,   reload,     downloads, mute,      blurMessages, zoomIn,
+    return {showHide, newChat,   reload,     downloads, mute,      blurMessages, toggleTheme, zoomIn,
             zoomOut,  zoomReset, fullScreen, settings,  shortcuts, about,        quit};
 }
 
