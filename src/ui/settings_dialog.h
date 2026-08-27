@@ -50,6 +50,8 @@ private:
     QWidget* buildPrivacyTab();
     void loadValues();
     void refreshStorageSizes();
+    QWidget* buildNetworkGroup();
+    void updateProxyEnabled();
 
     core::Settings& m_settings;
     bool m_trayAvailable;
@@ -77,6 +79,13 @@ private:
     QCheckBox* m_notificationSound = nullptr;
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
+    QCheckBox* m_webrtcPublicOnly = nullptr;
+    QComboBox* m_proxyMode = nullptr;
+    QComboBox* m_proxyType = nullptr;
+    QLineEdit* m_proxyHost = nullptr;
+    QSpinBox* m_proxyPort = nullptr;
+    QLineEdit* m_proxyUser = nullptr;
+    QLineEdit* m_proxyPassword = nullptr;
     QLabel* m_cacheSize = nullptr;
     QLabel* m_sessionSize = nullptr;
 };

@@ -99,7 +99,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | A11 | Settings button in WhatsApp nav rail | no | yes | DROP→KEEP | Owner: a Qt overlay cannot render over the web view, so inject one Settings entry in the rail (bridge callback). ADR-028. | **KEEP** | done |
 | A12 | Chat-list collapse to avatar strip | no (W#159, 331) | yes (800 LOC) | DROP | | **DROP** | dropped |
 | A13 | Muted-updates hide / focus mode / HD AB flag / linked-device name patch | no | yes | DROP | | **DROP** | dropped |
-| A14 | Smooth scrolling (`ScrollAnimatorEnabled`) — **setting, default OFF** | no (W#178) | yes | NICE | Owner: expose as option, off by default. | **KEEP** | — (attr default off in skeleton) |
+| A14 | Smooth scrolling (`ScrollAnimatorEnabled`) — **setting, default OFF** | no (W#178) | yes | NICE | Owner: expose as option, off by default. | **KEEP** | done |
 | A15 | Emoji panel dismiss on outside click | no | yes | DROP | | **DROP** | dropped |
 | A16 | Undo send | no | yes | DROP | | **DROP** | dropped |
 | A17 | HD media auto-click | no (Y#96) | yes | DROP | | **DROP** | dropped |
@@ -120,7 +120,7 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | M10 | Media autoplay toggle | inverted | inverted | DROP | `PlaybackRequiresUserGesture=false`. | **DROP** | dropped |
 | M11 | Missing-codec / media-stuck notice | no | yes | LATER | Snap/Flatpak runtimes have codecs. | **DROP** | dropped |
 | M12a | Certificate-error override dialog | Qt example | same | DROP | Single-origin app: hard fail with message. | **DROP** | dropped |
-| M12b | Proxy-auth dialog | Qt example | same | NICE | Needed with P3. | **KEEP** | done (WebEngine default auth dialog; proxy in M5) |
+| M12b | Proxy-auth dialog | Qt example | same | NICE | Needed with P3. | **KEEP** | done (ui::ProxyAuthDialog; caches user, session-only password) |
 | M13 | Context-menu filtering | yes | yes | CORE | | **KEEP** | done |
 
 ## 6. Privacy, lock, network, performance
@@ -128,8 +128,8 @@ Sizes are the LOC whatly spent on the feature (a proxy for maintenance cost).
 | ID | Feature | whatsie | whatly | Rec. | Rationale | Decision | Status |
 |---|---|---|---|---|---|---|---|
 | P1 | App lock, **hardened**: PBKDF2 passcode, covers every window, notifications suppressed + page hidden while locked, attempt throttling; lock on start / hide / idle | base64 `asdfg`, overlay | PBKDF2, overlay, bypassable | NICE | ADR-015. | **KEEP** (M5) | — |
-| P2 | WebRTC IP handling policy | no | yes | NICE | One flag. | **KEEP** | — |
-| P3 | Network proxy (system / none / HTTP / SOCKS5 + auth) | system only (W#75, 223) | yes | NICE | Password via keychain or not stored. | **KEEP** | — |
+| P2 | WebRTC IP handling policy | no | yes | NICE | `WebRTCPublicInterfacesOnly` attribute, default off. | **KEEP** | done |
+| P3 | Network proxy (system / none / HTTP / SOCKS5 + auth) | system only (W#75, 223) | yes | NICE | Password session-only, never on disk (ADR-030). | **KEEP** | done |
 | P4 | Autostart at login (XDG / registry), sandbox-aware, starts minimized | no | yes (buggy) | NICE | XDG entry; Windows registry in M6. | **KEEP** | done (Linux) |
 | P5 | Storage manager with safe-delete guard | yes (W#230) | yes | CORE | | **KEEP** | done |
 | P6 | Hardware acceleration: auto / on / off | global flag | 18 knobs | CORE (1 setting) | Lesson B4. | **KEEP** | done |

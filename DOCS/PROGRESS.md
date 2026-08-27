@@ -5,6 +5,25 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — M5 network batch: proxy (P3), proxy-auth (M12b), WebRTC policy (P2), smooth-scroll (A14)
+
+- **P3 Network proxy**: settings for mode (System/None/Manual), type (HTTP/SOCKS5), host, port, user;
+  password kept in memory only (never persisted, ADR-030). `web::applyProxy()` uses
+  `QNetworkProxyFactory` for System and `QNetworkProxy::setApplicationProxy()` otherwise, re-applied
+  on change; `toNetworkProxy()` is pure and unit-tested (new tst_proxy). Settings → Privacy &
+  Advanced gets a "Network proxy" group (manual fields disabled unless Manual).
+- **M12b Proxy-auth**: `WebView` fills cached creds on `proxyAuthenticationRequired`, else signals
+  the UI → `ui::ProxyAuthDialog`; stores user (persisted) + password (session).
+- **P2 WebRTC**: `WebRTCPublicInterfacesOnly` profile attribute from a Privacy toggle (default off).
+- **A14**: smooth scrolling already wired; marked done.
+
+Verified: dialog renders correctly (screenshot of the Privacy tab, styled + green checkboxes);
+20/20 tests (adds tst_proxy incl. "password never persists"). clang-format clean. ADR-030.
+M5 remaining: spell check (L1/L2), IME plugins (L4, packaging), app lock (P1, last), S20 Wayland
+relaunch guard.
+
+---
+
 ## 2026-08-28 — Toggle-theme quick action (Ctrl+T)
 
 Owner: old whatsie had a theme-toggle quick action with a shortcut — add it back. Added

@@ -268,6 +268,26 @@ already used `FileManager1.ShowItems` for selecting a file; folders now match.
 **Consequences.** The button works on the desktop and stays correct under confinement via the fd
 path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
+## ADR-030 — Proxy config persists everything but the password (2026-08-28)
+
+**Context.** FEATURES P3 wants system / none / manual (HTTP or SOCKS5) proxies with optional
+authentication (M12b). The note on the row said "password via keychain or not stored"; a keychain
+means a new dependency (QtKeychain) and per-desktop backends.
+
+**Decision.** Persist `proxy/{mode,type,host,port,user}` in `QSettings`; keep the **password in
+memory only** (a `Settings` member, never a key). `core::ProxyConfig` carries it for the session.
+`web::applyProxy()` sets `QNetworkProxyFactory::setUseSystemConfiguration(true)` for System mode and
+`QNetworkProxy::setApplicationProxy()` otherwise (QtWebEngine honours the application proxy);
+`toNetworkProxy()` is a pure, tested mapping. Auth: `WebView` fills cached credentials on
+`proxyAuthenticationRequired`, or (no password yet) signals the UI, which shows `ui::ProxyAuthDialog`
+and stores the entered user (persisted) and password (session-only). WebRTC IP policy (P2) rides
+along as the `WebRTCPublicInterfacesOnly` profile attribute, default off.
+
+**Consequences.** No secret ever touches disk and no keychain dependency; the cost is re-entering
+the proxy password once per launch. Proxy changes apply process-wide immediately; a page reload
+picks them up (noted in the UI). System mode is not representable as a `QNetworkProxy`, so
+`toNetworkProxy()` maps it to `DefaultProxy` and `applyProxy()` special-cases it.
+
 ## ADR-029 — Widgets follow WhatsApp Web's design system via a Qt style sheet (2026-08-28)
 
 **Context.** Owner: the settings dialog and other widgets should match WhatsApp Web's look. The

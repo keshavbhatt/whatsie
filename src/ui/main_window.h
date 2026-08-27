@@ -4,6 +4,7 @@
 #include <QPointer>
 
 class QWebEngineDesktopMediaRequest;
+class QAuthenticator;
 
 namespace whatsie::core {
 class DndController;
@@ -68,6 +69,7 @@ private:
     void handleUnread(int count);
     void handleRenderProcessGaveUp();
     void handleDesktopMediaRequest(QWebEngineDesktopMediaRequest request);
+    void handleProxyAuth(const QString& proxyHost, QAuthenticator* authenticator);
     void syncAutostart();
     void clearCache();
     void confirmClearSession();

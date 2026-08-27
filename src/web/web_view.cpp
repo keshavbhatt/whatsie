@@ -14,6 +14,7 @@
 #include "web/web_profile.h"
 
 #include <QApplication>
+#include <QAuthenticator>
 #include <QChildEvent>
 #include <QClipboard>
 #include <QContextMenuEvent>
@@ -90,6 +91,8 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     connect(m_watchdogTimer, &QTimer::timeout, this, &WebView::checkWatchdog);
     connect(&m_profile->bridge(), &Bridge::connectionStateChanged, this, &WebView::handleConnectionChanged);
     connect(&m_profile->bridge(), &Bridge::settingsRequested, this, &WebView::settingsRequested);
+    connect(m_page, &QWebEnginePage::proxyAuthenticationRequired, this,
+            [this](const QUrl&, QAuthenticator* auth, const QString& host) { handleProxyAuth(auth, host); });
 
     // Network came back (FEATURES S14): force a reload attempt if we are down.
     if (QNetworkInformation::loadDefaultBackend()) {
@@ -268,6 +271,20 @@ void WebView::applyThemeLive()
     m_page->runJavaScript(u"window.__whatsieSetTheme && window.__whatsieSetTheme('%1')"_s.arg(mode),
                           QWebEngineScript::MainWorld);
     qCDebug(lcWeb) << "theme pushed to page:" << mode;
+}
+
+void WebView::handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost)
+{
+    // Use cached credentials if we have them; otherwise ask the UI to prompt
+    // (kept out of this layer). The password is session-only.
+    const QString user = m_settings.proxyUser();
+    const QString password = m_settings.proxyPassword();
+    if (!user.isEmpty() && !password.isEmpty()) {
+        authenticator->setUser(user);
+        authenticator->setPassword(password);
+        return;
+    }
+    Q_EMIT proxyAuthenticationRequired(proxyHost, authenticator);
 }
 
 void WebView::loadWhatsApp()

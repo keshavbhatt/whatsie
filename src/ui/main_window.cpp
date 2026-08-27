@@ -12,6 +12,7 @@
 #include "ui/logging.h"
 #include "ui/notification_hub.h"
 #include "ui/permission_prompt.h"
+#include "ui/proxy_auth_dialog.h"
 #include "ui/screen_picker_dialog.h"
 #include "ui/settings_dialog.h"
 #include "ui/shortcuts_dialog.h"
@@ -24,6 +25,7 @@
 #include <QAbstractItemModel>
 #include <QAction>
 #include <QApplication>
+#include <QAuthenticator>
 #include <QCloseEvent>
 #include <QFile>
 #include <QGuiApplication>
@@ -144,6 +146,7 @@ void MainWindow::connectWebView()
             [this](QWebEngineDesktopMediaRequest request) { handleDesktopMediaRequest(std::move(request)); });
     connect(m_webView, &web::WebView::connectionChanged, m_tray, &TrayController::setConnected);
     connect(m_webView, &web::WebView::settingsRequested, this, &MainWindow::showSettings);
+    connect(m_webView, &web::WebView::proxyAuthenticationRequired, this, &MainWindow::handleProxyAuth);
 }
 
 // Screen sharing (getDisplayMedia). On Wayland the PipeWire desktop portal
@@ -344,6 +347,18 @@ void MainWindow::showShortcuts()
 {
     ShortcutsDialog dialog(*m_actions, this);
     dialog.exec();
+}
+
+void MainWindow::handleProxyAuth(const QString& proxyHost, QAuthenticator* authenticator)
+{
+    ProxyAuthDialog dialog(proxyHost, m_settings.proxyUser(), this);
+    if (dialog.exec() != QDialog::Accepted) {
+        return; // leave the authenticator empty; the request fails
+    }
+    authenticator->setUser(dialog.user());
+    authenticator->setPassword(dialog.password());
+    m_settings.setProxyUser(dialog.user());         // remembered
+    m_settings.setProxyPassword(dialog.password()); // session only
 }
 
 // FEATURES A1: flip between Light and Dark based on what is on screen now, so it

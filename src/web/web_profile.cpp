@@ -3,6 +3,7 @@
 #include "core/settings/settings.h"
 #include "web/bridge.h"
 #include "web/logging.h"
+#include "web/proxy.h"
 #include "web/script_bundle.h"
 #include "web/user_agent.h"
 
@@ -37,6 +38,15 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     // WebView applies it live to the already-loaded page.
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { installBootstrap(); });
     connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { installBootstrap(); });
+
+    // FEATURES P3: proxy is process-wide; set it before the first request and
+    // re-apply whenever it changes (a page reload then picks it up).
+    applyProxy(m_settings.proxyConfig());
+    connect(&m_settings, &core::Settings::proxyChanged, this,
+            [this] { applyProxy(m_settings.proxyConfig()); });
+    connect(&m_settings, &core::Settings::webrtcPublicInterfacesOnlyChanged, this, [this](bool on) {
+        this->settings()->setAttribute(QWebEngineSettings::WebRTCPublicInterfacesOnly, on);
+    });
     qCInfo(lcWeb) << "profile ready, storage at" << persistentStoragePath();
 }
 
@@ -94,6 +104,8 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
     // FEATURES A14: user option, off by default.
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
+    // FEATURES P2: keep WebRTC off private interfaces when the user asks.
+    s->setAttribute(QWebEngineSettings::WebRTCPublicInterfacesOnly, m_settings.webrtcPublicInterfacesOnly());
 }
 
 QString WebProfile::themeName(core::Theme theme)

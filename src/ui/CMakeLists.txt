@@ -26,6 +26,8 @@ qt_add_library(whatsie_ui STATIC
     permission_list.h
     permission_prompt.cpp
     permission_prompt.h
+    proxy_auth_dialog.cpp
+    proxy_auth_dialog.h
     screen_picker_dialog.cpp
     screen_picker_dialog.h
     settings_dialog.cpp

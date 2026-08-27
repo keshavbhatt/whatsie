@@ -31,6 +31,8 @@
 using namespace Qt::StringLiterals;
 using whatsie::core::CloseAction;
 using whatsie::core::HardwareAcceleration;
+using whatsie::core::ProxyMode;
+using whatsie::core::ProxyType;
 using whatsie::core::Theme;
 
 namespace whatsie::ui {
@@ -289,6 +291,8 @@ QWidget* SettingsDialog::buildPrivacyTab()
     sform->addRow(QString(), buttons);
     outer->addWidget(storageBox);
 
+    outer->addWidget(buildNetworkGroup());
+
     // Notes and buttons live in the QVBoxLayout, not in the QFormLayout: a
     // word-wrapped label placed in a form's field column mis-sizes and overlaps
     // the next row.
@@ -305,6 +309,12 @@ QWidget* SettingsDialog::buildPrivacyTab()
             static_cast<HardwareAcceleration>(m_hardwareAcceleration->itemData(index).toInt()));
     });
     aform->addRow(tr("Hardware acceleration:"), m_hardwareAcceleration);
+    m_webrtcPublicOnly = new QCheckBox(tr("Route WebRTC through public interfaces only"), advBox);
+    m_webrtcPublicOnly->setToolTip(tr("Hides local network addresses from calls. May break calls "
+                                      "on some networks. Takes effect after a reload."));
+    connect(m_webrtcPublicOnly, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setWebrtcPublicInterfacesOnly(on); });
+    aform->addRow(QString(), m_webrtcPublicOnly);
     av->addLayout(aform);
 
     auto* hwNote =
@@ -327,6 +337,75 @@ QWidget* SettingsDialog::buildPrivacyTab()
     outer->addWidget(advBox);
     outer->addStretch();
     return page;
+}
+
+QWidget* SettingsDialog::buildNetworkGroup()
+{
+    auto* box = new QGroupBox(tr("Network proxy"), this);
+    auto* outer = new QVBoxLayout(box);
+    auto* form = new QFormLayout;
+
+    m_proxyMode = new QComboBox(box);
+    m_proxyMode->addItem(tr("Use system settings"), static_cast<int>(ProxyMode::System));
+    m_proxyMode->addItem(tr("No proxy (direct)"), static_cast<int>(ProxyMode::None));
+    m_proxyMode->addItem(tr("Manual"), static_cast<int>(ProxyMode::Manual));
+    connect(m_proxyMode, &QComboBox::currentIndexChanged, this, [this](int index) {
+        m_settings.setProxyMode(static_cast<ProxyMode>(m_proxyMode->itemData(index).toInt()));
+        updateProxyEnabled();
+    });
+    form->addRow(tr("Proxy:"), m_proxyMode);
+
+    m_proxyType = new QComboBox(box);
+    m_proxyType->addItem(tr("HTTP"), static_cast<int>(ProxyType::Http));
+    m_proxyType->addItem(tr("SOCKS5"), static_cast<int>(ProxyType::Socks5));
+    connect(m_proxyType, &QComboBox::currentIndexChanged, this, [this](int index) {
+        m_settings.setProxyType(static_cast<ProxyType>(m_proxyType->itemData(index).toInt()));
+    });
+    form->addRow(tr("Type:"), m_proxyType);
+
+    auto* hostRow = new QHBoxLayout;
+    m_proxyHost = new QLineEdit(box);
+    m_proxyHost->setPlaceholderText(tr("host or IP"));
+    connect(m_proxyHost, &QLineEdit::editingFinished, this,
+            [this] { m_settings.setProxyHost(m_proxyHost->text().trimmed()); });
+    m_proxyPort = new QSpinBox(box);
+    m_proxyPort->setRange(1, 65535);
+    connect(m_proxyPort, &QSpinBox::valueChanged, this, [this](int v) { m_settings.setProxyPort(v); });
+    hostRow->addWidget(m_proxyHost, 1);
+    hostRow->addWidget(new QLabel(tr("Port:"), box));
+    hostRow->addWidget(m_proxyPort);
+    form->addRow(tr("Server:"), hostRow);
+
+    m_proxyUser = new QLineEdit(box);
+    m_proxyUser->setPlaceholderText(tr("optional"));
+    connect(m_proxyUser, &QLineEdit::editingFinished, this,
+            [this] { m_settings.setProxyUser(m_proxyUser->text()); });
+    form->addRow(tr("Username:"), m_proxyUser);
+
+    m_proxyPassword = new QLineEdit(box);
+    m_proxyPassword->setEchoMode(QLineEdit::Password);
+    m_proxyPassword->setPlaceholderText(tr("kept for this session only"));
+    connect(m_proxyPassword, &QLineEdit::textEdited, this,
+            [this](const QString& text) { m_settings.setProxyPassword(text); });
+    form->addRow(tr("Password:"), m_proxyPassword);
+
+    outer->addLayout(form);
+    auto* note = new QLabel(tr("Reload WhatsApp (F5) for proxy changes to take effect. The password "
+                               "is never saved to disk."),
+                            box);
+    note->setWordWrap(true);
+    note->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    outer->addWidget(note);
+    return box;
+}
+
+void SettingsDialog::updateProxyEnabled()
+{
+    const bool manual = m_settings.proxyMode() == ProxyMode::Manual;
+    const QList<QWidget*> fields{m_proxyType, m_proxyHost, m_proxyPort, m_proxyUser, m_proxyPassword};
+    for (QWidget* w : fields) {
+        w->setEnabled(manual);
+    }
 }
 
 void SettingsDialog::refreshStorageSizes()
@@ -367,6 +446,14 @@ void SettingsDialog::loadValues()
     m_notificationTimeout->setEnabled(m_settings.notificationsEnabled());
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
+    m_webrtcPublicOnly->setChecked(m_settings.webrtcPublicInterfacesOnly());
+    m_proxyMode->setCurrentIndex(m_proxyMode->findData(static_cast<int>(m_settings.proxyMode())));
+    m_proxyType->setCurrentIndex(m_proxyType->findData(static_cast<int>(m_settings.proxyType())));
+    m_proxyHost->setText(m_settings.proxyHost());
+    m_proxyPort->setValue(m_settings.proxyPort());
+    m_proxyUser->setText(m_settings.proxyUser());
+    m_proxyPassword->setText(m_settings.proxyPassword());
+    updateProxyEnabled();
 }
 
 } // namespace whatsie::ui

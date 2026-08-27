@@ -59,6 +59,8 @@ Q_SIGNALS:
     void connectionChanged(bool up);
     /// The injected in-page settings button was clicked (FEATURES A11).
     void settingsRequested();
+    /// The proxy challenged and no credentials are cached (FEATURES M12b).
+    void proxyAuthenticationRequired(const QString& proxyHost, QAuthenticator* authenticator);
 
 protected:
     void contextMenuEvent(QContextMenuEvent* event) override;
@@ -75,6 +77,7 @@ private:
     void checkWatchdog();
     void applyBlurLive();
     void applyThemeLive();
+    void handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost);
     bool maybeHandleDrop(class QObject* watched, class QEvent* event);
     void handleFileDrop(const QStringList& paths);
 

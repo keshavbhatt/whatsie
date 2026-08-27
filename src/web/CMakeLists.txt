@@ -18,6 +18,8 @@ qt_add_library(whatsie_web STATIC
     permission_controller.h
     popup_window.cpp
     popup_window.h
+    proxy.cpp
+    proxy.h
     script_bundle.cpp
     script_bundle.h
     user_agent.cpp

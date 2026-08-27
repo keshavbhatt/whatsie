@@ -49,5 +49,13 @@ inline constexpr QLatin1StringView kLastOpenDirectory{"files/lastOpenDirectory"}
 
 // advanced/
 inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};
+inline constexpr QLatin1StringView kWebrtcPublicOnly{"advanced/webrtcPublicInterfacesOnly"};
+
+// proxy/ (password is deliberately NOT a key — never persisted)
+inline constexpr QLatin1StringView kProxyMode{"proxy/mode"};
+inline constexpr QLatin1StringView kProxyType{"proxy/type"};
+inline constexpr QLatin1StringView kProxyHost{"proxy/host"};
+inline constexpr QLatin1StringView kProxyPort{"proxy/port"};
+inline constexpr QLatin1StringView kProxyUser{"proxy/user"};
 
 } // namespace whatsie::core::keys

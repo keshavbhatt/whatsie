@@ -59,6 +59,7 @@ endif()
 # web
 whatsie_add_test(tst_user_agent          tst_user_agent.cpp          whatsie_web)
 whatsie_add_test(tst_web_scripts         tst_web_scripts.cpp         whatsie_web  GUI)
+whatsie_add_test(tst_proxy               tst_proxy.cpp               whatsie_web GUI)
 whatsie_add_test(tst_permissions         tst_permissions.cpp         whatsie_web  GUI)
 target_link_libraries(tst_web_scripts PRIVATE Qt6::Qml)
 # app / ui

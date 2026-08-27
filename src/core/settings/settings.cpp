@@ -35,6 +35,10 @@ constexpr int kDefaultMessageBlurLevel = 0;
 constexpr bool kDefaultAskWhereToSave = false;
 constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
+constexpr bool kDefaultWebrtcPublicOnly = false;
+constexpr ProxyMode kDefaultProxyMode = ProxyMode::System;
+constexpr ProxyType kDefaultProxyType = ProxyType::Http;
+constexpr int kDefaultProxyPort = 8080;
 
 HardwareAcceleration hardwareAccelerationFromInt(int value)
 {
@@ -63,6 +67,23 @@ Theme themeFromInt(int value)
 CloseAction closeActionFromInt(int value)
 {
     return value == static_cast<int>(CloseAction::Quit) ? CloseAction::Quit : CloseAction::MinimizeToTray;
+}
+
+ProxyMode proxyModeFromInt(int value)
+{
+    switch (value) {
+    case static_cast<int>(ProxyMode::None):
+        return ProxyMode::None;
+    case static_cast<int>(ProxyMode::Manual):
+        return ProxyMode::Manual;
+    default:
+        return ProxyMode::System;
+    }
+}
+
+ProxyType proxyTypeFromInt(int value)
+{
+    return value == static_cast<int>(ProxyType::Socks5) ? ProxyType::Socks5 : ProxyType::Http;
 }
 
 } // namespace
@@ -375,6 +396,110 @@ void Settings::setHardwareAcceleration(HardwareAcceleration mode)
     }
     m_store->setValue(keys::kHardwareAcceleration, static_cast<int>(mode));
     Q_EMIT hardwareAccelerationChanged(mode);
+}
+
+bool Settings::webrtcPublicInterfacesOnly() const
+{
+    return boolValue(keys::kWebrtcPublicOnly, kDefaultWebrtcPublicOnly);
+}
+
+void Settings::setWebrtcPublicInterfacesOnly(bool enabled)
+{
+    if (storeBool(keys::kWebrtcPublicOnly, kDefaultWebrtcPublicOnly, enabled)) {
+        Q_EMIT webrtcPublicInterfacesOnlyChanged(enabled);
+    }
+}
+
+// ---- proxy/ (FEATURES P3, M12b) --------------------------------------------
+
+ProxyMode Settings::proxyMode() const
+{
+    return proxyModeFromInt(m_store->value(keys::kProxyMode, static_cast<int>(kDefaultProxyMode)).toInt());
+}
+
+void Settings::setProxyMode(ProxyMode mode)
+{
+    if (mode == proxyMode()) {
+        return;
+    }
+    m_store->setValue(keys::kProxyMode, static_cast<int>(mode));
+    Q_EMIT proxyChanged();
+}
+
+ProxyType Settings::proxyType() const
+{
+    return proxyTypeFromInt(m_store->value(keys::kProxyType, static_cast<int>(kDefaultProxyType)).toInt());
+}
+
+void Settings::setProxyType(ProxyType type)
+{
+    if (type == proxyType()) {
+        return;
+    }
+    m_store->setValue(keys::kProxyType, static_cast<int>(type));
+    Q_EMIT proxyChanged();
+}
+
+QString Settings::proxyHost() const
+{
+    return m_store->value(keys::kProxyHost).toString();
+}
+
+void Settings::setProxyHost(const QString& host)
+{
+    if (host == proxyHost()) {
+        return;
+    }
+    m_store->setValue(keys::kProxyHost, host);
+    Q_EMIT proxyChanged();
+}
+
+int Settings::proxyPort() const
+{
+    return std::clamp(m_store->value(keys::kProxyPort, kDefaultProxyPort).toInt(), 1, 65535);
+}
+
+void Settings::setProxyPort(int port)
+{
+    const int clamped = std::clamp(port, 1, 65535);
+    if (clamped == proxyPort()) {
+        return;
+    }
+    m_store->setValue(keys::kProxyPort, clamped);
+    Q_EMIT proxyChanged();
+}
+
+QString Settings::proxyUser() const
+{
+    return m_store->value(keys::kProxyUser).toString();
+}
+
+void Settings::setProxyUser(const QString& user)
+{
+    if (user == proxyUser()) {
+        return;
+    }
+    m_store->setValue(keys::kProxyUser, user);
+    Q_EMIT proxyChanged();
+}
+
+QString Settings::proxyPassword() const
+{
+    return m_proxyPassword;
+}
+
+void Settings::setProxyPassword(const QString& password)
+{
+    if (password == m_proxyPassword) {
+        return;
+    }
+    m_proxyPassword = password; // memory only — never written to m_store
+    Q_EMIT proxyChanged();
+}
+
+ProxyConfig Settings::proxyConfig() const
+{
+    return ProxyConfig{proxyMode(), proxyType(), proxyHost(), proxyPort(), proxyUser(), m_proxyPassword};
 }
 
 // ---- appearance/ -----------------------------------------------------------
