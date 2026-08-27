@@ -13,20 +13,22 @@ namespace {
 QHash<QString, QString> tokens(bool dark)
 {
     if (dark) {
+        // Sampled from WhatsApp Web's dark theme (ADR-031).
         return {
-            {u"accent"_s, u"#00a884"_s},   {u"accentHover"_s, u"#06cf9c"_s}, {u"accentText"_s, u"#111b21"_s},
-            {u"bg"_s, u"#111b21"_s},       {u"panel"_s, u"#202c33"_s},       {u"elevated"_s, u"#233138"_s},
-            {u"input"_s, u"#2a3942"_s},    {u"inputBorder"_s, u"#374248"_s}, {u"border"_s, u"#2a3942"_s},
-            {u"text"_s, u"#e9edef"_s},     {u"muted"_s, u"#8696a0"_s},       {u"hover"_s, u"#2a3942"_s},
-            {u"selected"_s, u"#2a3942"_s},
+            {u"accent"_s, u"#21c063"_s},   {u"accentHover"_s, u"#25d366"_s}, {u"accentText"_s, u"#ffffff"_s},
+            {u"bg"_s, u"#262524"_s},       {u"panel"_s, u"#1d1f1f"_s},       {u"elevated"_s, u"#2a2c2c"_s},
+            {u"input"_s, u"#161717"_s},    {u"inputBorder"_s, u"#3a3d3d"_s}, {u"border"_s, u"#33393b"_s},
+            {u"text"_s, u"#ededed"_s},     {u"muted"_s, u"#8e9698"_s},       {u"hover"_s, u"#2a2c2c"_s},
+            {u"selected"_s, u"#2a2c2c"_s},
         };
     }
+    // Sampled from WhatsApp Web's light theme (ADR-031).
     return {
-        {u"accent"_s, u"#00a884"_s},   {u"accentHover"_s, u"#017561"_s}, {u"accentText"_s, u"#ffffff"_s},
-        {u"bg"_s, u"#f0f2f5"_s},       {u"panel"_s, u"#ffffff"_s},       {u"elevated"_s, u"#ffffff"_s},
-        {u"input"_s, u"#ffffff"_s},    {u"inputBorder"_s, u"#d1d7db"_s}, {u"border"_s, u"#e9edef"_s},
-        {u"text"_s, u"#111b21"_s},     {u"muted"_s, u"#667781"_s},       {u"hover"_s, u"#f0f2f5"_s},
-        {u"selected"_s, u"#f0f2f5"_s},
+        {u"accent"_s, u"#1daa61"_s},   {u"accentHover"_s, u"#128c4b"_s}, {u"accentText"_s, u"#ffffff"_s},
+        {u"bg"_s, u"#dbd8d4"_s},       {u"panel"_s, u"#ffffff"_s},       {u"elevated"_s, u"#ffffff"_s},
+        {u"input"_s, u"#f0efec"_s},    {u"inputBorder"_s, u"#d9d4ce"_s}, {u"border"_s, u"#e6e1db"_s},
+        {u"text"_s, u"#0a0a0a"_s},     {u"muted"_s, u"#54656f"_s},       {u"hover"_s, u"#efedea"_s},
+        {u"selected"_s, u"#efedea"_s},
     };
 }
 

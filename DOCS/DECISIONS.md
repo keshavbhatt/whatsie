@@ -268,6 +268,24 @@ already used `FileManager1.ShowItems` for selecting a file; folders now match.
 **Consequences.** The button works on the desktop and stays correct under confinement via the fd
 path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
+## ADR-031 — Native chrome colors are sampled from WhatsApp Web (2026-08-28)
+
+**Context.** The Qt widgets used hand-picked "WhatsApp-ish" tokens (`#00a884`, `#111b21`, …) that
+did not exactly match what WhatsApp Web renders now — a visible seam between the app chrome and the
+page. Owner asked to align them. WhatsApp does not expose its theme as readable CSS variables.
+
+**Decision.** Sample WhatsApp Web's actual rendered colors over CDP (`getComputedStyle` on `body`,
+`#pane-side`, `header`, and a frequency scan for the brand green) in both themes, and set
+`ThemeService`'s palettes and `whatsappStyleSheet()`'s tokens to those values. Nothing is injected
+into the page — the alignment is one-directional, Qt → sampled web. Key values (2026-08-28,
+WhatsApp Web 2.3000.x): accent `#21C063` dark / `#1DAA61` light (brighter in dark for contrast);
+window `#262524` / `#DBD8D4`; panel `#1D1F1F` / `#FFFFFF`; text `#FAFAFA` / `#0A0A0A`.
+
+**Consequences.** The settings dialog, tray menu and window chrome now read as the same surface as
+the page (verified by screenshot, light and dark). The accent is no longer identical across themes,
+so the theme-service test asserts "green-dominant" rather than "equal". If WhatsApp restyles, re-run
+the sampling and update the two colour tables — they are the single source of truth.
+
 ## ADR-030 — Proxy config persists everything but the password (2026-08-28)
 
 **Context.** FEATURES P3 wants system / none / manual (HTTP or SOCKS5) proxies with optional

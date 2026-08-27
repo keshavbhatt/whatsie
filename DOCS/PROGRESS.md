@@ -5,6 +5,17 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-08-28 — Align native chrome colors to WhatsApp Web (sampled)
+
+Owner: align the WhatsApp Web theme colors with our Qt theme. Chosen direction: Qt matches the web
+(robust, no DOM injection). Sampled WhatsApp Web's real rendered colors over CDP in both themes and
+set `ThemeService` palettes + `whatsappStyleSheet()` tokens to them: accent #21C063 dark / #1DAA61
+light, window #262524 / #DBD8D4, panel #1D1F1F / #FFFFFF, text #FAFAFA / #0A0A0A. Verified by
+screenshot in both themes — the settings dialog's green accent and warm background now match the
+page. Test updated (accent is green-dominant per theme, not identical). 22/22. ADR-031.
+
+---
+
 ## 2026-08-28 — Spell check (L1)
 
 - `core::Settings`: `spellCheckEnabled` (default on) + `spellCheckLanguages` (default = the system

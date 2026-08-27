@@ -53,8 +53,12 @@ private Q_SLOTS:
     {
         QVERIFY(ThemeService::lightPalette().color(QPalette::Window) !=
                 ThemeService::darkPalette().color(QPalette::Window));
-        QCOMPARE(ThemeService::darkPalette().color(QPalette::Highlight),
-                 ThemeService::lightPalette().color(QPalette::Highlight));
+        // Both accents are WhatsApp's brand green (a brighter shade in dark, a
+        // darker one in light for contrast) — green-dominant, not identical.
+        for (const QColor accent : {ThemeService::darkPalette().color(QPalette::Highlight),
+                                    ThemeService::lightPalette().color(QPalette::Highlight)}) {
+            QVERIFY(accent.green() > accent.red() && accent.green() > accent.blue());
+        }
     }
 };
 
