@@ -1,6 +1,7 @@
 #include "web/web_profile.h"
 
 #include "core/settings/settings.h"
+#include "core/spellcheck.h"
 #include "web/bridge.h"
 #include "web/logging.h"
 #include "web/proxy.h"
@@ -11,6 +12,7 @@
 #include <QStandardPaths>
 #include <QWebEnginePermission>
 #include <QWebEngineSettings>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 
@@ -128,12 +130,24 @@ QString WebProfile::themeName(core::Theme theme)
 
 void WebProfile::configureSpellCheck()
 {
-    // FEATURES L1: dictionaries come from QTWEBENGINE_DICTIONARIES_PATH (set by
-    // Application). With none present the checker is a harmless no-op.
+    // FEATURES L1: resolve each configured language to a dictionary that is
+    // actually installed (QTWEBENGINE_DICTIONARIES_PATH, set by Application) —
+    // e.g. en-IN, which has no dictionary, falls back to en-GB. Feeding the
+    // checker an absent language just silently disables it (owner report: the
+    // UI claimed "en-IN" while spell check did nothing).
+    const QStringList available =
+        core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
+    QStringList effective;
+    for (const QString& want : m_settings.spellCheckLanguages()) {
+        const QString dict = core::resolveDictionary(want, available);
+        if (!dict.isEmpty() && !effective.contains(dict)) {
+            effective << dict;
+        }
+    }
     setSpellCheckEnabled(m_settings.spellCheckEnabled());
-    setSpellCheckLanguages(m_settings.spellCheckLanguages());
-    qCInfo(lcWeb) << "spell check" << (m_settings.spellCheckEnabled() ? "on" : "off")
-                  << m_settings.spellCheckLanguages();
+    setSpellCheckLanguages(effective);
+    qCInfo(lcWeb) << "spell check" << (m_settings.spellCheckEnabled() ? "on" : "off") << "requested"
+                  << m_settings.spellCheckLanguages() << "effective" << effective;
 }
 
 void WebProfile::installBootstrap()

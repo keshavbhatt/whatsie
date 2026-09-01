@@ -1,6 +1,7 @@
 #include "core/spellcheck.h"
 
 #include <QDir>
+#include <QFile>
 #include <QLocale>
 #include <QTemporaryDir>
 #include <QTest>
@@ -46,6 +47,30 @@ private Q_SLOTS:
     {
         QTemporaryDir a;
         QVERIFY(findDictionariesPath({a.path(), QString()}).isEmpty());
+    }
+
+    void listsAvailableBdicNames()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        for (const QString& n : {u"en-US"_s, u"de-DE"_s, u"notes.txt"_s}) {
+            QFile f(dir.filePath(n.contains(u'.') ? n : n + u".bdic"_s));
+            QVERIFY(f.open(QIODevice::WriteOnly));
+        }
+        QCOMPARE(availableDictionaries(dir.path()), (QStringList{u"de-DE"_s, u"en-US"_s}));
+        QVERIFY(availableDictionaries(QString()).isEmpty());
+    }
+
+    void resolvesExactThenSameLanguageElseEmpty()
+    {
+        const QStringList avail{u"de-DE"_s, u"en-GB"_s, u"en-US"_s, u"fr-FR"_s};
+        QCOMPARE(resolveDictionary(u"en-US"_s, avail), u"en-US"_s); // exact
+        QCOMPARE(resolveDictionary(u"en-IN"_s, avail), u"en-GB"_s); // same language, first variant
+        QCOMPARE(resolveDictionary(u"fr-CA"_s, avail), u"fr-FR"_s); // same language
+        QVERIFY(resolveDictionary(u"ru-RU"_s, avail).isEmpty()); // no Russian -> empty, never cross-language
+        QVERIFY(resolveDictionary(u"en-US"_s, {}).isEmpty());    // nothing installed
+        QCOMPARE(resolveDictionary(u"en"_s, QStringList{u"en"_s, u"en-US"_s}),
+                 u"en"_s); // bare language present
     }
 };
 

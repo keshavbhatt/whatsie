@@ -16,4 +16,15 @@ namespace whatsie::core {
 /// roots, or an empty string. QtWebEngine reads `.bdic` files from there.
 [[nodiscard]] QString findDictionariesPath(const QStringList& candidateRoots);
 
+/// The `.bdic` dictionary names present in `dictionaryDir` (e.g. "en-US"),
+/// sorted. Empty when the directory is missing or has none.
+[[nodiscard]] QStringList availableDictionaries(const QString& dictionaryDir);
+
+/// Picks the installed dictionary to actually use for `want` (a name from
+/// dictionaryNameForLocale, e.g. "en-IN"): the exact one if present, else the
+/// bare language ("en"), else the first same-language variant ("en-GB"), else
+/// empty. Never crosses languages — a missing language means no spell check,
+/// not the wrong dictionary underlining every word.
+[[nodiscard]] QString resolveDictionary(const QString& want, const QStringList& available);
+
 } // namespace whatsie::core

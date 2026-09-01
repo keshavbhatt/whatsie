@@ -4,6 +4,7 @@
 #include "core/downloads/file_naming.h"
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
+#include "core/spellcheck.h"
 #include "core/storage_policy.h"
 #include "core/zoom_policy.h"
 #include "platform/file_manager.h"
@@ -33,6 +34,7 @@
 #include <QUrl>
 #include <QVBoxLayout>
 #include <QtConcurrent>
+#include <QtEnvironmentVariables>
 
 using namespace Qt::StringLiterals;
 using whatsie::core::CloseAction;
@@ -317,10 +319,28 @@ QWidget* SettingsDialog::buildPrivacyTab()
     connect(m_spellCheck, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setSpellCheckEnabled(on); });
     spellLayout->addWidget(m_spellCheck);
-    auto* spellNote = new QLabel(tr("Dictionary: %1. More languages can be added by installing their "
-                                    "dictionaries.")
-                                     .arg(m_settings.spellCheckLanguages().join(u", "_s)),
-                                 spellBox);
+    // Show the dictionary that will actually be used: the configured language
+    // (e.g. en-IN) may have no dictionary and fall back to the closest installed
+    // one — or none. Never claim a dictionary that is not really active.
+    const QStringList available =
+        core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
+    const QString want = m_settings.spellCheckLanguages().value(0);
+    const QString effective = core::resolveDictionary(want, available);
+    QString spellText;
+    if (effective.isEmpty()) {
+        spellText = tr("No dictionary is available for %1, so spell check is inactive. Install a "
+                       "dictionary for your language to enable it.")
+                        .arg(want);
+    } else if (effective == want) {
+        spellText = tr("Dictionary: %1. More languages can be added by installing their "
+                       "dictionaries.")
+                        .arg(effective);
+    } else {
+        spellText = tr("Dictionary: %1 (closest available for %2). More languages can be added by "
+                       "installing their dictionaries.")
+                        .arg(effective, want);
+    }
+    auto* spellNote = new QLabel(spellText, spellBox);
     spellNote->setWordWrap(true);
     spellNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
     spellLayout->addWidget(spellNote);

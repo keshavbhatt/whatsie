@@ -1,6 +1,7 @@
 #include "core/spellcheck.h"
 
 #include <QDir>
+#include <QFileInfo>
 #include <QLocale>
 
 using namespace Qt::StringLiterals;
@@ -30,6 +31,41 @@ QString findDictionariesPath(const QStringList& candidateRoots)
         }
     }
     return {};
+}
+
+QStringList availableDictionaries(const QString& dictionaryDir)
+{
+    if (dictionaryDir.isEmpty()) {
+        return {};
+    }
+    QStringList names;
+    const auto entries = QDir(dictionaryDir).entryInfoList({u"*.bdic"_s}, QDir::Files, QDir::Name);
+    for (const QFileInfo& entry : entries) {
+        names << entry.completeBaseName();
+    }
+    names.sort();
+    return names;
+}
+
+QString resolveDictionary(const QString& want, const QStringList& available)
+{
+    if (want.isEmpty() || available.isEmpty()) {
+        return {};
+    }
+    if (available.contains(want)) {
+        return want;
+    }
+    const QString language = want.section(u'-', 0, 0); // "en-IN" -> "en"
+    if (available.contains(language)) {
+        return language;
+    }
+    const QString prefix = language + u'-';
+    for (const QString& name : available) { // available is sorted; first variant wins
+        if (name.startsWith(prefix)) {
+            return name;
+        }
+    }
+    return {}; // no dictionary for this language — spell check stays off
 }
 
 } // namespace whatsie::core
