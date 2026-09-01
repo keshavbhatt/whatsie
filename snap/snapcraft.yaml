@@ -85,6 +85,32 @@ parts:
         ${CRAFT_PART_INSTALL}/meta/gui/icon.png
       sed -i "s|^Icon=.*|Icon=\${SNAP}/meta/gui/icon.png|" \
         ${CRAFT_PART_INSTALL}/usr/share/applications/com.ktechpit.whatsie.desktop
+      # Spell-check dictionaries (FEATURES L1): convert the hunspell dicts pulled
+      # in via build-packages to Chromium .bdic here, where the SDK's converter
+      # AND its libraries are on the path (CMake's configure-time execute_process
+      # cannot load them). Best-effort: logs what it finds and never fails build.
+      convert="$(command -v qwebengine_convert_dict || true)"
+      [ -n "$convert" ] || convert="$(find /snap/kde-qt6-core24-sdk/current /usr/lib -name qwebengine_convert_dict 2>/dev/null | head -1)"
+      echo "whatsie: qwebengine_convert_dict = ${convert:-<not found>}"
+      if [ -n "$convert" ]; then
+        qtprefix="$(cd "$(dirname "$convert")/../../.." && pwd)"
+        export LD_LIBRARY_PATH="$qtprefix/lib/$(uname -m)-linux-gnu:$qtprefix/lib:${LD_LIBRARY_PATH:-}"
+        dictdir="${CRAFT_PART_INSTALL}/usr/share/whatsie/qtwebengine_dictionaries"
+        mkdir -p "$dictdir"
+        for aff in /usr/share/hunspell/*.aff; do
+          [ -e "$aff" ] || continue
+          base="$(basename "$aff" .aff)"
+          dic="/usr/share/hunspell/${base}.dic"
+          [ -f "$dic" ] || continue
+          name="$(echo "$base" | tr '_' '-')"
+          if "$convert" "$dic" "$dictdir/${name}.bdic"; then
+            echo "whatsie: bundled dictionary ${name}"
+          else
+            echo "whatsie: failed to convert ${base}"
+          fi
+        done
+        ls -la "$dictdir" || true
+      fi
     prime:
       - -usr/include
       - -usr/lib/*/cmake

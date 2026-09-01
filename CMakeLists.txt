@@ -90,10 +90,31 @@ if(LINUX)
     # Best-effort: if the tool or the dictionaries are absent (e.g. this dev
     # host), it silently produces nothing and spell check falls back to a no-op.
     # CI (kde-neon-6) has both, so the packaged app ships real dictionaries.
-    find_program(WHATSIE_CONVERT_DICT qwebengine_convert_dict
-        HINTS /usr/lib/qt6 /usr/lib/qt6/libexec /usr/lib/x86_64-linux-gnu/qt6/libexec /usr/libexec)
+    # The tool ships in the Qt WebEngine libexec dir, which varies by distro and
+    # (in the kde-neon-6 snap SDK) lives under the SDK mount. Search broadly and,
+    # as a last resort, glob the SDK/Qt trees. All of this is logged so a failed
+    # lookup is diagnosable from the CI output.
+    file(GLOB _whatsie_convert_glob
+        /snap/kde-qt6-core24-sdk/current/usr/lib/*/qt6/libexec/qwebengine_convert_dict
+        /snap/kde-qt6-core24-sdk/current/usr/lib/qt6/libexec/qwebengine_convert_dict
+        /usr/lib/*/qt6/libexec/qwebengine_convert_dict
+        /usr/lib/qt6/libexec/qwebengine_convert_dict)
+    find_program(WHATSIE_CONVERT_DICT
+        NAMES qwebengine_convert_dict
+        HINTS ${_whatsie_convert_glob}
+        PATHS /usr/lib/qt6 /usr/lib/x86_64-linux-gnu/qt6 /usr/lib/aarch64-linux-gnu/qt6
+              /usr/lib/qt6/libexec /usr/libexec /usr/libexec/qt6
+        PATH_SUFFIXES libexec qt6/libexec)
     set(WHATSIE_HUNSPELL_DIR "/usr/share/hunspell" CACHE PATH "hunspell .aff/.dic directory")
     set(_whatsie_dicts_out "${CMAKE_BINARY_DIR}/qtwebengine_dictionaries")
+    message(STATUS "whatsie: qwebengine_convert_dict = ${WHATSIE_CONVERT_DICT}")
+    if(EXISTS "${WHATSIE_HUNSPELL_DIR}")
+        file(GLOB _whatsie_hunspell_list "${WHATSIE_HUNSPELL_DIR}/*.dic")
+        message(STATUS "whatsie: hunspell dir ${WHATSIE_HUNSPELL_DIR} has "
+                       "${_whatsie_hunspell_list}")
+    else()
+        message(STATUS "whatsie: hunspell dir ${WHATSIE_HUNSPELL_DIR} does not exist")
+    endif()
     if(WHATSIE_CONVERT_DICT AND EXISTS "${WHATSIE_HUNSPELL_DIR}")
         file(GLOB _whatsie_affs "${WHATSIE_HUNSPELL_DIR}/*.aff")
         file(MAKE_DIRECTORY "${_whatsie_dicts_out}")
