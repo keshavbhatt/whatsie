@@ -2,6 +2,7 @@
 
 #include <QWidget>
 
+class QShortcut;
 class QWebEnginePage;
 class QWebEngineView;
 
@@ -28,7 +29,9 @@ protected:
 
 private:
     class Page;
+    void exitFullScreen();
     QWebEngineView* m_view = nullptr;
+    QShortcut* m_exitFullScreen = nullptr;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
 };
 

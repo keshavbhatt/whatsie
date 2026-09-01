@@ -142,6 +142,13 @@ void WebView::closePopups()
     }
 }
 
+void WebView::exitPageFullScreen()
+{
+    m_page->runJavaScript(
+        u"if (document.fullscreenElement) { document.exitFullscreen(); }"_s,
+        QWebEngineScript::MainWorld);
+}
+
 void WebView::wirePopup(QWidget* window)
 {
     auto* popup = qobject_cast<PopupWindow*>(window);

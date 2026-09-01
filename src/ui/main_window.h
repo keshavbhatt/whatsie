@@ -5,6 +5,7 @@
 
 class QWebEngineDesktopMediaRequest;
 class QAuthenticator;
+class QShortcut;
 class QStackedWidget;
 class QTimer;
 
@@ -100,6 +101,7 @@ private:
     bool m_quitting = false;
 
     // App lock (FEATURES P1)
+    QShortcut* m_exitFullScreen = nullptr;
     QStackedWidget* m_stack = nullptr;
     LockScreen* m_lockScreen = nullptr;
     QTimer* m_idleTimer = nullptr;

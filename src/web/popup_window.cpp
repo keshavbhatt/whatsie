@@ -6,8 +6,10 @@
 
 #include <QDesktopServices>
 #include <QKeyEvent>
+#include <QShortcut>
 #include <QVBoxLayout>
 #include <QWebEngineFullScreenRequest>
+#include <QWebEngineScript>
 #include <QWebEnginePage>
 #include <QWebEngineView>
 
@@ -67,10 +69,18 @@ PopupWindow::PopupWindow(WebProfile& profile, QWidget* parent)
         if (request.toggleOn()) {
             m_stateBeforeFullScreen = windowState();
             showFullScreen();
+            m_exitFullScreen->setEnabled(true);
         } else {
-            setWindowState(m_stateBeforeFullScreen & ~Qt::WindowFullScreen);
+            exitFullScreen();
         }
     });
+    // Esc leaves full screen even while the web view holds keyboard focus (a
+    // plain keyPressEvent never reaches us then); only active in full screen so
+    // it does not shadow Esc otherwise. FEATURES M3.
+    m_exitFullScreen = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    m_exitFullScreen->setContext(Qt::WindowShortcut);
+    m_exitFullScreen->setEnabled(false);
+    connect(m_exitFullScreen, &QShortcut::activated, this, &PopupWindow::exitFullScreen);
     qCInfo(lcWeb) << "popup window created";
 }
 
@@ -79,11 +89,25 @@ QWebEnginePage* PopupWindow::page() const
     return m_view->page();
 }
 
+void PopupWindow::exitFullScreen()
+{
+    m_exitFullScreen->setEnabled(false);
+    // Explicit restore (clearing the flag via setWindowState is unreliable on
+    // Wayland) and sync the page out of HTML full screen.
+    if (m_stateBeforeFullScreen & Qt::WindowMaximized) {
+        showMaximized();
+    } else {
+        showNormal();
+    }
+    page()->runJavaScript(u"if (document.fullscreenElement) { document.exitFullscreen(); }"_s,
+                          QWebEngineScript::MainWorld);
+}
+
 void PopupWindow::keyPressEvent(QKeyEvent* event)
 {
     if (event->key() == Qt::Key_Escape) {
         if (isFullScreen()) {
-            setWindowState(m_stateBeforeFullScreen & ~Qt::WindowFullScreen);
+            exitFullScreen();
         } else {
             close();
         }

@@ -35,6 +35,7 @@
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSessionManager>
+#include <QShortcut>
 #include <QStackedWidget>
 #include <QStandardPaths>
 #include <QTimer>
@@ -129,6 +130,14 @@ void MainWindow::connectActions()
     connect(m_actions->zoomOut, &QAction::triggered, this, [this] { m_webView->zoomStep(-1); });
     connect(m_actions->zoomReset, &QAction::triggered, this, [this] { m_webView->zoomReset(); });
     connect(m_actions->fullScreen, &QAction::toggled, this, &MainWindow::setFullScreenMode);
+    // Esc always leaves full screen, even if WhatsApp's own video control is
+    // unreachable — only active while full screen so it never eats the page's
+    // own Esc (closing chats/search) otherwise.
+    m_exitFullScreen = new QShortcut(QKeySequence(Qt::Key_Escape), this);
+    m_exitFullScreen->setContext(Qt::WindowShortcut);
+    m_exitFullScreen->setEnabled(false);
+    connect(m_exitFullScreen, &QShortcut::activated, this,
+            [this] { m_actions->fullScreen->setChecked(false); });
     connect(m_actions->settings, &QAction::triggered, this, &MainWindow::showSettings);
     connect(m_actions->shortcuts, &QAction::triggered, this, &MainWindow::showShortcuts);
     connect(m_actions->about, &QAction::triggered, this, &MainWindow::showAbout);
@@ -310,16 +319,29 @@ void MainWindow::applyMinimumSize()
 void MainWindow::setFullScreenMode(bool on)
 {
     if (on == isFullScreen()) {
+        // Still keep the page and the Esc hatch in sync even if the window is
+        // already in the target state (e.g. a page-driven request while there).
+        m_exitFullScreen->setEnabled(on);
+        if (!on) {
+            m_webView->exitPageFullScreen();
+        }
         return;
     }
     if (on) {
         m_stateBeforeFullScreen = windowState();
         showFullScreen();
+        m_exitFullScreen->setEnabled(true);
     } else {
-        setWindowState(m_stateBeforeFullScreen & ~Qt::WindowFullScreen);
-        if (!isVisible()) {
-            show();
+        // Restore explicitly (setWindowState clearing the flag is unreliable on
+        // Wayland) and make sure the page leaves its own HTML full screen too,
+        // so an exit started on either side can't leave the other stuck.
+        m_exitFullScreen->setEnabled(false);
+        if (m_stateBeforeFullScreen & Qt::WindowMaximized) {
+            showMaximized();
+        } else {
+            showNormal();
         }
+        m_webView->exitPageFullScreen();
     }
 }
 

@@ -49,6 +49,8 @@ public:
     [[nodiscard]] PermissionController& permissions() { return *m_permissions; }
     /// Close any popped-out windows (calls) — used when locking (FEATURES P1).
     void closePopups();
+    /// Ask the page to leave HTML fullscreen (keeps window/page fullscreen in sync).
+    void exitPageFullScreen();
 
 Q_SIGNALS:
     void unreadCountChanged(int count);
