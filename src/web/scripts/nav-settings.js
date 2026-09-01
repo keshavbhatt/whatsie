@@ -18,11 +18,30 @@
         '<path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>' +
         '<path fill="currentColor" d="M19.4 13c.04-.32.06-.66.06-1s-.02-.68-.06-1l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.73-1l-.38-2.65A.5.5 0 0 0 14 1h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.3 7.3 0 0 0-1.73 1l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64L4.6 11c-.04.32-.06.66-.06 1s.02.68.06 1l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.14.24.42.32.61.22l2.49-1c.52.4 1.1.74 1.73 1l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.63-.26 1.21-.6 1.73-1l2.49 1c.24.1.47.02.61-.22l2-3.46a.5.5 0 0 0-.12-.64L19.4 13z"/>';
 
+    // Buttons in the far-left column, excluding any inside a modal/overlay (the
+    // media viewer, dialogs) — those must never be treated as rail entries or we
+    // would clone one and hijack, e.g., the viewer's close button.
+    var OVERLAY = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
+        + '[data-animate-modal-backdrop],[data-animate-media-viewer]';
     function railButtons() {
         return Array.prototype.slice.call(document.querySelectorAll('button')).filter(function (b) {
+            if (b.closest(OVERLAY)) { return false; }
             var r = b.getBoundingClientRect();
             return r.width > 0 && r.width <= 72 && r.left < 80;
         });
+    }
+    // The persistent nav rail is a vertical stack of icon (svg, no img) buttons
+    // near the top-left. A media viewer / modal has no such stack, so this tells
+    // "real rail is present" from "some transient overlay is showing".
+    function mainRailPresent(rail) {
+        var n = 0;
+        for (var i = 0; i < rail.length; i++) {
+            var b = rail[i];
+            if (b.getBoundingClientRect().top < 320 && b.querySelector('svg') && !b.querySelector('img')) {
+                n++;
+            }
+        }
+        return n >= 3;
     }
     // Climb until `node` and `other` become siblings — the level rail entries
     // share, several wrappers above the <button> itself.
@@ -46,6 +65,7 @@
     function anchors() {
         var rail = railButtons();
         rail.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
+        if (!mainRailPresent(rail)) { return null; } // don't inject into a viewer/overlay
         var mine = function (b) { return b.closest('[id^="whatsie-"]'); };
         var avatar = null;
         for (var i = rail.length - 1; i >= 0; i--) {
@@ -112,6 +132,7 @@
             entry.addEventListener('click', function (ev) {
                 ev.preventDefault();
                 ev.stopPropagation();
+                if (!anchors()) { return; } // never act while a viewer/overlay is up
                 var api = window.__whatsie;
                 if (api && api.bridge && typeof api.bridge.openSettings === 'function') {
                     api.bridge.openSettings();
