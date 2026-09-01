@@ -5,6 +5,19 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-09-01 — GitHub wired up; first green snap CI build (both arches)
+
+Connected new-whatsie to the existing `keshavbhatt/whatsie` repo (owner request). Pushed the 36-commit
+rewrite to a new `origin/rewrite` branch — `main` (original whatsie) untouched, histories unrelated,
+no force. Added `rewrite` to `snap.yml`'s push trigger (artifact-only; `PUBLISH_TO_STORE` unset, no
+store release). First CI snap build ran and is **green on both amd64 and arm64**
+(run 33520045425), each producing a ~20 MB `.snap` artifact — the snapcraft config (kde-neon-6 SDK,
+spell-check `.bdic` conversion, install rules, dual-arch) is validated end-to-end on real CI for the
+first time. `main` stays the original; making `rewrite` canonical + wiring the store publish is the
+deferred Option B.
+
+---
+
 ## 2026-09-01 — GPU auto-fallback resolves the whatsie #334 crash/blank-video dilemma
 
 Investigated original whatsie commit 1b496d7 (#334), which removed `--disable-gpu` to fix blank call
@@ -632,6 +645,6 @@ recovery, A8 privacy blur, M6 drag-and-drop attach.
 | M1 Usable shell | ✅ done | 2026-08-27 |
 | M2 Notifications | ✅ done | 2026-08-27 |
 | M3 Web integration | ✅ done | 2026-08-27 (parts A + B) |
-| M4 Packaging & CI | ◐ snap done | snap config + CI; flatpak later |
+| M4 Packaging & CI | ◐ snap CI green (both arches) | flatpak + store publish later |
 | M5 Approved extras | — | list fixed in `ROADMAP.md` |
 | M6 Windows | — | ADR-016 |
