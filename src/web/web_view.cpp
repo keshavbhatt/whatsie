@@ -20,6 +20,7 @@
 #include <QContextMenuEvent>
 #include <QDragMoveEvent>
 #include <QDropEvent>
+#include <QFont>
 #include <QFutureWatcher>
 #include <QJsonDocument>
 #include <QKeyEvent>
@@ -436,6 +437,26 @@ void WebView::contextMenuEvent(QContextMenuEvent* event)
 
     auto* menu = new QMenu(this);
     menu->setAttribute(Qt::WA_DeleteOnClose);
+    // Spelling suggestions come first (FEATURES L1). Chromium underlines the
+    // misspelled word but only offers corrections through the context menu; our
+    // filtered menu has to surface them itself or the red squiggle is a dead end.
+    if (editable && !request->misspelledWord().isEmpty()) {
+        const QStringList suggestions = request->spellCheckerSuggestions();
+        if (suggestions.isEmpty()) {
+            QAction* none = menu->addAction(tr("No spelling suggestions"));
+            none->setEnabled(false);
+        } else {
+            for (const QString& suggestion : suggestions) {
+                QAction* fix = menu->addAction(suggestion);
+                QFont bold = fix->font();
+                bold.setBold(true);
+                fix->setFont(bold);
+                connect(fix, &QAction::triggered, this,
+                        [this, suggestion] { m_page->replaceMisspelledWord(suggestion); });
+            }
+        }
+        menu->addSeparator();
+    }
     if (editable) {
         menu->addAction(pageAction(QWebEnginePage::Undo));
         menu->addAction(pageAction(QWebEnginePage::Redo));
