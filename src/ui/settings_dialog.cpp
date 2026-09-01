@@ -319,31 +319,43 @@ QWidget* SettingsDialog::buildPrivacyTab()
     connect(m_spellCheck, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setSpellCheckEnabled(on); });
     spellLayout->addWidget(m_spellCheck);
-    // Show the dictionary that will actually be used: the configured language
-    // (e.g. en-IN) may have no dictionary and fall back to the closest installed
-    // one — or none. Never claim a dictionary that is not really active.
+
+    // Let the user pick any bundled dictionary (they cannot install more yet —
+    // on-demand downloads are a future feature — so we only ever offer what is
+    // actually present, and say so honestly).
     const QStringList available =
         core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
-    const QString want = m_settings.spellCheckLanguages().value(0);
-    const QString effective = core::resolveDictionary(want, available);
-    QString spellText;
-    if (effective.isEmpty()) {
-        spellText = tr("No dictionary is available for %1, so spell check is inactive. Install a "
-                       "dictionary for your language to enable it.")
-                        .arg(want);
-    } else if (effective == want) {
-        spellText = tr("Dictionary: %1. More languages can be added by installing their "
-                       "dictionaries.")
-                        .arg(effective);
+    if (available.isEmpty()) {
+        auto* none = new QLabel(tr("No dictionaries are bundled, so spell check is inactive."), spellBox);
+        none->setWordWrap(true);
+        none->setStyleSheet(u"color: palette(placeholder-text);"_s);
+        spellLayout->addWidget(none);
     } else {
-        spellText = tr("Dictionary: %1 (closest available for %2). More languages can be added by "
-                       "installing their dictionaries.")
-                        .arg(effective, want);
+        auto* row = new QFormLayout;
+        m_spellLanguage = new QComboBox(spellBox);
+        for (const QString& code : available) {
+            const QLocale loc(code);
+            const QString label = loc.language() == QLocale::AnyLanguage
+                                      ? code
+                                      : tr("%1 (%2) — %3")
+                                            .arg(QLocale::languageToString(loc.language()),
+                                                 QLocale::territoryToString(loc.territory()), code);
+            m_spellLanguage->addItem(label, code);
+        }
+        const QString effective =
+            core::resolveDictionary(m_settings.spellCheckLanguages().value(0), available);
+        m_spellLanguage->setCurrentIndex(std::max(0, m_spellLanguage->findData(effective)));
+        connect(m_spellLanguage, &QComboBox::currentIndexChanged, this, [this](int index) {
+            m_settings.setSpellCheckLanguages({m_spellLanguage->itemData(index).toString()});
+        });
+        row->addRow(tr("Language:"), m_spellLanguage);
+        spellLayout->addLayout(row);
+        auto* hint =
+            new QLabel(tr("Only bundled dictionaries are listed; more arrive with app updates."), spellBox);
+        hint->setWordWrap(true);
+        hint->setStyleSheet(u"color: palette(placeholder-text);"_s);
+        spellLayout->addWidget(hint);
     }
-    auto* spellNote = new QLabel(spellText, spellBox);
-    spellNote->setWordWrap(true);
-    spellNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
-    spellLayout->addWidget(spellNote);
     outer->addWidget(spellBox);
 
     outer->addWidget(buildLockGroup());

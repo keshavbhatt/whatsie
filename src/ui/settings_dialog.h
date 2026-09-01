@@ -83,6 +83,7 @@ private:
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
     QCheckBox* m_spellCheck = nullptr;
+    QComboBox* m_spellLanguage = nullptr;
     QLabel* m_lockStatus = nullptr;
     QPushButton* m_lockSet = nullptr;
     QPushButton* m_lockRemove = nullptr;

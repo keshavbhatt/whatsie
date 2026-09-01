@@ -34,38 +34,64 @@
         return null;
     }
 
-    var railParent = null;
+    // The two anchors we place relative to, recomputed every tick so the button
+    // tracks WhatsApp's rail instead of sticking wherever it first landed:
+    //   avatar   = the BOTTOM-MOST rail button with an <img> (the profile). This
+    //              matters because WhatsApp's "Meta AI" entry is also an <img>;
+    //              picking the last one avoids latching onto Meta AI before the
+    //              profile avatar has loaded (the cause of the wandering icon).
+    //   template = the icon (svg-only) button directly above that avatar, in the
+    //              same group — cloned so our entry looks native and lands right
+    //              above the profile.
+    function anchors() {
+        var rail = railButtons();
+        rail.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
+        var mine = function (b) { return b.closest('[id^="whatsie-"]'); };
+        var avatar = null;
+        for (var i = rail.length - 1; i >= 0; i--) {
+            if (!mine(rail[i]) && rail[i].querySelector('img')) { avatar = rail[i]; break; }
+        }
+        if (!avatar) { return null; }
+        var avatarTop = avatar.getBoundingClientRect().top;
+        var template = null;
+        for (var j = rail.length - 1; j >= 0; j--) {
+            var b = rail[j];
+            if (b !== avatar && !mine(b) && b.querySelector('svg') && !b.querySelector('img') &&
+                b.getBoundingClientRect().top < avatarTop) {
+                template = b;
+                break;
+            }
+        }
+        if (!template) { return null; }
+        var avatarWrapper = wrapperSharedWith(avatar, template);
+        var templateWrapper = wrapperSharedWith(template, avatar);
+        if (!avatarWrapper || !templateWrapper ||
+            avatarWrapper.parentElement !== templateWrapper.parentElement) {
+            return null;
+        }
+        return { avatarWrapper: avatarWrapper, templateWrapper: templateWrapper };
+    }
 
-    function placed() {
+    // Placed correctly only when our entry sits immediately above the current
+    // avatar; if WhatsApp reflows the rail (or the real avatar appears after a
+    // provisional placement), this turns false and install() moves it.
+    function placed(a) {
         var entry = document.getElementById(ID);
-        return !!(entry && entry.isConnected && railParent && railParent.isConnected &&
-                  entry.parentElement === railParent);
+        return !!(entry && entry.isConnected && a &&
+                  entry.parentElement === a.avatarWrapper.parentElement &&
+                  entry.nextElementSibling === a.avatarWrapper);
     }
 
     function install() {
-        if (placed()) { return; }
         try {
+            var a = anchors();
+            if (!a) { return; }
+            if (placed(a)) { return; }
+
             var existing = document.getElementById(ID);
             if (existing) { existing.remove(); }
-
-            var rail = railButtons();
-            var avatar = null;
-            var template = null;
-            for (var i = rail.length - 1; i >= 0; i--) {
-                if (!avatar && rail[i].querySelector('img')) { avatar = rail[i]; continue; }
-                if (avatar && !template && rail[i].querySelector('svg') &&
-                    !rail[i].querySelector('img') && !rail[i].closest('[id^="whatsie-"]')) {
-                    template = rail[i];
-                }
-            }
-            if (!avatar || !template) { return; }
-
-            var avatarWrapper = wrapperSharedWith(avatar, template);
-            var templateWrapper = wrapperSharedWith(template, avatar);
-            if (!avatarWrapper || !templateWrapper ||
-                avatarWrapper.parentElement !== templateWrapper.parentElement) {
-                return;
-            }
+            var avatarWrapper = a.avatarWrapper;
+            var templateWrapper = a.templateWrapper;
 
             // Clone a whole neighbouring entry so it looks native without relying
             // on any obfuscated class; cloneNode drops its listeners.
@@ -93,7 +119,6 @@
             }, true);
 
             avatarWrapper.parentElement.insertBefore(entry, avatarWrapper);
-            railParent = avatarWrapper.parentElement;
         } catch (e) {
             var api = window.__whatsie;
             api && api.report && api.report('nav-settings', e);
