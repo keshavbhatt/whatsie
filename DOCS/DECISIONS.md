@@ -100,10 +100,15 @@ Chromium sandbox in a snap needs `browser-support` with `allow-sandbox: true`, w
 store snap-declaration (manual reviewer approval) to auto-connect. Owner decision (2026-08-27):
 match the original whatsie snap so no reviewer declaration is needed.
 
+**Revision (2026-09-01).** `--no-sandbox` is now added in `Application::applyChromiumFlags()` when
+`$SNAP` is set, instead of in the snap's `environment:`. The env override replaced the user's
+`QTWEBENGINE_CHROMIUM_FLAGS` wholesale, disabling the P7 expert escape hatch inside the snap; adding
+it in code and merging the user's value restores that hatch (needed to test GPU flags on the snap
+without a rebuild).
+
 **Decision.** Native and Flatpak builds keep the Chromium sandbox (we never hard-code
-`--no-sandbox`). The **snap** uses plain `browser-support` and passes `--no-sandbox` via the app
-`environment` (`QTWEBENGINE_CHROMIUM_FLAGS`), which `core::mergeChromiumFlags` preserves —
-isolation there comes from strict snap confinement (AppArmor + seccomp). No allow-sandbox, no
+`--no-sandbox`). The **snap** uses plain `browser-support` and passes `--no-sandbox`; isolation
+there comes from strict snap confinement (AppArmor + seccomp). No allow-sandbox, no
 store declaration. Users can still override `QTWEBENGINE_CHROMIUM_FLAGS`.
 
 ## ADR-009 — Notifications over `org.freedesktop.Notifications` via QDBus, no libnotify-qt (2026-08-27)

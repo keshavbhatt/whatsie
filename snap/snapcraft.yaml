@@ -20,8 +20,6 @@ platforms:
 apps:
   whatsie:
     command: usr/bin/whatsie
-    environment:
-      QTWEBENGINE_CHROMIUM_FLAGS: "--no-sandbox"
     desktop: usr/share/applications/com.ktechpit.whatsie.desktop
     common-id: com.ktechpit.whatsie
     extensions:

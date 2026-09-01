@@ -164,6 +164,14 @@ void Application::applyChromiumFlags()
     evaluateGpuStability();
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
     QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled());
+    // In a snap we pass --no-sandbox here (isolation comes from snap confinement,
+    // ADR-008) rather than hard-coding it in the snap's environment: — that let
+    // it override the user's QTWEBENGINE_CHROMIUM_FLAGS and blocked the expert
+    // escape hatch (P7). Setting it in code, and merging the user's value below,
+    // restores that hatch inside the snap.
+    if (qEnvironmentVariableIsSet("SNAP")) {
+        ours << u"--no-sandbox"_s;
+    }
     // Keep Chromium's device scale in step with QT_SCALE_FACTOR (FEATURES A7) so
     // page rendering stays crisp rather than bitmap-stretched.
     const double scale = m_settings->interfaceScale();
