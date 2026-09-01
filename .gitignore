@@ -40,3 +40,6 @@ stage/
 # OS
 .DS_Store
 Thumbs.db
+
+# Internal planning/tracking — kept local, not published
+DOCS/

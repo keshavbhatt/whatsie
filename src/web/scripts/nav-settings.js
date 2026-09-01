@@ -2,10 +2,10 @@
 // purpose:  add a Settings entry to WhatsApp's left nav rail so the app is
 //           reachable without a system tray (FEATURES A11). A Qt widget cannot
 //           be drawn over the QWebEngineView (and a floating window cannot track
-//           it on Wayland), so the button must live in the page. Approach — clone
-//           a neighbouring rail entry and re-place it on a timer — is adapted
-//           from whatly (webtweaks.cpp), which proved it against WhatsApp's rail
-//           rebuilds. Click calls back through the QWebChannel bridge.
+//           it on Wayland), so the button must live in the page. Approach: clone
+//           a neighbouring rail entry and re-place it on a timer (proven robust
+//           against WhatsApp's rail rebuilds). Click calls back through the
+//           QWebChannel bridge.
 // depends:  window.__whatsie.bridge.openSettings; the rail's <button> entries and
 //           the avatar (last rail button with an <img>). All obfuscated classes
 //           are avoided — entries are found by shape, not class.
@@ -102,7 +102,7 @@
 
     // WhatsApp rebuilds the rail on navigation; a 1s timer re-places the button
     // (a MutationObserver over WA's constantly-mutating DOM would force layout
-    // far too often — whatly's lesson).
+    // far too often).
     install();
     setInterval(install, 1000);
 })();

@@ -33,7 +33,7 @@ include(Version)
 # ---------------------------------------------------------------------------
 # Qt 6.11 — the version shipped by the kde-qt6-core24-sdk snap and the
 # Flathub KDE runtime, i.e. what every distributed build actually runs on.
-# See DOCS/DECISIONS.md ADR-001 and scripts/dev-build.sh.
+# See scripts/dev-build.sh.
 # ---------------------------------------------------------------------------
 find_package(Qt6 6.11 REQUIRED COMPONENTS
     Core

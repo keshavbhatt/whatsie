@@ -1,6 +1,6 @@
 // name:     file-drop
 // purpose:  attach files dragged onto the window (FEATURES M6). Used when
-//           Chromium's native drop can't read the paths (Wayland / Flatpak, Y#32).
+//           Chromium's native drop can't read the paths (Wayland / Flatpak).
 // depends:  DataTransfer + ClipboardEvent (standard); #main footer, contenteditable
 // verified: 2026-08-27 against WhatsApp Web 2.3000.x
 // on-fail:  no-op; reports via bridge
@@ -8,7 +8,6 @@
 // A synthetic HTML5 *drop* event does NOT reach WhatsApp Web's handler, but a
 // synthetic *paste* on the focused composer does — it opens the media editor for
 // images/videos and the document preview otherwise, exactly like a real drop
-// (technique from the whatly fork).
 (function () {
     'use strict';
     var api = window.__whatsie || {};

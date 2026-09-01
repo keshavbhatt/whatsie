@@ -1,25 +1,25 @@
-# Whatsie (rewrite)
+# Whatsie
 
-A from-scratch rewrite of [whatsie](https://github.com/keshavbhatt/whatsie), the WhatsApp Web
-desktop client built with Qt 6 WebEngine.
+A lightweight WhatsApp Web desktop client built with Qt 6 WebEngine — WhatsApp in its
+own window with native desktop notifications, a system-tray unread badge, light/dark
+themes that follow the page, zoom and interface scaling, a real downloads manager, voice,
+video and screen-share calls, spell check, a network proxy, and an optional app lock.
 
-Why a rewrite: the original grew into a few thousand-line classes with WhatsApp-internals
-hacks that broke on every WhatsApp Web change; the [whatly](https://github.com/shakaran/whatly)
-fork fixed the engineering but added ~25 k lines of features most people never use. This
-project keeps the good parts of both and stays small. The reasoning is in
-[`DOCS/LESSONS.md`](DOCS/LESSONS.md); the scope in [`DOCS/FEATURES.md`](DOCS/FEATURES.md).
+## Features
 
-## Status
-
-Milestone **M0 — Foundation** is done: layered CMake scaffold, settings facade, WebEngine
-profile/page/view, tests, dev scripts, and the full documentation set. Scope has been decided
-(Linux + Windows, ~24 settings, no automation/AI features). Next: M1, the usable shell. See
-[`DOCS/PROGRESS.md`](DOCS/PROGRESS.md) and [`DOCS/ROADMAP.md`](DOCS/ROADMAP.md).
+- Native notifications with avatars; system-tray icon with unread badge, mute and
+  do-not-disturb.
+- Light / dark / follow-system theming, kept in step with WhatsApp Web.
+- Voice, video and screen-share calls (Wayland via the desktop portal).
+- Downloads window with history; drag-and-drop and paste of attachments.
+- Per-site camera/microphone/location controls; privacy blur; passcode app lock.
+- System-language spell check; network proxy (HTTP / SOCKS5) with authentication.
+- Single instance with `--profile` for multiple accounts; autostart at login.
 
 ## Build
 
-Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub KDE
-runtime), CMake ≥ 3.21, a C++20 compiler.
+Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub
+KDE runtime), CMake ≥ 3.21, and a C++20 compiler.
 
 ```sh
 # Development build against the KDE Qt 6.11 snap SDK (any distro)
@@ -43,11 +43,8 @@ src/ui        QtWidgets: main window, dialogs, tray
 src/app       Application object, CLI, single instance
 tests/        Qt Test suites (unit + offscreen smoke)
 packaging/    snap, flatpak, …
-DOCS/         roadmap, decisions, feature contract, progress, references
 ```
-
-Coding rules: [`DOCS/CODING_STANDARDS.md`](DOCS/CODING_STANDARDS.md).
 
 ## License
 
-MIT (same as whatsie).
+MIT.

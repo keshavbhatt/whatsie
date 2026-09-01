@@ -1,6 +1,6 @@
 # Injected scripts
 
-JavaScript injected into WhatsApp Web. Rules (see `DOCS/CODING_STANDARDS.md` §7, ADR-006):
+JavaScript injected into WhatsApp Web. Rules:
 
 * One file per concern, registered in `../CMakeLists.txt` via `qt_add_resources`, installed by
   `web::ScriptBundle` on the **profile-level** script collection.
@@ -12,7 +12,7 @@ JavaScript injected into WhatsApp Web. Rules (see `DOCS/CODING_STANDARDS.md` §7
 * Only the *stable tier* is allowed: standard APIs, our own CSS, structural anchors
   (`#pane-side`, `#main`, `#side`, `footer [contenteditable]`). No `window.require('WAWeb…')`,
   no React internals, no IndexedDB schema, no localised text.
-* No script is added before its feature row in `DOCS/FEATURES.md` is approved.
+* Each script maps to one approved feature; nothing speculative.
 
 | File | Injection | Feature |
 |---|---|---|

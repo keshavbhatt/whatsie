@@ -194,7 +194,7 @@ void WebView::checkWatchdog()
 
 // FEATURES M6: attach files dragged onto the window. We handle the drop
 // ourselves and inject real File objects via file-drop.js, which works where
-// Chromium's native drop cannot read the paths (Wayland / Flatpak, Y#32).
+// Chromium's native drop cannot read the paths (Wayland / Flatpak).
 bool WebView::maybeHandleDrop(QObject* watched, QEvent* event)
 {
     Q_UNUSED(watched)

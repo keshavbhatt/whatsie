@@ -6,7 +6,7 @@
 
 // Letter-tile avatar for contacts without a picture (FEATURES D5). Colours are
 // derived from a stable hash so a contact keeps its colour across launches
-// (whatly used the randomly seeded qHash).
+//
 namespace whatsie::core {
 
 [[nodiscard]] QColor identiconColor(const QString& label);

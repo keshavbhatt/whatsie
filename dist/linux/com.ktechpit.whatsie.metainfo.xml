@@ -32,7 +32,7 @@
   <releases>
     <release version="6.0.0" date="2026-08-27">
       <description>
-        <p>From-scratch Qt 6.11 rewrite: notifications, downloads, theme, zoom,
+        <p>Qt 6.11 WhatsApp Web client: notifications, downloads, theme, zoom,
         calls and screen sharing, plus autostart, spell check, proxy support,
         tray options, interface scaling and a keyboard-shortcuts sheet.</p>
       </description>

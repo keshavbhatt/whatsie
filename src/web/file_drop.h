@@ -7,7 +7,7 @@
 // Drag-and-drop file attach (FEATURES M6). Dropped local files are read and
 // handed to WhatsApp Web as a synthetic DragEvent carrying real File objects
 // (file-drop.js), which works even where Chromium's native drop path fails
-// (Wayland / Flatpak portal paths, Y#32). The heavy lifting is split into a
+// (Wayland / Flatpak portal paths). The heavy lifting is split into a
 // pure, testable payload builder here plus the widget wiring in WebView.
 namespace whatsie::web {
 

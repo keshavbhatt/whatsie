@@ -58,9 +58,8 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
         // but is backed by a pure-software rasterizer, so it never touches the
         // (possibly broken) vendor driver — yet WebGL stays available, so
         // WhatsApp calls render instead of showing a blank remote video. A bare
-        // --disable-gpu (the original whatsie's fix for #334 / commit 1b496d7)
-        // is stable but kills WebGL; this keeps both. Verified via CDP:
-        // webgl:true, renderer software. ADR-032.
+        // --disable-gpu is stable but kills WebGL, blanking call video; this
+        // keeps both. Verified via CDP: webgl:true, renderer software. ADR-032.
         flags << u"--use-gl=angle"_s << u"--use-angle=swiftshader"_s << u"--enable-unsafe-swiftshader"_s;
     } else if (acceleration == HardwareAcceleration::On) {
         flags << u"--ignore-gpu-blocklist"_s;

@@ -3,8 +3,8 @@
 //           WhatsApp's own theme state — its WAWeb modules, the React store, and
 //           the DOM/localStorage it persists to — rather than QStyleHints, which
 //           the portal/KDE platform theme overrides before it reaches Blink
-//           (verified 2026-08-27 via CDP). Sequence adapted from the original
-//           whatsie (mainwindow_webengine.cpp), proven against live WhatsApp Web.
+//           (verified 2026-08-27 via CDP). Sequence proven against live
+//           WhatsApp Web.
 // depends:  window.__whatsie.config.colorScheme; WhatsApp's require() modules,
 //           .app-wrapper-web React fiber, and `dark` body class (all optional —
 //           each step is guarded and degrades to a no-op).

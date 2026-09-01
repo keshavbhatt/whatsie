@@ -7,7 +7,7 @@
 // Decides what to do when Chromium's render process dies (FEATURES S12).
 // Pure: time is injected so it can be unit-tested. Reloads with growing
 // delays; after `maxRetries` crashes inside `window` it gives up and lets the
-// UI ask the user instead of looping (W#102, Y#28).
+// UI ask the user instead of looping (W#102).
 namespace whatsie::core {
 
 class RenderCrashPolicy

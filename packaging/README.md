@@ -10,7 +10,7 @@ that dev-run has to add by hand, so the shipped snap needs none of those workaro
 - **App id:** `com.ktechpit.whatsie` (ADR-014). Desktop file, AppStream metainfo and hicolor
   icons are installed by CMake (`dist/linux/`, top-level `install()` rules); `adopt-info` reads
   the version from the metainfo.
-- **Sandbox** (ADR-008): to match the original whatsie snap and avoid a store reviewer
+- **Sandbox** (ADR-008): to avoid a store reviewer
   declaration, the snap uses plain `browser-support` and passes `--no-sandbox` via the app
   `environment` — isolation comes from strict snap confinement. Native and Flatpak builds keep
   the Chromium sandbox (the app never hard-codes `--no-sandbox`).

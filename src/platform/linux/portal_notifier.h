@@ -8,7 +8,7 @@
 namespace whatsie::platform::linux_ {
 
 /// org.freedesktop.portal.Notification client for sandboxed (Flatpak) builds
-/// (FEATURES N3). Unlike whatly's version the call is awaited, so a failure
+/// (FEATURES N3). The call is awaited, so a failure
 /// is reported and the service can fall back.
 class PortalNotifier : public core::INotifier
 {
