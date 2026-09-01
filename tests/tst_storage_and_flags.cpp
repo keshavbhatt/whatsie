@@ -103,6 +103,10 @@ private Q_SLOTS:
         QVERIFY(autoFlags.join(u' ').contains(u"--enable-features=SharedArrayBuffer"_s));
 #ifdef Q_OS_LINUX
         QVERIFY(autoFlags.join(u' ').contains(u"WebRTCPipeWireCapturer"_s));
+        // Hardware video decode is off on Linux (ADR-032): its dmabuf frames
+        // crash the compositor GL context on many Mesa/Wayland/snap stacks.
+        QVERIFY(autoFlags.contains(u"--disable-accelerated-video-decode"_s));
+        QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--disable-accelerated-video-decode"_s));
 #endif
     }
 

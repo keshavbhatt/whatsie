@@ -41,6 +41,16 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
 #ifdef Q_OS_LINUX
     // Screen sharing on Wayland goes through PipeWire (FEATURES M2).
     features << u"WebRTCPipeWireCapturer"_s;
+    // Decode video on the CPU. Hardware decode hands the compositor NV12 frames
+    // in a platform GPU-memory-buffer (dmabuf) that many Linux Mesa/Wayland
+    // stacks — especially under snap/flatpak confinement — cannot back into the
+    // shared GL context; the context is then lost and video goes blank while
+    // audio continues (owner-reproduced on the snap; --disable-features=
+    // VaapiVideoDecoder and --disable-gpu-memory-buffer-video-frames did NOT
+    // help, only this did). GPU compositing and WebGL stay on, so calls still
+    // render; the cost is CPU video decode, negligible for a chat client.
+    // ADR-032. Expert override: set QTWEBENGINE_CHROMIUM_FLAGS.
+    flags << u"--disable-accelerated-video-decode"_s;
 #endif
     flags << u"--enable-features="_s + features.join(u',');
     if (useSoftwareGpu(acceleration, gpuAutoDisabled)) {

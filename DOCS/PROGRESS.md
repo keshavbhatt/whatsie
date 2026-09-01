@@ -5,6 +5,18 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-09-01 — Confirmed snap video fix: --disable-accelerated-video-decode
+
+Restored the flag hatch let the owner test candidate flags on the snap with real video. Results:
+`--disable-accelerated-video-decode` → video works (13 transient context-losses, no Mailbox cascade);
+`--disable-gpu-memory-buffer-video-frames` and `--disable-features=VaapiVideoDecoder` → still
+flickered/broke (one crashed on screen-share stop). Baked `--disable-accelerated-video-decode` into
+`chromiumFlags()` on Linux (GPU compositing + WebGL stay on, calls render; decode moves to CPU).
+Also confirmed this build bundles 36 `.bdic` dictionaries (L1 works) and restores the
+`QTWEBENGINE_CHROMIUM_FLAGS` hatch in the snap. Tests 23/23. ADR-032 revised.
+
+---
+
 ## 2026-09-01 — Snap GPU video crash: diagnosis + flag escape hatch restored
 
 Owner installed the snap; playing any video gives a white flash then audio-only, no video. Log

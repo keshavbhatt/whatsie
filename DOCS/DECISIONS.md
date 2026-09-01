@@ -310,6 +310,21 @@ not yet auto-disabled) it drops a `<cache>/gpu-probe` marker; a clean quit and a
 avoid a one-off fluke disabling the GPU; a clean 20 s resets the count. Changing the acceleration
 setting clears the fallback, so picking "Automatic" re-trials the GPU and On/Off are honoured directly.
 
+**Revision (2026-09-01) — Linux disables hardware video decode.** Owner-testing the snap surfaced a
+distinct failure the crash-probe cannot catch: playing any video loses the GL compositor context
+(white flash → blank video, audio only) *without crashing the app*. Root cause: hardware video decode
+hands the compositor NV12 frames in a **platform GPU-memory-buffer (dmabuf)** that many Linux
+Mesa/Wayland stacks — especially under snap confinement — cannot back into the shared GL context
+(`MailboxVideoFrameConverter` → `Could not find SharedImageBackingFactory … gmb_type: platform` →
+context lost). Tested three flags live on the snap with real video: `--disable-features=VaapiVideoDecoder`
+and `--disable-gpu-memory-buffer-video-frames` both still flickered/broke (one crashed on screen-share
+stop); only **`--disable-accelerated-video-decode`** fixed it. So `chromiumFlags()` now adds
+`--disable-accelerated-video-decode` on Linux unconditionally: GPU compositing and WebGL stay on
+(calls render), only decode moves to the CPU (negligible for a chat client). This, not the
+SwiftShader fallback (which does not help — the decoder emits platform-GMB frames regardless of GL
+backend), is the real fix for the whatsie snap instability reports. Expert override via
+`QTWEBENGINE_CHROMIUM_FLAGS` (restored inside the snap, ADR-008 revision).
+
 **Consequences.** Both user classes are served with no manual step: hardware GPU for the majority
 (calls hardware-accelerated), automatic software fallback for broken-driver machines (stable, calls
 software-rendered but functional). The escape hatch stands — a user-set `QTWEBENGINE_CHROMIUM_FLAGS`
