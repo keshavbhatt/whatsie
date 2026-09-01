@@ -62,6 +62,9 @@ inline constexpr QLatin1StringView kLockIdleMinutes{"lock/idleMinutes"};
 // advanced/
 inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};
 inline constexpr QLatin1StringView kWebrtcPublicOnly{"advanced/webrtcPublicInterfacesOnly"};
+// GPU auto-fallback state (ADR-032): set after repeated unstable GPU trials.
+inline constexpr QLatin1StringView kGpuAutoDisabled{"advanced/gpuAutoDisabled"};
+inline constexpr QLatin1StringView kGpuProbeStrikes{"advanced/gpuProbeStrikes"};
 
 // proxy/ (password is deliberately NOT a key — never persisted)
 inline constexpr QLatin1StringView kProxyMode{"proxy/mode"};

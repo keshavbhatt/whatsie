@@ -157,6 +157,12 @@ public:
     /// LAN calls). Default off.
     [[nodiscard]] bool webrtcPublicInterfacesOnly() const;
     void setWebrtcPublicInterfacesOnly(bool enabled);
+    /// GPU auto-fallback (ADR-032): true after the GPU proved unstable under the
+    /// Automatic setting; makes chromiumFlags choose the software path.
+    [[nodiscard]] bool gpuAutoDisabled() const;
+    void setGpuAutoDisabled(bool disabled);
+    [[nodiscard]] int gpuProbeStrikes() const;
+    void setGpuProbeStrikes(int strikes);
 
     // proxy/ (FEATURES P3, M12b)
     [[nodiscard]] ProxyMode proxyMode() const;
@@ -208,6 +214,7 @@ Q_SIGNALS:
     void smoothScrollingChanged(bool enabled);
     void webrtcPublicInterfacesOnlyChanged(bool enabled);
     void proxyChanged();
+    void gpuAutoDisabledChanged(bool disabled);
     void lockConfigChanged();
     void spellCheckEnabledChanged(bool enabled);
     void spellCheckLanguagesChanged(const QStringList& languages);

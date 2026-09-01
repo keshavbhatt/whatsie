@@ -59,14 +59,47 @@ private Q_SLOTS:
         QVERIFY(!QDir(inside).exists());
     }
 
+    void gpuAutoFallbackChoosesSoftware()
+    {
+        // useSoftwareGpu: setting wins for On/Off; Auto follows the fallback flag.
+        QVERIFY(!useSoftwareGpu(HardwareAcceleration::On, true));  // On always keeps GPU
+        QVERIFY(useSoftwareGpu(HardwareAcceleration::Off, false)); // Off always software
+        QVERIFY(!useSoftwareGpu(HardwareAcceleration::Auto, false));
+        QVERIFY(useSoftwareGpu(HardwareAcceleration::Auto, true)); // auto-disabled -> software
+        // Auto + auto-disabled produces the SwiftShader software path.
+        const QStringList fallback = chromiumFlags(HardwareAcceleration::Auto, true);
+        QVERIFY(fallback.contains(u"--use-angle=swiftshader"_s));
+        QVERIFY(fallback.contains(u"--enable-unsafe-swiftshader"_s));
+        // Auto + not-disabled keeps the GPU on (no software flags).
+        QVERIFY(!chromiumFlags(HardwareAcceleration::Auto, false).contains(u"--use-angle=swiftshader"_s));
+    }
+
+    void settingChangeResetsGpuFallback()
+    {
+        QTemporaryDir dir;
+        QVERIFY(dir.isValid());
+        Settings settings(dir.filePath(u"gpu.ini"_s));
+        settings.setGpuAutoDisabled(true);
+        settings.setGpuProbeStrikes(2);
+        // Choosing a specific acceleration re-arms a fresh GPU trial.
+        settings.setHardwareAcceleration(HardwareAcceleration::On);
+        QVERIFY(!settings.gpuAutoDisabled());
+        QCOMPARE(settings.gpuProbeStrikes(), 0);
+    }
+
     void flagsFollowAccelerationSetting()
     {
         const QStringList autoFlags = chromiumFlags(HardwareAcceleration::Auto);
         QVERIFY(!autoFlags.contains(u"--disable-gpu"_s));
         QVERIFY(!autoFlags.contains(u"--ignore-gpu-blocklist"_s));
         QVERIFY(autoFlags.contains(u"--disable-extensions"_s));
-        QVERIFY(chromiumFlags(HardwareAcceleration::Off).contains(u"--disable-gpu"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--ignore-gpu-blocklist"_s));
+        // GPU-off uses ANGLE→SwiftShader (software) so WhatsApp calls keep a
+        // WebGL context rather than a blank video (ADR-032).
+        const QStringList off = chromiumFlags(HardwareAcceleration::Off);
+        QVERIFY(off.contains(u"--use-angle=swiftshader"_s));
+        QVERIFY(off.contains(u"--enable-unsafe-swiftshader"_s));
+        QVERIFY(!chromiumFlags(HardwareAcceleration::On).contains(u"--use-angle=swiftshader"_s));
         QVERIFY(autoFlags.join(u' ').contains(u"--enable-features=SharedArrayBuffer"_s));
 #ifdef Q_OS_LINUX
         QVERIFY(autoFlags.join(u' ').contains(u"WebRTCPipeWireCapturer"_s));

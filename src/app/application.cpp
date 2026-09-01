@@ -79,6 +79,11 @@ Application::Application(int& argc, char** argv)
 
 Application::~Application()
 {
+    // A clean shutdown means this run was stable — clear the GPU probe so the
+    // next start is not treated as a crash (ADR-032).
+    if (m_gpuTrialActive) {
+        QFile::remove(gpuProbeMarkerPath());
+    }
     if (m_settings) {
         m_settings->sync();
     }
@@ -102,11 +107,63 @@ void Application::setupLogging()
     core::LogSink::setLogFile(m_cli.logFile.value_or(core::LogSink::defaultLogFilePath()));
 }
 
+QString Application::gpuProbeMarkerPath() const
+{
+    return QStandardPaths::writableLocation(QStandardPaths::CacheLocation) + u"/gpu-probe"_s;
+}
+
+void Application::evaluateGpuStability()
+{
+    // ADR-032: detect a GPU that brings the app down early. When running the GPU
+    // under the Automatic setting we drop a probe marker; a clean quit (and the
+    // 20 s stability timer) removes it. Finding it at startup means the previous
+    // GPU trial crashed before proving stable — after two such strikes we fall
+    // back to software rendering (with SwiftShader, so calls still work).
+    const auto accel = m_settings->hardwareAcceleration();
+    const QString marker = gpuProbeMarkerPath();
+    const bool crashedTrial = QFile::exists(marker);
+    QFile::remove(marker);
+
+    if (crashedTrial && accel == core::HardwareAcceleration::Auto && !m_settings->gpuAutoDisabled()) {
+        const int strikes = m_settings->gpuProbeStrikes() + 1;
+        if (strikes >= 2) {
+            m_settings->setGpuAutoDisabled(true);
+            m_settings->setGpuProbeStrikes(0);
+            qCWarning(lcApp) << "GPU proved unstable across" << strikes
+                             << "starts; falling back to software rendering (ADR-032)";
+        } else {
+            m_settings->setGpuProbeStrikes(strikes);
+            qCWarning(lcApp) << "GPU trial did not reach stability; strike" << strikes << "of 2";
+        }
+    }
+
+    // If this run will trial the GPU, arm the marker for next time.
+    if (accel == core::HardwareAcceleration::Auto && !m_settings->gpuAutoDisabled()) {
+        QDir().mkpath(QFileInfo(marker).absolutePath());
+        QFile file(marker);
+        if (file.open(QIODevice::WriteOnly)) {
+            file.close();
+        }
+        m_gpuTrialActive = true;
+    }
+}
+
+void Application::markGpuStable()
+{
+    if (m_gpuTrialActive) {
+        QFile::remove(gpuProbeMarkerPath());
+        m_settings->setGpuProbeStrikes(0);
+        m_gpuTrialActive = false;
+        qCInfo(lcApp) << "GPU stable; probe cleared";
+    }
+}
+
 void Application::applyChromiumFlags()
 {
     // Must happen before the first QWebEngineProfile is created (FEATURES P6).
+    evaluateGpuStability();
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
-    QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration());
+    QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled());
     // Keep Chromium's device scale in step with QT_SCALE_FACTOR (FEATURES A7) so
     // page rendering stays crisp rather than bitmap-stretched.
     const double scale = m_settings->interfaceScale();

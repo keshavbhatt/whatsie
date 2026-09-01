@@ -280,6 +280,39 @@ already used `FileManager1.ShowItems` for selecting a file; folders now match.
 **Consequences.** The button works on the desktop and stays correct under confinement via the fd
 path. `ShowFolders` opens the folder itself (vs `ShowItems` which selects it in the parent).
 
+## ADR-032 — GPU: default on, auto-fall-back to software WebGL when unstable (2026-09-01)
+
+**Context.** Original whatsie hit a genuine either/or. Its Qt6 migration (60e689a) forced
+`--disable-gpu --disable-gpu-compositing` always: stable everywhere, but WhatsApp **video calls
+showed a blank remote video** (WhatsApp renders the remote stream through WebGL, which lives in the
+GPU process; since Chromium M133 the software fallback needs an explicit `--enable-unsafe-swiftshader`
+that was absent). Commit 1b496d7 (#334) dropped the flags → GPU on → calls work, **but** users on
+broken GPU drivers now crash/auto-close (reported on Ubuntu 24.04); demoting the snap fixed them.
+So GPU-on = calls work but some crash; GPU-off (as done) = stable but blank call video.
+
+**Decision.** Default GPU **on** (setting `HardwareAcceleration::Auto`), and *detect* an unstable GPU
+to fall back — not to a bare `--disable-gpu`, but to **software WebGL via ANGLE→SwiftShader**
+(`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`). That keeps the GPU process
+running on a pure-software rasterizer that never touches the vendor driver, so it is stable *and*
+WebGL stays available (verified via CDP: `webgl:true`, software renderer) — calls render on the
+fallback path too. The same flags back the explicit "Off" setting, so choosing Off no longer blanks
+calls either. `core::useSoftwareGpu()` / `chromiumFlags()` are pure and unit-tested.
+
+Detection is a crash probe (`Application::evaluateGpuStability`): when a run trials the GPU (Auto and
+not yet auto-disabled) it drops a `<cache>/gpu-probe` marker; a clean quit and a 20 s stability timer
+(`markGpuStable`) remove it. Finding the marker at the next start means the trial crashed early — after
+**two** such strikes `advanced/gpuAutoDisabled` is set and future starts use software. Two strikes
+avoid a one-off fluke disabling the GPU; a clean 20 s resets the count. Changing the acceleration
+setting clears the fallback, so picking "Automatic" re-trials the GPU and On/Off are honoured directly.
+
+**Consequences.** Both user classes are served with no manual step: hardware GPU for the majority
+(calls hardware-accelerated), automatic software fallback for broken-driver machines (stable, calls
+software-rendered but functional). The escape hatch stands — a user-set `QTWEBENGINE_CHROMIUM_FLAGS`
+short-circuits everything (mergeChromiumFlags). Cost: a broken-driver user sees up to two early exits
+before the fallback engages. SwiftShader software rendering is slower, acceptable for a stability
+fallback. This is the fix to carry into the shared whatsie repo so both the crash reporters and the
+#334 requester are satisfied.
+
 ## ADR-031 — Native chrome colors are sampled from WhatsApp Web (2026-08-28)
 
 **Context.** The Qt widgets used hand-picked "WhatsApp-ish" tokens (`#00a884`, `#111b21`, …) that

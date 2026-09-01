@@ -5,6 +5,25 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-09-01 — GPU auto-fallback resolves the whatsie #334 crash/blank-video dilemma
+
+Investigated original whatsie commit 1b496d7 (#334), which removed `--disable-gpu` to fix blank call
+video but destabilised broken-driver machines (Ubuntu 24.04 auto-close reports). Root cause: GPU-off
+kills WebGL (WhatsApp's remote video), GPU-on crashes bad drivers — a strict either/or in the original.
+
+Fix (ADR-032): default GPU on, auto-detect an unstable GPU and fall back to **software WebGL via
+ANGLE→SwiftShader** (`--use-gl=angle --use-angle=swiftshader --enable-unsafe-swiftshader`) instead of
+a bare `--disable-gpu`. Keeps the GPU process on a software rasterizer (no vendor driver) so it is
+stable *and* WebGL survives — verified via CDP that both the hardware path and the software path give
+`webgl:true`. Detection: a `<cache>/gpu-probe` marker written when trialing the GPU, removed on clean
+quit + a 20 s stability timer; two early-exit strikes set `advanced/gpuAutoDisabled`. Changing the
+acceleration setting resets the trial. Off setting now also uses the software path (calls no longer
+blank). Pure logic unit-tested; 23/23.
+
+**Also:** CI will target the existing keshavbhatt/whatsie GitHub repo (owner) — push/remote pending.
+
+---
+
 ## 2026-08-28 — Ctrl+L to lock
 
 Added `Actions::lock` (Ctrl+L, old whatsie's shortcut) — in the tray menu and the shortcuts sheet,

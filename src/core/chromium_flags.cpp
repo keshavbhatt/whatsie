@@ -8,7 +8,20 @@ using namespace Qt::StringLiterals;
 
 namespace whatsie::core {
 
-QStringList chromiumFlags(HardwareAcceleration acceleration)
+bool useSoftwareGpu(HardwareAcceleration acceleration, bool autoDisabled)
+{
+    switch (acceleration) {
+    case HardwareAcceleration::On:
+        return false;
+    case HardwareAcceleration::Off:
+        return true;
+    case HardwareAcceleration::Auto:
+        break;
+    }
+    return autoDisabled;
+}
+
+QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled)
 {
     QStringList flags{
         // Nothing here is a chat client's business.
@@ -30,15 +43,17 @@ QStringList chromiumFlags(HardwareAcceleration acceleration)
     features << u"WebRTCPipeWireCapturer"_s;
 #endif
     flags << u"--enable-features="_s + features.join(u',');
-    switch (acceleration) {
-    case HardwareAcceleration::Auto:
-        break;
-    case HardwareAcceleration::On:
+    if (useSoftwareGpu(acceleration, gpuAutoDisabled)) {
+        // Software rendering via ANGLE→SwiftShader: the GPU process still runs
+        // but is backed by a pure-software rasterizer, so it never touches the
+        // (possibly broken) vendor driver — yet WebGL stays available, so
+        // WhatsApp calls render instead of showing a blank remote video. A bare
+        // --disable-gpu (the original whatsie's fix for #334 / commit 1b496d7)
+        // is stable but kills WebGL; this keeps both. Verified via CDP:
+        // webgl:true, renderer software. ADR-032.
+        flags << u"--use-gl=angle"_s << u"--use-angle=swiftshader"_s << u"--enable-unsafe-swiftshader"_s;
+    } else if (acceleration == HardwareAcceleration::On) {
         flags << u"--ignore-gpu-blocklist"_s;
-        break;
-    case HardwareAcceleration::Off:
-        flags << u"--disable-gpu"_s;
-        break;
     }
     return flags;
 }

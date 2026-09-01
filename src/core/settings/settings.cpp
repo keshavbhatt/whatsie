@@ -401,6 +401,10 @@ void Settings::setHardwareAcceleration(HardwareAcceleration mode)
         return;
     }
     m_store->setValue(keys::kHardwareAcceleration, static_cast<int>(mode));
+    // A deliberate choice resets the auto-fallback: picking "Automatic" gives
+    // the GPU a fresh trial, On/Off are honoured directly (ADR-032).
+    setGpuAutoDisabled(false);
+    setGpuProbeStrikes(0);
     Q_EMIT hardwareAccelerationChanged(mode);
 }
 
@@ -414,6 +418,28 @@ void Settings::setWebrtcPublicInterfacesOnly(bool enabled)
     if (storeBool(keys::kWebrtcPublicOnly, kDefaultWebrtcPublicOnly, enabled)) {
         Q_EMIT webrtcPublicInterfacesOnlyChanged(enabled);
     }
+}
+
+bool Settings::gpuAutoDisabled() const
+{
+    return boolValue(keys::kGpuAutoDisabled, false);
+}
+
+void Settings::setGpuAutoDisabled(bool disabled)
+{
+    if (storeBool(keys::kGpuAutoDisabled, false, disabled)) {
+        Q_EMIT gpuAutoDisabledChanged(disabled);
+    }
+}
+
+int Settings::gpuProbeStrikes() const
+{
+    return std::max(0, m_store->value(keys::kGpuProbeStrikes, 0).toInt());
+}
+
+void Settings::setGpuProbeStrikes(int strikes)
+{
+    m_store->setValue(keys::kGpuProbeStrikes, std::max(0, strikes));
 }
 
 // ---- proxy/ (FEATURES P3, M12b) --------------------------------------------

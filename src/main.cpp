@@ -98,6 +98,10 @@ int main(int argc, char* argv[])
     const whatsie::app::CliOptions& cli = app.cliOptions();
     window.start(cli.startMinimized || app.settings().startMinimized());
 
+    // If the GPU is on trial (ADR-032), a clean 20 s means it is stable — clear
+    // the crash probe so the next start is not treated as a GPU crash.
+    QTimer::singleShot(20000, &app, [&app] { app.markGpuStable(); });
+
     // Give the GPU stack time to fail, then fall back to XCB if it did (once).
     const bool retried = qEnvironmentVariableIsSet("WHATSIE_XCB_RETRY");
     if (!retried && QGuiApplication::platformName() == QLatin1StringView("wayland")) {

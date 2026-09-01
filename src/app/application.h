@@ -41,6 +41,10 @@ public:
     /// the signals below.
     void dispatchCommand(const QJsonObject& command);
 
+    /// Called once the window has stayed up long enough to deem the GPU stable;
+    /// clears the crash probe so the next start is not treated as a crash.
+    void markGpuStable();
+
 Q_SIGNALS:
     void raiseRequested();
     void newChatRequested(const QString& target);
@@ -51,12 +55,15 @@ private:
     void applyIdentity();
     void setupLogging();
     void applyChromiumFlags();
+    void evaluateGpuStability();
+    [[nodiscard]] QString gpuProbeMarkerPath() const;
     void configureDictionaries();
     void honourClearSessionMarker();
     [[nodiscard]] bool forwardToPrimary();
 
     CliOptions m_cli;
     std::optional<int> m_exitCode;
+    bool m_gpuTrialActive = false;
     std::unique_ptr<SingleInstance> m_instance;
     std::unique_ptr<core::Settings> m_settings;
     std::unique_ptr<core::ThemeService> m_theme;
