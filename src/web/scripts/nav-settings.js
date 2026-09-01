@@ -89,6 +89,13 @@
             avatarWrapper.parentElement !== templateWrapper.parentElement) {
             return null;
         }
+        // A rail entry is small. If the shared wrapper is large we have climbed
+        // into some other container (e.g. a media-viewer panel) — never clone
+        // that, or the clone becomes a full-area click target that hijacks every
+        // click in the region (owner report: clicking anywhere in the gallery
+        // opened Settings).
+        var box = templateWrapper.getBoundingClientRect();
+        if (box.width > 72 || box.height > 120) { return null; }
         return { avatarWrapper: avatarWrapper, templateWrapper: templateWrapper };
     }
 
