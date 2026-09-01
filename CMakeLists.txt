@@ -95,8 +95,8 @@ if(LINUX)
     # as a last resort, glob the SDK/Qt trees. All of this is logged so a failed
     # lookup is diagnosable from the CI output.
     file(GLOB _whatsie_convert_glob
-        /snap/kde-qt6-core24-sdk/current/usr/lib/*/qt6/libexec/qwebengine_convert_dict
-        /snap/kde-qt6-core24-sdk/current/usr/lib/qt6/libexec/qwebengine_convert_dict
+        /snap/*/current/usr/lib/*/qt6/libexec/qwebengine_convert_dict
+        /snap/*/current/usr/lib/qt6/libexec/qwebengine_convert_dict
         /usr/lib/*/qt6/libexec/qwebengine_convert_dict
         /usr/lib/qt6/libexec/qwebengine_convert_dict)
     find_program(WHATSIE_CONVERT_DICT

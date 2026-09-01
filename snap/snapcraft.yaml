@@ -88,7 +88,7 @@ parts:
       # AND its libraries are on the path (CMake's configure-time execute_process
       # cannot load them). Best-effort: logs what it finds and never fails build.
       convert="$(command -v qwebengine_convert_dict || true)"
-      [ -n "$convert" ] || convert="$(find /snap/kde-qt6-core24-sdk/current /usr/lib -name qwebengine_convert_dict 2>/dev/null | head -1)"
+      [ -n "$convert" ] || convert="$(find /snap /usr -name qwebengine_convert_dict 2>/dev/null | head -1)"
       echo "whatsie: qwebengine_convert_dict = ${convert:-<not found>}"
       if [ -n "$convert" ]; then
         qtprefix="$(cd "$(dirname "$convert")/../../.." && pwd)"
