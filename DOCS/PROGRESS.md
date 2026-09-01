@@ -5,6 +5,33 @@ what is blocked. Milestone status table at the bottom.
 
 ---
 
+## 2026-09-01 — Snap GPU video crash: diagnosis + flag escape hatch restored
+
+Owner installed the snap; playing any video gives a white flash then audio-only, no video. Log
+(/tmp/whatsie_snap_run.log + snap app log) shows a GL **context loss** cascade rooted in a
+`MailboxVideoFrameConverter` failure: `Could not find SharedImageBackingFactory ... format (Y_UV,420,
+8unorm) ... gmb_type: platform` — i.e. decoded video frames arrive as a **platform GPU-memory-buffer
+(dmabuf/NV12)** the compositor's GL context can't back on this Mesa/Wayland/snap combo, so the shared
+context is lost and all GPU raster/compositing (video) dies while audio (CPU) continues.
+
+Two consequences: (1) the app does NOT crash, so the ADR-032 crash-probe never fires (`GPU stable;
+probe cleared` in the log) — a detection gap; (2) the ADR-032 software fallback (`--use-angle=
+swiftshader`) does not fix it because the decoder still produces platform-GMB frames regardless of GL
+backend, and swiftshader libs may not even be present in the snap runtime.
+
+The real fix is a targeted flag that keeps GPU/WebGL but changes how video frames are handled
+(candidates: `--disable-accelerated-video-decode`, `--disable-gpu-memory-buffer-video-frames`,
+`--disable-features=VaapiVideoDecoder`). To validate on the actual failing hardware without a rebuild
+per attempt, restored the expert flag hatch inside the snap: `--no-sandbox` moved into code under
+`$SNAP` (ADR-008 revision) and the snap `environment:` override dropped, so `QTWEBENGINE_CHROMIUM_FLAGS`
+is user-settable again and merged with ours. Next: owner tests candidate flags on the new snap +
+a real video; the winner becomes the Linux default and the watcher is extended to catch context-loss.
+
+Also fixed: the `.bdic` converter was `<not found>` in CI (searched the dev-host SDK path); broadened
+to `/snap /usr`.
+
+---
+
 ## 2026-09-01 — GitHub wired up; first green snap CI build (both arches)
 
 Connected new-whatsie to the existing `keshavbhatt/whatsie` repo (owner request). Pushed the 36-commit
