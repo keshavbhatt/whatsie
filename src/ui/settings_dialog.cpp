@@ -16,7 +16,8 @@
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
 #include <QComboBox>
-#include <QCoreApplication>
+#include <QScrollBar>
+#include <QWheelEvent>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
@@ -155,11 +156,15 @@ bool SettingsDialog::eventFilter(QObject* watched, QEvent* event)
     if (event->type() == QEvent::Wheel) {
         auto* widget = qobject_cast<QWidget*>(watched);
         if (widget != nullptr && !widget->hasFocus()) {
-            // Redirect the wheel to the enclosing scroll area so the page scrolls
-            // instead of the control changing value.
+            // Scroll the enclosing area's scrollbar directly rather than
+            // re-dispatching the event: forwarding the same wheel event with
+            // sendEvent re-enters this filter and recurses until the stack
+            // overflows. Moving the scrollbar keeps the page scrolling with no
+            // re-dispatch, and consuming the event stops the control changing.
             for (QWidget* p = widget->parentWidget(); p != nullptr; p = p->parentWidget()) {
                 if (auto* area = qobject_cast<QAbstractScrollArea*>(p)) {
-                    QCoreApplication::sendEvent(area->viewport(), event);
+                    QScrollBar* bar = area->verticalScrollBar();
+                    bar->setValue(bar->value() - static_cast<QWheelEvent*>(event)->angleDelta().y());
                     break;
                 }
             }
