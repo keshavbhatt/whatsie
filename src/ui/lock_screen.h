@@ -1,10 +1,13 @@
 #pragma once
 
+#include <QPixmap>
 #include <QWidget>
 
+class QFrame;
 class QLabel;
 class QLineEdit;
 class QPushButton;
+class QGraphicsOpacityEffect;
 
 namespace whatsie::ui {
 
@@ -29,12 +32,21 @@ public:
 Q_SIGNALS:
     void unlockRequested(const QString& passcode);
 
+protected:
+    void paintEvent(QPaintEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+
 private:
     void submit();
+    void animateIn();
 
+    QFrame* m_card = nullptr;
+    QGraphicsOpacityEffect* m_cardOpacity = nullptr;
     QLabel* m_status = nullptr;
     QLineEdit* m_input = nullptr;
     QPushButton* m_unlock = nullptr;
+    QPixmap m_doodle;       ///< as-shipped grey doodles, for light themes
+    QPixmap m_doodleLight;  ///< strokes recoloured light, for dark themes
 };
 
 } // namespace whatsie::ui
