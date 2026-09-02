@@ -28,6 +28,7 @@ private:
     void setupUi();
     void toggleDebugInfo();
     void copyDiagnostics();
+    void reportBug();
 
     const core::Settings& m_settings;
     QString m_userAgent;

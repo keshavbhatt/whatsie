@@ -19,6 +19,9 @@ whatsie_set_warnings(whatsie)
 target_link_libraries(whatsie PRIVATE whatsie_app)
 
 set_target_properties(whatsie PROPERTIES
+    # Export symbols (-rdynamic) so the crash handler's backtrace shows function
+    # names instead of bare addresses.
+    ENABLE_EXPORTS ON
     WIN32_EXECUTABLE TRUE
     MACOSX_BUNDLE TRUE
     # Pure QtWidgets app: no QML anywhere, skip the qmlimportscanner finalizer

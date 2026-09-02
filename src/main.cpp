@@ -4,6 +4,7 @@
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
 #include "core/settings/settings_keys.h"
+#include "platform/crash_handler.h"
 #include "ui/main_window.h"
 
 #include <QByteArray>
@@ -11,6 +12,7 @@
 #include <QGuiApplication>
 #include <QProcess>
 #include <QSettings>
+#include <QStandardPaths>
 #include <QTimer>
 
 #include <algorithm>
@@ -80,6 +82,12 @@ int main(int argc, char* argv[])
     if (app.shouldExit()) {
         return app.exitCode();
     }
+
+    // Record fatal signals so the next run can offer the crash in a bug report,
+    // and pick up any report the previous run left behind.
+    whatsie::platform::installCrashHandler(
+        QStandardPaths::writableLocation(QStandardPaths::CacheLocation) +
+        QLatin1String("/last-crash.txt"));
 
     // Chain onto the sink Application just installed, so a later graphics failure
     // during window/WebEngine creation is observed (FEATURES S20).

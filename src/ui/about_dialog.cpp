@@ -1,6 +1,7 @@
 #include "ui/about_dialog.h"
 
 #include "core/settings/settings.h"
+#include "platform/crash_handler.h"
 #include "platform/file_manager.h"
 #include "ui/diagnostics.h"
 
@@ -12,6 +13,7 @@
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
+#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPropertyAnimation>
 #include <QPushButton>
@@ -102,10 +104,14 @@ void AboutDialog::setupUi()
     copy->setToolTip(
         tr("Copies versions, paths and recent log lines for a bug report. No messages are included."));
     connect(copy, &QPushButton::clicked, this, &AboutDialog::copyDiagnostics);
+    auto* report = new QPushButton(tr("Report a bug…"), m_content);
+    report->setToolTip(tr("Opens a pre-filled GitHub issue with diagnostics (and the last crash, if any)."));
+    connect(report, &QPushButton::clicked, this, &AboutDialog::reportBug);
 
     auto* debugRow = new QHBoxLayout;
     debugRow->addWidget(m_debugToggle);
     debugRow->addWidget(copy);
+    debugRow->addWidget(report);
     debugRow->addStretch();
 
     m_debugText = new QPlainTextEdit(m_content);
@@ -172,6 +178,20 @@ void AboutDialog::showEvent(QShowEvent* event)
 void AboutDialog::copyDiagnostics()
 {
     QApplication::clipboard()->setText(buildDiagnostics(m_settings, m_userAgent));
+}
+
+void AboutDialog::reportBug()
+{
+    // Full diagnostics to the clipboard (the URL carries a trimmed copy), then a
+    // pre-filled GitHub issue in the browser.
+    QApplication::clipboard()->setText(buildDiagnostics(m_settings, m_userAgent));
+    platform::openUrl(bugReportUrl(m_settings, m_userAgent));
+    QMessageBox::information(
+        this, tr("Report a bug"),
+        tr("A new GitHub issue is opening in your browser, pre-filled with diagnostics"
+           "%1.\n\nYour full diagnostics were also copied to the clipboard — paste them into the "
+           "issue if the form looks short. No messages or chats are included.")
+            .arg(platform::lastCrashReport().isEmpty() ? QString() : tr(" and the last crash")));
 }
 
 } // namespace whatsie::ui
