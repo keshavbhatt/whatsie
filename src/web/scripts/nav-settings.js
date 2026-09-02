@@ -18,11 +18,26 @@
         '<path fill="currentColor" d="M12 8a4 4 0 1 0 0 8 4 4 0 0 0 0-8zm0 6a2 2 0 1 1 0-4 2 2 0 0 1 0 4z"/>' +
         '<path fill="currentColor" d="M19.4 13c.04-.32.06-.66.06-1s-.02-.68-.06-1l2.11-1.65a.5.5 0 0 0 .12-.64l-2-3.46a.5.5 0 0 0-.61-.22l-2.49 1a7.3 7.3 0 0 0-1.73-1l-.38-2.65A.5.5 0 0 0 14 1h-4a.5.5 0 0 0-.5.42l-.38 2.65a7.3 7.3 0 0 0-1.73 1l-2.49-1a.5.5 0 0 0-.61.22l-2 3.46a.5.5 0 0 0 .12.64L4.6 11c-.04.32-.06.66-.06 1s.02.68.06 1l-2.11 1.65a.5.5 0 0 0-.12.64l2 3.46c.14.24.42.32.61.22l2.49-1c.52.4 1.1.74 1.73 1l.38 2.65c.04.24.25.42.5.42h4c.25 0 .46-.18.5-.42l.38-2.65c.63-.26 1.21-.6 1.73-1l2.49 1c.24.1.47.02.61-.22l2-3.46a.5.5 0 0 0-.12-.64L19.4 13z"/>';
 
-    // Buttons in the far-left column, excluding any inside a modal/overlay (the
-    // media viewer, dialogs) — those must never be treated as rail entries or we
-    // would clone one and hijack, e.g., the viewer's close button.
+    // Overlays that must freeze this script completely. The fullscreen media
+    // viewer is the dangerous one: WhatsApp mounts it (data-testid
+    // "drawer-fullscreen" / "media-viewer-modal") as a live, screen-covering,
+    // position:fixed subtree — and the "Media" rail entry can host it. If we
+    // re-clone the rail while that is up, cloneNode deep-copies the whole viewer
+    // into our button, which then blankets the page and turns every click into
+    // openSettings(). So while any of these is present we do not touch the DOM.
     var OVERLAY = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
-        + '[data-animate-modal-backdrop],[data-animate-media-viewer]';
+        + '[data-animate-modal-backdrop],[data-animate-media-viewer],'
+        + '[data-testid="drawer-fullscreen"],[data-testid="media-viewer-modal"]';
+    // The "an overlay is actually up" test is a STRICT subset: WhatsApp keeps an
+    // empty, screen-sized [data-testid="drawer-fullscreen"] mounted at all times
+    // (verified: present and visible with no viewer open), so keying the freeze on
+    // that would stop the button from ever installing. media-viewer-modal, by
+    // contrast, exists only while a photo/video is actually open.
+    var OVERLAY_OPEN = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
+        + '[data-animate-media-viewer],[data-testid="media-viewer-modal"]';
+    function overlayOpen() {
+        return !!document.querySelector(OVERLAY_OPEN);
+    }
     function railButtons() {
         return Array.prototype.slice.call(document.querySelectorAll('button')).filter(function (b) {
             if (b.closest(OVERLAY)) { return false; }
@@ -55,23 +70,28 @@
 
     // The two anchors we place relative to, recomputed every tick so the button
     // tracks WhatsApp's rail instead of sticking wherever it first landed:
-    //   avatar   = the BOTTOM-MOST rail button with an <img> (the profile). This
-    //              matters because WhatsApp's "Meta AI" entry is also an <img>;
-    //              picking the last one avoids latching onto Meta AI before the
-    //              profile avatar has loaded (the cause of the wandering icon).
+    //   avatar   = the profile, which is ALWAYS the bottom-most entry of the rail
+    //              and carries an <img>. We therefore take the last rail entry and
+    //              require it to be an image: WhatsApp's "Meta AI" entry is also an
+    //              <img> but sits in the TOP group (never last), so this excludes
+    //              it structurally — no locale-fragile label match. And before the
+    //              avatar has loaded the bottom entry is a plain icon, so we wait
+    //              rather than latch onto Meta AI and land in the wrong group (the
+    //              cause of the icon appearing up top, above Meta AI).
     //   template = the icon (svg-only) button directly above that avatar, in the
     //              same group — cloned so our entry looks native and lands right
     //              above the profile.
     function anchors() {
+        if (overlayOpen()) { return null; } // never mutate the DOM while a viewer/dialog is up
         var rail = railButtons();
         rail.sort(function (a, b) { return a.getBoundingClientRect().top - b.getBoundingClientRect().top; });
         if (!mainRailPresent(rail)) { return null; } // don't inject into a viewer/overlay
         var mine = function (b) { return b.closest('[id^="whatsie-"]'); };
         var avatar = null;
         for (var i = rail.length - 1; i >= 0; i--) {
-            if (!mine(rail[i]) && rail[i].querySelector('img')) { avatar = rail[i]; break; }
+            if (!mine(rail[i])) { avatar = rail[i]; break; } // bottom-most real entry
         }
-        if (!avatar) { return null; }
+        if (!avatar || !avatar.querySelector('img')) { return null; } // avatar not loaded yet
         var avatarTop = avatar.getBoundingClientRect().top;
         var template = null;
         for (var j = rail.length - 1; j >= 0; j--) {
@@ -99,14 +119,22 @@
         return { avatarWrapper: avatarWrapper, templateWrapper: templateWrapper };
     }
 
-    // Placed correctly only when our entry sits immediately above the current
-    // avatar; if WhatsApp reflows the rail (or the real avatar appears after a
-    // provisional placement), this turns false and install() moves it.
+    // Correctly placed only when our entry sits immediately above the CURRENT
+    // avatar. This is deliberately position-based, not "is it still in the
+    // remembered container": WhatsApp reveals the profile avatar late and rebuilds
+    // the rail, so the anchor moves under us. Re-checking position each tick lets
+    // install() lift a provisionally-placed button to the right spot once the
+    // avatar loads — and also catches WhatsApp re-parenting our entry out of the
+    // rail (then parentElement no longer matches and we re-place).
     function placed(a) {
         var entry = document.getElementById(ID);
-        return !!(entry && entry.isConnected && a &&
-                  entry.parentElement === a.avatarWrapper.parentElement &&
-                  entry.nextElementSibling === a.avatarWrapper);
+        if (!entry || !entry.isConnected || !a) { return false; }
+        // If our entry ever absorbed WhatsApp content (a stray data-testid means a
+        // real WA subtree rode in on a clone), it is not correctly placed — force a
+        // clean rebuild rather than leave a page-covering blob behind.
+        if (entry.querySelector('[data-testid]')) { return false; }
+        return entry.parentElement === a.avatarWrapper.parentElement &&
+               entry.nextElementSibling === a.avatarWrapper;
     }
 
     function install() {
@@ -124,6 +152,11 @@
             // on any obfuscated class; cloneNode drops its listeners.
             var entry = templateWrapper.cloneNode(true);
             entry.id = ID;
+            // Defence in depth: drop any WhatsApp-tagged descendant the clone may
+            // carry, so our button can never smuggle in a live WA subtree (see the
+            // OVERLAY note). Our own button is found by shape, not data-testid.
+            Array.prototype.slice.call(entry.querySelectorAll('[data-testid]'))
+                .forEach(function (n) { n.removeAttribute('data-testid'); });
             var button = entry.querySelector('button') || entry;
             button.removeAttribute('data-navbar-item');
             button.removeAttribute('aria-pressed');
@@ -136,10 +169,15 @@
                 svg.setAttribute('viewBox', '0 0 24 24');
                 svg.innerHTML = GEAR;
             }
+            // Scope the handler to our button and require the click to originate
+            // on it — not merely anywhere inside the entry. Broad capture on the
+            // whole entry was the second half of the gallery-hijack: anything
+            // nested under the entry fired it. Now a stray subtree can't.
             entry.addEventListener('click', function (ev) {
+                if (!button.contains(ev.target)) { return; }
                 ev.preventDefault();
                 ev.stopPropagation();
-                if (!anchors()) { return; } // never act while a viewer/overlay is up
+                if (overlayOpen()) { return; } // never act while a viewer/overlay is up
                 var api = window.__whatsie;
                 if (api && api.bridge && typeof api.bridge.openSettings === 'function') {
                     api.bridge.openSettings();
