@@ -70,14 +70,36 @@ void SettingsDialog::setupUi()
     m_tabs->addTab(wrapInScroll(buildPrivacyTab()), tr("Privacy"));
     m_tabs->addTab(wrapInScroll(buildAdvancedTab()), tr("Advanced"));
 
+    auto* header = new QWidget(this);
+    header->setObjectName(u"settingsHeader"_s);
+    header->setStyleSheet(u"QWidget#settingsHeader { border-bottom: 2px solid #21c063; }"_s);
+    auto* headerRow = new QHBoxLayout(header);
+    headerRow->setContentsMargins(14, 12, 14, 12);
+    headerRow->setSpacing(10);
+    auto* logo = new QLabel(header);
+    logo->setPixmap(QIcon(u":/icons/whatsie.svg"_s).pixmap(26, 26));
+    auto* headerTitle = new QLabel(tr("Settings"), header);
+    QFont headerFont = headerTitle->font();
+    headerFont.setPointSizeF(headerFont.pointSizeF() * 1.25);
+    headerFont.setBold(true);
+    headerTitle->setFont(headerFont);
+    headerRow->addWidget(logo);
+    headerRow->addWidget(headerTitle);
+    headerRow->addStretch();
+
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::close);
 
     auto* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setSpacing(0);
+    layout->addWidget(header);
     layout->addWidget(m_tabs, 1);
-    layout->addWidget(buttons);
-    // Tall tabs (Privacy & Advanced especially) scroll inside a fixed dialog
-    // instead of stretching it past the screen.
+    auto* buttonRow = new QHBoxLayout;
+    buttonRow->setContentsMargins(12, 8, 12, 12);
+    buttonRow->addWidget(buttons);
+    layout->addLayout(buttonRow);
+    // Tall tabs scroll inside a fixed dialog rather than stretching it off-screen.
     resize(580, 560);
 }
 
