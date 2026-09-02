@@ -94,6 +94,7 @@ void SettingsDialog::setupUi()
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setSpacing(0);
     layout->addWidget(header);
+    layout->addSpacing(12);
     layout->addWidget(m_tabs, 1);
     auto* buttonRow = new QHBoxLayout;
     buttonRow->setContentsMargins(12, 8, 12, 12);
@@ -313,6 +314,16 @@ QWidget* SettingsDialog::buildPrivacyTab()
     pl->addWidget(new PermissionList(m_profile, QUrl(u"https://web.whatsapp.com"_s), permBox));
     outer->addWidget(permBox);
 
+    outer->addWidget(buildLockGroup());
+    outer->addStretch();
+    return page;
+}
+
+QWidget* SettingsDialog::buildAdvancedTab()
+{
+    auto* page = new QWidget(this);
+    auto* outer = new QVBoxLayout(page);
+
     auto* storageBox = new QGroupBox(tr("Storage"), page);
     auto* sform = new QFormLayout(storageBox);
     m_cacheSize = new QLabel(tr("calculating…"), storageBox);
@@ -335,16 +346,6 @@ QWidget* SettingsDialog::buildPrivacyTab()
     buttons->addStretch();
     sform->addRow(QString(), buttons);
     outer->addWidget(storageBox);
-
-    outer->addWidget(buildLockGroup());
-    outer->addStretch();
-    return page;
-}
-
-QWidget* SettingsDialog::buildAdvancedTab()
-{
-    auto* page = new QWidget(this);
-    auto* outer = new QVBoxLayout(page);
 
     auto* spellBox = new QGroupBox(tr("Spell check"), page);
     auto* spellLayout = new QVBoxLayout(spellBox);
