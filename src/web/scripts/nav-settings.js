@@ -32,13 +32,16 @@
     var OVERLAY = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
         + '[data-animate-modal-backdrop],[data-animate-media-viewer],'
         + '[data-testid="drawer-fullscreen"],[data-testid="media-viewer-modal"]';
-    // The "an overlay is actually up" test is a STRICT subset: WhatsApp keeps an
-    // empty, screen-sized [data-testid="drawer-fullscreen"] mounted at all times
-    // (verified: present and visible with no viewer open), so keying the freeze on
-    // that would stop the button from ever installing. media-viewer-modal, by
-    // contrast, exists only while a photo/video is actually open.
-    var OVERLAY_OPEN = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
-        + '[data-animate-media-viewer],[data-testid="media-viewer-modal"]';
+    // The "the media viewer is actually up" test — and ONLY that. Its single job
+    // is to stop us re-cloning the Media rail entry (the viewer's host) while the
+    // viewer is mounted; nothing else needs to freeze the script or block a click
+    // on our own button. It must therefore be a tight allowlist of the real viewer
+    // markers. In particular it must NOT include [role="dialog"] / [aria-modal]:
+    // WhatsApp's Meta AI page mounts a persistent, visible role="dialog" that never
+    // goes away, which used to make this true forever and silently kill every
+    // settings click after the user opened Meta AI. (drawer-fullscreen is likewise
+    // always-present chrome and stays out too.)
+    var OVERLAY_OPEN = '[data-animate-media-viewer],[data-testid="media-viewer-modal"]';
     function overlayOpen() {
         return !!document.querySelector(OVERLAY_OPEN);
     }
@@ -173,27 +176,35 @@
                 svg.setAttribute('viewBox', ICON_VIEWBOX);
                 svg.innerHTML = ICON;
             }
-            // Scope the handler to our button and require the click to originate
-            // on it — not merely anywhere inside the entry. Broad capture on the
-            // whole entry was the second half of the gallery-hijack: anything
-            // nested under the entry fired it. Now a stray subtree can't.
-            entry.addEventListener('click', function (ev) {
-                if (!button.contains(ev.target)) { return; }
-                ev.preventDefault();
-                ev.stopPropagation();
-                if (overlayOpen()) { return; } // never act while a viewer/overlay is up
-                var api = window.__whatsie;
-                if (api && api.bridge && typeof api.bridge.openSettings === 'function') {
-                    api.bridge.openSettings();
-                }
-            }, true);
-
+            // NB: the click is handled by ONE delegated listener on document (set
+            // up once, below) — deliberately NOT attached to this node. WhatsApp
+            // rebuilds the rail by cloning it, and cloneNode drops listeners, so a
+            // per-node handler silently dies after a few navigations (the button
+            // then looked right but stopped opening Settings). Delegation survives.
             avatarWrapper.parentElement.insertBefore(entry, avatarWrapper);
         } catch (e) {
             var api = window.__whatsie;
             api && api.report && api.report('nav-settings', e);
         }
     }
+
+    // One delegated click handler for the life of the page: fires whenever a
+    // click lands inside our entry, however many times WhatsApp has re-cloned it.
+    // Capture phase + stopPropagation so the cloned nav button's own behaviour
+    // (it was copied from a real rail entry) never also runs.
+    document.addEventListener('click', function (ev) {
+        var target = ev.target;
+        if (!target || typeof target.closest !== 'function' || !target.closest('#' + ID)) {
+            return;
+        }
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (overlayOpen()) { return; } // never act while a viewer/overlay is up
+        var api = window.__whatsie;
+        if (api && api.bridge && typeof api.bridge.openSettings === 'function') {
+            api.bridge.openSettings();
+        }
+    }, true);
 
     // WhatsApp rebuilds the rail on navigation; a 1s timer re-places the button
     // (a MutationObserver over WA's constantly-mutating DOM would force layout
