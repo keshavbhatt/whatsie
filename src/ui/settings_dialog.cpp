@@ -12,7 +12,11 @@
 #include "ui/permission_list.h"
 
 #include <QCheckBox>
+#include <QAbstractScrollArea>
+#include <QAbstractSlider>
+#include <QAbstractSpinBox>
 #include <QComboBox>
+#include <QCoreApplication>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
 #include <QDoubleSpinBox>
@@ -87,8 +91,11 @@ void SettingsDialog::setupUi()
     headerRow->addWidget(headerTitle);
     headerRow->addStretch();
 
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
+    auto* buttons =
+        new QDialogButtonBox(QDialogButtonBox::Close | QDialogButtonBox::RestoreDefaults, this);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::close);
+    connect(buttons->button(QDialogButtonBox::RestoreDefaults), &QPushButton::clicked, this,
+            &SettingsDialog::restoreDefaults);
 
     auto* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -102,6 +109,64 @@ void SettingsDialog::setupUi()
     layout->addLayout(buttonRow);
     // Tall tabs scroll inside a fixed dialog rather than stretching it off-screen.
     resize(580, 560);
+
+    installWheelGuards();
+}
+
+void SettingsDialog::installWheelGuards()
+{
+    // Controls that change value on wheel are the ones a user scrolling the page
+    // can nudge by accident. Give them click/tab focus only and filter their wheel
+    // events (see eventFilter).
+    const auto guard = [this](QWidget* w) {
+        w->setFocusPolicy(Qt::StrongFocus);
+        w->installEventFilter(this);
+    };
+    for (auto* w : findChildren<QComboBox*>()) {
+        guard(w);
+    }
+    for (auto* w : findChildren<QAbstractSpinBox*>()) {
+        guard(w);
+    }
+    for (auto* w : findChildren<QAbstractSlider*>()) {
+        guard(w);
+    }
+}
+
+void SettingsDialog::restoreDefaults()
+{
+    const auto choice = QMessageBox::question(
+        this, tr("Restore defaults"),
+        tr("Reset all settings to their defaults?\n\nYour lock passcode is kept. Some changes take "
+           "effect after you restart Whatsie."),
+        QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+    if (choice != QMessageBox::Yes) {
+        return;
+    }
+    m_settings.resetToDefaults();
+    loadValues();
+    updateProxyEnabled();
+    updateLockUi();
+    refreshStorageSizes();
+}
+
+bool SettingsDialog::eventFilter(QObject* watched, QEvent* event)
+{
+    if (event->type() == QEvent::Wheel) {
+        auto* widget = qobject_cast<QWidget*>(watched);
+        if (widget != nullptr && !widget->hasFocus()) {
+            // Redirect the wheel to the enclosing scroll area so the page scrolls
+            // instead of the control changing value.
+            for (QWidget* p = widget->parentWidget(); p != nullptr; p = p->parentWidget()) {
+                if (auto* area = qobject_cast<QAbstractScrollArea*>(p)) {
+                    QCoreApplication::sendEvent(area->viewport(), event);
+                    break;
+                }
+            }
+            return true;
+        }
+    }
+    return QDialog::eventFilter(watched, event);
 }
 
 QWidget* SettingsDialog::wrapInScroll(QWidget* content)

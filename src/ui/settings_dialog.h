@@ -37,6 +37,11 @@ public:
                    QWebEngineProfile& profile, QWidget* parent = nullptr);
     ~SettingsDialog() override = default;
 
+protected:
+    /// Swallows wheel events on unfocused combo/spin/slider controls (redirected
+    /// to the enclosing scroll area) so scrolling the page never changes a value.
+    bool eventFilter(QObject* watched, QEvent* event) override;
+
 Q_SIGNALS:
     void testNotificationRequested();
     void clearCacheRequested();
@@ -44,6 +49,7 @@ Q_SIGNALS:
 
 private:
     void setupUi();
+    void installWheelGuards();
     QWidget* wrapInScroll(QWidget* content);
     QWidget* buildGeneralTab();
     QWidget* buildAppearanceTab();
@@ -56,6 +62,7 @@ private:
     QWidget* buildLockGroup();
     void updateProxyEnabled();
     void updateLockUi();
+    void restoreDefaults();
 
     core::Settings& m_settings;
     bool m_trayAvailable;
