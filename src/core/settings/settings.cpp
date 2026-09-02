@@ -706,6 +706,16 @@ void Settings::sync()
     m_store->sync();
 }
 
+void Settings::resetToDefaults()
+{
+    const PasscodeRecord passcode = passcodeRecord();
+    m_store->clear();
+    if (passcode.isValid()) {
+        setPasscode(passcode);
+    }
+    m_store->sync();
+}
+
 QString Settings::fileName() const
 {
     return m_store->fileName();

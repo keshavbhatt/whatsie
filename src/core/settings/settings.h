@@ -197,6 +197,11 @@ public:
     /// Flushes pending writes to disk. Normally automatic; explicit before quit.
     void sync();
 
+    /// Clears every stored value so getters fall back to their defaults. The lock
+    /// passcode is preserved (it has its own Remove control). A restart applies
+    /// the settings that are read only at startup.
+    void resetToDefaults();
+
     /// Location of the backing store (file path or registry key), for diagnostics.
     [[nodiscard]] QString fileName() const;
 
