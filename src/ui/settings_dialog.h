@@ -24,7 +24,7 @@ struct StoragePaths
     QString sessionDir;
 };
 
-/// Four tabs, ≤ 25 options total (FEATURES "Settings surface target").
+/// Five tabs, ≤ 25 options total (FEATURES "Settings surface target").
 /// Widgets write straight to core::Settings; nothing is buffered, no Apply.
 /// Destructive or engine-level operations are signalled to the window.
 class SettingsDialog : public QDialog
@@ -49,6 +49,7 @@ private:
     QWidget* buildAppearanceTab();
     QWidget* buildNotificationsTab();
     QWidget* buildPrivacyTab();
+    QWidget* buildAdvancedTab();
     void loadValues();
     void refreshStorageSizes();
     QWidget* buildNetworkGroup();

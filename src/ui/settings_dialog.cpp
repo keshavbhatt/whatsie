@@ -67,7 +67,8 @@ void SettingsDialog::setupUi()
     m_tabs->addTab(wrapInScroll(buildGeneralTab()), tr("General"));
     m_tabs->addTab(wrapInScroll(buildAppearanceTab()), tr("Appearance"));
     m_tabs->addTab(wrapInScroll(buildNotificationsTab()), tr("Notifications"));
-    m_tabs->addTab(wrapInScroll(buildPrivacyTab()), tr("Privacy && Advanced"));
+    m_tabs->addTab(wrapInScroll(buildPrivacyTab()), tr("Privacy"));
+    m_tabs->addTab(wrapInScroll(buildAdvancedTab()), tr("Advanced"));
 
     auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, this);
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::close);
@@ -313,6 +314,16 @@ QWidget* SettingsDialog::buildPrivacyTab()
     sform->addRow(QString(), buttons);
     outer->addWidget(storageBox);
 
+    outer->addWidget(buildLockGroup());
+    outer->addStretch();
+    return page;
+}
+
+QWidget* SettingsDialog::buildAdvancedTab()
+{
+    auto* page = new QWidget(this);
+    auto* outer = new QVBoxLayout(page);
+
     auto* spellBox = new QGroupBox(tr("Spell check"), page);
     auto* spellLayout = new QVBoxLayout(spellBox);
     m_spellCheck = new QCheckBox(tr("Check spelling as I type"), spellBox);
@@ -320,9 +331,6 @@ QWidget* SettingsDialog::buildPrivacyTab()
             [this](bool on) { m_settings.setSpellCheckEnabled(on); });
     spellLayout->addWidget(m_spellCheck);
 
-    // Let the user pick any bundled dictionary (they cannot install more yet —
-    // on-demand downloads are a future feature — so we only ever offer what is
-    // actually present, and say so honestly).
     const QStringList available =
         core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
     if (available.isEmpty()) {
@@ -353,7 +361,6 @@ QWidget* SettingsDialog::buildPrivacyTab()
     }
     outer->addWidget(spellBox);
 
-    outer->addWidget(buildLockGroup());
     outer->addWidget(buildNetworkGroup());
 
     // Notes and buttons live in the QVBoxLayout, not in the QFormLayout: a
