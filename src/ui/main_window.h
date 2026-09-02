@@ -80,6 +80,7 @@ private:
     void requestLock();
     void lock();
     void unlock();
+    void finalizeUnlock();
     void attemptUnlock(const QString& passcode);
     void tickThrottle();
     void updateIdleTimer();
@@ -109,6 +110,7 @@ private:
     int m_failedAttempts = 0;
     int m_throttleRemaining = 0;
     bool m_locked = false;
+    bool m_unlocking = false; ///< dismissal animation in flight
 };
 
 } // namespace whatsie::ui

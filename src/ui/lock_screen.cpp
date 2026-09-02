@@ -84,10 +84,6 @@ LockScreen::LockScreen(QWidget* parent)
     outer->addLayout(row);
     outer->addStretch();
 
-    m_cardOpacity = new QGraphicsOpacityEffect(m_card);
-    m_card->setGraphicsEffect(m_cardOpacity);
-    m_cardOpacity->setOpacity(1.0);
-
     // A light-recoloured copy of the doodle for dark themes: the shipped strokes
     // are grey and vanish on a dark ground, so keep the shapes and repaint them
     // near-white (SourceIn preserves the alpha, replaces the colour).
@@ -125,13 +121,18 @@ void LockScreen::showEvent(QShowEvent* event)
 
 void LockScreen::animateIn()
 {
-    if (m_cardOpacity == nullptr) {
+    if (m_card == nullptr) {
         return;
     }
     // Fade the card in while it rises a little into place — a calmer, more
-    // deliberate reveal than the instant swap.
-    m_cardOpacity->setOpacity(0.0);
-    auto* fade = new QPropertyAnimation(m_cardOpacity, "opacity", this);
+    // deliberate reveal than the instant swap. The opacity effect is attached
+    // only while animating and removed on completion: a QGraphicsEffect left on
+    // a widget forces it to render through an offscreen pixmap, which can paint
+    // black after a modal dialog (e.g. About) re-exposes the view.
+    auto* effect = new QGraphicsOpacityEffect(m_card);
+    m_card->setGraphicsEffect(effect);
+    effect->setOpacity(0.0);
+    auto* fade = new QPropertyAnimation(effect, "opacity", this);
     fade->setDuration(320);
     fade->setStartValue(0.0);
     fade->setEndValue(1.0);
@@ -152,7 +153,38 @@ void LockScreen::animateIn()
         rise->setEasingCurve(QEasingCurve::OutCubic);
         group->addAnimation(rise);
     }
+    // Render normally when idle — but only clear OUR effect, in case a dismiss
+    // started in the meantime and installed its own.
+    connect(group, &QParallelAnimationGroup::finished, this, [this, effect] {
+        if (m_card->graphicsEffect() == effect) {
+            m_card->setGraphicsEffect(nullptr);
+        }
+    });
     group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void LockScreen::playDismiss()
+{
+    if (m_card == nullptr) {
+        Q_EMIT dismissed();
+        return;
+    }
+    // Fade the card away, then hand back so the app is revealed — the mirror of
+    // animateIn(). The opacity effect is attached only for the animation and
+    // dropped afterwards (see animateIn()).
+    auto* effect = new QGraphicsOpacityEffect(m_card);
+    m_card->setGraphicsEffect(effect);
+    effect->setOpacity(1.0);
+    auto* fade = new QPropertyAnimation(effect, "opacity", this);
+    fade->setDuration(220);
+    fade->setStartValue(1.0);
+    fade->setEndValue(0.0);
+    fade->setEasingCurve(QEasingCurve::InCubic);
+    connect(fade, &QPropertyAnimation::finished, this, [this] {
+        m_card->setGraphicsEffect(nullptr); // drop the effect; card is hidden next
+        Q_EMIT dismissed();
+    });
+    fade->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void LockScreen::submit()

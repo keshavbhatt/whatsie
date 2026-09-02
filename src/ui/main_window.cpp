@@ -425,6 +425,7 @@ void MainWindow::handleProxyAuth(const QString& proxyHost, QAuthenticator* authe
 void MainWindow::setupLock()
 {
     connect(m_lockScreen, &LockScreen::unlockRequested, this, &MainWindow::attemptUnlock);
+    connect(m_lockScreen, &LockScreen::dismissed, this, &MainWindow::finalizeUnlock);
     m_idleTimer = new QTimer(this);
     m_idleTimer->setSingleShot(true);
     connect(m_idleTimer, &QTimer::timeout, this, &MainWindow::lock);
@@ -472,10 +473,22 @@ void MainWindow::lock()
 
 void MainWindow::unlock()
 {
+    if (!m_locked || m_unlocking) {
+        return;
+    }
+    // Play the lock screen's dismissal, then reveal the app in finalizeUnlock()
+    // when it signals dismissed().
+    m_unlocking = true;
+    m_lockScreen->playDismiss();
+}
+
+void MainWindow::finalizeUnlock()
+{
     if (!m_locked) {
         return;
     }
     m_locked = false;
+    m_unlocking = false;
     m_failedAttempts = 0;
     m_throttleRemaining = 0;
     m_throttleTimer->stop();

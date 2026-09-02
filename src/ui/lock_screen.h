@@ -7,7 +7,6 @@ class QFrame;
 class QLabel;
 class QLineEdit;
 class QPushButton;
-class QGraphicsOpacityEffect;
 
 namespace whatsie::ui {
 
@@ -29,8 +28,14 @@ public:
     /// Disable entry and show a countdown; call with 0 to re-enable.
     void showThrottle(int secondsRemaining);
 
+    /// Play the dismissal animation (card fades away); emits dismissed() when the
+    /// animation ends, at which point the caller reveals the app.
+    void playDismiss();
+
 Q_SIGNALS:
     void unlockRequested(const QString& passcode);
+    /// The dismissal animation has finished.
+    void dismissed();
 
 protected:
     void paintEvent(QPaintEvent* event) override;
@@ -41,7 +46,6 @@ private:
     void animateIn();
 
     QFrame* m_card = nullptr;
-    QGraphicsOpacityEffect* m_cardOpacity = nullptr;
     QLabel* m_status = nullptr;
     QLineEdit* m_input = nullptr;
     QPushButton* m_unlock = nullptr;
