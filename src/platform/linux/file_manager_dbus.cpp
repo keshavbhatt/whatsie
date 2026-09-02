@@ -101,6 +101,14 @@ bool openFile(const QString& filePath)
     return QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
+bool openUrl(const QString& url)
+{
+    if (portalOpenUri(url)) {
+        return true;
+    }
+    return QDesktopServices::openUrl(QUrl(url));
+}
+
 bool openDirectory(const QString& directory)
 {
     const QString uri = QUrl::fromLocalFile(directory).toString();

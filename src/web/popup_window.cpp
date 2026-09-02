@@ -1,10 +1,10 @@
 #include "web/popup_window.h"
 
 #include "core/navigation_policy.h"
+#include "platform/file_manager.h"
 #include "web/logging.h"
 #include "web/web_profile.h"
 
-#include <QDesktopServices>
 #include <QKeyEvent>
 #include <QShortcut>
 #include <QVBoxLayout>
@@ -29,9 +29,16 @@ public:
 protected:
     bool acceptNavigationRequest(const QUrl& url, NavigationType type, bool isMainFrame) override
     {
+        // The Adobe Acrobat PDF integration must load in-app: WhatsApp transfers
+        // the PDF to this window over postMessage, which breaks the moment the
+        // window is closed or handed to the browser. Let it (and its sign-in
+        // flow) through both guards below.
+        if (isMainFrame && core::isPdfIntegrationUrl(url)) {
+            return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);
+        }
         if (isMainFrame && core::shouldOpenExternally(url)) {
             qCInfo(lcWeb) << "popup → system browser:" << url;
-            QDesktopServices::openUrl(url);
+            platform::openUrl(url.toString());
             m_window->close();
             return false;
         }

@@ -2,12 +2,12 @@
 
 #include "core/navigation_policy.h"
 #include "core/settings/settings.h"
+#include "platform/file_manager.h"
 #include "web/logging.h"
 #include "web/popup_window.h"
 #include "web/web_profile.h"
 
 #include <QCoreApplication>
-#include <QDesktopServices>
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QMimeDatabase>
@@ -64,7 +64,7 @@ bool WebPage::acceptNavigationRequest(const QUrl& url, NavigationType type, bool
 {
     if (isMainFrame && type == NavigationTypeLinkClicked && core::shouldOpenExternally(url)) {
         qCInfo(lcWeb) << "link → system browser:" << url;
-        QDesktopServices::openUrl(url);
+        platform::openUrl(url.toString());
         return false;
     }
     return QWebEnginePage::acceptNavigationRequest(url, type, isMainFrame);

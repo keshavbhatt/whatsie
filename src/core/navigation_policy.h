@@ -23,6 +23,14 @@ struct NewChatRequest
 /// True when a link click should be handed to the system browser.
 [[nodiscard]] bool shouldOpenExternally(const QUrl& url);
 
+/// True for the Adobe Acrobat PDF integration that WhatsApp's "Continue to
+/// Acrobat" opens in a popup (acrobat.adobe.com and the adobe.com/adobelogin.com
+/// hosts its sign-in flow uses). Such a popup must stay INSIDE the app: WhatsApp
+/// transfers the PDF to it over postMessage, which only works while the app owns
+/// the child window — handing it to the system browser closes it and the
+/// transfer fails ("target window is closed").
+[[nodiscard]] bool isPdfIntegrationUrl(const QUrl& url);
+
 /// Accepts whatsapp://send?phone=..&text=.., https://wa.me/<phone>?text=..,
 /// https://api.whatsapp.com/send?phone=.., https://web.whatsapp.com/send?phone=..
 /// and plain phone numbers ("+49 170 1234567"). Returns nullopt otherwise.

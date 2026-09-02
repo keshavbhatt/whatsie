@@ -46,7 +46,21 @@ bool isWhatsAppWebUrl(const QUrl& url)
 
 bool shouldOpenExternally(const QUrl& url)
 {
-    return isHttp(url) && !isWhatsAppWebUrl(url);
+    return isHttp(url) && !isWhatsAppWebUrl(url) && !isPdfIntegrationUrl(url);
+}
+
+bool isPdfIntegrationUrl(const QUrl& url)
+{
+    if (!isHttp(url)) {
+        return false;
+    }
+    const QString host = url.host().toLower();
+    static const QString kAdobe = u"adobe.com"_s;
+    static const QString kAdobeLogin = u"adobelogin.com"_s;
+    const auto matches = [&host](const QString& domain) {
+        return host == domain || host.endsWith(u'.' + domain);
+    };
+    return matches(kAdobe) || matches(kAdobeLogin);
 }
 
 std::optional<NewChatRequest> parseChatLink(const QUrl& url)

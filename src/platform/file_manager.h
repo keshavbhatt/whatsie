@@ -18,4 +18,10 @@ bool openDirectory(const QString& directory);
 /// falling back to QDesktopServices. Returns false when nothing could open it.
 bool openFile(const QString& filePath);
 
+/// Opens a remote URL (http/https/mailto/...) in the system default handler.
+/// Prefers the desktop portal's OpenURI so it works under confinement and
+/// without spawning a shell (a spawned xdg-open can hit a broken library path in
+/// the snap runtime), falling back to QDesktopServices. Returns false on failure.
+bool openUrl(const QString& url);
+
 } // namespace whatsie::platform

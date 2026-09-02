@@ -51,6 +51,7 @@ qt_add_resources(whatsie_web "scripts"
 target_link_libraries(whatsie_web
     PUBLIC
         whatsie_core
+        whatsie_platform
         Qt6::WebEngineWidgets
         Qt6::WebChannel
         Qt6::Network

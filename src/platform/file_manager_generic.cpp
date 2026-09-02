@@ -21,6 +21,11 @@ bool openFile(const QString& filePath)
     return QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
 }
 
+bool openUrl(const QString& url)
+{
+    return QDesktopServices::openUrl(QUrl(url));
+}
+
 } // namespace whatsie::platform
 
 namespace whatsie::platform {

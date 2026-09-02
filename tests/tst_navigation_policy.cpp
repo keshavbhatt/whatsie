@@ -28,6 +28,21 @@ private Q_SLOTS:
         QVERIFY(!shouldOpenExternally(QUrl(u"about:blank"_s)));
     }
 
+    void pdfIntegrationStaysInApp()
+    {
+        // WhatsApp's "Continue to Acrobat" popup and its sign-in flow must not be
+        // handed to the browser (that closes the postMessage PDF bridge).
+        QVERIFY(isPdfIntegrationUrl(QUrl(u"https://acrobat.adobe.com/waintegration/index.html?x=1"_s)));
+        QVERIFY(isPdfIntegrationUrl(QUrl(u"https://adobe.com/"_s)));
+        QVERIFY(isPdfIntegrationUrl(QUrl(u"https://auth.services.adobe.com/en_US/index.html"_s)));
+        QVERIFY(isPdfIntegrationUrl(QUrl(u"https://ims-na1.adobelogin.com/ims/authorize"_s)));
+        QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://example.com/x"_s)));
+        QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://notadobe.com.evil.example/x"_s)));
+        QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://web.whatsapp.com/x"_s)));
+        // and shouldOpenExternally now defers to it
+        QVERIFY(!shouldOpenExternally(QUrl(u"https://acrobat.adobe.com/waintegration/index.html"_s)));
+    }
+
     void normalizesPhones()
     {
         QCOMPARE(normalizePhone(u"+49 (170) 123-4567"_s), u"491701234567"_s);
