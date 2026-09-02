@@ -350,11 +350,6 @@ QWidget* SettingsDialog::buildPrivacyTab()
         });
         row->addRow(tr("Language:"), m_spellLanguage);
         spellLayout->addLayout(row);
-        auto* hint =
-            new QLabel(tr("Only bundled dictionaries are listed; more arrive with app updates."), spellBox);
-        hint->setWordWrap(true);
-        hint->setStyleSheet(u"color: palette(placeholder-text);"_s);
-        spellLayout->addWidget(hint);
     }
     outer->addWidget(spellBox);
 
