@@ -31,6 +31,8 @@ public:
     [[nodiscard]] QSize sizeHint(const QStyleOptionViewItem& option, const QModelIndex& index) const override;
     bool editorEvent(QEvent* event, QAbstractItemModel* model, const QStyleOptionViewItem& option,
                      const QModelIndex& index) override;
+    bool helpEvent(QHelpEvent* event, QAbstractItemView* view, const QStyleOptionViewItem& option,
+                   const QModelIndex& index) override;
 
     /// "just now", "5 min ago", "yesterday 14:03", "12 Mar 2026" (pure).
     [[nodiscard]] static QString relativeTime(const QDateTime& when, const QDateTime& now);

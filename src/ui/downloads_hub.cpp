@@ -82,7 +82,7 @@ void DownloadsHub::perform(quint64 id, DownloadsDelegate::Action action)
     }
     switch (action) {
     case DownloadsDelegate::Action::Open:
-        if (!QDesktopServices::openUrl(QUrl::fromLocalFile(entry->filePath()))) {
+        if (!platform::openFile(entry->filePath())) {
             qCWarning(lcUi) << "cannot open" << entry->filePath();
         }
         break;

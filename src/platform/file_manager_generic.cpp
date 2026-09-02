@@ -16,6 +16,11 @@ bool revealInFileManager(const QString& filePath)
     return openDirectory(QFileInfo(filePath).absolutePath());
 }
 
+bool openFile(const QString& filePath)
+{
+    return QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}
+
 } // namespace whatsie::platform
 
 namespace whatsie::platform {

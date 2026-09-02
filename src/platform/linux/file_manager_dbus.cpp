@@ -62,7 +62,44 @@ bool portalOpenDirectory(const QString& directory)
     return reply.type() == QDBusMessage::ReplyMessage;
 }
 
+// xdg-desktop-portal OpenURI.OpenFile: opens a file in its default app from a
+// real file descriptor. Like OpenDirectory this is the confinement-safe route —
+// plain OpenURI on a local file:// silently no-ops under snap/flatpak.
+bool portalOpenFile(const QString& filePath)
+{
+    QDBusConnection bus = QDBusConnection::sessionBus();
+    if (!bus.isConnected() || bus.interface() == nullptr ||
+        !bus.interface()->isServiceRegistered(u"org.freedesktop.portal.Desktop"_s)) {
+        return false;
+    }
+    const int fd = ::open(QFile::encodeName(filePath).constData(), O_RDONLY | O_CLOEXEC);
+    if (fd < 0) {
+        return false;
+    }
+    QDBusUnixFileDescriptor descriptor(fd);
+    ::close(fd); // QDBusUnixFileDescriptor keeps its own dup
+    QDBusMessage call = QDBusMessage::createMethodCall(
+        u"org.freedesktop.portal.Desktop"_s, u"/org/freedesktop/portal/desktop"_s,
+        u"org.freedesktop.portal.OpenURI"_s, u"OpenFile"_s);
+    call << QString() << QVariant::fromValue(descriptor) << QVariantMap{};
+    const QDBusMessage reply = bus.call(call, QDBus::Block, 3000);
+    return reply.type() == QDBusMessage::ReplyMessage;
+}
+
 } // namespace
+
+bool openFile(const QString& filePath)
+{
+    // Portal first (works confined); OpenURI by string next (unconfined
+    // desktops); QDesktopServices last (dev builds with a working xdg-open).
+    if (portalOpenFile(filePath)) {
+        return true;
+    }
+    if (portalOpenUri(QUrl::fromLocalFile(filePath).toString())) {
+        return true;
+    }
+    return QDesktopServices::openUrl(QUrl::fromLocalFile(filePath));
+}
 
 bool openDirectory(const QString& directory)
 {

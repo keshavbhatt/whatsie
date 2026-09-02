@@ -3,12 +3,14 @@
 #include "core/downloads/download_model.h"
 #include "core/downloads/file_naming.h"
 
+#include <QAbstractItemView>
 #include <QApplication>
 #include <QFileInfo>
 #include <QHelpEvent>
 #include <QMimeDatabase>
 #include <QMouseEvent>
 #include <QPainter>
+#include <QPixmap>
 #include <QStyleOptionProgressBar>
 #include <QToolTip>
 
@@ -44,6 +46,31 @@ QIcon iconFor(const QModelIndex& index, const QFileIconProvider& provider)
         icon = provider.icon(QFileIconProvider::File);
     }
     return icon;
+}
+
+// Paints a (monochrome) theme icon recoloured to `color`, so the action glyphs
+// stay legible whatever the row background is — a plain theme icon washed out on
+// the green selection was the reported "can't see the buttons".
+void paintTinted(QPainter* painter, const QRect& rect, const QIcon& icon, const QColor& color)
+{
+    if (icon.isNull() || rect.isEmpty()) {
+        return;
+    }
+    const qreal dpr = painter->device()->devicePixelRatioF();
+    QPixmap pm = icon.pixmap(rect.size() * dpr);
+    if (pm.isNull()) {
+        return;
+    }
+    pm.setDevicePixelRatio(dpr);
+    QPixmap tinted(pm.size());
+    tinted.setDevicePixelRatio(dpr);
+    tinted.fill(Qt::transparent);
+    QPainter tp(&tinted);
+    tp.drawPixmap(0, 0, pm);
+    tp.setCompositionMode(QPainter::CompositionMode_SourceIn);
+    tp.fillRect(tinted.rect(), color);
+    tp.end();
+    painter->drawPixmap(rect, tinted);
 }
 } // namespace
 
@@ -157,24 +184,22 @@ void DownloadsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
     const QRect iconRect(r.left(), r.center().y() - kIconSize / 2, kIconSize, kIconSize);
     iconFor(index, m_icons).paint(painter, iconRect);
 
-    // Buttons (only on hover/selection) reserve space on the right.
+    // Action buttons, always shown so they are discoverable (they used to appear
+    // only on hover/selection). Each sits on a faint chip derived from the text
+    // colour, and the glyph is tinted to the text colour, so both read on a
+    // normal row and on the green selection.
     const QList<Button> buttons = buttonsFor(opt, index);
     int textRight = r.right();
-    if (hovered || selected) {
-        for (const Button& b : buttons) {
-            QStyleOptionToolButton tb;
-            tb.rect = b.rect;
-            tb.state = QStyle::State_Enabled | QStyle::State_AutoRaise | QStyle::State_Raised;
-            tb.palette = pal;
-            painter->setPen(Qt::NoPen);
-            painter->setBrush(selected ? pal.color(QPalette::Highlight).lighter(120)
-                                       : pal.color(QPalette::Button));
-            painter->drawRoundedRect(b.rect, 6, 6);
-            QIcon::fromTheme(b.iconName).paint(painter, b.rect.adjusted(6, 6, -6, -6));
-        }
-        if (!buttons.isEmpty()) {
-            textRight = buttons.first().rect.left() - kPadding;
-        }
+    for (const Button& b : buttons) {
+        QColor chip = textColor;
+        chip.setAlpha(hovered || selected ? 48 : 28);
+        painter->setPen(Qt::NoPen);
+        painter->setBrush(chip);
+        painter->drawRoundedRect(b.rect, 6, 6);
+        paintTinted(painter, b.rect.adjusted(6, 6, -6, -6), QIcon::fromTheme(b.iconName), textColor);
+    }
+    if (!buttons.isEmpty()) {
+        textRight = buttons.first().rect.left() - kPadding;
     }
 
     // Text block
@@ -230,6 +255,21 @@ bool DownloadsDelegate::editorEvent(QEvent* event, QAbstractItemModel* model,
         }
     }
     return QStyledItemDelegate::editorEvent(event, model, option, index);
+}
+
+bool DownloadsDelegate::helpEvent(QHelpEvent* event, QAbstractItemView* view,
+                                  const QStyleOptionViewItem& option, const QModelIndex& index)
+{
+    if (event->type() == QEvent::ToolTip) {
+        for (const Button& b : buttonsFor(option, index)) {
+            if (b.rect.contains(event->pos())) {
+                QToolTip::showText(event->globalPos(), b.tooltip, view);
+                return true;
+            }
+        }
+        QToolTip::hideText();
+    }
+    return QStyledItemDelegate::helpEvent(event, view, option, index);
 }
 
 } // namespace whatsie::ui
