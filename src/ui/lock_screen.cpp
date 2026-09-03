@@ -108,7 +108,7 @@ void LockScreen::paintEvent(QPaintEvent* /*event*/)
         // theme, the light-recoloured copy on a dark one, so the pattern reads
         // either way without glaring.
         const bool dark = window.lightness() < 128;
-        p.setOpacity(dark ? 0.12 : 0.45);
+        p.setOpacity(dark ? 0.22 : 0.5);
         p.drawTiledPixmap(rect(), dark && !m_doodleLight.isNull() ? m_doodleLight : m_doodle);
     }
 }
@@ -169,22 +169,35 @@ void LockScreen::playDismiss()
         Q_EMIT dismissed();
         return;
     }
-    // Fade the card away, then hand back so the app is revealed — the mirror of
-    // animateIn(). The opacity effect is attached only for the animation and
-    // dropped afterwards (see animateIn()).
+    // Fade the card away while it glides upward, then hand back so the app is
+    // revealed — the mirror of animateIn(). The opacity effect is attached only
+    // for the animation and dropped afterwards (see animateIn()).
     auto* effect = new QGraphicsOpacityEffect(m_card);
     m_card->setGraphicsEffect(effect);
     effect->setOpacity(1.0);
     auto* fade = new QPropertyAnimation(effect, "opacity", this);
-    fade->setDuration(220);
+    fade->setDuration(300);
     fade->setStartValue(1.0);
     fade->setEndValue(0.0);
     fade->setEasingCurve(QEasingCurve::InCubic);
-    connect(fade, &QPropertyAnimation::finished, this, [this] {
+
+    auto* group = new QParallelAnimationGroup(this);
+    group->addAnimation(fade);
+
+    const QRect start = m_card->geometry();
+    if (start.isValid() && start.width() > 0 && start.height() > 0) {
+        auto* glide = new QPropertyAnimation(m_card, "geometry", this);
+        glide->setDuration(320);
+        glide->setStartValue(start);
+        glide->setEndValue(start.translated(0, -40));
+        glide->setEasingCurve(QEasingCurve::InBack);
+        group->addAnimation(glide);
+    }
+    connect(group, &QParallelAnimationGroup::finished, this, [this] {
         m_card->setGraphicsEffect(nullptr); // drop the effect; card is hidden next
         Q_EMIT dismissed();
     });
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
+    group->start(QAbstractAnimation::DeleteWhenStopped);
 }
 
 void LockScreen::submit()
