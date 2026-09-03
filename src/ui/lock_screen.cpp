@@ -116,6 +116,13 @@ void LockScreen::paintEvent(QPaintEvent* /*event*/)
 void LockScreen::showEvent(QShowEvent* event)
 {
     QWidget::showEvent(event);
+    // Re-run the layout so the card is at its true resting position before we
+    // animate from it — a safeguard against any leftover geometry from a prior
+    // dismiss animation.
+    if (layout() != nullptr) {
+        layout()->invalidate();
+        layout()->activate();
+    }
     animateIn();
 }
 
@@ -184,17 +191,24 @@ void LockScreen::playDismiss()
     auto* group = new QParallelAnimationGroup(this);
     group->addAnimation(fade);
 
-    const QRect start = m_card->geometry();
-    if (start.isValid() && start.width() > 0 && start.height() > 0) {
+    const QRect home = m_card->geometry();
+    const bool hasHome = home.isValid() && home.width() > 0 && home.height() > 0;
+    if (hasHome) {
         auto* glide = new QPropertyAnimation(m_card, "geometry", this);
         glide->setDuration(320);
-        glide->setStartValue(start);
-        glide->setEndValue(start.translated(0, -40));
+        glide->setStartValue(home);
+        glide->setEndValue(home.translated(0, -40));
         glide->setEasingCurve(QEasingCurve::InBack);
         group->addAnimation(glide);
     }
-    connect(group, &QParallelAnimationGroup::finished, this, [this] {
+    // Animating "geometry" leaves the card at the displaced end rect, which the
+    // layout does not reset on the next show — so restore its resting position
+    // here (while it is invisible), or repeated unlocks drift it upward.
+    connect(group, &QParallelAnimationGroup::finished, this, [this, home, hasHome] {
         m_card->setGraphicsEffect(nullptr); // drop the effect; card is hidden next
+        if (hasHome) {
+            m_card->setGeometry(home);
+        }
         Q_EMIT dismissed();
     });
     group->start(QAbstractAnimation::DeleteWhenStopped);
