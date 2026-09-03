@@ -51,6 +51,7 @@ qt_add_resources(whatsie_web "scripts"
         scripts/privacy-blur.js
         scripts/linked-device-name.js
         scripts/file-drop.js
+        scripts/chat-list-collapse.js
 )
 
 target_link_libraries(whatsie_web
