@@ -165,6 +165,10 @@ public:
     void setGpuAutoDisabled(bool disabled);
     [[nodiscard]] int gpuProbeStrikes() const;
     void setGpuProbeStrikes(int strikes);
+    /// One-shot marker: the GPU was just auto-disabled, so the UI should tell the
+    /// user why on the next launch, then clear it.
+    [[nodiscard]] bool gpuFallbackNotice() const;
+    void setGpuFallbackNotice(bool pending);
 
     // proxy/ (FEATURES P3, M12b)
     [[nodiscard]] ProxyMode proxyMode() const;

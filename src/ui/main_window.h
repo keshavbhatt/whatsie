@@ -69,6 +69,7 @@ private:
     void connectWebView();
     void restoreWindowState();
     void saveWindowState();
+    void maybeShowGpuFallbackNotice();
     void updateZoomMode();
     void applyMinimumSize();
     void setFullScreenMode(bool on);

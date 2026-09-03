@@ -6,6 +6,7 @@
 #include "core/settings/settings.h"
 #include "core/settings/settings_keys.h"
 #include "platform/crash_handler.h"
+#include "platform/gpu_stderr_watch.h"
 #include "ui/main_window.h"
 
 #include <QByteArray>
@@ -109,6 +110,24 @@ void relaunchUnderXcb(whatsie::app::Application& app)
     }
 }
 
+// A GPU context-loss storm (e.g. stopping a Wayland screen share) hangs the GPU
+// process. Persist the fall-back to software rendering — and a one-shot notice so
+// the user is told why — then relaunch onto the working configuration.
+void relaunchForGpuFallback(whatsie::app::Application& app)
+{
+    qWarning("GPU context-loss storm detected; disabling hardware acceleration and relaunching");
+    app.settings().setGpuAutoDisabled(true);
+    app.settings().setGpuFallbackNotice(true);
+    app.settings().sync(); // flush before the child starts
+    app.singleInstance().release();
+    const QStringList args = QCoreApplication::arguments().mid(1);
+    if (QProcess::startDetached(QCoreApplication::applicationFilePath(), args)) {
+        QCoreApplication::quit();
+    } else {
+        qWarning("GPU-fallback relaunch failed to start");
+    }
+}
+
 } // namespace
 
 int main(int argc, char* argv[])
@@ -135,6 +154,16 @@ int main(int argc, char* argv[])
     // Chain onto the sink Application just installed, so a later graphics failure
     // during window/WebEngine creation is observed (FEATURES S20).
     g_previousHandler = qInstallMessageHandler(graphicsWatchHandler);
+
+    // Watch stderr for a GPU context-loss storm (the EGL_BAD_DISPLAY flood that
+    // hangs the app when a Wayland screen share is stopped) and self-heal onto
+    // software rendering. Installed before the web engine spawns its GPU
+    // subprocess so their inherited stderr is captured too.
+    auto* gpuWatch = new whatsie::platform::GpuStderrWatch(&app);
+    if (gpuWatch->install()) {
+        QObject::connect(gpuWatch, &whatsie::platform::GpuStderrWatch::gpuContextLostStorm, &app,
+                         [&app] { relaunchForGpuFallback(app); });
+    }
 
     whatsie::ui::MainWindow window(app.settings(), app.themeService());
     QObject::connect(&app, &whatsie::app::Application::raiseRequested, &window,

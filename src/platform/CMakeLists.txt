@@ -6,6 +6,7 @@ qt_add_library(whatsie_platform STATIC
     autostart.h
     crash_handler.h
     file_manager.h
+    gpu_stderr_watch.h
     logging.cpp
     logging.h
     notifier_factory.cpp
@@ -28,6 +29,7 @@ if(LINUX)
         linux/dbus_image.cpp
         linux/dbus_image.h
         linux/file_manager_dbus.cpp
+        linux/gpu_stderr_watch.cpp
         linux/freedesktop_notifier.cpp
         linux/freedesktop_notifier.h
         linux/portal_notifier.cpp
@@ -38,5 +40,6 @@ else()
     target_sources(whatsie_platform PRIVATE
         crash_handler_generic.cpp
         file_manager_generic.cpp
+        gpu_stderr_watch_generic.cpp
     )
 endif()

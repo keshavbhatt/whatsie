@@ -8,6 +8,8 @@ qt_add_library(whatsie_core STATIC
     chromium_flags.h
     graphics_fallback.cpp
     graphics_fallback.h
+    gpu_storm_detector.cpp
+    gpu_storm_detector.h
     spellcheck.cpp
     spellcheck.h
     connection_watchdog_policy.cpp

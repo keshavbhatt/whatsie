@@ -129,6 +129,7 @@ void Application::evaluateGpuStability()
         if (strikes >= 2) {
             m_settings->setGpuAutoDisabled(true);
             m_settings->setGpuProbeStrikes(0);
+            m_settings->setGpuFallbackNotice(true); // tell the user on this launch
             qCWarning(lcApp) << "GPU proved unstable across" << strikes
                              << "starts; falling back to software rendering (ADR-032)";
         } else {

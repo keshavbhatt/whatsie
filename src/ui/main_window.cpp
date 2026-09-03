@@ -221,12 +221,27 @@ void MainWindow::start(bool startHidden)
     if (startHidden && m_tray->isAvailable()) {
         qCInfo(lcUi) << "starting hidden in tray";
         m_tray->setWindowVisible(false);
+        maybeShowGpuFallbackNotice();
         return;
     }
     show();
     if (m_locked) {
         m_lockScreen->reset();
     }
+    maybeShowGpuFallbackNotice();
+}
+
+void MainWindow::maybeShowGpuFallbackNotice()
+{
+    if (!m_settings.gpuFallbackNotice()) {
+        return;
+    }
+    m_settings.setGpuFallbackNotice(false); // one-shot
+    QMessageBox::information(
+        isVisible() ? this : nullptr, tr("Hardware acceleration turned off"),
+        tr("Whatsie hit a graphics-driver problem — often when a screen share is stopped — and "
+           "switched to software rendering so it stays stable.\n\nEverything still works; you can "
+           "turn hardware acceleration back on in Settings → Advanced."));
 }
 
 void MainWindow::showAndRaise()

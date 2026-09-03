@@ -445,6 +445,16 @@ void Settings::setGpuAutoDisabled(bool disabled)
     }
 }
 
+bool Settings::gpuFallbackNotice() const
+{
+    return boolValue(keys::kGpuFallbackNotice, false);
+}
+
+void Settings::setGpuFallbackNotice(bool pending)
+{
+    storeBool(keys::kGpuFallbackNotice, false, pending);
+}
+
 int Settings::gpuProbeStrikes() const
 {
     return std::max(0, m_store->value(keys::kGpuProbeStrikes, 0).toInt());

@@ -66,6 +66,8 @@ inline constexpr QLatin1StringView kWebrtcPublicOnly{"advanced/webrtcPublicInter
 // GPU auto-fallback state (ADR-032): set after repeated unstable GPU trials.
 inline constexpr QLatin1StringView kGpuAutoDisabled{"advanced/gpuAutoDisabled"};
 inline constexpr QLatin1StringView kGpuProbeStrikes{"advanced/gpuProbeStrikes"};
+// Set when the GPU was auto-disabled, so the next launch can tell the user why.
+inline constexpr QLatin1StringView kGpuFallbackNotice{"advanced/gpuFallbackNotice"};
 
 // proxy/ (password is deliberately NOT a key — never persisted)
 inline constexpr QLatin1StringView kProxyMode{"proxy/mode"};
