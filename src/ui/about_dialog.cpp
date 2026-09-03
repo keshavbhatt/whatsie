@@ -7,7 +7,6 @@
 
 #include <QApplication>
 #include <QClipboard>
-#include <QDialogButtonBox>
 #include <QFontDatabase>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
@@ -128,9 +127,6 @@ void AboutDialog::setupUi()
     m_debugText->setMinimumHeight(180);
     m_debugText->hide();
 
-    auto* buttons = new QDialogButtonBox(QDialogButtonBox::Close, m_content);
-    connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
-
     auto* content = new QVBoxLayout(m_content);
     content->setContentsMargins(20, 20, 20, 16);
     content->setSpacing(10);
@@ -139,7 +135,6 @@ void AboutDialog::setupUi()
     content->addWidget(separator);
     content->addLayout(debugRow);
     content->addWidget(m_debugText);
-    content->addWidget(buttons);
 
     auto* outer = new QVBoxLayout(this);
     outer->setContentsMargins(0, 0, 0, 0);

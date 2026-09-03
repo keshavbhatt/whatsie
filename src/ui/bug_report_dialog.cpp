@@ -7,9 +7,9 @@
 #include <QApplication>
 #include <QCheckBox>
 #include <QClipboard>
-#include <QFontDatabase>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
@@ -17,6 +17,10 @@
 using namespace Qt::StringLiterals;
 
 namespace whatsie::ui {
+
+namespace {
+constexpr int kMaxTitle = 80;
+} // namespace
 
 BugReportDialog::BugReportDialog(const core::Settings& settings, QString userAgent, QWidget* parent)
     : QDialog(parent)
@@ -32,38 +36,32 @@ void BugReportDialog::setupUi()
     setModal(true);
 
     auto* intro = new QLabel(
-        tr("Describe what went wrong. A pre-filled GitHub issue will open in your browser and the "
-           "full report — including diagnostics — is copied to your clipboard to paste in."),
+        tr("A pre-filled GitHub issue will open in your browser. The diagnostics are copied to your "
+           "clipboard — paste them in at the end of the issue. No messages or chats are included."),
         this);
     intro->setWordWrap(true);
 
-    auto* summaryLabel = new QLabel(tr("What happened?"), this);
-    m_summary = new QPlainTextEdit(this);
-    m_summary->setPlaceholderText(
+    auto* titleLabel = new QLabel(tr("Title"), this);
+    m_title = new QLineEdit(this);
+    m_title->setMaxLength(kMaxTitle);
+    m_title->setPlaceholderText(tr("Short summary of the problem"));
+
+    auto* descriptionLabel = new QLabel(tr("What happened?"), this);
+    m_description = new QPlainTextEdit(this);
+    m_description->setPlaceholderText(
         tr("e.g. The window turns black after I close a chat, and only a restart fixes it."));
-    m_summary->setMinimumHeight(90);
+    m_description->setMinimumHeight(100);
 
     m_includeCrash = new QCheckBox(tr("Include the last crash report"), this);
     const bool hasCrash = !platform::lastCrashReport().isEmpty();
     m_includeCrash->setChecked(hasCrash);
     m_includeCrash->setVisible(hasCrash);
 
-    m_detailsToggle = new QPushButton(tr("Show diagnostics that will be attached"), this);
-    m_detailsToggle->setCheckable(true);
-    m_detailsToggle->setFlat(true);
-    m_detailsToggle->setStyleSheet(u"text-align:left;"_s);
-
-    m_details = new QPlainTextEdit(this);
-    m_details->setReadOnly(true);
-    m_details->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    m_details->setMinimumHeight(160);
-    m_details->hide();
-
     m_status = new QLabel(this);
     m_status->setWordWrap(true);
     m_status->setStyleSheet(u"color: palette(placeholder-text);"_s);
 
-    auto* copy = new QPushButton(tr("Copy report"), this);
+    auto* copy = new QPushButton(tr("Copy diagnostics"), this);
     auto* open = new QPushButton(tr("Open GitHub Issue"), this);
     open->setDefault(true);
     open->setProperty("whatsiePrimary", true);
@@ -78,56 +76,37 @@ void BugReportDialog::setupUi()
     auto* layout = new QVBoxLayout(this);
     layout->addWidget(intro);
     layout->addSpacing(6);
-    layout->addWidget(summaryLabel);
-    layout->addWidget(m_summary);
+    layout->addWidget(titleLabel);
+    layout->addWidget(m_title);
+    layout->addWidget(descriptionLabel);
+    layout->addWidget(m_description);
     layout->addWidget(m_includeCrash);
-    layout->addWidget(m_detailsToggle);
-    layout->addWidget(m_details);
     layout->addWidget(m_status);
     layout->addLayout(buttons);
     setMinimumWidth(560);
 
-    connect(m_detailsToggle, &QPushButton::toggled, this, [this](bool on) {
-        m_detailsToggle->setText(on ? tr("Hide diagnostics that will be attached")
-                                    : tr("Show diagnostics that will be attached"));
-        if (on) {
-            refreshDetails();
-        }
-        m_details->setVisible(on);
-        adjustSize();
-    });
-    connect(m_includeCrash, &QCheckBox::toggled, this, [this] {
-        if (m_details->isVisible()) {
-            refreshDetails();
-        }
-    });
-    connect(copy, &QPushButton::clicked, this, &BugReportDialog::copyReport);
+    connect(copy, &QPushButton::clicked, this, &BugReportDialog::copyDiagnostics);
     connect(open, &QPushButton::clicked, this, &BugReportDialog::submit);
     connect(close, &QPushButton::clicked, this, &QDialog::reject);
 }
 
-void BugReportDialog::refreshDetails()
+QString BugReportDialog::diagnostics() const
 {
-    m_details->setPlainText(bugReportBody(m_settings, m_userAgent, m_summary->toPlainText(),
-                                          m_includeCrash->isChecked()));
+    return buildDiagnostics(m_settings, m_userAgent, 200, m_includeCrash->isChecked());
 }
 
-void BugReportDialog::copyReport()
+void BugReportDialog::copyDiagnostics()
 {
-    QApplication::clipboard()->setText(bugReportBody(m_settings, m_userAgent,
-                                                     m_summary->toPlainText(),
-                                                     m_includeCrash->isChecked()));
-    m_status->setText(tr("Full report copied to the clipboard."));
+    QApplication::clipboard()->setText(diagnostics());
+    m_status->setText(tr("Diagnostics copied to the clipboard."));
 }
 
 void BugReportDialog::submit()
 {
-    QApplication::clipboard()->setText(bugReportBody(m_settings, m_userAgent,
-                                                     m_summary->toPlainText(),
-                                                     m_includeCrash->isChecked()));
-    platform::openUrl(bugReportUrl(m_userAgent, m_summary->toPlainText()));
-    m_status->setText(tr("A GitHub issue is opening in your browser. Your full report is on the "
-                         "clipboard — paste it (Ctrl+V) into the issue. No messages are included."));
+    QApplication::clipboard()->setText(diagnostics());
+    platform::openUrl(bugReportUrl(m_userAgent, m_title->text(), m_description->toPlainText()));
+    m_status->setText(tr("A GitHub issue is opening in your browser. Paste your clipboard (Ctrl+V) "
+                         "at the end of the issue to attach the diagnostics."));
 }
 
 } // namespace whatsie::ui

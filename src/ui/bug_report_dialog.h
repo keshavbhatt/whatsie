@@ -4,8 +4,8 @@
 
 class QCheckBox;
 class QLabel;
+class QLineEdit;
 class QPlainTextEdit;
-class QPushButton;
 
 namespace whatsie::core {
 class Settings;
@@ -27,16 +27,15 @@ public:
 
 private:
     void setupUi();
-    void refreshDetails();
+    QString diagnostics() const;
     void submit();
-    void copyReport();
+    void copyDiagnostics();
 
     const core::Settings& m_settings;
     QString m_userAgent;
-    QPlainTextEdit* m_summary = nullptr;
+    QLineEdit* m_title = nullptr;
+    QPlainTextEdit* m_description = nullptr;
     QCheckBox* m_includeCrash = nullptr;
-    QPushButton* m_detailsToggle = nullptr;
-    QPlainTextEdit* m_details = nullptr;
     QLabel* m_status = nullptr;
 };
 

@@ -61,27 +61,16 @@ QString buildDiagnostics(const core::Settings& settings, const QString& userAgen
     return out.join(u'\n');
 }
 
-QString bugReportBody(const core::Settings& settings, const QString& userAgent,
-                      const QString& summary, bool includeCrash)
+QString bugReportUrl(const QString& userAgent, const QString& title, const QString& description)
 {
-    const QString described = summary.trimmed().isEmpty() ? u"_(describe the problem here)_"_s
-                                                          : summary.trimmed();
-    return u"**What happened?**\n\n"_s + described +
-           u"\n\n**Steps to reproduce**\n1. \n2. \n3. \n\n"
-           "**Expected behaviour**\n\n\n"
-           "---\n"_s +
-           buildDiagnostics(settings, userAgent, 200, includeCrash);
-}
-
-QString bugReportUrl(const QString& userAgent, const QString& summary)
-{
-    // Only the user's summary and a short environment block go in the URL —
-    // logs and the crash backtrace would blow past GitHub's length limit and
-    // get the whole request rejected ("Malformed request"). The full report is
-    // put on the clipboard by the caller for pasting.
-    const QString described = summary.trimmed().isEmpty()
+    // Only the user's title, description and a short environment block go in the
+    // URL — logs and the crash backtrace would blow past GitHub's length limit
+    // and get the request rejected ("Malformed request"). Diagnostics are copied
+    // to the clipboard by the caller; the body must not repeat them, or pasting
+    // would duplicate the prefilled sections.
+    const QString described = description.trimmed().isEmpty()
                                   ? u"<!-- describe the problem here -->"_s
-                                  : summary.trimmed().left(1500);
+                                  : description.trimmed().left(1500);
     const QString body =
         u"**What happened?**\n\n"_s + described +
         u"\n\n**Steps to reproduce**\n1. \n2. \n3. \n\n"
@@ -90,18 +79,15 @@ QString bugReportUrl(const QString& userAgent, const QString& summary)
         u"- Whatsie: %1\n"_s.arg(QCoreApplication::applicationVersion()) +
         u"- OS: %1\n"_s.arg(platform::describeHost()) +
         u"- Chromium: %1\n\n"_s.arg(chromiumVersion(userAgent)) +
-        u"<!-- Full logs and any crash report are on your clipboard — paste them below. -->"_s;
+        u"<!-- Paste the diagnostics from your clipboard below. -->"_s;
 
-    QString title = u"[Bug] "_s;
-    const QString firstLine = summary.trimmed().section(u'\n', 0, 0).left(60);
-    if (!firstLine.isEmpty()) {
-        title += firstLine;
-    }
+    QString issueTitle = u"[Bug] "_s;
+    issueTitle += title.trimmed().section(u'\n', 0, 0).left(80);
 
     QUrl url(u"https://github.com/keshavbhatt/whatsie/issues/new"_s);
     QUrlQuery query;
     query.addQueryItem(u"labels"_s, u"bug"_s);
-    query.addQueryItem(u"title"_s, title);
+    query.addQueryItem(u"title"_s, issueTitle);
     query.addQueryItem(u"body"_s, body);
     url.setQuery(query);
     return url.toString(QUrl::FullyEncoded);
