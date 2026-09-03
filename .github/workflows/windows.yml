@@ -11,7 +11,7 @@ name: windows
 
 on:
   push:
-    branches: [main, rewrite]
+    branches: [main, rewrite, feature/windows-support]
     tags: ['v*.*.*']
   workflow_dispatch:
 
