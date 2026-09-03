@@ -74,20 +74,37 @@ bool SingleInstance::primaryIsAlive(const QString& key, int timeoutMs)
 
 void SingleInstance::startServer()
 {
-    // A stale socket file from a crashed primary would make listen() fail.
-    QLocalServer::removeServer(m_key);
     m_server = std::make_unique<QLocalServer>();
     m_server->setSocketOptions(QLocalServer::UserAccessOption);
     connect(m_server.get(), &QLocalServer::newConnection, this, &SingleInstance::onNewConnection);
-    if (!m_server->listen(m_key)) {
-        qCWarning(lcApp) << "cannot listen on" << m_key << m_server->errorString()
-                         << "- continuing without single-instance guard";
-        m_server.reset();
+
+    // Try to claim the name first. Removing the socket unconditionally (as before)
+    // let two near-simultaneous launches each unlink the other's fresh socket and
+    // both become "primary"; listening first makes the winner's socket survive.
+    if (m_server->listen(m_key)) {
         m_primary = true;
+        qCDebug(lcApp) << "primary instance listening on" << m_key;
         return;
     }
+    // The name is taken. Either another process won the race (it is the primary
+    // and answers), or a crashed primary left a stale socket file (nobody answers,
+    // and only then is it safe to clear).
+    if (primaryIsAlive(m_key, 200)) {
+        m_server.reset();
+        m_primary = false;
+        qCInfo(lcApp) << "lost the single-instance race for" << m_key << "- running as secondary";
+        return;
+    }
+    QLocalServer::removeServer(m_key);
+    if (m_server->listen(m_key)) {
+        m_primary = true;
+        qCDebug(lcApp) << "primary instance listening on" << m_key << "(cleared a stale socket)";
+        return;
+    }
+    qCWarning(lcApp) << "cannot listen on" << m_key << m_server->errorString()
+                     << "- continuing without single-instance guard";
+    m_server.reset();
     m_primary = true;
-    qCDebug(lcApp) << "primary instance listening on" << m_key;
 }
 
 void SingleInstance::onNewConnection()
