@@ -4,6 +4,8 @@
 #include <QFileIconProvider>
 #include <QStyledItemDelegate>
 
+#include <optional>
+
 namespace whatsie::ui {
 
 /// Draws one download row: file icon, name, status/progress line and hover
@@ -55,6 +57,15 @@ private:
 
     QFileIconProvider m_icons;
     QPersistentModelIndex m_hovered;
+    // The button pressed on MouseButtonPress; the action fires on release only if
+    // it lands on the same button, so a row whose state (and thus button set)
+    // changes mid-click cannot trigger an action the user did not aim at.
+    struct Pressed
+    {
+        quint64 id;
+        Action action;
+    };
+    std::optional<Pressed> m_pressed;
 };
 
 } // namespace whatsie::ui

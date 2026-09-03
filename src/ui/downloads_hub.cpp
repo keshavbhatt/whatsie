@@ -11,6 +11,7 @@
 
 #include <QDesktopServices>
 #include <QFileInfo>
+#include <QMessageBox>
 #include <QUrl>
 
 using namespace Qt::StringLiterals;
@@ -60,8 +61,13 @@ void DownloadsHub::showWindow()
         m_dialog = new DownloadsDialog(*m_model, m_dialogParent);
         m_dialog->setAttribute(Qt::WA_DeleteOnClose);
         connect(m_dialog, &DownloadsDialog::actionRequested, this, &DownloadsHub::perform);
-        connect(m_dialog, &DownloadsDialog::openFolderRequested, this,
-                [this] { platform::openDirectory(m_settings.downloadDirectory()); });
+        connect(m_dialog, &DownloadsDialog::openFolderRequested, this, [this] {
+            const QString dir = m_settings.downloadDirectory();
+            if (!platform::openDirectory(dir)) {
+                QMessageBox::warning(m_dialog, tr("Downloads"),
+                                     tr("Couldn't open the downloads folder:\n%1").arg(dir));
+            }
+        });
         connect(m_dialog, &DownloadsDialog::clearFinishedRequested, m_model.get(),
                 &core::DownloadModel::clearFinished);
     }
@@ -95,10 +101,17 @@ void DownloadsHub::perform(quint64 id, DownloadsDelegate::Action action)
     case DownloadsDelegate::Action::Open:
         if (!platform::openFile(entry->filePath())) {
             qCWarning(lcUi) << "cannot open" << entry->filePath();
+            QMessageBox::warning(m_dialogParent, tr("Open download"),
+                                 tr("Couldn't open this file:\n%1").arg(entry->filePath()));
         }
         break;
     case DownloadsDelegate::Action::Reveal:
-        platform::revealInFileManager(entry->filePath());
+        if (!platform::revealInFileManager(entry->filePath())) {
+            qCWarning(lcUi) << "cannot reveal" << entry->filePath();
+            QMessageBox::warning(m_dialogParent, tr("Show in folder"),
+                                 tr("Couldn't show this file in the file manager:\n%1")
+                                     .arg(entry->filePath()));
+        }
         break;
     case DownloadsDelegate::Action::Cancel:
         m_controller->cancel(id);

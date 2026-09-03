@@ -308,7 +308,13 @@ void MainWindow::restoreWindowState()
 void MainWindow::saveWindowState()
 {
     if (isFullScreen()) {
-        return; // never persist the full-screen state
+        // Persist the geometry captured before we went full screen (so the user's
+        // last normal size is not lost when they quit from full screen) but never
+        // the full-screen state itself.
+        if (!m_geometryBeforeFullScreen.isEmpty()) {
+            m_settings.setWindowGeometry(m_geometryBeforeFullScreen);
+        }
+        return;
     }
     m_settings.setWindowGeometry(saveGeometry());
     m_settings.setWindowState(saveState());
@@ -337,6 +343,7 @@ void MainWindow::setFullScreenMode(bool on)
     }
     if (on) {
         m_stateBeforeFullScreen = windowState();
+        m_geometryBeforeFullScreen = saveGeometry(); // so quitting from full screen still persists it
         showFullScreen();
         m_exitFullScreen->setEnabled(true);
     } else {

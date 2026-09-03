@@ -18,6 +18,7 @@
 #include <QAbstractSpinBox>
 #include <QComboBox>
 #include <QScrollBar>
+#include <QSignalBlocker>
 #include <QWheelEvent>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
@@ -431,8 +432,12 @@ QWidget* SettingsDialog::buildAdvancedTab()
     auto* spellBox = new QGroupBox(tr("Spell check"), page);
     auto* spellLayout = new QVBoxLayout(spellBox);
     m_spellCheck = new QCheckBox(tr("Check spelling as I type"), spellBox);
-    connect(m_spellCheck, &QCheckBox::toggled, this,
-            [this](bool on) { m_settings.setSpellCheckEnabled(on); });
+    connect(m_spellCheck, &QCheckBox::toggled, this, [this](bool on) {
+        m_settings.setSpellCheckEnabled(on);
+        if (m_spellLanguage != nullptr) {
+            m_spellLanguage->setEnabled(on); // no point choosing a language while off
+        }
+    });
     spellLayout->addWidget(m_spellCheck);
 
     const QStringList available =
@@ -690,6 +695,15 @@ void SettingsDialog::loadValues()
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_spellCheck->setChecked(m_settings.spellCheckEnabled());
+    if (m_spellLanguage != nullptr) {
+        const QStringList available =
+            core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
+        const QString effective =
+            core::resolveDictionary(m_settings.spellCheckLanguages().value(0), available);
+        const QSignalBlocker blocker(m_spellLanguage);
+        m_spellLanguage->setCurrentIndex(std::max(0, m_spellLanguage->findData(effective)));
+        m_spellLanguage->setEnabled(m_settings.spellCheckEnabled());
+    }
     m_lockOnStart->setChecked(m_settings.lockOnStart());
     m_lockOnHide->setChecked(m_settings.lockOnHide());
     m_lockIdle->setValue(m_settings.lockIdleMinutes());

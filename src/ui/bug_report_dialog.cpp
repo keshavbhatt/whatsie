@@ -104,9 +104,18 @@ void BugReportDialog::copyDiagnostics()
 void BugReportDialog::submit()
 {
     QApplication::clipboard()->setText(diagnostics());
-    platform::openUrl(bugReportUrl(m_userAgent, m_title->text(), m_description->toPlainText()));
-    m_status->setText(tr("A GitHub issue is opening in your browser. Paste your clipboard (Ctrl+V) "
-                         "at the end of the issue to attach the diagnostics."));
+    const QString url = bugReportUrl(m_userAgent, m_title->text(), m_description->toPlainText());
+    if (platform::openUrl(url)) {
+        m_status->setText(tr("A GitHub issue is opening in your browser. Paste your clipboard "
+                             "(Ctrl+V) at the end of the issue to attach the diagnostics."));
+    } else {
+        // Don't leave the user staring at a dead button: the report is already on
+        // the clipboard, so tell them and offer the URL to open by hand.
+        m_status->setText(tr("Couldn't open the browser automatically. Your report is on the "
+                             "clipboard — open this URL and paste it in:\n%1")
+                              .arg(url));
+        m_status->setTextInteractionFlags(Qt::TextSelectableByMouse);
+    }
 }
 
 } // namespace whatsie::ui

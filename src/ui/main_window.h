@@ -99,6 +99,7 @@ private:
     ThemeApplier* m_themeApplier = nullptr;
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
+    QByteArray m_geometryBeforeFullScreen;
     bool m_quitting = false;
 
     // App lock (FEATURES P1)

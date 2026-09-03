@@ -243,15 +243,33 @@ void DownloadsDelegate::paint(QPainter* painter, const QStyleOptionViewItem& opt
 bool DownloadsDelegate::editorEvent(QEvent* event, QAbstractItemModel* model,
                                     const QStyleOptionViewItem& option, const QModelIndex& index)
 {
-    if (event->type() == QEvent::MouseButtonRelease) {
+    if (event->type() == QEvent::MouseButtonPress) {
         auto* mouse = static_cast<QMouseEvent*>(event);
+        m_pressed.reset();
         if (mouse->button() == Qt::LeftButton) {
+            const quint64 id = index.data(DownloadModel::IdRole).toULongLong();
             for (const Button& b : buttonsFor(option, index)) {
                 if (b.rect.contains(mouse->pos())) {
-                    Q_EMIT actionRequested(index.data(DownloadModel::IdRole).toULongLong(), b.action);
+                    m_pressed = Pressed{id, b.action};
                     return true;
                 }
             }
+        }
+    } else if (event->type() == QEvent::MouseButtonRelease) {
+        auto* mouse = static_cast<QMouseEvent*>(event);
+        if (mouse->button() == Qt::LeftButton && m_pressed.has_value()) {
+            const quint64 id = index.data(DownloadModel::IdRole).toULongLong();
+            // Fire only if release lands on the same button that was pressed —
+            // the row's state (and button set) may have changed in between.
+            for (const Button& b : buttonsFor(option, index)) {
+                if (b.rect.contains(mouse->pos()) && id == m_pressed->id &&
+                    b.action == m_pressed->action) {
+                    m_pressed.reset();
+                    Q_EMIT actionRequested(id, b.action);
+                    return true;
+                }
+            }
+            m_pressed.reset();
         }
     }
     return QStyledItemDelegate::editorEvent(event, model, option, index);
