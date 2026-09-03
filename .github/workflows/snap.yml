@@ -28,14 +28,17 @@ jobs:
             runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
+      # snapcore/action-build / -publish have no Node 24 major yet, so they still
+      # emit a Node 20 deprecation warning — harmless, and out of our hands until
+      # Canonical ships a new major.
       - name: Build snap (${{ matrix.arch }})
         uses: snapcore/action-build@v1
         id: build
 
       - name: Upload the snap artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: whatsie-snap-${{ matrix.arch }}
           path: ${{ steps.build.outputs.snap }}
