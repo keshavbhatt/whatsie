@@ -6,6 +6,8 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS Concurrent)
 qt_add_library(whatsie_ui STATIC
     about_dialog.cpp
     about_dialog.h
+    bug_report_dialog.cpp
+    bug_report_dialog.h
     actions.cpp
     actions.h
     diagnostics.cpp

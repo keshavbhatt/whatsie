@@ -25,7 +25,8 @@ QString chromiumVersion(const QString& userAgent)
 }
 } // namespace
 
-QString buildDiagnostics(const core::Settings& settings, const QString& userAgent, int logLines)
+QString buildDiagnostics(const core::Settings& settings, const QString& userAgent, int logLines,
+                         bool includeCrash)
 {
     QStringList out;
     out << u"### Whatsie diagnostics"_s;
@@ -46,39 +47,62 @@ QString buildDiagnostics(const core::Settings& settings, const QString& userAgen
     }
     out << u"```"_s << u"</details>"_s;
 
-    const QString crash = platform::lastCrashReport();
-    if (!crash.isEmpty()) {
-        out << QString() << u"<details><summary>Previous crash</summary>"_s << QString() << u"```"_s;
-        for (const QString& line : crash.split(u'\n')) {
-            out << line;
+    if (includeCrash) {
+        const QString crash = platform::lastCrashReport();
+        if (!crash.isEmpty()) {
+            out << QString() << u"<details><summary>Previous crash</summary>"_s << QString()
+                << u"```"_s;
+            for (const QString& line : crash.split(u'\n')) {
+                out << line;
+            }
+            out << u"```"_s << u"</details>"_s;
         }
-        out << u"```"_s << u"</details>"_s;
     }
     return out.join(u'\n');
 }
 
-QString bugReportUrl(const core::Settings& settings, const QString& userAgent)
+QString bugReportBody(const core::Settings& settings, const QString& userAgent,
+                      const QString& summary, bool includeCrash)
 {
-    const QString body =
-        u"**What happened?**\n\n\n"
-        "**Steps to reproduce**\n1. \n2. \n3. \n\n"
-        "**Expected behaviour**\n\n\n"
-        "---\n"_s +
-        buildDiagnostics(settings, userAgent, 25);
+    const QString described = summary.trimmed().isEmpty() ? u"_(describe the problem here)_"_s
+                                                          : summary.trimmed();
+    return u"**What happened?**\n\n"_s + described +
+           u"\n\n**Steps to reproduce**\n1. \n2. \n3. \n\n"
+           "**Expected behaviour**\n\n\n"
+           "---\n"_s +
+           buildDiagnostics(settings, userAgent, 200, includeCrash);
+}
 
-    // Keep the whole URL comfortably under the ~8k limit browsers/GitHub accept;
-    // the caller also copies the full diagnostics to the clipboard as a backup.
-    constexpr int kMaxBody = 6000;
-    const QString trimmed =
-        body.size() > kMaxBody
-            ? body.left(kMaxBody) + u"\n\n… truncated — full diagnostics are on your clipboard."_s
-            : body;
+QString bugReportUrl(const QString& userAgent, const QString& summary)
+{
+    // Only the user's summary and a short environment block go in the URL —
+    // logs and the crash backtrace would blow past GitHub's length limit and
+    // get the whole request rejected ("Malformed request"). The full report is
+    // put on the clipboard by the caller for pasting.
+    const QString described = summary.trimmed().isEmpty()
+                                  ? u"<!-- describe the problem here -->"_s
+                                  : summary.trimmed().left(1500);
+    const QString body =
+        u"**What happened?**\n\n"_s + described +
+        u"\n\n**Steps to reproduce**\n1. \n2. \n3. \n\n"
+        "**Expected behaviour**\n\n\n"
+        "**Environment**\n"_s +
+        u"- Whatsie: %1\n"_s.arg(QCoreApplication::applicationVersion()) +
+        u"- OS: %1\n"_s.arg(platform::describeHost()) +
+        u"- Chromium: %1\n\n"_s.arg(chromiumVersion(userAgent)) +
+        u"<!-- Full logs and any crash report are on your clipboard — paste them below. -->"_s;
+
+    QString title = u"[Bug] "_s;
+    const QString firstLine = summary.trimmed().section(u'\n', 0, 0).left(60);
+    if (!firstLine.isEmpty()) {
+        title += firstLine;
+    }
 
     QUrl url(u"https://github.com/keshavbhatt/whatsie/issues/new"_s);
     QUrlQuery query;
     query.addQueryItem(u"labels"_s, u"bug"_s);
-    query.addQueryItem(u"title"_s, u"[Bug] "_s);
-    query.addQueryItem(u"body"_s, trimmed);
+    query.addQueryItem(u"title"_s, title);
+    query.addQueryItem(u"body"_s, body);
     url.setQuery(query);
     return url.toString(QUrl::FullyEncoded);
 }

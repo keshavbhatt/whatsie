@@ -1,19 +1,19 @@
 #include "ui/about_dialog.h"
 
 #include "core/settings/settings.h"
-#include "platform/crash_handler.h"
 #include "platform/file_manager.h"
+#include "ui/bug_report_dialog.h"
 #include "ui/diagnostics.h"
 
 #include <QApplication>
 #include <QClipboard>
 #include <QDialogButtonBox>
 #include <QFontDatabase>
+#include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
 #include <QIcon>
 #include <QLabel>
-#include <QMessageBox>
 #include <QPlainTextEdit>
 #include <QPropertyAnimation>
 #include <QPushButton>
@@ -49,42 +49,43 @@ void AboutDialog::setupUi()
     m_content = new QWidget(this);
 
     auto* icon = new QLabel(m_content);
-    icon->setPixmap(QIcon(u":/icons/whatsie.svg"_s).pixmap(120, 120));
-    icon->setAlignment(Qt::AlignTop | Qt::AlignHCenter);
+    icon->setPixmap(QIcon(u":/icons/whatsie.svg"_s).pixmap(96, 96));
+    icon->setFixedSize(96, 96);
 
-    auto* name = new QLabel(u"<span style=\"font-size:18pt;\">%1</span>"_s.arg(
+    auto* name = new QLabel(u"<span style=\"font-size:17pt; font-weight:600;\">%1</span>"_s.arg(
                                 QApplication::applicationName()),
                             m_content);
     auto* description = new QLabel(tr("WhatsApp Web client for Linux Desktop"), m_content);
     description->setWordWrap(true);
     auto* version =
-        new QLabel(tr("Version: %1").arg(QApplication::applicationVersion()), m_content);
+        new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), m_content);
     version->setStyleSheet(u"color: palette(placeholder-text);"_s);
 
+    auto* identity = new QVBoxLayout;
+    identity->setSpacing(2);
+    identity->addStretch();
+    identity->addWidget(name);
+    identity->addWidget(description);
+    identity->addWidget(version);
+    identity->addStretch();
+
+    auto* top = new QHBoxLayout;
+    top->setSpacing(16);
+    top->addWidget(icon, 0, Qt::AlignVCenter);
+    top->addLayout(identity, 1);
+
     auto* author =
-        new QLabel(tr("<p><b>Designed &amp; Developed by:</b> Keshav Bhatt</p>"
-                      "<p><b>Email:</b> <a href=\"mailto:%1\">%1</a></p>"
-                      "<p><b>Website:</b> <a href=\"%2\">ktechpit.com</a></p>")
+        new QLabel(tr("<b>Designed &amp; Developed by</b> Keshav Bhatt<br>"
+                      "<b>Email</b> <a href=\"mailto:%1\">%1</a> &nbsp;·&nbsp; "
+                      "<b>Website</b> <a href=\"%2\">ktechpit.com</a>")
                        .arg(kAuthorEmail, kWebsiteUrl),
                    m_content);
+    author->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
+    author->setTextFormat(Qt::RichText);
     author->setOpenExternalLinks(false);
     author->setTextInteractionFlags(Qt::TextBrowserInteraction);
     connect(author, &QLabel::linkActivated, this,
             [](const QString& link) { platform::openUrl(link); });
-
-    auto* identity = new QVBoxLayout;
-    identity->setSpacing(4);
-    identity->addWidget(name);
-    identity->addWidget(description);
-    identity->addWidget(version);
-    identity->addSpacing(8);
-    identity->addWidget(author);
-    identity->addStretch();
-
-    auto* top = new QHBoxLayout;
-    top->addWidget(icon, 0, Qt::AlignTop);
-    top->addSpacing(16);
-    top->addLayout(identity, 1);
 
     const auto linkButton = [this](const QString& label, const QString& url) {
         auto* button = new QPushButton(label, m_content);
@@ -92,27 +93,33 @@ void AboutDialog::setupUi()
         return button;
     };
     auto* actions = new QHBoxLayout;
+    actions->setSpacing(8);
     actions->addWidget(linkButton(tr("Donate PayPal"), kDonateUrl));
     actions->addWidget(linkButton(tr("Rate in Store"), kRateUrl));
     actions->addWidget(linkButton(tr("More Applications"), kMoreAppsUrl));
     actions->addWidget(linkButton(tr("Source Code"), kSourceUrl));
 
+    auto* separator = new QFrame(m_content);
+    separator->setFrameShape(QFrame::HLine);
+    separator->setFrameShadow(QFrame::Sunken);
+
     m_debugToggle = new QPushButton(tr("Show Debug Info"), m_content);
     m_debugToggle->setCheckable(true);
+    m_debugToggle->setFlat(true);
+    m_debugToggle->setStyleSheet(u"text-align:left;"_s);
     connect(m_debugToggle, &QPushButton::clicked, this, &AboutDialog::toggleDebugInfo);
     auto* copy = new QPushButton(tr("Copy"), m_content);
     copy->setToolTip(
         tr("Copies versions, paths and recent log lines for a bug report. No messages are included."));
     connect(copy, &QPushButton::clicked, this, &AboutDialog::copyDiagnostics);
     auto* report = new QPushButton(tr("Report a bug…"), m_content);
-    report->setToolTip(tr("Opens a pre-filled GitHub issue with diagnostics (and the last crash, if any)."));
     connect(report, &QPushButton::clicked, this, &AboutDialog::reportBug);
 
     auto* debugRow = new QHBoxLayout;
     debugRow->addWidget(m_debugToggle);
+    debugRow->addStretch();
     debugRow->addWidget(copy);
     debugRow->addWidget(report);
-    debugRow->addStretch();
 
     m_debugText = new QPlainTextEdit(m_content);
     m_debugText->setReadOnly(true);
@@ -125,9 +132,13 @@ void AboutDialog::setupUi()
     connect(buttons, &QDialogButtonBox::rejected, this, &QDialog::reject);
 
     auto* content = new QVBoxLayout(m_content);
+    content->setContentsMargins(20, 20, 20, 16);
+    content->setSpacing(10);
     content->addLayout(top);
-    content->addSpacing(8);
+    content->addWidget(author);
+    content->addSpacing(2);
     content->addLayout(actions);
+    content->addWidget(separator);
     content->addLayout(debugRow);
     content->addWidget(m_debugText);
     content->addWidget(buttons);
@@ -135,7 +146,7 @@ void AboutDialog::setupUi()
     auto* outer = new QVBoxLayout(this);
     outer->setContentsMargins(0, 0, 0, 0);
     outer->addWidget(m_content);
-    setMinimumWidth(520);
+    setMinimumWidth(540);
 }
 
 void AboutDialog::toggleDebugInfo()
@@ -182,16 +193,8 @@ void AboutDialog::copyDiagnostics()
 
 void AboutDialog::reportBug()
 {
-    // Full diagnostics to the clipboard (the URL carries a trimmed copy), then a
-    // pre-filled GitHub issue in the browser.
-    QApplication::clipboard()->setText(buildDiagnostics(m_settings, m_userAgent));
-    platform::openUrl(bugReportUrl(m_settings, m_userAgent));
-    QMessageBox::information(
-        this, tr("Report a bug"),
-        tr("A new GitHub issue is opening in your browser, pre-filled with diagnostics"
-           "%1.\n\nYour full diagnostics were also copied to the clipboard — paste them into the "
-           "issue if the form looks short. No messages or chats are included.")
-            .arg(platform::lastCrashReport().isEmpty() ? QString() : tr(" and the last crash")));
+    BugReportDialog dialog(m_settings, m_userAgent, this);
+    dialog.exec();
 }
 
 } // namespace whatsie::ui
