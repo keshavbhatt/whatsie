@@ -28,6 +28,12 @@ public:
     /// Secondary only. Sends one command and waits briefly for delivery.
     bool sendToPrimary(const QJsonObject& command, int timeoutMs = 2000);
 
+    /// Primary only. Drops the lock (closes the socket) so another process can
+    /// immediately become primary — used before relaunching ourselves under a
+    /// different QPA platform, so the child does not see us as still alive and
+    /// self-terminate as a secondary.
+    void release();
+
 Q_SIGNALS:
     /// Primary only. Emitted for every command a secondary instance sent.
     void commandReceived(const QJsonObject& command);

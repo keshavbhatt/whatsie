@@ -1,4 +1,5 @@
 #include "app/application.h"
+#include "app/single_instance.h"
 #include "app/version.h"
 #include "core/graphics_fallback.h"
 #include "core/log_sink.h"
@@ -14,6 +15,12 @@
 #include <QSettings>
 #include <QStandardPaths>
 #include <QTimer>
+
+#ifdef Q_OS_UNIX
+#include <QSocketNotifier>
+#include <csignal>
+#include <unistd.h>
+#endif
 
 #include <algorithm>
 #include <atomic>
@@ -56,13 +63,49 @@ void graphicsWatchHandler(QtMsgType type, const QMessageLogContext& context, con
     }
 }
 
-void relaunchUnderXcb()
+#ifdef Q_OS_UNIX
+// Self-pipe so SIGTERM/SIGINT (session logout, shutdown, Ctrl+C) become a
+// graceful QApplication quit instead of an abrupt death. Normal teardown then
+// runs — settings are synced and the GPU-probe marker is cleared — so an
+// ordinary shutdown within the ~20 s GPU trial window is not later miscounted
+// as a crash strike (which, twice, would wrongly force software rendering).
+int g_termPipe[2] = {-1, -1};
+
+void writeTermSignal(int /*signum*/)
+{
+    const char byte = 1;
+    const ssize_t ignored = ::write(g_termPipe[1], &byte, 1);
+    static_cast<void>(ignored); // async-signal-safe; nothing useful to do on error
+}
+
+int installGracefulTermination()
+{
+    if (::pipe(g_termPipe) != 0) {
+        return -1;
+    }
+    struct sigaction action{};
+    action.sa_handler = writeTermSignal;
+    sigemptyset(&action.sa_mask);
+    action.sa_flags = SA_RESTART;
+    sigaction(SIGTERM, &action, nullptr);
+    sigaction(SIGINT, &action, nullptr);
+    return g_termPipe[0];
+}
+#endif
+
+void relaunchUnderXcb(whatsie::app::Application& app)
 {
     qputenv("QT_QPA_PLATFORM", "xcb");
     qputenv("WHATSIE_XCB_RETRY", "1");
     const QStringList args = QCoreApplication::arguments().mid(1);
+    // Drop the single-instance lock first: otherwise the XCB child sees this
+    // still-listening process as the primary, forwards a "raise" command and
+    // exits as a secondary — leaving the app fully closed with no window.
+    app.singleInstance().release();
     if (QProcess::startDetached(QCoreApplication::applicationFilePath(), args)) {
         QCoreApplication::quit();
+    } else {
+        qWarning("xcb relaunch failed to start; staying on the current platform");
     }
 }
 
@@ -113,13 +156,26 @@ int main(int argc, char* argv[])
     // Give the GPU stack time to fail, then fall back to XCB if it did (once).
     const bool retried = qEnvironmentVariableIsSet("WHATSIE_XCB_RETRY");
     if (!retried && QGuiApplication::platformName() == QLatin1StringView("wayland")) {
-        QTimer::singleShot(3000, &window, [] {
+        QTimer::singleShot(3000, &window, [&app] {
             if (whatsie::core::shouldRetryUnderXcb(QLatin1StringView("wayland"), false,
                                                    g_graphicsFailed.load())) {
-                relaunchUnderXcb();
+                relaunchUnderXcb(app);
             }
         });
     }
+
+#ifdef Q_OS_UNIX
+    const int termFd = installGracefulTermination();
+    if (termFd >= 0) {
+        auto* termNotifier = new QSocketNotifier(termFd, QSocketNotifier::Read, &window);
+        QObject::connect(termNotifier, &QSocketNotifier::activated, &window, [&window] {
+            char byte = 0;
+            const ssize_t ignored = ::read(g_termPipe[0], &byte, 1);
+            static_cast<void>(ignored);
+            window.quit();
+        });
+    }
+#endif
 
     // Commands given on our own command line (we are the primary instance).
     for (const QJsonObject& command : whatsie::app::commandsFor(cli)) {

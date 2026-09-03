@@ -51,6 +51,16 @@ SingleInstance::~SingleInstance()
     }
 }
 
+void SingleInstance::release()
+{
+    if (m_server) {
+        m_server->close();
+        QLocalServer::removeServer(m_key);
+        m_server.reset();
+    }
+    m_primary = false;
+}
+
 bool SingleInstance::primaryIsAlive(const QString& key, int timeoutMs)
 {
     QLocalSocket probe;
