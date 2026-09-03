@@ -28,7 +28,6 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QNetworkInformation>
-#include <QStyleHints>
 #include <QTimer>
 #include <QUrl>
 #include <QWebChannel>
@@ -52,6 +51,7 @@ const QUrl kWhatsAppUrl(u"https://web.whatsapp.com/"_s);
 WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* parent)
     : QWebEngineView(parent)
     , m_settings(settings)
+    , m_theme(theme)
     , m_profile(new WebProfile(settings, this))
     , m_page(new WebPage(*m_profile, this))
     , m_permissions(new PermissionController(this))
@@ -82,6 +82,9 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     connect(m_page, &QWebEnginePage::renderProcessTerminated, this, &WebView::handleRenderProcessTerminated);
     connect(m_page, &QWebEnginePage::loadFinished, this, [this](bool ok) {
         if (ok) {
+            if (url().scheme() != u"data"_s) {
+                m_showingError = false; // a real page loaded; our error page is a data: URL
+            }
             m_crashPolicy.onLoadSucceeded();
             applyBlurLive();
             applyThemeLive();
@@ -134,6 +137,10 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
         [this](Qt::ColorScheme) {
             refreshColorScheme();
             applyThemeLive(); // repaint WhatsApp when the OS scheme changes in System mode
+            if (m_showingError) {
+                // Our error page is static HTML — re-render it in the new theme.
+                m_page->setHtml(errorPageHtml(m_theme.isDark(), m_errorTitle, m_errorDetail));
+            }
         },
         Qt::QueuedConnection);
 }
@@ -246,8 +253,10 @@ void WebView::showLoadError(const QWebEngineLoadingInfo& info)
 
     qCInfo(lcWeb) << "load failed:" << info.url().toString() << info.errorString()
                   << "-> showing custom error page";
-    const bool dark = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
-    m_page->setHtml(errorPageHtml(dark, title, detail));
+    m_showingError = true;
+    m_errorTitle = title;
+    m_errorDetail = detail;
+    m_page->setHtml(errorPageHtml(m_theme.isDark(), title, detail));
 }
 
 void WebView::checkWatchdog()

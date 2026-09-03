@@ -89,6 +89,7 @@ private:
     void handleFileDrop(const QStringList& paths);
 
     core::Settings& m_settings;
+    core::ThemeService& m_theme;
     WebProfile* m_profile = nullptr;
     WebPage* m_page = nullptr;
     PermissionController* m_permissions = nullptr;
@@ -98,6 +99,11 @@ private:
     QElapsedTimer m_clock;
     bool m_maximizedMode = false;
     int m_unread = 0;
+    // Current custom error page (if shown), remembered so it can be re-rendered
+    // when the theme changes.
+    bool m_showingError = false;
+    QString m_errorTitle;
+    QString m_errorDetail;
 };
 
 } // namespace whatsie::web

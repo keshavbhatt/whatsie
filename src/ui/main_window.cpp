@@ -33,6 +33,7 @@
 #include <QCloseEvent>
 #include <QFile>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QInputDialog>
 #include <QMessageBox>
 #include <QSessionManager>
@@ -98,7 +99,9 @@ void MainWindow::setupUi()
     m_actions = new Actions(this);
     m_dnd = new core::DndController(this);
     m_tray = new TrayController(m_settings, *m_dnd, *m_actions, this);
-    setWindowIcon(m_tray->currentIcon());
+    // The window/taskbar icon is always the full-colour logo — the tray icon can
+    // be symbolic/badged, which looks poor in a title bar.
+    setWindowIcon(QIcon(u":/icons/whatsie.svg"_s));
 
     m_webView = new web::WebView(m_settings, m_theme, this);
     m_lockScreen = new LockScreen(this);
@@ -620,8 +623,7 @@ void MainWindow::syncAutostart()
 
 void MainWindow::handleUnread(int count)
 {
-    m_tray->setUnreadCount(count);
-    setWindowIcon(m_tray->currentIcon());
+    m_tray->setUnreadCount(count); // unread shows on the tray; the window keeps the colour logo
 }
 
 void MainWindow::handleRenderProcessGaveUp()
