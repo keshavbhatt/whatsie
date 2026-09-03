@@ -18,6 +18,16 @@ qt_add_executable(whatsie
 whatsie_set_warnings(whatsie)
 target_link_libraries(whatsie PRIVATE whatsie_app)
 
+if(LINUX)
+    # QtWebEngine drags in libproxy, whose duktape/snappy backends are not always
+    # resolvable at link time in the KDE Qt6 content snaps — on arm64 the SDK
+    # update left libduktape.so.207 off the linker search path, so libproxy's
+    # `duk_error_raw` broke the final link. Those symbols come from shared
+    # libraries and resolve at runtime, so allow undefined symbols originating in
+    # shared libraries; undefined references from our own objects still error.
+    target_link_options(whatsie PRIVATE -Wl,--allow-shlib-undefined)
+endif()
+
 set_target_properties(whatsie PROPERTIES
     # Export symbols (-rdynamic) so the crash handler's backtrace shows function
     # names instead of bare addresses.
