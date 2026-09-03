@@ -3,15 +3,16 @@
 # plus test builds). Pushing a version tag (v6.0.0) additionally attaches the zip
 # and MSI to the GitHub Release for that tag.
 #
-# Note: QtWebEngine from the official Qt binaries ships without the proprietary
-# H.264/AAC codecs, so WhatsApp *voice/video calls* do not work on this build;
-# messaging, media and screen share do. A codec-enabled QtWebEngine would need a
-# separate (multi-hour) WebEngine rebuild — a future addition.
+# Note: the official Qt binaries ship QtWebEngine without the proprietary
+# H.264/AAC codecs, so this build cannot send MP4 videos (WhatsApp rejects them).
+# Photos, WebM/VP8/VP9 videos, messaging and screen share work; voice calls (Opus)
+# are unaffected. Qt links FFmpeg statically, so enabling H.264 needs a separate
+# multi-hour QtWebEngine rebuild — a possible future addition.
 name: windows
 
 on:
   push:
-    branches: [main, rewrite, feature/windows-support]
+    branches: [main]
     tags: ['v*.*.*']
   workflow_dispatch:
 

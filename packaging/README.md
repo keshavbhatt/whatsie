@@ -47,11 +47,13 @@ not build Windows on developer machines.
 - **Autostart:** a per-user registry `Run` entry (`src/platform/windows/`), the Windows
   counterpart to the Linux XDG autostart file.
 
-Known limitation: the official QtWebEngine binaries omit the proprietary H.264/AAC codecs,
-so **voice/video calls do not work** on this build (messaging, media and screen share do).
-A codec-enabled WebEngine would require a separate multi-hour rebuild — a future addition.
-Code signing (to avoid the SmartScreen "unknown publisher" prompt) is likewise a later
-step; the workflow can gain a secret-gated signing stage without other changes.
+Known limitation: the official QtWebEngine binaries omit the proprietary **H.264/AAC**
+codecs, so this build **cannot send MP4 videos** (WhatsApp rejects them as unsupported).
+Photos, WebM/VP8/VP9 videos, messaging and screen share all work, and voice calls (Opus)
+are unaffected. Qt links FFmpeg statically — there is no drop-in codec pack — so enabling
+H.264 needs a separate multi-hour QtWebEngine rebuild, a possible future addition. Code
+signing (to avoid the SmartScreen "unknown publisher" prompt) is likewise a later step;
+the workflow can gain a secret-gated signing stage without other changes.
 
 ## Flatpak (later)
 
