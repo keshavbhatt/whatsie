@@ -2,7 +2,9 @@
 
 #include <QWidget>
 
+class QLabel;
 class QShortcut;
+class QTimer;
 class QWebEnginePage;
 class QWebEngineView;
 
@@ -26,13 +28,19 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     class Page;
     void exitFullScreen();
+    void showFullScreenHint();
+    void hideFullScreenHint();
+    void positionFullScreenHint();
     QWebEngineView* m_view = nullptr;
     QShortcut* m_exitFullScreen = nullptr;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
+    QLabel* m_fullScreenHint = nullptr;
+    QTimer* m_fullScreenHintTimer = nullptr;
 };
 
 } // namespace whatsie::web
