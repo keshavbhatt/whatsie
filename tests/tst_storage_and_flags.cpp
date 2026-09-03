@@ -66,12 +66,13 @@ private Q_SLOTS:
         QVERIFY(useSoftwareGpu(HardwareAcceleration::Off, false)); // Off always software
         QVERIFY(!useSoftwareGpu(HardwareAcceleration::Auto, false));
         QVERIFY(useSoftwareGpu(HardwareAcceleration::Auto, true)); // auto-disabled -> software
-        // Auto + auto-disabled produces the SwiftShader software path.
+        // Auto + auto-disabled fully disables the GPU (ADR-032; --disable-gpu,
+        // not SwiftShader, is what avoids the Wayland screen-capture EGL hang).
         const QStringList fallback = chromiumFlags(HardwareAcceleration::Auto, true);
-        QVERIFY(fallback.contains(u"--use-angle=swiftshader"_s));
-        QVERIFY(fallback.contains(u"--enable-unsafe-swiftshader"_s));
+        QVERIFY(fallback.contains(u"--disable-gpu"_s));
+        QVERIFY(!fallback.contains(u"--use-angle=swiftshader"_s));
         // Auto + not-disabled keeps the GPU on (no software flags).
-        QVERIFY(!chromiumFlags(HardwareAcceleration::Auto, false).contains(u"--use-angle=swiftshader"_s));
+        QVERIFY(!chromiumFlags(HardwareAcceleration::Auto, false).contains(u"--disable-gpu"_s));
     }
 
     void settingChangeResetsGpuFallback()
@@ -94,12 +95,11 @@ private Q_SLOTS:
         QVERIFY(!autoFlags.contains(u"--ignore-gpu-blocklist"_s));
         QVERIFY(autoFlags.contains(u"--disable-extensions"_s));
         QVERIFY(chromiumFlags(HardwareAcceleration::On).contains(u"--ignore-gpu-blocklist"_s));
-        // GPU-off uses ANGLE→SwiftShader (software) so WhatsApp calls keep a
-        // WebGL context rather than a blank video (ADR-032).
+        // GPU-off fully disables the GPU process (ADR-032) — the only thing that
+        // avoids the Wayland screen-capture EGL_BAD_DISPLAY hang.
         const QStringList off = chromiumFlags(HardwareAcceleration::Off);
-        QVERIFY(off.contains(u"--use-angle=swiftshader"_s));
-        QVERIFY(off.contains(u"--enable-unsafe-swiftshader"_s));
-        QVERIFY(!chromiumFlags(HardwareAcceleration::On).contains(u"--use-angle=swiftshader"_s));
+        QVERIFY(off.contains(u"--disable-gpu"_s));
+        QVERIFY(!chromiumFlags(HardwareAcceleration::On).contains(u"--disable-gpu"_s));
         QVERIFY(autoFlags.join(u' ').contains(u"--enable-features=SharedArrayBuffer"_s));
 #ifdef Q_OS_LINUX
         QVERIFY(autoFlags.join(u' ').contains(u"WebRTCPipeWireCapturer"_s));

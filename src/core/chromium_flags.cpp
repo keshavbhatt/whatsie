@@ -54,13 +54,16 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
 #endif
     flags << u"--enable-features="_s + features.join(u',');
     if (useSoftwareGpu(acceleration, gpuAutoDisabled)) {
-        // Software rendering via ANGLE→SwiftShader: the GPU process still runs
-        // but is backed by a pure-software rasterizer, so it never touches the
-        // (possibly broken) vendor driver — yet WebGL stays available, so
-        // WhatsApp calls render instead of showing a blank remote video. A bare
-        // --disable-gpu is stable but kills WebGL, blanking call video; this
-        // keeps both. Verified via CDP: webgl:true, renderer software. ADR-032.
-        flags << u"--use-gl=angle"_s << u"--use-angle=swiftshader"_s << u"--enable-unsafe-swiftshader"_s;
+        // Fully disable the GPU process. SwiftShader (software compositing) was
+        // tried first to keep WebGL, but it still spins up a GPU process that
+        // touches the vendor EGL driver for the Wayland screen-capture dmabuf
+        // import — which floods EGL_BAD_DISPLAY and hangs the app when a screen
+        // share is stopped (owner-reproduced on KDE/Wayland; SwiftShader did NOT
+        // help, only --disable-gpu did). Removing the GPU process entirely avoids
+        // the vendor driver; WhatsApp calls still render (their remote video is a
+        // <video> element fed by WebRTC, not WebGL — verified on a real call).
+        // ADR-032.
+        flags << u"--disable-gpu"_s;
     } else if (acceleration == HardwareAcceleration::On) {
         flags << u"--ignore-gpu-blocklist"_s;
     }
