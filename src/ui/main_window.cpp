@@ -52,6 +52,14 @@ namespace whatsie::ui {
 namespace {
 constexpr QSize kDefaultSize(1100, 720);
 constexpr QSize kBaseMinimumSize(520, 440);
+
+// WhatsApp Web's own startup/loading background. The web page is painted with
+// this before its content renders, so the first paint matches the loading
+// screen and there is no visible flash from the native chrome colour.
+QColor whatsappPageBackground(bool dark)
+{
+    return dark ? QColor(0x11, 0x1B, 0x21) : QColor(0xF0, 0xF2, 0xF5);
+}
 } // namespace
 
 MainWindow::MainWindow(core::Settings& settings, core::ThemeService& theme, QWidget* parent)
@@ -97,9 +105,9 @@ void MainWindow::setupUi()
     m_stack->addWidget(m_webView);    // index 0
     m_stack->addWidget(m_lockScreen); // index 1
     setCentralWidget(m_stack);
-    m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
+    m_webView->page()->setBackgroundColor(whatsappPageBackground(m_theme.isDark()));
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
-        m_webView->page()->setBackgroundColor(m_theme.palette().color(QPalette::Window));
+        m_webView->page()->setBackgroundColor(whatsappPageBackground(m_theme.isDark()));
     });
 
     m_notifications = new NotificationHub(m_settings, *m_dnd, *m_tray, *m_webView, this);
