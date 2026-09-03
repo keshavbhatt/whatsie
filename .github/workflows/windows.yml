@@ -66,12 +66,17 @@ jobs:
         shell: pwsh
         run: |
           # windeployqt on recent Qt only stages vc_redist.exe (which a portable
-          # zip cannot run), so copy the CRT DLLs next to the exe ourselves.
+          # zip cannot run), so copy the CRT DLLs next to the exe ourselves. The
+          # Redist tree is versioned independently of the compiler toolset, so
+          # pick the newest Redist version folder that actually exists.
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           $vs = & $vswhere -latest -property installationPath
-          $ver = Get-Content "$vs\VC\Auxiliary\Build\Microsoft.VCToolsVersion.default.txt"
-          $crt = Get-ChildItem "$vs\VC\Redist\MSVC\$($ver.Trim())\x64" -Directory |
+          $redist = Join-Path $vs 'VC\Redist\MSVC'
+          $verDir = Get-ChildItem $redist -Directory |
+                    Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+          $crt = Get-ChildItem (Join-Path $verDir.FullName 'x64') -Directory |
                  Where-Object { $_.Name -like 'Microsoft.VC*.CRT' } | Select-Object -First 1
+          if (-not $crt) { throw "MSVC CRT redist folder not found under $redist" }
           Write-Host "Copying CRT from $($crt.FullName)"
           Copy-Item "$($crt.FullName)\*.dll" build\Release\ -Force
           Remove-Item build\Release\vc_redist.x64.exe -ErrorAction SilentlyContinue
