@@ -29,6 +29,10 @@ starts fast and stays light.
 
 ## Screenshots
 
+<p align="center">
+  <img src="screenshots/00-hero.png" alt="WhatsApp Web running in the Whatsie window" width="100%">
+</p>
+
 <table>
   <tr>
     <td width="50%"><img src="screenshots/01-lock.png" alt="Passcode lock screen"></td>
