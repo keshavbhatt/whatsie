@@ -20,3 +20,4 @@ JavaScript injected into WhatsApp Web. Rules:
 | `theme-control.js` | DocumentCreation (bundled) | A1 (page-level theme, ADR-026) |
 | `nav-settings.js` | DocumentCreation (bundled) | A11 (Settings button in the nav rail, ADR-028) |
 | `storage-persist.js` | DocumentCreation (bundled) | S1 |
+| `chat-list-collapse.js` | DocumentCreation (bundled) | nav-rail toggle to collapse the chat list to an avatar strip |

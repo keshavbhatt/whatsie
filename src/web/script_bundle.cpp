@@ -42,6 +42,7 @@ QStringList ScriptBundle::bootstrapResources()
         u":/scripts/connection-watchdog.js"_s, u":/scripts/sw-recovery.js"_s,
         u":/scripts/privacy-blur.js"_s,        u":/scripts/nav-settings.js"_s,
         u":/scripts/linked-device-name.js"_s, u":/scripts/file-drop.js"_s,
+        u":/scripts/chat-list-collapse.js"_s,
     };
 }
 
