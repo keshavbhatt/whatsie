@@ -42,6 +42,9 @@ constexpr bool kDefaultSpellCheckEnabled = true;
 constexpr bool kDefaultLockOnStart = false;
 constexpr bool kDefaultLockOnHide = false;
 constexpr int kDefaultLockIdleMinutes = 0;
+// Upper bound (24h) guards the idle-timer arithmetic (minutes * 60 * 1000) in
+// the UI against int overflow from a corrupted or hand-edited stored value.
+constexpr int kMaxLockIdleMinutes = 1440;
 constexpr ProxyMode kDefaultProxyMode = ProxyMode::System;
 constexpr ProxyType kDefaultProxyType = ProxyType::Http;
 constexpr int kDefaultProxyPort = 8080;
@@ -638,12 +641,13 @@ void Settings::setLockOnHide(bool enabled)
 
 int Settings::lockIdleMinutes() const
 {
-    return std::max(0, m_store->value(keys::kLockIdleMinutes, kDefaultLockIdleMinutes).toInt());
+    return std::clamp(m_store->value(keys::kLockIdleMinutes, kDefaultLockIdleMinutes).toInt(), 0,
+                      kMaxLockIdleMinutes);
 }
 
 void Settings::setLockIdleMinutes(int minutes)
 {
-    const int clamped = std::max(0, minutes);
+    const int clamped = std::clamp(minutes, 0, kMaxLockIdleMinutes);
     if (clamped == lockIdleMinutes()) {
         return;
     }
@@ -718,10 +722,20 @@ void Settings::sync()
 
 void Settings::resetToDefaults()
 {
+    // Preserve the whole screen-lock configuration, not just the passcode:
+    // clearing the triggers while keeping the passcode leaves an inconsistent
+    // state (a passcode the user believes was wiped, or auto-lock silently
+    // switched off). Restore Defaults resets appearance/behaviour, not security.
     const PasscodeRecord passcode = passcodeRecord();
+    const bool lockOnStartWas = lockOnStart();
+    const bool lockOnHideWas = lockOnHide();
+    const int lockIdleWas = lockIdleMinutes();
     m_store->clear();
     if (passcode.isValid()) {
         setPasscode(passcode);
+        setLockOnStart(lockOnStartWas);
+        setLockOnHide(lockOnHideWas);
+        setLockIdleMinutes(lockIdleWas);
     }
     m_store->sync();
 }

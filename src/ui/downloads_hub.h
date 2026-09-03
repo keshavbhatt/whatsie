@@ -37,6 +37,10 @@ public:
     void showWindow();
     /// Close the downloads window if open (used when locking, FEATURES P1).
     void hideWindow();
+    /// While suppressed the window never opens (and any open one is closed), so a
+    /// download starting while the app is locked cannot expose filenames over the
+    /// lock screen (FEATURES P1).
+    void setSuppressed(bool suppressed);
     [[nodiscard]] core::DownloadModel& model() { return *m_model; }
 
 private:
@@ -50,6 +54,7 @@ private:
     std::unique_ptr<web::DownloadController> m_controller;
     QPointer<DownloadsDialog> m_dialog;
     QHash<quint64, quint64> m_notificationToDownload;
+    bool m_suppressed = false;
 };
 
 } // namespace whatsie::ui

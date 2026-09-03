@@ -1,5 +1,7 @@
+#include "core/app_lock.h"
 #include "core/settings/settings.h"
 
+#include <QSettings>
 #include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
@@ -144,6 +146,38 @@ private Q_SLOTS:
         QCOMPARE(reloaded.theme(), Theme::System);
         QCOMPARE(reloaded.closeAction(), CloseAction::MinimizeToTray);
         QCOMPARE(reloaded.zoomFactor(), 0.25); // toDouble() → 0 → clamped to min
+    }
+
+    void lockIdleMinutesClampsHugeStoredValue()
+    {
+        // A corrupted/hand-edited value must not overflow minutes * 60 * 1000.
+        const QString path = m_settings->fileName();
+        m_settings.reset();
+        {
+            QSettings raw(path, QSettings::IniFormat);
+            raw.setValue(u"lock/idleMinutes"_s, 999999999);
+        }
+        Settings reloaded(path);
+        QVERIFY(reloaded.lockIdleMinutes() >= 0);
+        QVERIFY(reloaded.lockIdleMinutes() <= 1440);
+    }
+
+    void resetToDefaultsKeepsLockConfiguration()
+    {
+        using whatsie::core::makePasscode;
+        m_settings->setPasscode(makePasscode(u"1234"_s, 1000));
+        m_settings->setLockOnStart(true);
+        m_settings->setLockIdleMinutes(15);
+        m_settings->setZoomFactor(2.0);
+
+        m_settings->resetToDefaults();
+
+        // Security config survives; everything else reverts.
+        QVERIFY(m_settings->hasPasscode());
+        QVERIFY(whatsie::core::verifyPasscode(u"1234"_s, m_settings->passcodeRecord()));
+        QCOMPARE(m_settings->lockOnStart(), true);
+        QCOMPARE(m_settings->lockIdleMinutes(), 15);
+        QCOMPARE(m_settings->zoomFactor(), 1.0);
     }
 
 private:

@@ -461,9 +461,15 @@ void MainWindow::requestLock()
 
 void MainWindow::lock()
 {
-    if (m_locked || !m_settings.hasPasscode()) {
+    if (!m_settings.hasPasscode()) {
         return;
     }
+    if (m_locked && !m_unlocking) {
+        return; // already fully locked
+    }
+    // If an unlock animation is mid-flight, cancel it so we stay locked — see the
+    // m_unlocking guard in finalizeUnlock().
+    m_unlocking = false;
     m_locked = true;
     m_failedAttempts = 0;
     m_lockScreen->reset();
@@ -473,8 +479,18 @@ void MainWindow::lock()
     if (m_settingsDialog) {
         m_settingsDialog->close();
     }
-    m_downloads->hideWindow();
+    m_downloads->setSuppressed(true);
     m_webView->closePopups();
+    // Close any modal dialog (About, New chat, proxy prompt, …) sitting above the
+    // lock screen; an idle lock can fire inside its nested event loop and would
+    // otherwise leave it on top, grabbing input, with the passcode field
+    // unreachable and the dialog still operable "while locked".
+    while (QWidget* modal = QApplication::activeModalWidget()) {
+        modal->close();
+        if (QApplication::activeModalWidget() == modal) {
+            break; // a modal that refuses to close — do not spin
+        }
+    }
     m_idleTimer->stop();
     qCInfo(lcUi) << "app locked";
 }
@@ -492,8 +508,8 @@ void MainWindow::unlock()
 
 void MainWindow::finalizeUnlock()
 {
-    if (!m_locked) {
-        return;
+    if (!m_unlocking) {
+        return; // the unlock was cancelled (e.g. re-locked mid-animation)
     }
     m_locked = false;
     m_unlocking = false;
@@ -502,6 +518,7 @@ void MainWindow::finalizeUnlock()
     m_throttleTimer->stop();
     m_stack->setCurrentWidget(m_webView);
     m_notifications->service().setLockSuppressed(false);
+    m_downloads->setSuppressed(false);
     updateIdleTimer();
     qCInfo(lcUi) << "app unlocked";
 }

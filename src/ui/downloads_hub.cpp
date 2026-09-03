@@ -53,6 +53,9 @@ DownloadsHub::~DownloadsHub() = default;
 
 void DownloadsHub::showWindow()
 {
+    if (m_suppressed) {
+        return; // locked: never surface the window (filenames) over the lock screen
+    }
     if (!m_dialog) {
         m_dialog = new DownloadsDialog(*m_model, m_dialogParent);
         m_dialog->setAttribute(Qt::WA_DeleteOnClose);
@@ -71,6 +74,14 @@ void DownloadsHub::hideWindow()
 {
     if (m_dialog) {
         m_dialog->close();
+    }
+}
+
+void DownloadsHub::setSuppressed(bool suppressed)
+{
+    m_suppressed = suppressed;
+    if (suppressed) {
+        hideWindow();
     }
 }
 
