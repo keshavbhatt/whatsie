@@ -1,7 +1,7 @@
 # ui: QtWidgets layer. May use everything. Nothing depends on it except app/.
 # No .ui files — widgets are built in code (see CODING_STANDARDS.md §5).
 
-find_package(Qt6 6.11 REQUIRED COMPONENTS Concurrent)
+find_package(Qt6 ${WHATSIE_QT_MIN_VERSION} REQUIRED COMPONENTS Concurrent)
 
 qt_add_library(whatsie_ui STATIC
     about_dialog.cpp

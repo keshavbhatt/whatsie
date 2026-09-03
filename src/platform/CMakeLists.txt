@@ -22,7 +22,7 @@ target_link_libraries(whatsie_platform
 )
 
 if(LINUX)
-    find_package(Qt6 6.11 REQUIRED COMPONENTS DBus)
+    find_package(Qt6 ${WHATSIE_QT_MIN_VERSION} REQUIRED COMPONENTS DBus)
     target_sources(whatsie_platform PRIVATE
         linux/autostart_xdg.cpp
         linux/crash_handler_posix.cpp
