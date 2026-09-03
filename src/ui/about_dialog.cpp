@@ -98,9 +98,11 @@ void AboutDialog::setupUi()
     actions->addWidget(linkButton(tr("More Applications"), kMoreAppsUrl));
     actions->addWidget(linkButton(tr("Source Code"), kSourceUrl));
 
+    // A subtle, theme-neutral divider. A Sunken QFrame::HLine derives its light
+    // edge from the palette and reads far too bright on the dark theme.
     auto* separator = new QFrame(m_content);
-    separator->setFrameShape(QFrame::HLine);
-    separator->setFrameShadow(QFrame::Sunken);
+    separator->setFixedHeight(1);
+    separator->setStyleSheet(u"background-color: rgba(128, 128, 128, 0.35);"_s);
 
     m_debugToggle = new QPushButton(tr("Show Debug Info"), m_content);
     m_debugToggle->setCheckable(true);
