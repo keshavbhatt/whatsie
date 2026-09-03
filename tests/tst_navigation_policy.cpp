@@ -39,8 +39,11 @@ private Q_SLOTS:
         QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://example.com/x"_s)));
         QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://notadobe.com.evil.example/x"_s)));
         QVERIFY(!isPdfIntegrationUrl(QUrl(u"https://web.whatsapp.com/x"_s)));
-        // and shouldOpenExternally now defers to it
-        QVERIFY(!shouldOpenExternally(QUrl(u"https://acrobat.adobe.com/waintegration/index.html"_s)));
+        // The PDF popup keeps these in-app via its own isPdfIntegrationUrl guard
+        // (checked before shouldOpenExternally). shouldOpenExternally itself must
+        // still return true so an Adobe link clicked in a chat opens in the
+        // browser instead of navigating the whole WhatsApp view away.
+        QVERIFY(shouldOpenExternally(QUrl(u"https://acrobat.adobe.com/waintegration/index.html"_s)));
     }
 
     void normalizesPhones()

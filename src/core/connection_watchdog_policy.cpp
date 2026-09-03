@@ -31,11 +31,15 @@ void ConnectionWatchdogPolicy::networkReturned(ms now)
     if (m_connected) {
         return;
     }
-    // Give the page a fresh chance: reset the reload budget and grace so a
-    // reload fires promptly.
-    m_reloads = 0;
-    m_lastReload = ms{-1};
-    m_downSince = now - m_grace; // grace already elapsed → reload on next check
+    // The OS says the link is back: make the page eligible to reload now by
+    // treating the grace as already elapsed, and — if the reload cap was hit —
+    // grant exactly one more attempt. The cooldown (m_lastReload) is deliberately
+    // kept, so a connection that flaps Online repeatedly cannot reload on every
+    // edge (a reload storm); shouldReload still enforces one reload per cooldown.
+    m_downSince = now - m_grace;
+    if (m_reloads >= m_maxReloads) {
+        m_reloads = m_maxReloads - 1;
+    }
 }
 
 bool ConnectionWatchdogPolicy::shouldReload(ms now) const

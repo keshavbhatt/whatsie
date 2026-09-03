@@ -37,8 +37,18 @@
         function Patched(url, protocols) {
             var ws = protocols === undefined ? new Native(url) : new Native(url, protocols);
             if (isWhatsApp(url)) {
-                ws.addEventListener('open', function () { openCount++; report(true); });
-                var drop = function () { openCount = Math.max(0, openCount - 1); if (openCount === 0) report(false); };
+                // A failing socket fires both 'error' and 'close'; count each
+                // socket's open once and release it once, so one blip does not
+                // over-decrement and falsely report the whole link down.
+                var counted = false;
+                var settled = false;
+                ws.addEventListener('open', function () { counted = true; openCount++; report(true); });
+                var drop = function () {
+                    if (settled || !counted) { return; }
+                    settled = true;
+                    openCount = Math.max(0, openCount - 1);
+                    if (openCount === 0) { report(false); }
+                };
                 ws.addEventListener('close', drop);
                 ws.addEventListener('error', drop);
             }

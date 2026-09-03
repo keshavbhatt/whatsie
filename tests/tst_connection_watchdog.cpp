@@ -64,6 +64,21 @@ private Q_SLOTS:
         p.networkReturned(10s);
         QVERIFY(!p.shouldReload(1h));
     }
+
+    void flappingNetworkReturnRespectsCooldown()
+    {
+        // A link that reports Online repeatedly must not reload on every edge —
+        // the cooldown bounds it to one reload per cooldown window.
+        ConnectionWatchdogPolicy p(20s, 3, 15s);
+        p.setConnected(false, 0ms);
+        p.networkReturned(20s);
+        QVERIFY(p.shouldReload(20s));
+        p.noteReload(20s);
+        p.networkReturned(22s);        // flap Online again, 2s later
+        QVERIFY(!p.shouldReload(22s));  // still within the 15s cooldown
+        p.networkReturned(40s);        // flap Online after the cooldown
+        QVERIFY(p.shouldReload(40s));   // now eligible again
+    }
 };
 
 QTEST_GUILESS_MAIN(TestConnectionWatchdog)

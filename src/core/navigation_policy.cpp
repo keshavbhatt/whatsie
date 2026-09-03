@@ -46,7 +46,7 @@ bool isWhatsAppWebUrl(const QUrl& url)
 
 bool shouldOpenExternally(const QUrl& url)
 {
-    return isHttp(url) && !isWhatsAppWebUrl(url) && !isPdfIntegrationUrl(url);
+    return isHttp(url) && !isWhatsAppWebUrl(url);
 }
 
 bool isPdfIntegrationUrl(const QUrl& url)
