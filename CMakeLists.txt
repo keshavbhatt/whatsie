@@ -31,11 +31,14 @@ include(Warnings)
 include(Version)
 
 # ---------------------------------------------------------------------------
-# Qt 6.11 — the version shipped by the kde-qt6-core24-sdk snap and the
-# Flathub KDE runtime, i.e. what every distributed build actually runs on.
-# See scripts/dev-build.sh.
+# Qt version. Linux builds and runs on 6.11 — the version shipped by the
+# kde-qt6-core24-sdk snap and the Flathub KDE runtime, i.e. what every
+# distributed Linux build actually runs on (see scripts/dev-build.sh). The
+# Windows build bundles its own Qt and pins 6.10 (the newest Qt whose Windows
+# SDK layout aqtinstall can install), so its CI overrides this floor.
 # ---------------------------------------------------------------------------
-find_package(Qt6 6.11 REQUIRED COMPONENTS
+set(WHATSIE_QT_MIN_VERSION "6.11" CACHE STRING "Minimum required Qt6 version")
+find_package(Qt6 ${WHATSIE_QT_MIN_VERSION} REQUIRED COMPONENTS
     Core
     Gui
     Widgets
