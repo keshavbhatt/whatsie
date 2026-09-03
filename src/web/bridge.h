@@ -23,11 +23,14 @@ public Q_SLOTS:
     void connectionChanged(bool up);
     /// The injected nav-rail button was clicked (FEATURES A11).
     void openSettings();
+    /// The custom error page's "Try again" was clicked — reload WhatsApp in-app.
+    void retry();
 
 Q_SIGNALS:
     void scriptFailure(const QString& name, const QString& message);
     void connectionStateChanged(bool up);
     void settingsRequested();
+    void retryRequested();
 };
 
 } // namespace whatsie::web

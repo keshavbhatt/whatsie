@@ -9,6 +9,8 @@
 #include <QWebEnginePermission>
 #include <QWebEngineView>
 
+class QWebEngineLoadingInfo;
+
 namespace whatsie::core {
 class Settings;
 class ThemeService;
@@ -78,6 +80,7 @@ private:
     void handleTitleChanged(const QString& title);
     void handleRenderProcessTerminated(QWebEnginePage::RenderProcessTerminationStatus status, int exitCode);
     void handleConnectionChanged(bool up);
+    void showLoadError(const QWebEngineLoadingInfo& info);
     void checkWatchdog();
     void applyBlurLive();
     void applyThemeLive();

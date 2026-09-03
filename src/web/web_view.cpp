@@ -6,6 +6,7 @@
 #include "core/zoom_policy.h"
 #include "web/bridge.h"
 #include "web/clipboard_fix.h"
+#include "web/error_page.h"
 #include "web/file_drop.h"
 #include "web/logging.h"
 #include "web/permission_controller.h"
@@ -27,11 +28,13 @@
 #include <QMenu>
 #include <QMimeData>
 #include <QNetworkInformation>
+#include <QStyleHints>
 #include <QTimer>
 #include <QUrl>
 #include <QWebChannel>
 #include <QWebEngineContextMenuRequest>
 #include <QWebEngineFullScreenRequest>
+#include <QWebEngineLoadingInfo>
 #include <QWebEngineScript>
 #include <QWebEngineScriptCollection>
 #include <QWebEngineSettings>
@@ -84,6 +87,12 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
             applyThemeLive();
         }
     });
+    // Replace Chromium's stock error page (disabled in the profile) with our own.
+    connect(m_page, &QWebEnginePage::loadingChanged, this, [this](const QWebEngineLoadingInfo& info) {
+        if (info.status() == QWebEngineLoadingInfo::LoadFailedStatus) {
+            showLoadError(info);
+        }
+    });
 
     // Connection watchdog (FEATURES S13): the injected script reports up/down;
     // a timer drives the reload decision while down.
@@ -92,6 +101,13 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     connect(m_watchdogTimer, &QTimer::timeout, this, &WebView::checkWatchdog);
     connect(&m_profile->bridge(), &Bridge::connectionStateChanged, this, &WebView::handleConnectionChanged);
     connect(&m_profile->bridge(), &Bridge::settingsRequested, this, &WebView::settingsRequested);
+    // Reload WhatsApp in-app when the custom error page's "Try again" is clicked.
+    // Going through C++ (not a page navigation) guarantees it never leaks to the
+    // system browser, unlike navigating away from the data: error page.
+    connect(&m_profile->bridge(), &Bridge::retryRequested, this, [this] {
+        qCInfo(lcWeb) << "reloading WhatsApp after error-page retry";
+        load(kWhatsAppUrl);
+    });
     connect(m_page, &QWebEnginePage::proxyAuthenticationRequired, this,
             [this](const QUrl&, QAuthenticator* auth, const QString& host) { handleProxyAuth(auth, host); });
 
@@ -188,6 +204,50 @@ void WebView::handleConnectionChanged(bool up)
     } else {
         m_watchdogTimer->start();
     }
+}
+
+void WebView::showLoadError(const QWebEngineLoadingInfo& info)
+{
+    // A superseded/stopped navigation (net::ERR_ABORTED) is not a real failure —
+    // e.g. the user hit Try again, or we reloaded — so leave the page alone.
+    constexpr int kErrAborted = -3;
+    if (info.errorCode() == kErrAborted) {
+        return;
+    }
+    // Only take over genuine http(s) top-frame failures, never our own
+    // data/about error page finishing.
+    const QString scheme = info.url().scheme();
+    if (scheme != u"http"_s && scheme != u"https"_s) {
+        return;
+    }
+
+    using Domain = QWebEngineLoadingInfo::ErrorDomain;
+    QString title;
+    QString detail;
+    switch (info.errorDomain()) {
+    case Domain::ConnectionErrorDomain:
+    case Domain::DnsErrorDomain:
+        title = tr("You appear to be offline");
+        detail = tr("Whatsie couldn't reach WhatsApp. Check your internet connection, then try again.");
+        break;
+    case Domain::CertificateErrorDomain:
+        title = tr("Secure connection failed");
+        detail = tr("The connection to WhatsApp couldn't be verified. Please try again in a moment.");
+        break;
+    case Domain::HttpErrorDomain:
+        title = tr("WhatsApp is unavailable");
+        detail = tr("WhatsApp Web returned an error. Please try again in a moment.");
+        break;
+    default:
+        title = tr("Couldn't load WhatsApp");
+        detail = tr("Something went wrong loading WhatsApp Web. Please try again.");
+        break;
+    }
+
+    qCInfo(lcWeb) << "load failed:" << info.url().toString() << info.errorString()
+                  << "-> showing custom error page";
+    const bool dark = QGuiApplication::styleHints()->colorScheme() == Qt::ColorScheme::Dark;
+    m_page->setHtml(errorPageHtml(dark, title, detail));
 }
 
 void WebView::checkWatchdog()

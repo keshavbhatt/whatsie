@@ -109,6 +109,9 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::DnsPrefetchEnabled, true);
     s->setAttribute(QWebEngineSettings::LocalStorageEnabled, true);
     s->setAttribute(QWebEngineSettings::FocusOnNavigationEnabled, false);
+    // We render our own branded error page on load failure (WebView), so turn
+    // off Chromium's stock one — it looks out of place inside Whatsie.
+    s->setAttribute(QWebEngineSettings::ErrorPageEnabled, false);
     // FEATURES A14: user option, off by default.
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
     // FEATURES P2: keep WebRTC off private interfaces when the user asks.

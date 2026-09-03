@@ -31,4 +31,10 @@ void Bridge::openSettings()
     Q_EMIT settingsRequested();
 }
 
+void Bridge::retry()
+{
+    qCInfo(lcWebJs) << "error page: retry requested";
+    Q_EMIT retryRequested();
+}
+
 } // namespace whatsie::web

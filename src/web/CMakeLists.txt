@@ -6,6 +6,8 @@ qt_add_library(whatsie_web STATIC
     bridge.h
     clipboard_fix.cpp
     clipboard_fix.h
+    error_page.cpp
+    error_page.h
     file_drop.cpp
     file_drop.h
     full_screen_hint.cpp
