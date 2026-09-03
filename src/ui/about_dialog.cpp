@@ -30,7 +30,6 @@ const QString kDonateUrl = u"https://paypal.me/keshavnrj/5"_s;
 const QString kRateUrl = u"snap://whatsie"_s;
 const QString kMoreAppsUrl = u"https://snapcraft.io/publisher/keshavnrj"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
-const QString kAuthorEmail = u"keshavnrj@gmail.com"_s;
 } // namespace
 
 AboutDialog::AboutDialog(const core::Settings& settings, const QString& userAgent, QWidget* parent)
@@ -61,24 +60,10 @@ void AboutDialog::setupUi()
         new QLabel(tr("Version %1").arg(QApplication::applicationVersion()), m_content);
     version->setStyleSheet(u"color: palette(placeholder-text);"_s);
 
-    auto* identity = new QVBoxLayout;
-    identity->setSpacing(2);
-    identity->addStretch();
-    identity->addWidget(name);
-    identity->addWidget(description);
-    identity->addWidget(version);
-    identity->addStretch();
-
-    auto* top = new QHBoxLayout;
-    top->setSpacing(16);
-    top->addWidget(icon, 0, Qt::AlignVCenter);
-    top->addLayout(identity, 1);
-
     auto* author =
-        new QLabel(tr("<b>Designed &amp; Developed by</b> Keshav Bhatt<br>"
-                      "<b>Email</b> <a href=\"mailto:%1\">%1</a> &nbsp;·&nbsp; "
-                      "<b>Website</b> <a href=\"%2\">ktechpit.com</a>")
-                       .arg(kAuthorEmail, kWebsiteUrl),
+        new QLabel(tr("<b>Designed &amp; Developed by:</b> Keshav Bhatt<br>"
+                      "<b>Website:</b> <a href=\"%1\">ktechpit.com</a>")
+                       .arg(kWebsiteUrl),
                    m_content);
     author->setAlignment(Qt::AlignLeft | Qt::AlignVCenter);
     author->setTextFormat(Qt::RichText);
@@ -86,6 +71,21 @@ void AboutDialog::setupUi()
     author->setTextInteractionFlags(Qt::TextBrowserInteraction);
     connect(author, &QLabel::linkActivated, this,
             [](const QString& link) { platform::openUrl(link); });
+
+    auto* identity = new QVBoxLayout;
+    identity->setSpacing(2);
+    identity->addStretch();
+    identity->addWidget(name);
+    identity->addWidget(description);
+    identity->addWidget(version);
+    identity->addSpacing(10);
+    identity->addWidget(author);
+    identity->addStretch();
+
+    auto* top = new QHBoxLayout;
+    top->setSpacing(16);
+    top->addWidget(icon, 0, Qt::AlignTop);
+    top->addLayout(identity, 1);
 
     const auto linkButton = [this](const QString& label, const QString& url) {
         auto* button = new QPushButton(label, m_content);
@@ -135,8 +135,6 @@ void AboutDialog::setupUi()
     content->setContentsMargins(20, 20, 20, 16);
     content->setSpacing(10);
     content->addLayout(top);
-    content->addWidget(author);
-    content->addSpacing(2);
     content->addLayout(actions);
     content->addWidget(separator);
     content->addLayout(debugRow);
@@ -154,11 +152,16 @@ void AboutDialog::toggleDebugInfo()
     const bool show = !m_debugText->isVisible();
     m_debugText->setVisible(show);
     m_debugToggle->setText(show ? tr("Hide Debug Info") : tr("Show Debug Info"));
-    if (show) {
-        adjustSize();
-    } else {
-        resize(width(), minimumSizeHint().height());
+    // Force the layouts to release/claim the panel's space now, then fit the
+    // window height to the result — otherwise hiding leaves the dialog at its
+    // taller size with an empty gap.
+    if (m_content->layout() != nullptr) {
+        m_content->layout()->activate();
     }
+    if (layout() != nullptr) {
+        layout()->activate();
+    }
+    resize(width(), sizeHint().height());
 }
 
 void AboutDialog::showEvent(QShowEvent* event)
