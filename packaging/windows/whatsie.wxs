@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  WiX v5 MSI source for Whatsie.
+
+  Built in CI by the `windows` workflow, which passes:
+    -d Version=<x.y.z>       the release version
+    -d Src=build\Release     the windeployqt output directory to package
+
+  It harvests the whole deployed tree with <Files Include>, installs to
+  "Program Files\Whatsie" per machine, and adds Start Menu + Desktop shortcuts.
+  The UpgradeCode is fixed forever so a newer MSI upgrades an older install in
+  place; do not change it.
+-->
+<Wix xmlns="http://wixtoolset.org/schemas/v4/wxs">
+  <Package Name="Whatsie"
+           Manufacturer="Keshav Bhatt"
+           Version="$(Version)"
+           UpgradeCode="E588B982-EE64-48C3-88AF-B34A8BA93041"
+           Scope="perMachine"
+           Compressed="yes">
+
+    <MajorUpgrade DowngradeErrorMessage="A newer version of Whatsie is already installed." />
+    <MediaTemplate EmbedCab="yes" />
+
+    <!-- Add/Remove Programs icon, taken from the app executable. -->
+    <Icon Id="whatsie.exe" SourceFile="$(Src)\whatsie.exe" />
+    <Property Id="ARPPRODUCTICON" Value="whatsie.exe" />
+    <Property Id="ARPURLINFOABOUT" Value="https://github.com/keshavbhatt/whatsie" />
+
+    <!-- Install location: Program Files\Whatsie. -->
+    <StandardDirectory Id="ProgramFiles64Folder">
+      <Directory Id="INSTALLFOLDER" Name="Whatsie" />
+    </StandardDirectory>
+    <!-- Start Menu folder and the Desktop (standard) folder. -->
+    <StandardDirectory Id="ProgramMenuFolder">
+      <Directory Id="AppShortcutFolder" Name="Whatsie" />
+    </StandardDirectory>
+    <StandardDirectory Id="DesktopFolder" />
+
+    <Feature Id="Main" Title="Whatsie" Level="1">
+      <ComponentGroupRef Id="AppFiles" />
+      <ComponentRef Id="StartMenuShortcut" />
+      <ComponentRef Id="DesktopShortcut" />
+    </Feature>
+
+    <!-- Harvest every file windeployqt produced (exe + all Qt/WebEngine DLLs,
+         resources, translations) so the list never has to be maintained. -->
+    <ComponentGroup Id="AppFiles" Directory="INSTALLFOLDER">
+      <Files Include="$(Src)\**" />
+    </ComponentGroup>
+
+    <!-- Start Menu shortcut. HKLM keypath because the install is per-machine. -->
+    <Component Id="StartMenuShortcut" Directory="AppShortcutFolder" Guid="*">
+      <Shortcut Id="StartMenuWhatsie"
+                Name="Whatsie"
+                Target="[INSTALLFOLDER]whatsie.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RemoveFolder Id="RemoveAppShortcutFolder" Directory="AppShortcutFolder" On="uninstall" />
+      <RegistryValue Root="HKLM" Key="Software\ktechpit\Whatsie" Name="StartMenuShortcut"
+                     Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+    <!-- Desktop shortcut. -->
+    <Component Id="DesktopShortcut" Directory="DesktopFolder" Guid="*">
+      <Shortcut Id="DesktopWhatsie"
+                Name="Whatsie"
+                Target="[INSTALLFOLDER]whatsie.exe"
+                WorkingDirectory="INSTALLFOLDER" />
+      <RegistryValue Root="HKLM" Key="Software\ktechpit\Whatsie" Name="DesktopShortcut"
+                     Type="integer" Value="1" KeyPath="yes" />
+    </Component>
+
+  </Package>
+</Wix>

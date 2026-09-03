@@ -11,6 +11,7 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QDir>
 #include <QGuiApplication>
 #include <QProcess>
 #include <QSettings>
@@ -144,6 +145,14 @@ int main(int argc, char* argv[])
     if (app.shouldExit()) {
         return app.exitCode();
     }
+
+#ifdef Q_OS_WIN
+    // Started from an autostart entry or a shell verb, the process can inherit
+    // C:\Windows\System32 as its working directory; QtWebEngine then resolves its
+    // Chromium DLLs against that path and aborts. Anchor the working directory to
+    // the executable, before the web engine initialises.
+    QDir::setCurrent(QCoreApplication::applicationDirPath());
+#endif
 
     // Record fatal signals so the next run can offer the crash in a bug report,
     // and pick up any report the previous run left behind.

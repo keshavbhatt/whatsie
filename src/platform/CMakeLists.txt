@@ -22,7 +22,7 @@ target_link_libraries(whatsie_platform
 )
 
 if(LINUX)
-    find_package(Qt6 6.11 REQUIRED COMPONENTS DBus)
+    find_package(Qt6 ${WHATSIE_QT_MIN_VERSION} REQUIRED COMPONENTS DBus)
     target_sources(whatsie_platform PRIVATE
         linux/autostart_xdg.cpp
         linux/crash_handler_posix.cpp
@@ -42,4 +42,9 @@ else()
         file_manager_generic.cpp
         gpu_stderr_watch_generic.cpp
     )
+    if(WIN32)
+        target_sources(whatsie_platform PRIVATE windows/autostart_registry.cpp)
+    else()
+        target_sources(whatsie_platform PRIVATE autostart_generic.cpp)
+    endif()
 endif()

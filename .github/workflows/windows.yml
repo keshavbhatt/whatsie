@@ -1,0 +1,133 @@
+# Build Whatsie for Windows (x64, MSVC) in GitHub's CI. Every push to main/rewrite
+# produces a portable zip and an MSI as downloadable artifacts (a compile check
+# plus test builds). Pushing a version tag (v6.0.0) additionally attaches the zip
+# and MSI to the GitHub Release for that tag.
+#
+# Note: the official Qt binaries ship QtWebEngine without the proprietary
+# H.264/AAC codecs, so this build cannot send MP4 videos (WhatsApp rejects them).
+# Photos, WebM/VP8/VP9 videos, messaging and screen share work; voice calls (Opus)
+# are unaffected. Qt links FFmpeg statically, so enabling H.264 needs a separate
+# multi-hour QtWebEngine rebuild — a possible future addition.
+name: windows
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*.*.*']
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-2022
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          # Exact pin. 6.10 is the newest Qt whose Windows SDK repo layout the
+          # released aqtinstall can resolve (6.11+ changed to a per-compiler
+          # layout it does not yet handle — miurahr/aqtinstall#959). The Windows
+          # build bundles this Qt, independent of the Linux 6.11 runtime.
+          version: '6.10.3'
+          arch: win64_msvc2022_64
+          modules: 'qtwebengine qtwebchannel qtpositioning'
+          cache: true
+
+      - name: Determine version
+        id: ver
+        shell: pwsh
+        run: |
+          if ($env:GITHUB_REF -like 'refs/tags/*') {
+            $ver = $env:GITHUB_REF -replace 'refs/tags/v?', ''
+          } else {
+            $cm = Get-Content CMakeLists.txt -Raw
+            if ($cm -match 'project\(\s*whatsie\s+VERSION\s+(\d+\.\d+\.\d+)') { $ver = $Matches[1] }
+            else { $ver = '0.0.0' }
+          }
+          "version=$ver" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+          Write-Host "Whatsie version: $ver"
+
+      - name: Configure
+        run: >
+          cmake -G "Visual Studio 17 2022" -A x64 -B build
+          -DCMAKE_PREFIX_PATH="$env:QT_ROOT_DIR"
+          -DWHATSIE_QT_MIN_VERSION=6.10
+          -DWHATSIE_BUILD_TESTS=OFF
+
+      - name: Build
+        run: cmake --build build --config Release
+
+      - name: Deploy Qt runtime
+        shell: pwsh
+        run: |
+          & "$env:QT_ROOT_DIR\bin\windeployqt.exe" --release build\Release\whatsie.exe
+
+      - name: Bundle the MSVC runtime (app-local)
+        shell: pwsh
+        run: |
+          # windeployqt on recent Qt only stages vc_redist.exe (which a portable
+          # zip cannot run), so copy the CRT DLLs next to the exe ourselves. The
+          # Redist tree is versioned independently of the compiler toolset, so
+          # pick the newest Redist version folder that actually exists.
+          $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
+          $vs = & $vswhere -latest -property installationPath
+          $redist = Join-Path $vs 'VC\Redist\MSVC'
+          # This dir holds numeric version folders plus a non-numeric "v143"
+          # alias; keep only the version folders before sorting.
+          $verDir = Get-ChildItem $redist -Directory |
+                    Where-Object { $_.Name -match '^\d+\.\d+' } |
+                    Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
+          $crt = Get-ChildItem (Join-Path $verDir.FullName 'x64') -Directory |
+                 Where-Object { $_.Name -like 'Microsoft.VC*.CRT' } | Select-Object -First 1
+          if (-not $crt) { throw "MSVC CRT redist folder not found under $redist" }
+          Write-Host "Copying CRT from $($crt.FullName)"
+          Copy-Item "$($crt.FullName)\*.dll" build\Release\ -Force
+          Remove-Item build\Release\vc_redist.x64.exe -ErrorAction SilentlyContinue
+
+      - name: Verify the runtime is complete
+        shell: pwsh
+        run: |
+          $needed = 'whatsie.exe', 'Qt6WebEngineCore.dll', 'QtWebEngineProcess.exe',
+                    'msvcp140.dll', 'vcruntime140.dll', 'vcruntime140_1.dll'
+          $missing = $needed | Where-Object { -not (Test-Path "build\Release\$_") }
+          if ($missing) { throw "Missing from the deployed tree: $($missing -join ', ')" }
+          Write-Host "Runtime looks complete."
+
+      - name: Package portable zip
+        id: zip
+        shell: pwsh
+        run: |
+          $ver = '${{ steps.ver.outputs.version }}'
+          $name = "whatsie-$ver-windows-x64.zip"
+          Compress-Archive -Path build\Release\* -DestinationPath $name -Force
+          "path=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Build MSI installer
+        id: msi
+        shell: pwsh
+        run: |
+          dotnet tool install --global wix --version 5.* | Out-Host
+          $ver = '${{ steps.ver.outputs.version }}'
+          $name = "whatsie-$ver-x64.msi"
+          wix build packaging\windows\whatsie.wxs -arch x64 `
+            -d Version=$ver -d Src="$PWD\build\Release" -o $name
+          if ((Get-Item $name).Length -lt 30MB) { throw "MSI is suspiciously small — harvest likely failed." }
+          "path=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: whatsie-windows-x64
+          path: |
+            ${{ steps.zip.outputs.path }}
+            ${{ steps.msi.outputs.path }}
+          if-no-files-found: error
+
+      - name: Attach to the GitHub Release
+        if: startsWith(github.ref, 'refs/tags/')
+        uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            ${{ steps.zip.outputs.path }}
+            ${{ steps.msi.outputs.path }}

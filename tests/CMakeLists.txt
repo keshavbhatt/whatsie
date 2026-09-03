@@ -1,4 +1,4 @@
-find_package(Qt6 6.11 REQUIRED COMPONENTS Test Qml)
+find_package(Qt6 ${WHATSIE_QT_MIN_VERSION} REQUIRED COMPONENTS Test Qml)
 
 # Environment every test runs with. Offscreen so the suite works headless and
 # in CI; GPU off because WebEngine has nothing to draw to.

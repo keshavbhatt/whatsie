@@ -28,6 +28,15 @@ if(LINUX)
     target_link_options(whatsie PRIVATE -Wl,--allow-shlib-undefined)
 endif()
 
+if(WIN32)
+    # Embed the application icon and version information in the executable.
+    string(REPLACE "." "," WHATSIE_VERSION_RC "${PROJECT_VERSION}")
+    set(WHATSIE_VERSION_RC "${WHATSIE_VERSION_RC},0")
+    configure_file("${CMAKE_SOURCE_DIR}/dist/windows/whatsie.rc.in"
+                   "${CMAKE_CURRENT_BINARY_DIR}/whatsie.rc" @ONLY)
+    target_sources(whatsie PRIVATE "${CMAKE_CURRENT_BINARY_DIR}/whatsie.rc")
+endif()
+
 set_target_properties(whatsie PROPERTIES
     # Export symbols (-rdynamic) so the crash handler's backtrace shows function
     # names instead of bare addresses.
