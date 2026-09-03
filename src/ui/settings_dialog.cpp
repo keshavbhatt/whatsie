@@ -12,6 +12,7 @@
 #include "ui/permission_list.h"
 
 #include <QCheckBox>
+#include <QCloseEvent>
 #include <QAbstractScrollArea>
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
@@ -110,8 +111,18 @@ void SettingsDialog::setupUi()
     layout->addLayout(buttonRow);
     // Tall tabs scroll inside a fixed dialog rather than stretching it off-screen.
     resize(580, 560);
+    const QByteArray geometry = m_settings.settingsDialogGeometry();
+    if (!geometry.isEmpty()) {
+        restoreGeometry(geometry);
+    }
 
     installWheelGuards();
+}
+
+void SettingsDialog::closeEvent(QCloseEvent* event)
+{
+    m_settings.setSettingsDialogGeometry(saveGeometry());
+    QDialog::closeEvent(event);
 }
 
 void SettingsDialog::installWheelGuards()

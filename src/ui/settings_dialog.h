@@ -41,6 +41,7 @@ protected:
     /// Swallows wheel events on unfocused combo/spin/slider controls (redirected
     /// to the enclosing scroll area) so scrolling the page never changes a value.
     bool eventFilter(QObject* watched, QEvent* event) override;
+    void closeEvent(QCloseEvent* event) override;
 
 Q_SIGNALS:
     void testNotificationRequested();

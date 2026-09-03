@@ -38,6 +38,7 @@ private Q_SLOTS:
         QCOMPARE(m_settings->smoothScrolling(), false);
         QVERIFY(m_settings->windowGeometry().isEmpty());
         QVERIFY(m_settings->windowState().isEmpty());
+        QVERIFY(m_settings->settingsDialogGeometry().isEmpty());
     }
 
     void zoomFactorRoundTripAndSignal()
@@ -118,6 +119,7 @@ private Q_SLOTS:
         m_settings->setTheme(Theme::Light);
         m_settings->setCloseAction(CloseAction::Quit);
         m_settings->setWindowGeometry(QByteArrayLiteral("geom"));
+        m_settings->setSettingsDialogGeometry(QByteArrayLiteral("dlg"));
         m_settings.reset();
 
         Settings reloaded(path);
@@ -125,6 +127,7 @@ private Q_SLOTS:
         QCOMPARE(reloaded.theme(), Theme::Light);
         QCOMPARE(reloaded.closeAction(), CloseAction::Quit);
         QCOMPARE(reloaded.windowGeometry(), QByteArrayLiteral("geom"));
+        QCOMPARE(reloaded.settingsDialogGeometry(), QByteArrayLiteral("dlg"));
     }
 
     void garbageValuesFallBackToDefaults()

@@ -141,6 +141,16 @@ void Settings::setWindowGeometry(const QByteArray& geometry)
     m_store->setValue(keys::kWindowGeometry, geometry);
 }
 
+QByteArray Settings::settingsDialogGeometry() const
+{
+    return m_store->value(keys::kSettingsDialogGeometry).toByteArray();
+}
+
+void Settings::setSettingsDialogGeometry(const QByteArray& geometry)
+{
+    m_store->setValue(keys::kSettingsDialogGeometry, geometry);
+}
+
 QByteArray Settings::windowState() const
 {
     return m_store->value(keys::kWindowState).toByteArray();

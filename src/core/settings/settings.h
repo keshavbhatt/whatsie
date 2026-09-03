@@ -78,6 +78,8 @@ public:
     void setWindowGeometry(const QByteArray& geometry);
     [[nodiscard]] QByteArray windowState() const;
     void setWindowState(const QByteArray& state);
+    [[nodiscard]] QByteArray settingsDialogGeometry() const;
+    void setSettingsDialogGeometry(const QByteArray& geometry);
     [[nodiscard]] CloseAction closeAction() const;
     void setCloseAction(CloseAction action);
     [[nodiscard]] bool startMinimized() const;

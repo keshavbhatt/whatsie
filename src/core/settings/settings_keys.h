@@ -9,6 +9,7 @@ namespace whatsie::core::keys {
 // window/
 inline constexpr QLatin1StringView kWindowGeometry{"window/geometry"};
 inline constexpr QLatin1StringView kWindowState{"window/state"};
+inline constexpr QLatin1StringView kSettingsDialogGeometry{"window/settingsDialogGeometry"};
 inline constexpr QLatin1StringView kCloseAction{"window/closeAction"};
 inline constexpr QLatin1StringView kStartMinimized{"window/startMinimized"};
 
