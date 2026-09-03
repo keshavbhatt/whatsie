@@ -72,7 +72,10 @@ jobs:
           $vswhere = "${env:ProgramFiles(x86)}\Microsoft Visual Studio\Installer\vswhere.exe"
           $vs = & $vswhere -latest -property installationPath
           $redist = Join-Path $vs 'VC\Redist\MSVC'
+          # This dir holds numeric version folders plus a non-numeric "v143"
+          # alias; keep only the version folders before sorting.
           $verDir = Get-ChildItem $redist -Directory |
+                    Where-Object { $_.Name -match '^\d+\.\d+' } |
                     Sort-Object { [version]$_.Name } -Descending | Select-Object -First 1
           $crt = Get-ChildItem (Join-Path $verDir.FullName 'x64') -Directory |
                  Where-Object { $_.Name -like 'Microsoft.VC*.CRT' } | Select-Object -First 1
