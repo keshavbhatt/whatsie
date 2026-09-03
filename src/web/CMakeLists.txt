@@ -8,6 +8,8 @@ qt_add_library(whatsie_web STATIC
     clipboard_fix.h
     file_drop.cpp
     file_drop.h
+    full_screen_hint.cpp
+    full_screen_hint.h
     download_controller.cpp
     download_controller.h
     logging.cpp

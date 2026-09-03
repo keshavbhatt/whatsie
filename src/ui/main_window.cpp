@@ -21,6 +21,7 @@
 #include "ui/shortcuts_dialog.h"
 #include "ui/theme_applier.h"
 #include "ui/tray_controller.h"
+#include "web/full_screen_hint.h"
 #include "web/permission_controller.h"
 #include "web/web_profile.h"
 #include "web/web_view.h"
@@ -105,6 +106,7 @@ void MainWindow::setupUi()
     m_stack->addWidget(m_webView);    // index 0
     m_stack->addWidget(m_lockScreen); // index 1
     setCentralWidget(m_stack);
+    m_fullScreenHint = new web::FullScreenHint(this);
     m_webView->page()->setBackgroundColor(whatsappPageBackground(m_theme.isDark()));
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this, [this](Qt::ColorScheme) {
         m_webView->page()->setBackgroundColor(whatsappPageBackground(m_theme.isDark()));
@@ -332,6 +334,9 @@ void MainWindow::applyMinimumSize()
 
 void MainWindow::setFullScreenMode(bool on)
 {
+    if (!on) {
+        m_fullScreenHint->hideHint();
+    }
     if (on == isFullScreen()) {
         // Still keep the page and the Esc hatch in sync even if the window is
         // already in the target state (e.g. a page-driven request while there).
@@ -346,6 +351,7 @@ void MainWindow::setFullScreenMode(bool on)
         m_geometryBeforeFullScreen = saveGeometry(); // so quitting from full screen still persists it
         showFullScreen();
         m_exitFullScreen->setEnabled(true);
+        m_fullScreenHint->showHint(tr("Press Esc or F11 to exit full screen"));
     } else {
         // Restore explicitly (setWindowState clearing the flag is unreliable on
         // Wayland) and make sure the page leaves its own HTML full screen too,

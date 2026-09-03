@@ -15,6 +15,7 @@ class Settings;
 class ThemeService;
 } // namespace whatsie::core
 namespace whatsie::web {
+class FullScreenHint;
 class WebView;
 }
 
@@ -100,6 +101,7 @@ private:
     QPointer<SettingsDialog> m_settingsDialog;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
     QByteArray m_geometryBeforeFullScreen;
+    web::FullScreenHint* m_fullScreenHint = nullptr;
     bool m_quitting = false;
 
     // App lock (FEATURES P1)

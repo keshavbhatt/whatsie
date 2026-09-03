@@ -2,23 +2,17 @@
 
 #include "core/navigation_policy.h"
 #include "platform/file_manager.h"
+#include "web/full_screen_hint.h"
 #include "web/logging.h"
 #include "web/web_profile.h"
 
-#include <QGraphicsOpacityEffect>
 #include <QKeyEvent>
-#include <QLabel>
-#include <QPropertyAnimation>
-#include <QResizeEvent>
 #include <QShortcut>
-#include <QTimer>
 #include <QVBoxLayout>
 #include <QWebEngineFullScreenRequest>
 #include <QWebEngineScript>
 #include <QWebEnginePage>
 #include <QWebEngineView>
-
-#include <algorithm>
 
 using namespace Qt::StringLiterals;
 
@@ -84,28 +78,15 @@ PopupWindow::PopupWindow(WebProfile& profile, QWidget* parent)
             m_stateBeforeFullScreen = windowState();
             showFullScreen();
             m_exitFullScreen->setEnabled(true);
-            showFullScreenHint();
+            m_fullScreenHint->showHint(tr("Press Esc to exit full screen"));
         } else {
             exitFullScreen();
         }
     });
 
-    // A Chrome-style transient hint so the user always knows how to get out of a
-    // full-screen video (the web view swallows most keys, so this is easy to miss).
-    m_fullScreenHint = new QLabel(tr("Press Esc to exit full screen"), this);
-    m_fullScreenHint->setObjectName(u"fullScreenHint"_s);
-    m_fullScreenHint->setAttribute(Qt::WA_TransparentForMouseEvents);
-    m_fullScreenHint->setStyleSheet(u"QLabel#fullScreenHint {"
-                                    u"  background-color: rgba(0, 0, 0, 190);"
-                                    u"  color: white;"
-                                    u"  padding: 8px 18px;"
-                                    u"  border-radius: 10px;"
-                                    u"}"_s);
-    m_fullScreenHint->hide();
-    m_fullScreenHintTimer = new QTimer(this);
-    m_fullScreenHintTimer->setSingleShot(true);
-    m_fullScreenHintTimer->setInterval(3500);
-    connect(m_fullScreenHintTimer, &QTimer::timeout, this, &PopupWindow::hideFullScreenHint);
+    // The web view swallows most keys, so the way out of a full-screen video is
+    // easy to miss — hint it, Chrome-style.
+    m_fullScreenHint = new FullScreenHint(this);
     // Esc leaves full screen even while the web view holds keyboard focus (a
     // plain keyPressEvent never reaches us then); only active in full screen so
     // it does not shadow Esc otherwise. FEATURES M3.
@@ -121,64 +102,9 @@ QWebEnginePage* PopupWindow::page() const
     return m_view->page();
 }
 
-void PopupWindow::showFullScreenHint()
-{
-    if (m_fullScreenHint == nullptr) {
-        return;
-    }
-    m_fullScreenHint->setGraphicsEffect(nullptr); // clear any leftover fade
-    positionFullScreenHint();
-    m_fullScreenHint->show();
-    m_fullScreenHint->raise();
-    m_fullScreenHintTimer->start();
-}
-
-void PopupWindow::hideFullScreenHint()
-{
-    if (m_fullScreenHint == nullptr || !m_fullScreenHint->isVisible() ||
-        m_fullScreenHint->graphicsEffect() != nullptr) {
-        return; // hidden already, or a fade is already running
-    }
-    m_fullScreenHintTimer->stop();
-    // The opacity effect is attached only for the fade and dropped afterwards (a
-    // QGraphicsEffect left on a widget can force offscreen rendering that paints
-    // it black on re-expose).
-    auto* effect = new QGraphicsOpacityEffect(m_fullScreenHint);
-    m_fullScreenHint->setGraphicsEffect(effect);
-    auto* fade = new QPropertyAnimation(effect, "opacity", this);
-    fade->setDuration(400);
-    fade->setStartValue(1.0);
-    fade->setEndValue(0.0);
-    fade->setEasingCurve(QEasingCurve::InCubic);
-    connect(fade, &QPropertyAnimation::finished, this, [this, effect] {
-        if (m_fullScreenHint->graphicsEffect() == effect) {
-            m_fullScreenHint->setGraphicsEffect(nullptr);
-        }
-        m_fullScreenHint->hide();
-    });
-    fade->start(QAbstractAnimation::DeleteWhenStopped);
-}
-
-void PopupWindow::positionFullScreenHint()
-{
-    if (m_fullScreenHint == nullptr) {
-        return;
-    }
-    m_fullScreenHint->adjustSize();
-    m_fullScreenHint->move(std::max(0, (width() - m_fullScreenHint->width()) / 2), 28);
-}
-
-void PopupWindow::resizeEvent(QResizeEvent* event)
-{
-    QWidget::resizeEvent(event);
-    if (m_fullScreenHint != nullptr && m_fullScreenHint->isVisible()) {
-        positionFullScreenHint();
-    }
-}
-
 void PopupWindow::exitFullScreen()
 {
-    hideFullScreenHint();
+    m_fullScreenHint->hideHint();
     m_exitFullScreen->setEnabled(false);
     // Explicit restore (clearing the flag via setWindowState is unreliable on
     // Wayland) and sync the page out of HTML full screen.

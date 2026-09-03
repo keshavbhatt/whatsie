@@ -2,14 +2,13 @@
 
 #include <QWidget>
 
-class QLabel;
 class QShortcut;
-class QTimer;
 class QWebEnginePage;
 class QWebEngineView;
 
 namespace whatsie::web {
 
+class FullScreenHint;
 class WebProfile;
 
 /// Hosts window.open() targets that stay on web.whatsapp.com — the call
@@ -28,19 +27,14 @@ public:
 
 protected:
     void keyPressEvent(QKeyEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
 
 private:
     class Page;
     void exitFullScreen();
-    void showFullScreenHint();
-    void hideFullScreenHint();
-    void positionFullScreenHint();
     QWebEngineView* m_view = nullptr;
     QShortcut* m_exitFullScreen = nullptr;
     Qt::WindowStates m_stateBeforeFullScreen = Qt::WindowNoState;
-    QLabel* m_fullScreenHint = nullptr;
-    QTimer* m_fullScreenHintTimer = nullptr;
+    FullScreenHint* m_fullScreenHint = nullptr;
 };
 
 } // namespace whatsie::web
