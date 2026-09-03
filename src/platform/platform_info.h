@@ -11,4 +11,8 @@ namespace whatsie::platform {
 /// True when running inside a snap or flatpak sandbox.
 [[nodiscard]] bool isSandboxed();
 
+/// How this build was packaged/installed: "snap" (with revision), "flatpak",
+/// "AppImage", or "native". Useful in bug reports to reproduce the environment.
+[[nodiscard]] QString packageType();
+
 } // namespace whatsie::platform
