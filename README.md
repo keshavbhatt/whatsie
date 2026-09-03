@@ -1,50 +1,119 @@
-# Whatsie
+<p align="center">
+  <img src="screenshots/banner.png" alt="Whatsie — WhatsApp Web, in a real desktop app" width="100%">
+</p>
 
-A lightweight WhatsApp Web desktop client built with Qt 6 WebEngine — WhatsApp in its
-own window with native desktop notifications, a system-tray unread badge, light/dark
-themes that follow the page, zoom and interface scaling, a real downloads manager, voice,
-video and screen-share calls, spell check, a network proxy, and an optional app lock.
+<h1 align="center">Whatsie</h1>
+
+<p align="center">
+  <b>WhatsApp Web, in a real desktop app.</b><br>
+  Native notifications, a tray unread badge, calls and screen share, a real downloads
+  manager, themes that follow the page, spell check, a proxy, and an optional app lock —
+  lightweight and open source, built with Qt&nbsp;6.
+</p>
+
+<p align="center">
+  <img src="https://img.shields.io/badge/license-MIT-green" alt="MIT license">
+  <img src="https://img.shields.io/badge/Qt-6.11-41cd52?logo=qt&logoColor=white" alt="Qt 6.11">
+  <img src="https://img.shields.io/badge/C%2B%2B-20-00599c" alt="C++20">
+  <img src="https://img.shields.io/badge/platform-Linux-333" alt="Linux">
+</p>
+
+---
+
+## Why Whatsie
+
+WhatsApp Web is great, but a browser tab is a poor home for it. Whatsie gives it a real
+window: it stays in your tray, tells you when a message arrives, opens your downloads where
+you expect them, and gets out of the way. It’s a thin, native shell — **no Electron** — so it
+starts fast and stays light.
+
+## Screenshots
+
+<table>
+  <tr>
+    <td width="50%"><img src="screenshots/01-lock.png" alt="Passcode lock screen"></td>
+    <td width="50%"><img src="screenshots/02-appearance.png" alt="Appearance settings"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/03-privacy.png" alt="Privacy and permission controls"></td>
+    <td width="50%"><img src="screenshots/04-bug-report.png" alt="One-click bug report"></td>
+  </tr>
+  <tr>
+    <td width="50%"><img src="screenshots/05-about.png" alt="About and diagnostics"></td>
+    <td width="50%"></td>
+  </tr>
+</table>
 
 ## Features
 
-- Native notifications with avatars; system-tray icon with unread badge, mute and
-  do-not-disturb.
-- Light / dark / follow-system theming, kept in step with WhatsApp Web.
-- Voice, video and screen-share calls (Wayland via the desktop portal).
-- Downloads window with history; drag-and-drop and paste of attachments.
-- Per-site camera/microphone/location controls; privacy blur; passcode app lock.
-- System-language spell check; network proxy (HTTP / SOCKS5) with authentication.
+**Desktop integration**
+- Native notifications with contact avatars.
+- System-tray icon with an unread badge, mute, and do-not-disturb.
 - Single instance with `--profile` for multiple accounts; autostart at login.
+- `whatsapp:` / `wa.me` links and a `--new-chat` command open straight into a chat.
 
-## Build
+**The web experience, done right**
+- Light / dark / follow-system theming, kept in step with WhatsApp Web.
+- Voice, video and screen-share calls (Wayland via the desktop portal), with a reliable
+  full-screen exit hint.
+- A real downloads window with history; drag-and-drop and paste of attachments.
+- Zoom and interface scaling; optional smooth scrolling.
+- System-language spell check with suggestions.
+
+**Privacy & control**
+- Per-site camera, microphone and location controls.
+- Privacy blur to hide message text and media until you hover.
+- A passcode **app lock** (PBKDF2) that covers every window and can lock on start, on hide,
+  or after idle.
+- HTTP / SOCKS5 network proxy with authentication.
+
+**Honest about problems**
+- A built-in **Report a bug** flow that pre-fills a GitHub issue with diagnostics — and the
+  last crash, if there was one — while keeping your messages private.
+
+## Install
+
+> Store builds are on the way. For now, build from source (below); the snap is built in CI
+> and will be published to the Snap Store and Flathub.
+
+## Build from source
 
 Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub
 KDE runtime), CMake ≥ 3.21, and a C++20 compiler.
 
 ```sh
-# Development build against the KDE Qt 6.11 snap SDK (any distro)
+# Development build against the KDE Qt 6.11 snap SDK (works on any distro)
 sudo snap install kde-qt6-core24-sdk kf6-core24
-scripts/dev-build.sh --tests
-scripts/dev-run.sh
+scripts/dev-build.sh --tests    # configure + build + run the test suite
+scripts/dev-run.sh              # launch
 
-# Or with a system Qt >= 6.11
+# …or with a system Qt >= 6.11
 cmake -B build -DCMAKE_BUILD_TYPE=RelWithDebInfo
 cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
-## Layout
+## Project layout
 
 ```
 src/core      pure logic (settings, services) — Qt Core only, unit-tested
-src/web       WebEngine profile/page/view, injected scripts, bridge
-src/platform  OS backends behind interfaces (notifications, autostart, …)
-src/ui        QtWidgets: main window, dialogs, tray
+src/web       WebEngine profile/page/view, injected scripts, the JS↔C++ bridge
+src/platform  OS backends behind interfaces (notifications, autostart, files, …)
+src/ui        QtWidgets: main window, dialogs, tray, lock screen
 src/app       Application object, CLI, single instance
 tests/        Qt Test suites (unit + offscreen smoke)
-packaging/    snap, flatpak, …
+snap/         snap packaging (built in CI)
 ```
+
+## Contributing
+
+Found a bug? The fastest path is **Menu → About → Report a bug…**, which opens a pre-filled
+issue with the diagnostics already attached. Otherwise, open an issue or a pull request —
+the test suite runs with `scripts/dev-build.sh --tests`.
 
 ## License
 
-MIT.
+[MIT](LICENSE) © Keshav Bhatt
+
+<sub>WhatsApp is a trademark of WhatsApp LLC. Whatsie is an independent client and is not
+affiliated with, endorsed by, or sponsored by WhatsApp or Meta.</sub>
