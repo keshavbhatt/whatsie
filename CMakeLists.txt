@@ -48,6 +48,12 @@ find_package(Qt6 6.11 REQUIRED COMPONENTS
 qt_standard_project_setup()
 include(SnapSdkWorkaround)
 
+if(MSVC)
+    # Sources are UTF-8 (string literals, comments); /bigobj for the heavy
+    # WebEngine translation units. Warning flags are set per-target in Warnings.cmake.
+    add_compile_options(/utf-8 /bigobj)
+endif()
+
 # Qt hygiene: forces explicit string conversions and keyword-free signal syntax.
 add_compile_definitions(
     QT_NO_CAST_FROM_ASCII

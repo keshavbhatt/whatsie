@@ -26,6 +26,33 @@ to `main`, uploads the `.snap` as an artifact, and — when the repo variable
 To build locally anyway (not recommended): `snapcraft --use-lxd`. Clean up afterwards with
 `snapcraft clean` and `lxc --project snapcraft list`/`delete` — the build containers are large.
 
+## Windows (x64)
+
+Built in CI on `windows-2022` with MSVC — see `.github/workflows/windows.yml`. We do
+not build Windows on developer machines.
+
+- **Qt:** `jurplel/install-qt-action` installs Qt 6.11 (`win64_msvc2022_64`) with the
+  `qtwebengine qtwebchannel qtpositioning` modules — the same Qt major the app requires
+  everywhere.
+- **Build:** `cmake -G "Visual Studio 17 2022" -A x64` → `cmake --build --config Release`.
+  The app icon and version info come from `dist/windows/whatsie.rc.in` (embedded via the
+  `WIN32` block in `src/CMakeLists.txt`; the icon is `dist/windows/whatsie.ico`).
+- **Deploy:** `windeployqt` stages the Qt/Chromium runtime; the MSVC CRT DLLs are then
+  copied app-local (a plain `windeployqt` leaves only `vc_redist.exe`, which a portable
+  zip can't run) and a step fails the build if any required DLL is missing.
+- **Packaging:** a portable **zip** and a **WiX MSI** (`packaging/windows/whatsie.wxs` —
+  per-machine, Start Menu + Desktop shortcuts, in-place upgrades via a fixed
+  `UpgradeCode`; the deployed tree is auto-harvested). Both are uploaded as CI artifacts
+  on every push; a version tag (`v6.0.0`) also attaches them to that GitHub Release.
+- **Autostart:** a per-user registry `Run` entry (`src/platform/windows/`), the Windows
+  counterpart to the Linux XDG autostart file.
+
+Known limitation: the official QtWebEngine binaries omit the proprietary H.264/AAC codecs,
+so **voice/video calls do not work** on this build (messaging, media and screen share do).
+A codec-enabled WebEngine would require a separate multi-hour rebuild — a future addition.
+Code signing (to avoid the SmartScreen "unknown publisher" prompt) is likewise a later
+step; the workflow can gain a secret-gated signing stage without other changes.
+
 ## Flatpak (later)
 
 Planned on `org.kde.Platform` 6.x with portals for files/notifications. Not started yet.

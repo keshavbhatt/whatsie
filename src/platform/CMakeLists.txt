@@ -42,4 +42,9 @@ else()
         file_manager_generic.cpp
         gpu_stderr_watch_generic.cpp
     )
+    if(WIN32)
+        target_sources(whatsie_platform PRIVATE windows/autostart_registry.cpp)
+    else()
+        target_sources(whatsie_platform PRIVATE autostart_generic.cpp)
+    endif()
 endif()

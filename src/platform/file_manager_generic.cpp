@@ -27,9 +27,3 @@ bool openUrl(const QString& url)
 }
 
 } // namespace whatsie::platform
-
-namespace whatsie::platform {
-// Autostart backends per OS land with their platform milestones; no-op fallback.
-bool autostartEnabled() { return false; }
-bool setAutostartEnabled(bool, bool) { return false; }
-} // namespace whatsie::platform
