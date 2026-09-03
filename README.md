@@ -81,15 +81,9 @@ Whatsie is on the **Snap Store** and **Flathub** — install once and new versio
 automatically.
 
 <p align="center">
-  <a href="https://snapcraft.io/whatsie">
-    <img alt="Get it from the Snap Store" height="56"
-         src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg">
-  </a>
+  <a href="https://snapcraft.io/whatsie"><img alt="Get it from the Snap Store" height="56" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"></a>
   &nbsp;&nbsp;
-  <a href="https://flathub.org/apps/com.ktechpit.whatsie">
-    <img alt="Get it on Flathub" height="56"
-         src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg">
-  </a>
+  <a href="https://flathub.org/apps/com.ktechpit.whatsie"><img alt="Get it on Flathub" height="56" src="https://dl.flathub.org/assets/badges/flathub-badge-en.svg"></a>
 </p>
 
 ```sh
