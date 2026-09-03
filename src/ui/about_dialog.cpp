@@ -25,9 +25,9 @@ namespace whatsie::ui {
 
 namespace {
 const QString kSourceUrl = u"https://github.com/keshavbhatt/whatsie"_s;
-const QString kDonateUrl = u"https://paypal.me/keshavnrj/5"_s;
+const QString kDonateUrl = u"https://www.paypal.com/paypalme/keshavnrj/11"_s;
 const QString kRateUrl = u"snap://whatsie"_s;
-const QString kMoreAppsUrl = u"https://snapcraft.io/publisher/keshavnrj"_s;
+const QString kMoreAppsUrl = u"https://ktechpit.com/USS/public/products.php"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
 } // namespace
 
@@ -41,7 +41,7 @@ AboutDialog::AboutDialog(const core::Settings& settings, const QString& userAgen
 
 void AboutDialog::setupUi()
 {
-    setWindowTitle(tr("%1 | About").arg(QApplication::applicationName()));
+    setWindowTitle(tr("%1 | About").arg(QApplication::applicationDisplayName()));
     setModal(true);
 
     m_content = new QWidget(this);
@@ -51,7 +51,7 @@ void AboutDialog::setupUi()
     icon->setFixedSize(96, 96);
 
     auto* name = new QLabel(u"<span style=\"font-size:17pt; font-weight:600;\">%1</span>"_s.arg(
-                                QApplication::applicationName()),
+                                QApplication::applicationDisplayName()),
                             m_content);
     auto* description = new QLabel(tr("WhatsApp Web client for Linux Desktop"), m_content);
     description->setWordWrap(true);
