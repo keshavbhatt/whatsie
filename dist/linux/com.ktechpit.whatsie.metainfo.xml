@@ -102,6 +102,14 @@
   </content_rating>
 
   <releases>
+    <release version="6.0.1" date="2026-09-04">
+      <description>
+        <p>Bug-fix release for device linking:</p>
+        <ul>
+          <li>Fixes linking a device failing with "Something went wrong" — linking by phone number and by QR code both work again</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.0.0" date="2026-08-27">
       <description>
         <p>
