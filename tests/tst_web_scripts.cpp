@@ -12,6 +12,7 @@
 #include <QJSEngine>
 #include <QJsonObject>
 #include <QMimeData>
+#include <QRegularExpression>
 #include <QTemporaryDir>
 #include <QTest>
 #include <QWebEngineProfile>
@@ -33,6 +34,19 @@ private Q_SLOTS:
             QVERIFY2(!source.isEmpty(), qPrintable(resource));
             const QJSValue result = engine.evaluate(u"(function(){ %1 })"_s.arg(source), resource);
             QVERIFY2(!result.isError(), qPrintable(resource + u": "_s + result.toString()));
+        }
+    }
+
+    // Force-requiring a WhatsApp module resolves its whole dependency subtree
+    // before WhatsApp has loaded it, which corrupts the module system and blocks
+    // login. Scripts may inspect the registry (require('__debug')) but must never
+    // require('WAWeb…'). See scripts/README.md and the linked-device-name fix.
+    void noForcedWhatsAppModuleRequires()
+    {
+        static const QRegularExpression forbidden(u"\\brequire\\s*\\(\\s*['\"]WAWeb"_s);
+        for (const QString& resource : ScriptBundle::bootstrapResources()) {
+            const QString source = ScriptBundle::readResource(resource);
+            QVERIFY2(!source.contains(forbidden), qPrintable(resource));
         }
     }
 

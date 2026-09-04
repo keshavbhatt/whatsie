@@ -5,10 +5,11 @@
 //           the portal/KDE platform theme overrides before it reaches Blink
 //           (verified 2026-08-27 via CDP). Sequence proven against live
 //           WhatsApp Web.
-// depends:  window.__whatsie.config.colorScheme; WhatsApp's require() modules,
-//           .app-wrapper-web React fiber, and `dark` body class (all optional —
-//           each step is guarded and degrades to a no-op).
-// verified: 2026-08-27 against WhatsApp Web 2.3000.x
+// depends:  window.__whatsie.config.colorScheme; already-loaded WhatsApp theme
+//           modules (read from the registry, never require()d), .app-wrapper-web
+//           React fiber, and `dark` body class (all optional — each step is
+//           guarded and degrades to a no-op).
+// verified: 2026-09-04 against WhatsApp Web 2.3000.x
 // on-fail:  no-op; falls back to WhatsApp's own OS-following behaviour
 // live-api: window.__whatsieSetTheme('system'|'light'|'dark'); called from
 //           WebView::applyThemeLive() on theme change and every page load.
@@ -24,31 +25,42 @@
         }
     }
 
+    // A WhatsApp module's exports, but only if WhatsApp has already loaded it.
+    // Reading the registry never triggers evaluation — unlike require(), which
+    // force-resolves the module's whole dependency subtree.
+    function loadedModule(name) {
+        try {
+            if (typeof require !== 'function') { return null; }
+            var rec = require('__debug').modulesMap[name];
+            if (!rec) { return null; }
+            return rec.exports || (rec.publicModule && rec.publicModule.exports) || rec.defaultExport || null;
+        } catch (e) {
+            return null;
+        }
+    }
+
     function applyTheme(mode) {
         var system = mode === 'system';
         var theme = system ? osTheme() : (mode === 'dark' ? 'dark' : 'light');
         var isDark = theme === 'dark';
 
-        // 1. WhatsApp's own preference + theme modules.
+        // 1. WhatsApp's own preference + theme modules — but only if WhatsApp has
+        //    already loaded them. Never require() a WAWeb module here: forcing
+        //    WAWebUserPrefsGeneral (and the storage subtree it depends on) to
+        //    resolve before WhatsApp is ready corrupts the module system and blocks
+        //    login. Until then, steps 2 and 3 below carry the theme; once WhatsApp
+        //    loads these modules, C++ re-applies on loadFinished and this runs.
         try {
-            if (typeof require === 'function') {
-                try {
-                    var up = require('WAWebUserPrefsGeneral');
-                    if (up) {
-                        if (typeof up.setSystemThemeMode === 'function') { up.setSystemThemeMode(system); }
-                        if (typeof up.setTheme === 'function') { up.setTheme(theme); }
-                    }
-                } catch (e) { /* module absent */ }
-                try {
-                    var tc = require('WAWebThemeContext');
-                    if (tc && typeof tc.applyThemeToUI === 'function') { tc.applyThemeToUI(theme); }
-                } catch (e) { /* module absent */ }
-                try {
-                    var st = require('WAWebSystemTheme');
-                    if (st) { st.theme = theme; }
-                } catch (e) { /* module absent */ }
+            var up = loadedModule('WAWebUserPrefsGeneral');
+            if (up) {
+                if (typeof up.setSystemThemeMode === 'function') { up.setSystemThemeMode(system); }
+                if (typeof up.setTheme === 'function') { up.setTheme(theme); }
             }
-        } catch (e) { /* require unavailable */ }
+            var tc = loadedModule('WAWebThemeContext');
+            if (tc && typeof tc.applyThemeToUI === 'function') { tc.applyThemeToUI(theme); }
+            var st = loadedModule('WAWebSystemTheme');
+            if (st) { st.theme = theme; }
+        } catch (e) { /* module internals changed */ }
 
         // 2. React store: walk the fiber ancestors for the component holding
         //    { theme, systemThemeMode } and setState; else forceUpdate upward.

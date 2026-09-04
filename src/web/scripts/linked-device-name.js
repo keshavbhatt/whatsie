@@ -5,8 +5,10 @@
 //           and is empty when the setting is off.
 // depends:  WhatsApp Web's WAWebBrowserInfo module (WAWebMiscBrowserUtils.info
 //           on older builds); wraps the browser-info object it returns
-// verified: 2026-09-03 against WhatsApp Web 2.3000.x (cf. whatsapp-web.js #3325)
-// on-fail:  no-op; WhatsApp's stock browser label is used
+// verified: 2026-09-04 against WhatsApp Web 2.3000.x (cf. whatsapp-web.js #3325)
+// on-fail:  no-op; WhatsApp's stock browser label is used. Only the module
+//           registry is read — a WAWeb module is never require()d, so this can
+//           never force-load a half-ready module and block login.
 //
 // WhatsApp derives the linked-device label client-side and stores it on the
 // phone at link time. The phone renders it as "Browser (OS)" but validates the
@@ -32,12 +34,22 @@
         };
     }
 
+    // A module's evaluated exports, but only if WhatsApp has already run its
+    // factory. Reading these off the registry record never triggers evaluation —
+    // unlike require(), which force-resolves the whole dependency subtree.
+    function loadedExports(rec) {
+        if (!rec) { return null; }
+        return rec.exports || (rec.publicModule && rec.publicModule.exports) || null;
+    }
+
     function hookOnce() {
         if (hooked) { return true; }
         try {
             if (typeof window.require !== 'function') { return false; }
-            // Current builds: a bare-function module patched via the registry.
-            var rec = window.require('__debug').modulesMap['WAWebBrowserInfo'];
+            var map = window.require('__debug').modulesMap;
+            if (!map) { return false; }
+            // Current builds: WAWebBrowserInfo's default export is the info function.
+            var rec = map['WAWebBrowserInfo'];
             if (rec && typeof rec.defaultExport === 'function') {
                 var wrapped = wrap(rec.defaultExport);
                 rec.defaultExport = wrapped;
@@ -47,14 +59,19 @@
                 hooked = true;
                 return true;
             }
-            // Older builds: a plain export on WAWebMiscBrowserUtils.
-            var mod = window.require('WAWebMiscBrowserUtils');
+            // Older builds: a plain export on WAWebMiscBrowserUtils. Read it from
+            // the registry ONLY if WhatsApp has already loaded it — never require()
+            // a WAWeb module here. Forcing WAWebMiscBrowserUtils to resolve before
+            // its dependency subtree (UserPrefs, storage, lazy chunks) is ready
+            // corrupts WhatsApp's module system and blocks login — both the
+            // phone-number "alt pairing" flow and the QR flow.
+            var mod = loadedExports(map['WAWebMiscBrowserUtils']);
             if (mod && typeof mod.info === 'function') {
                 mod.info = wrap(mod.info);
                 hooked = true;
                 return true;
             }
-        } catch (e) { /* module not registered yet — retry */ }
+        } catch (e) { /* module system not ready yet — retry */ }
         return false;
     }
 
