@@ -77,8 +77,7 @@ starts fast and stays light.
 
 ## Install
 
-Whatsie is on the **Snap Store** and **Flathub** — install once and new versions arrive
-automatically.
+### Linux
 
 <p align="center">
   <a href="https://snapcraft.io/whatsie"><img alt="Get it from the Snap Store" height="56" src="https://snapcraft.io/static/images/badges/en/snap-store-black.svg"></a>
@@ -92,7 +91,25 @@ sudo snap install whatsie
 
 # Flatpak — from Flathub
 flatpak install flathub com.ktechpit.whatsie
+
+# Arch Linux (AUR) — builds from source
+yay -S whatsie      # or: paru -S whatsie
 ```
+
+**AppImage** and a self-contained **`.deb`** (Qt bundled, installs on any modern
+Debian/Ubuntu) are attached to the [latest release](https://github.com/keshavbhatt/whatsie/releases/latest).
+Make the AppImage executable and run it (`chmod +x whatsie-*.AppImage`); install the deb with
+`sudo apt install ./whatsie_*_amd64.deb`.
+
+### Windows (x64)
+
+Download the installer or portable build from the
+[latest release](https://github.com/keshavbhatt/whatsie/releases/latest):
+
+- **`whatsie-<version>-x64.msi`** — installer (Start Menu + Desktop shortcuts, in-place upgrades)
+- **`whatsie-<version>-windows-x64.zip`** — portable, no install required
+
+Windows 10/11, 64-bit; it bundles its own Qt runtime.
 
 ## Build from source
 
