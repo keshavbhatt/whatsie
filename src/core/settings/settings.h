@@ -155,6 +155,13 @@ public:
     // advanced/
     [[nodiscard]] HardwareAcceleration hardwareAcceleration() const;
     void setHardwareAcceleration(HardwareAcceleration mode);
+    /// V8 JavaScript heap cap in MB; 0 = automatic (ask V8 to optimize for size).
+    /// Bounds WhatsApp Web's memory so a long-running session cannot thrash into
+    /// an out-of-memory abort. Applied to the Chromium flags at startup.
+    [[nodiscard]] int jsMemoryLimitMb() const;
+    void setJsMemoryLimitMb(int mb);
+    static constexpr int kMinJsMemoryLimitMb = 256;
+    static constexpr int kMaxJsMemoryLimitMb = 8192;
     /// FEATURES P2: force WebRTC onto public interfaces only (privacy; can break
     /// LAN calls). Default off.
     [[nodiscard]] bool webrtcPublicInterfacesOnly() const;
@@ -239,6 +246,7 @@ Q_SIGNALS:
     void askWhereToSaveChanged(bool ask);
     void showDownloadsOnStartChanged(bool show);
     void hardwareAccelerationChanged(whatsie::core::HardwareAcceleration mode);
+    void jsMemoryLimitMbChanged(int mb);
 
 private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;

@@ -91,6 +91,7 @@ private:
     QCheckBox* m_notificationSound = nullptr;
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
+    QSpinBox* m_jsMemoryLimit = nullptr;
     QCheckBox* m_spellCheck = nullptr;
     QComboBox* m_spellLanguage = nullptr;
     QLabel* m_lockStatus = nullptr;

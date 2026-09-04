@@ -488,6 +488,17 @@ QWidget* SettingsDialog::buildAdvancedTab()
             static_cast<HardwareAcceleration>(m_hardwareAcceleration->itemData(index).toInt()));
     });
     aform->addRow(tr("Hardware acceleration:"), m_hardwareAcceleration);
+    m_jsMemoryLimit = new QSpinBox(advBox);
+    m_jsMemoryLimit->setRange(0, core::Settings::kMaxJsMemoryLimitMb);
+    m_jsMemoryLimit->setSingleStep(256);
+    m_jsMemoryLimit->setSpecialValueText(tr("Automatic"));
+    m_jsMemoryLimit->setSuffix(tr(" MB"));
+    m_jsMemoryLimit->setToolTip(tr("Cap WhatsApp Web's JavaScript memory so a long session cannot "
+                                   "grow without bound. 0 = automatic; lower it if the app uses too "
+                                   "much RAM."));
+    connect(m_jsMemoryLimit, &QSpinBox::valueChanged, this,
+            [this](int mb) { m_settings.setJsMemoryLimitMb(mb); });
+    aform->addRow(tr("JavaScript memory limit:"), m_jsMemoryLimit);
     m_webrtcPublicOnly = new QCheckBox(tr("Route WebRTC through public interfaces only"), advBox);
     m_webrtcPublicOnly->setToolTip(tr("Hides local network addresses from calls. May break calls "
                                       "on some networks. Takes effect after a reload."));
@@ -694,6 +705,7 @@ void SettingsDialog::loadValues()
     m_notificationTimeout->setEnabled(m_settings.notificationsEnabled());
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
+    m_jsMemoryLimit->setValue(m_settings.jsMemoryLimitMb());
     m_spellCheck->setChecked(m_settings.spellCheckEnabled());
     if (m_spellLanguage != nullptr) {
         const QStringList available =
