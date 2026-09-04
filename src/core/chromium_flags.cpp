@@ -21,7 +21,7 @@ bool useSoftwareGpu(HardwareAcceleration acceleration, bool autoDisabled)
     return autoDisabled;
 }
 
-QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled)
+QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, int jsMemoryLimitMb)
 {
     QStringList flags{
         // Nothing here is a chat client's business.
@@ -66,6 +66,15 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
         flags << u"--disable-gpu"_s;
     } else if (acceleration == HardwareAcceleration::On) {
         flags << u"--ignore-gpu-blocklist"_s;
+    }
+    // Bound WhatsApp Web's V8 heap so a long-running session cannot thrash into
+    // an out-of-memory abort. A hard cap when the user sets one, otherwise ask V8
+    // to trim its baseline heap. Packed into one --js-flags token (Qt splits the
+    // env var on spaces). Expert override: set QTWEBENGINE_CHROMIUM_FLAGS.
+    if (jsMemoryLimitMb > 0) {
+        flags << u"--js-flags=--max-old-space-size=%1"_s.arg(jsMemoryLimitMb);
+    } else {
+        flags << u"--js-flags=--optimize-for-size"_s;
     }
     return flags;
 }

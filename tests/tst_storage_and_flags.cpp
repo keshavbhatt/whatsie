@@ -110,6 +110,16 @@ private Q_SLOTS:
 #endif
     }
 
+    void jsMemoryLimitFlag()
+    {
+        // Automatic (0) trims the baseline heap; a positive value hard-caps it.
+        QVERIFY(chromiumFlags(HardwareAcceleration::Auto, false, 0)
+                    .contains(u"--js-flags=--optimize-for-size"_s));
+        const QStringList capped = chromiumFlags(HardwareAcceleration::Auto, false, 1024);
+        QVERIFY(capped.contains(u"--js-flags=--max-old-space-size=1024"_s));
+        QVERIFY(!capped.contains(u"--js-flags=--optimize-for-size"_s));
+    }
+
     void userFlagsAreKeptAndDeduplicated()
     {
         const QString merged =

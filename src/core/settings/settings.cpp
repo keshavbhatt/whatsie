@@ -37,6 +37,7 @@ constexpr int kDefaultMessageBlurLevel = 0;
 constexpr bool kDefaultAskWhereToSave = false;
 constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
+constexpr int kDefaultJsMemoryLimitMb = 0;
 constexpr bool kDefaultWebrtcPublicOnly = false;
 constexpr bool kDefaultSpellCheckEnabled = true;
 constexpr bool kDefaultLockOnStart = false;
@@ -419,6 +420,22 @@ void Settings::setHardwareAcceleration(HardwareAcceleration mode)
     setGpuAutoDisabled(false);
     setGpuProbeStrikes(0);
     Q_EMIT hardwareAccelerationChanged(mode);
+}
+
+int Settings::jsMemoryLimitMb() const
+{
+    const int stored = m_store->value(keys::kJsMemoryLimitMb, kDefaultJsMemoryLimitMb).toInt();
+    return stored <= 0 ? 0 : std::clamp(stored, kMinJsMemoryLimitMb, kMaxJsMemoryLimitMb);
+}
+
+void Settings::setJsMemoryLimitMb(int mb)
+{
+    const int clamped = mb <= 0 ? 0 : std::clamp(mb, kMinJsMemoryLimitMb, kMaxJsMemoryLimitMb);
+    if (clamped == jsMemoryLimitMb()) {
+        return;
+    }
+    m_store->setValue(keys::kJsMemoryLimitMb, clamped);
+    Q_EMIT jsMemoryLimitMbChanged(clamped);
 }
 
 bool Settings::webrtcPublicInterfacesOnly() const

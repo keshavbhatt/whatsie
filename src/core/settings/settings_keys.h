@@ -68,6 +68,8 @@ inline constexpr QLatin1StringView kGpuAutoDisabled{"advanced/gpuAutoDisabled"};
 inline constexpr QLatin1StringView kGpuProbeStrikes{"advanced/gpuProbeStrikes"};
 // Set when the GPU was auto-disabled, so the next launch can tell the user why.
 inline constexpr QLatin1StringView kGpuFallbackNotice{"advanced/gpuFallbackNotice"};
+// V8 JavaScript heap cap in MB; 0 = automatic. Bounds WhatsApp Web's memory.
+inline constexpr QLatin1StringView kJsMemoryLimitMb{"advanced/jsMemoryLimitMb"};
 
 // proxy/ (password is deliberately NOT a key — never persisted)
 inline constexpr QLatin1StringView kProxyMode{"proxy/mode"};
