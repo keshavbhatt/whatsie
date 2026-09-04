@@ -37,6 +37,11 @@ struct NewChatRequest
 [[nodiscard]] std::optional<NewChatRequest> parseChatLink(const QUrl& url);
 [[nodiscard]] std::optional<NewChatRequest> parseChatLink(const QString& urlOrPhone);
 
+/// The group-invite code from a link, or empty when it is not an invite:
+/// https://chat.whatsapp.com/[invite/]<code> or whatsapp://chat?code=<code>.
+/// A send link (whatsapp://send, wa.me, ...) or a phone number returns empty.
+[[nodiscard]] QString inviteCodeFromUrl(const QString& link);
+
 /// https://web.whatsapp.com/send?phone=<digits>&text=<encoded>
 [[nodiscard]] QUrl newChatUrl(const NewChatRequest& request);
 

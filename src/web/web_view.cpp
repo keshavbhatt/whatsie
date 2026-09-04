@@ -88,6 +88,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
             m_crashPolicy.onLoadSucceeded();
             applyBlurLive();
             applyThemeLive();
+            flushPendingInvite();
         }
     });
     // Replace Chromium's stock error page (disabled in the profile) with our own.
@@ -385,6 +386,48 @@ void WebView::openChat(const core::NewChatRequest& request)
     const QUrl target = core::newChatUrl(request);
     qCInfo(lcWeb) << "open chat" << target.toString(QUrl::RemoveQuery) << "phone=" << request.phone;
     load(target);
+}
+
+void WebView::openGroupInvite(const QString& code)
+{
+    if (code.isEmpty()) {
+        return;
+    }
+    m_pendingInvite = code;
+    flushPendingInvite();
+}
+
+void WebView::flushPendingInvite()
+{
+    // Only meaningful once WhatsApp Web itself is loaded — its click handler must
+    // exist to turn the synthetic click into a "Join group" preview. Until then
+    // the code stays pending and is flushed from loadFinished.
+    if (m_pendingInvite.isEmpty() || m_showingError || !core::isWhatsAppWebUrl(url())) {
+        return;
+    }
+    const QString code = m_pendingInvite;
+    m_pendingInvite.clear();
+    qCInfo(lcWeb) << "opening group invite";
+    // WhatsApp Web only opens a group invite when a chat.whatsapp.com link is
+    // clicked inside the page; navigating there does nothing. So synthesise a
+    // hidden link and click it. The code is validated to [A-Za-z0-9._-] by
+    // core::inviteCodeFromUrl, so embedding it in the script is safe.
+    static const QString kInviteScript = uR"JS(
+(function () {
+    function go() {
+        if (!document.body) { setTimeout(go, 100); return; }
+        var a = document.createElement('a');
+        a.href = 'https://chat.whatsapp.com/%1';
+        a.rel = 'noopener';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+        setTimeout(function () { a.remove(); }, 0);
+    }
+    go();
+})();
+)JS"_s;
+    m_page->runJavaScript(kInviteScript.arg(code));
 }
 
 QString WebView::userAgent() const

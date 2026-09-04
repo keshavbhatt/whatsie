@@ -111,6 +111,21 @@ private Q_SLOTS:
         QVERIFY(parsed.has_value());
         QCOMPARE(*parsed, request);
     }
+
+    void parsesGroupInviteCodes()
+    {
+        QCOMPARE(inviteCodeFromUrl(u"https://chat.whatsapp.com/AbC123_-.xy"_s), u"AbC123_-.xy"_s);
+        QCOMPARE(inviteCodeFromUrl(u"https://chat.whatsapp.com/invite/AbC123"_s), u"AbC123"_s);
+        QCOMPARE(inviteCodeFromUrl(u"  chat.whatsapp.com/Zz99  "_s), u"Zz99"_s); // trimmed, no scheme
+        QCOMPARE(inviteCodeFromUrl(u"whatsapp://chat?code=Kk77"_s), u"Kk77"_s);
+        QCOMPARE(inviteCodeFromUrl(u"whatsapp://chat?foo=1&code=Kk77"_s), u"Kk77"_s);
+        // Not invites: send links, plain numbers, a send whose text mentions code=.
+        QVERIFY(inviteCodeFromUrl(u"whatsapp://send?phone=15551234"_s).isEmpty());
+        QVERIFY(inviteCodeFromUrl(u"whatsapp://send?text=code=NOTACODE"_s).isEmpty());
+        QVERIFY(inviteCodeFromUrl(u"https://wa.me/15551234"_s).isEmpty());
+        QVERIFY(inviteCodeFromUrl(u"+1 555 1234"_s).isEmpty());
+        QVERIFY(inviteCodeFromUrl(QString()).isEmpty());
+    }
 };
 
 QTEST_GUILESS_MAIN(TestNavigationPolicy)

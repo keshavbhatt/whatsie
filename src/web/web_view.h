@@ -38,6 +38,9 @@ public:
     void loadWhatsApp();
     /// Opens a chat via https://web.whatsapp.com/send?phone=… (FEATURES S10).
     void openChat(const core::NewChatRequest& request);
+    /// Opens WhatsApp Web's "Join group" preview for an invite code (issue #186).
+    /// Deferred until the page has loaded if it is not ready yet.
+    void openGroupInvite(const QString& code);
 
     /// Selects which zoom setting applies (normal vs maximized/fullscreen).
     void setZoomMode(bool maximized);
@@ -84,6 +87,7 @@ private:
     void checkWatchdog();
     void applyBlurLive();
     void applyThemeLive();
+    void flushPendingInvite();
     void handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost);
     bool maybeHandleDrop(class QObject* watched, class QEvent* event);
     void handleFileDrop(const QStringList& paths);
@@ -104,6 +108,8 @@ private:
     bool m_showingError = false;
     QString m_errorTitle;
     QString m_errorDetail;
+    // A group-invite code awaiting a loaded WhatsApp Web page (issue #186).
+    QString m_pendingInvite;
 };
 
 } // namespace whatsie::web
