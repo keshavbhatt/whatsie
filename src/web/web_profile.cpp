@@ -153,27 +153,14 @@ void WebProfile::configureSpellCheck()
                   << m_settings.spellCheckLanguages() << "effective" << effective;
 }
 
-QString linkedDeviceLabel()
-{
-#if defined(Q_OS_WIN)
-    return u"Whatsie for Windows"_s;
-#elif defined(Q_OS_MACOS)
-    return u"Whatsie for macOS"_s;
-#else
-    return u"Whatsie for Linux"_s;
-#endif
-}
-
 void WebProfile::installBootstrap()
 {
     // Config passed to injected scripts as window.__whatsie.config. theme-control.js
     // forces an explicit colorScheme at the page level; "system" lets WhatsApp
     // follow the OS prefers-color-scheme (ADR-020, revised by ADR-026).
-    // linkedDeviceName brands this session in WhatsApp's linked-devices list (PR #324).
     m_scripts->installBootstrap(QJsonObject{
         {u"blurLevel"_s, m_settings.messageBlurLevel()},
         {u"colorScheme"_s, themeName(m_settings.theme())},
-        {u"linkedDeviceName"_s, linkedDeviceLabel()},
     });
 }
 

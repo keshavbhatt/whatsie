@@ -15,10 +15,6 @@ namespace whatsie::web {
 class Bridge;
 class ScriptBundle;
 
-/// The brand label shown in WhatsApp's linked-devices list, e.g.
-/// "Whatsie for Linux" (PR #324). Platform-specific.
-[[nodiscard]] QString linkedDeviceLabel();
-
 /// The one persistent profile of the application. Storage paths, cookie
 /// policy, user agent, engine attributes and the injected script bundle are
 /// configured here and nowhere else (ADR-006: profile-level scripts only).

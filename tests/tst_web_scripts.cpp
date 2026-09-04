@@ -40,7 +40,7 @@ private Q_SLOTS:
     // Force-requiring a WhatsApp module resolves its whole dependency subtree
     // before WhatsApp has loaded it, which corrupts the module system and blocks
     // login. Scripts may inspect the registry (require('__debug')) but must never
-    // require('WAWeb…'). See scripts/README.md and the linked-device-name fix.
+    // require('WAWeb…') — see scripts/README.md (the "stable tier" rule).
     void noForcedWhatsAppModuleRequires()
     {
         static const QRegularExpression forbidden(u"\\brequire\\s*\\(\\s*['\"]WAWeb"_s);
