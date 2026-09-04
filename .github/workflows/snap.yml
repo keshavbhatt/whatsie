@@ -1,12 +1,12 @@
-# Build the snap in GitHub's CI (we do not build locally). Each architecture is
-# built on its native runner; on push (main or rewrite) the .snap is uploaded as
+# Build the snap in GitHub's CI. Each architecture is
+# built on its native runner; on push (main) the .snap is uploaded as
 # an artifact, and with the repo variable PUBLISH_TO_STORE=true plus the
 # SNAPCRAFT_STORE_CREDENTIALS secret it is also released to the edge channel.
 name: snap
 
 on:
   push:
-    branches: [main, rewrite]
+    branches: [main]
     paths:
       - 'src/**'
       - 'cmake/**'
@@ -36,13 +36,6 @@ jobs:
       - name: Build snap (${{ matrix.arch }})
         uses: snapcore/action-build@v1
         id: build
-
-      - name: Upload the snap artifact
-        uses: actions/upload-artifact@v5
-        with:
-          name: whatsie-snap-${{ matrix.arch }}
-          path: ${{ steps.build.outputs.snap }}
-          if-no-files-found: error
 
       - name: Publish to the Snap Store (edge)
         if: >-

@@ -19,9 +19,10 @@ that dev-run has to add by hand, so the shipped snap needs none of those workaro
 
 We do **not** build the snap on developer machines (it pulls a multi-GB KDE SDK into an LXD
 container). CI does it: `.github/workflows/snap.yml` runs `snapcore/action-build` on every push
-to `main`, uploads the `.snap` as an artifact, and — when the repo variable
-`PUBLISH_TO_STORE=true` and the `SNAPCRAFT_STORE_CREDENTIALS` secret are set — releases it to the
-**edge** channel.
+to `main` and — when the repo variable `PUBLISH_TO_STORE=true` and the
+`SNAPCRAFT_STORE_CREDENTIALS` secret are set — releases it to the **edge** channel. Nothing is
+stored as a GitHub Actions artifact (the free storage quota is limited); output goes to the
+store or a release only.
 
 To build locally anyway (not recommended): `snapcraft --use-lxd`. Clean up afterwards with
 `snapcraft clean` and `lxc --project snapcraft list`/`delete` — the build containers are large.
@@ -42,8 +43,8 @@ not build Windows on developer machines.
   zip can't run) and a step fails the build if any required DLL is missing.
 - **Packaging:** a portable **zip** and a **WiX MSI** (`packaging/windows/whatsie.wxs` —
   per-machine, Start Menu + Desktop shortcuts, in-place upgrades via a fixed
-  `UpgradeCode`; the deployed tree is auto-harvested). Both are uploaded as CI artifacts
-  on every push; a version tag (`v6.0.0`) also attaches them to that GitHub Release.
+  `UpgradeCode`; the deployed tree is auto-harvested). A version tag (`v6.0.1`) attaches both
+  to that GitHub Release; other pushes build them only as a check (nothing is stored).
 - **Autostart:** a per-user registry `Run` entry (`src/platform/windows/`), the Windows
   counterpart to the Linux XDG autostart file.
 

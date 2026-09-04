@@ -1,4 +1,4 @@
-# Build Whatsie for Windows (x64, MSVC) in GitHub's CI. Every push to main/rewrite
+# Build Whatsie for Windows (x64, MSVC) in GitHub's CI. Every push to main
 # produces a portable zip and an MSI as downloadable artifacts (a compile check
 # plus test builds). Pushing a version tag (v6.0.0) additionally attaches the zip
 # and MSI to the GitHub Release for that tag.
@@ -114,15 +114,6 @@ jobs:
             -d Version=$ver -d Src="$PWD\build\Release" -o $name
           if ((Get-Item $name).Length -lt 30MB) { throw "MSI is suspiciously small — harvest likely failed." }
           "path=$name" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v5
-        with:
-          name: whatsie-windows-x64
-          path: |
-            ${{ steps.zip.outputs.path }}
-            ${{ steps.msi.outputs.path }}
-          if-no-files-found: error
 
       - name: Attach to the GitHub Release
         if: startsWith(github.ref, 'refs/tags/')
