@@ -392,6 +392,14 @@ void MainWindow::openChat(const QString& target)
         showAndRaise();
         return;
     }
+    // A group-invite link opens WhatsApp Web's "Join group" preview (issue #186);
+    // checked before the send-link parse so an invite is never treated as a send.
+    const QString invite = core::inviteCodeFromUrl(target);
+    if (!invite.isEmpty()) {
+        showAndRaise();
+        m_webView->openGroupInvite(invite);
+        return;
+    }
     const auto request = core::parseChatLink(target);
     if (!request) {
         qCWarning(lcUi) << "not a chat link or phone number:" << target;

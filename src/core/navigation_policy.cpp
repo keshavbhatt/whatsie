@@ -1,5 +1,6 @@
 #include "core/navigation_policy.h"
 
+#include <QRegularExpression>
 #include <QUrlQuery>
 
 using namespace Qt::StringLiterals;
@@ -112,6 +113,29 @@ std::optional<NewChatRequest> parseChatLink(const QString& urlOrPhone)
         return std::nullopt;
     }
     return NewChatRequest{.phone = digits, .text = {}};
+}
+
+QString inviteCodeFromUrl(const QString& link)
+{
+    const QString trimmed = link.trimmed();
+    // A web invite link: https://chat.whatsapp.com/<code> (older links add an
+    // extra /invite/ segment). Checked first so it wins regardless of scheme.
+    static const QRegularExpression web(u"chat\\.whatsapp\\.com/(?:invite/)?([A-Za-z0-9._-]+)"_s);
+    QRegularExpressionMatch m = web.match(trimmed);
+    if (m.hasMatch()) {
+        return m.captured(1);
+    }
+    // The deep link the x-scheme-handler delivers: whatsapp://chat?code=<code>.
+    // Scoped to the "chat" action so a whatsapp://send request whose text happens
+    // to contain "code=" can never be mistaken for an invite.
+    if (trimmed.startsWith(u"whatsapp://chat"_s, Qt::CaseInsensitive)) {
+        static const QRegularExpression codeParam(u"[?&]code=([A-Za-z0-9._-]+)"_s);
+        m = codeParam.match(trimmed);
+        if (m.hasMatch()) {
+            return m.captured(1);
+        }
+    }
+    return {};
 }
 
 QUrl newChatUrl(const NewChatRequest& request)
