@@ -102,6 +102,15 @@
   </content_rating>
 
   <releases>
+    <release version="6.0.2" date="2026-09-04">
+      <description>
+        <p>Feature and fix release:</p>
+        <ul>
+          <li>New "JavaScript memory limit" (Settings → Advanced) to bound memory on long-running sessions</li>
+          <li>Group-invite links now open WhatsApp Web's "Join group" preview in the app</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.0.1" date="2026-09-04">
       <description>
         <p>Bug-fix release for device linking:</p>
