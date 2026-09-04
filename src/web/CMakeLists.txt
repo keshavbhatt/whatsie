@@ -49,7 +49,6 @@ qt_add_resources(whatsie_web "scripts"
         scripts/connection-watchdog.js
         scripts/sw-recovery.js
         scripts/privacy-blur.js
-        scripts/linked-device-name.js
         scripts/file-drop.js
         scripts/chat-list-collapse.js
 )

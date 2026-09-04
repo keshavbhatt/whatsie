@@ -25,9 +25,21 @@
                 return false;
             }
         }
+        // The reload policy exists to recover an established session after a
+        // suspend/network drop — not to run during login. On the landing / QR /
+        // phone-number screens WhatsApp opens and closes short-lived sockets whose
+        // churn would report the link "down" and trigger a reload that aborts the
+        // pairing handshake (both QR and "link with phone number"). The chat pane
+        // exists only once logged in, so gate "down" reports on it.
+        function loggedIn() {
+            return !!document.querySelector('#pane-side');
+        }
         function report(up) {
             if (up === reported) {
                 return;
+            }
+            if (!up && !loggedIn()) {
+                return; // never report the link down before the user is logged in
             }
             reported = up;
             if (api.bridge) {

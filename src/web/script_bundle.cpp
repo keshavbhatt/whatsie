@@ -4,6 +4,7 @@
 
 #include <QFile>
 #include <QJsonDocument>
+#include <QtEnvironmentVariables>
 #include <QWebEngineProfile>
 #include <QWebEngineScriptCollection>
 
@@ -36,14 +37,31 @@ QString ScriptBundle::readResource(const QString& resourcePath)
 
 QStringList ScriptBundle::bootstrapResources()
 {
-    return {
-        u":/qtwebchannel/qwebchannel.js"_s,    u":/scripts/bootstrap.js"_s,
+    static const QStringList kFeatures{
         u":/scripts/theme-control.js"_s,       u":/scripts/storage-persist.js"_s,
         u":/scripts/connection-watchdog.js"_s, u":/scripts/sw-recovery.js"_s,
         u":/scripts/privacy-blur.js"_s,        u":/scripts/nav-settings.js"_s,
-        u":/scripts/linked-device-name.js"_s, u":/scripts/file-drop.js"_s,
-        u":/scripts/chat-list-collapse.js"_s,
+        u":/scripts/file-drop.js"_s,           u":/scripts/chat-list-collapse.js"_s,
     };
+    QStringList resources{u":/qtwebchannel/qwebchannel.js"_s, u":/scripts/bootstrap.js"_s};
+
+    // Diagnostic escape hatch: WHATSIE_DISABLE_WEB_SCRIPTS turns page tweaks off to
+    // isolate an interfering feature. "1"/"all" drops every tweak; otherwise it is
+    // a comma-separated list of script names to drop (e.g. "privacy-blur").
+    const QString disable = qEnvironmentVariable("WHATSIE_DISABLE_WEB_SCRIPTS").trimmed();
+    if (disable == u"1"_s || disable.compare(u"all"_s, Qt::CaseInsensitive) == 0) {
+        return resources;
+    }
+    const QStringList drop = disable.isEmpty()
+                                 ? QStringList()
+                                 : disable.split(u',', Qt::SkipEmptyParts);
+    for (const QString& res : kFeatures) {
+        const QString name = res.mid(res.lastIndexOf(u'/') + 1).chopped(3); // basename, no ".js"
+        if (!drop.contains(name.trimmed())) {
+            resources << res;
+        }
+    }
+    return resources;
 }
 
 void ScriptBundle::installBootstrap(const QJsonObject& config)
