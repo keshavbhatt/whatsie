@@ -1,0 +1,6 @@
+whatsie (6.0.1) unstable; urgency=medium
+
+  * Debian packaging for the Qt 6 rewrite.
+  * Fixes device linking (phone number and QR code).
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Fri, 04 Sep 2026 18:57:00 +0530

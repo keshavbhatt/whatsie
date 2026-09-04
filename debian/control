@@ -1,0 +1,32 @@
+Source: whatsie
+Section: net
+Priority: optional
+Maintainer: Keshav Bhatt <keshavnrj@gmail.com>
+Build-Depends:
+ debhelper-compat (= 13),
+ cmake,
+ qt6-base-dev (>= 6.11),
+ qt6-declarative-dev,
+ qt6-svg-dev,
+ qt6-webchannel-dev,
+ qt6-webengine-dev (>= 6.11)
+Standards-Version: 4.7.0
+Homepage: https://github.com/keshavbhatt/whatsie
+Vcs-Git: https://github.com/keshavbhatt/whatsie.git
+Vcs-Browser: https://github.com/keshavbhatt/whatsie
+Rules-Requires-Root: no
+
+Package: whatsie
+Architecture: any
+Depends:
+ ${shlibs:Depends},
+ ${misc:Depends}
+Description: feature-rich WhatsApp Web client for the desktop
+ Whatsie is a Qt 6 / QtWebEngine desktop client for WhatsApp Web. It wraps the
+ web app with native desktop integration:
+ .
+  * system tray with an unread badge and native notifications
+  * light/dark themes synced with WhatsApp Web, plus zoom and interface scaling
+  * a passcode app lock, message blur and per-site permission control
+  * a downloads manager, with drag-and-drop and paste of attachments
+  * spell check, network proxy, autostart and multiple-account profiles

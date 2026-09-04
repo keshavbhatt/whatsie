@@ -56,10 +56,35 @@ H.264 needs a separate multi-hour QtWebEngine rebuild, a possible future additio
 signing (to avoid the SmartScreen "unknown publisher" prompt) is likewise a later step;
 the workflow can gain a secret-gated signing stage without other changes.
 
-## Flatpak (later)
+## Flatpak
 
-Planned on `org.kde.Platform` 6.x with portals for files/notifications. Not started yet.
+Shipped on Flathub (`com.ktechpit.whatsie`), built against `org.kde.Platform`//6.11 with the
+`io.qt.qtwebengine.BaseApp`. The manifest lives in the Flathub repo, not here; CMake installs
+the desktop file, AppStream metainfo and icons the store reads. The Flatpak's WebEngine is
+built with the proprietary codecs, so it is the one Linux build that can send MP4 video.
+
+## Debian (.deb) — x86_64
+
+Two independent routes:
+
+- **Source package** (`debian/`): a native `3.0` package using debhelper's CMake buildsystem.
+  `dpkg-buildpackage -b -us -uc` on a system with **Qt 6.11 dev packages** produces a lean
+  `.deb` that depends on the system Qt — for a PPA, or a distro that ships Qt 6.11.
+- **Self-contained `.deb`** (CI): `.github/workflows/linux-bundles.yml` bundles Qt +
+  QtWebEngine under `/opt/whatsie` (via linuxdeploy) and packages it with fpm, so it installs
+  on any modern-glibc Debian/Ubuntu regardless of its system Qt. Attached to the release; not
+  stored in the repo.
+
+## AppImage — x86_64
+
+Built by the same `linux-bundles.yml` workflow (one AppDir feeds both the AppImage and the
+bundled `.deb`) with linuxdeploy + linuxdeploy-plugin-qt. The NSS modules WebEngine loads at
+runtime are bundled explicitly, and the WebEngine sandbox is disabled (a read-only AppImage
+cannot ship a setuid helper). Attached to the release.
+
+The AppImage and bundled `.deb` use the official Qt WebEngine, so — like Snap and Windows —
+they cannot send MP4 video (H.264/AAC); the Flatpak is the codec-enabled Linux option.
 
 ## Other targets
 
-AppImage / deb / rpm / AUR / macOS are not release targets (ADR-016 keeps v1 to snap + Windows).
+rpm / AUR / macOS are not release targets yet.
