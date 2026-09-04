@@ -1,0 +1,9 @@
+#!/usr/bin/make -f
+# Build Whatsie with debhelper's CMake buildsystem.
+# Whatsie requires Qt 6.11 / QtWebEngine; an older distro Qt fails at configure.
+
+%:
+	dh $@ --buildsystem=cmake
+
+override_dh_auto_configure:
+	dh_auto_configure -- -DWHATSIE_BUILD_TESTS=OFF
