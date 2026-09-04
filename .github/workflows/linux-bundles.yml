@@ -1,0 +1,153 @@
+# Build self-contained Linux artifacts and attach them to the GitHub Release:
+# an AppImage and a .deb that bundle Qt 6.11 + QtWebEngine (installs to /opt), so
+# they run on any modern glibc distro regardless of its system Qt. Nothing is
+# stored as a workflow artifact — the files are uploaded straight to the release.
+#
+# Runs on a version tag (v6.0.1); use workflow_dispatch with a `tag` input to
+# (re)build for an existing tag/release.
+#
+# Note: the official Qt binaries have no proprietary H.264/AAC codecs, so these
+# builds cannot send MP4 video (photos, WebM/VP8/VP9, messaging, screen share
+# work). The Flatpak, built on the KDE runtime, is the codec-enabled option.
+name: linux-bundles
+
+on:
+  push:
+    tags: ['v*.*.*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing tag to build and attach to (e.g. v6.0.1)'
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  bundle:
+    # Oldest supported runner for the widest glibc compatibility.
+    runs-on: ubuntu-22.04
+    env:
+      APPIMAGE_EXTRACT_AND_RUN: 1  # GitHub runners have no FUSE
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Determine version
+        id: ver
+        run: |
+          tag="${{ github.event.inputs.tag || github.ref_name }}"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          echo "ver=${tag#v}" >> "$GITHUB_OUTPUT"
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: '6.11.*'
+          # qtserialport: the qtpositioning NMEA plugin links it, and
+          # linuxdeploy-plugin-qt fails to deploy WebEngine without it present.
+          modules: 'qtwebengine qtwebchannel qtpositioning qtserialport'
+          cache: true
+
+      - name: Install build & packaging tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y ninja-build libx11-dev libxcb1-dev libfuse2 libnss3 ruby ruby-dev
+          sudo gem install --no-document fpm
+
+      - name: Build and install into AppDir
+        run: |
+          cmake -S . -B build -G Ninja \
+            -DCMAKE_BUILD_TYPE=Release \
+            -DCMAKE_INSTALL_PREFIX=/usr \
+            -DCMAKE_PREFIX_PATH="$QT_ROOT_DIR" \
+            -DWHATSIE_BUILD_TESTS=OFF
+          cmake --build build --parallel
+          DESTDIR="$PWD/AppDir" cmake --install build
+
+      - name: Bundle the NSS modules WebEngine dlopen()s
+        run: |
+          # linuxdeploy bundles the linked NSS libs but not the ones NSS loads at
+          # runtime; shipping the matching set avoids a symbol-version crash.
+          mkdir -p AppDir/usr/lib
+          for lib in libsoftokn3.so libfreebl3.so libnssckbi.so libnssdbm3.so; do
+            f=$(find /usr/lib/x86_64-linux-gnu -maxdepth 2 -name "$lib" | head -1)
+            if [ -n "$f" ]; then cp -v "$f" AppDir/usr/lib/; \
+            else echo "::error::NSS module $lib not found on the runner"; exit 1; fi
+          done
+
+      - name: Disable the WebEngine sandbox in the relocatable bundle
+        run: |
+          # A read-only AppImage / a /opt install cannot ship a setuid
+          # chrome-sandbox, so run WebEngine without it (standard for WebEngine
+          # AppImages). The Chromium renderer still runs; only the OS sandbox is off.
+          mkdir -p AppDir/apprun-hooks
+          echo 'export QTWEBENGINE_DISABLE_SANDBOX=1' > AppDir/apprun-hooks/sandbox.sh
+
+      - name: Fetch linuxdeploy
+        run: |
+          base=https://github.com/linuxdeploy/linuxdeploy/releases/download/continuous
+          qtbase=https://github.com/linuxdeploy/linuxdeploy-plugin-qt/releases/download/continuous
+          wget -q --tries=5 --retry-connrefused "$base/linuxdeploy-x86_64.AppImage"
+          wget -q --tries=5 --retry-connrefused "$qtbase/linuxdeploy-plugin-qt-x86_64.AppImage"
+          chmod +x linuxdeploy*.AppImage
+
+      - name: Build the AppImage (and populate the bundled AppDir)
+        run: |
+          export QMAKE="$QT_ROOT_DIR/bin/qmake"
+          export OUTPUT="whatsie-${{ steps.ver.outputs.ver }}-x86_64.AppImage"
+          n=0
+          until ./linuxdeploy-x86_64.AppImage --appdir AppDir \
+            --desktop-file AppDir/usr/share/applications/com.ktechpit.whatsie.desktop \
+            --icon-file AppDir/usr/share/icons/hicolor/256x256/apps/com.ktechpit.whatsie.png \
+            --plugin qt --output appimage; do
+            n=$((n+1)); [ $n -ge 3 ] && { echo "::error::linuxdeploy failed after $n attempts"; exit 1; }
+            echo "linuxdeploy attempt $n failed; retrying in 15s"; sleep 15
+          done
+
+      - name: Verify the WebEngine runtime survived bundling
+        run: |
+          need() { find AppDir -name "$1" | grep -q . || { echo "::error::missing $1 from the bundle"; exit 1; }; }
+          need QtWebEngineProcess
+          need icudtl.dat
+          need qtwebengine_resources.pak
+          find AppDir -path '*qtwebengine_locales/*.pak' | grep -q . || { echo "::error::no WebEngine locales bundled"; exit 1; }
+          test -f AppDir/usr/lib/libsoftokn3.so || { echo "::error::NSS not bundled"; exit 1; }
+
+      - name: Build the self-contained .deb (bundled Qt, installs to /opt)
+        id: deb
+        run: |
+          ver='${{ steps.ver.outputs.ver }}'
+          rm -rf pkg
+          mkdir -p pkg/opt/whatsie pkg/usr/bin pkg/usr/share/applications \
+                   pkg/usr/share/icons/hicolor pkg/usr/share/metainfo
+          cp -a AppDir/usr/. pkg/opt/whatsie/
+          # Launcher: turn off the WebEngine sandbox (no setuid helper under /opt),
+          # then exec the bundled binary, which finds its Qt via RPATH ($ORIGIN/../lib).
+          printf '#!/bin/sh\nexport QTWEBENGINE_DISABLE_SANDBOX=1\nexec /opt/whatsie/bin/whatsie "$@"\n' \
+            > pkg/usr/bin/whatsie
+          chmod 0755 pkg/usr/bin/whatsie
+          cp AppDir/usr/share/applications/com.ktechpit.whatsie.desktop pkg/usr/share/applications/
+          cp -a AppDir/usr/share/icons/hicolor/. pkg/usr/share/icons/hicolor/
+          cp AppDir/usr/share/metainfo/com.ktechpit.whatsie.metainfo.xml pkg/usr/share/metainfo/ 2>/dev/null || true
+          name="whatsie_${ver}_amd64.deb"
+          fpm -s dir -t deb -n whatsie -v "$ver" --license MIT \
+            --description "Feature-rich WhatsApp Web client for the desktop (Qt WebEngine bundled)" \
+            --url "https://github.com/keshavbhatt/whatsie" \
+            --maintainer "Keshav Bhatt <keshavnrj@gmail.com>" \
+            -d libglib2.0-0 -d libnss3 -d libxcomposite1 -d libxdamage1 \
+            -d libxrandr2 -d libxkbcommon0 -d libasound2 -d fonts-noto-core \
+            -C pkg --force -p "$name" opt usr
+          echo "path=$name" >> "$GITHUB_OUTPUT"
+
+      - name: Attach to the GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          tag='${{ steps.ver.outputs.tag }}'
+          gh release view "$tag" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1 \
+            || gh release create "$tag" --repo "$GITHUB_REPOSITORY" \
+                 --title "Whatsie ${{ steps.ver.outputs.ver }}" --generate-notes || true
+          gh release upload "$tag" \
+            "whatsie-${{ steps.ver.outputs.ver }}-x86_64.AppImage" \
+            "${{ steps.deb.outputs.path }}" \
+            --repo "$GITHUB_REPOSITORY" --clobber
