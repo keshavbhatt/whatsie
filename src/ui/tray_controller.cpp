@@ -219,7 +219,7 @@ void TrayController::updateTooltip()
     if (m_tray == nullptr) {
         return;
     }
-    QStringList parts{u"WhatsApp"_s};
+    QStringList parts{u"Whatsie"_s};
     if (m_unread > 0) {
         parts << tr("%n unread", nullptr, m_unread);
     }
