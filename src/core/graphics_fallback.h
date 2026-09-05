@@ -11,6 +11,13 @@ namespace whatsie::core {
 /// initialize (EGL/GLX/OpenGL/RHI). Matched by substring, case-insensitively.
 [[nodiscard]] bool isGraphicsInitFailure(const QString& message);
 
+/// True for the Chromium log line emitted on NVIDIA/Wayland when GBM buffers are
+/// unavailable and it falls back to Vulkan rendering — which paints the web view
+/// black while the GPU process stays healthy (issue #351). Not a hard init
+/// failure, so detected separately; on Wayland it warrants one retry under
+/// XWayland, where the NVIDIA driver renders correctly.
+[[nodiscard]] bool isGbmVulkanFallback(const QString& message);
+
 /// Relaunch under XCB only on Wayland, only once, and only if a graphics
 /// failure was actually observed.
 [[nodiscard]] bool shouldRetryUnderXcb(QLatin1StringView platformName, bool alreadyRetried, bool failureSeen);
