@@ -1,3 +1,12 @@
+whatsie (6.0.3) unstable; urgency=medium
+
+  * Drag-and-drop: show a drop hint and report files that can't be attached
+    instead of failing silently.
+  * Tray tooltip now reads "Whatsie".
+  * Bug-report diagnostics include the CPU architecture.
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Sat, 05 Sep 2026 12:00:00 +0530
+
 whatsie (6.0.1) unstable; urgency=medium
 
   * Debian packaging for the Qt 6 rewrite.

@@ -102,6 +102,16 @@
   </content_rating>
 
   <releases>
+    <release version="6.0.3" date="2026-09-05">
+      <description>
+        <p>Fixes and small improvements:</p>
+        <ul>
+          <li>Drag-and-drop now shows a "Drop files to send" hint and, when a file can't be attached, explains why instead of doing nothing</li>
+          <li>The system-tray tooltip now reads "Whatsie"</li>
+          <li>Bug-report diagnostics include the CPU architecture</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.0.2" date="2026-09-04">
       <description>
         <p>Feature and fix release:</p>
