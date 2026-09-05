@@ -23,17 +23,26 @@ DropOutcome buildDropPayload(const QStringList& paths, qint64 maxBytesPerFile)
     DropOutcome out;
     for (const QString& path : paths) {
         const QFileInfo info(path);
-        if (!info.isFile()) {
-            continue; // dropped a directory or something unreadable
+        if (info.isDir()) {
+            continue; // folders aren't attachable; nothing to report
+        }
+        if (!info.exists()) {
+            // Under a sandbox a dropped path outside the exported dirs (e.g. /tmp,
+            // external drives) is simply not visible here — report it so the drop
+            // does not fail silently.
+            qCWarning(lcWeb) << "drop: cannot access" << path << "(missing or outside sandbox)";
+            out.unreadable << info.fileName();
+            continue;
         }
         if (info.size() > maxBytesPerFile) {
-            qCWarning(lcWeb) << "drop: skipping" << info.fileName() << "(" << info.size() << "bytes > cap)";
-            out.skipped << info.fileName();
+            qCWarning(lcWeb) << "drop: skipping" << path << "(" << info.size() << "bytes > cap)";
+            out.tooLarge << info.fileName();
             continue;
         }
         QFile file(path);
         if (!file.open(QIODevice::ReadOnly)) {
-            out.skipped << info.fileName();
+            qCWarning(lcWeb) << "drop: cannot read" << path << file.errorString();
+            out.unreadable << info.fileName();
             continue;
         }
         const QByteArray bytes = file.readAll();

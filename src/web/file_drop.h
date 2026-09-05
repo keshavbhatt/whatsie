@@ -13,8 +13,10 @@ namespace whatsie::web {
 
 struct DropOutcome
 {
-    QJsonArray files;    ///< [{name, type, b64}] for files within the cap
-    QStringList skipped; ///< names skipped (too big / unreadable)
+    QJsonArray files;       ///< [{name, type, b64}] for files within the cap
+    QStringList tooLarge;   ///< names skipped for exceeding the size cap
+    QStringList unreadable; ///< names that could not be accessed (missing path /
+                            ///< sandbox confinement / permission denied)
     qint64 totalBytes = 0;
 };
 

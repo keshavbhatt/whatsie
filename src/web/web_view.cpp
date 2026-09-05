@@ -4,6 +4,7 @@
 #include "core/theme/theme_service.h"
 #include "core/unread_badge.h"
 #include "core/zoom_policy.h"
+#include "platform/platform_info.h"
 #include "web/bridge.h"
 #include "web/clipboard_fix.h"
 #include "web/error_page.h"
@@ -23,6 +24,7 @@
 #include <QDropEvent>
 #include <QFont>
 #include <QFutureWatcher>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QKeyEvent>
 #include <QMenu>
@@ -277,6 +279,10 @@ bool WebView::maybeHandleDrop(QObject* watched, QEvent* event)
 {
     Q_UNUSED(watched)
     const QEvent::Type t = event->type();
+    if (t == QEvent::DragLeave) {
+        hideDropHintSoon();
+        return false;
+    }
     if (t != QEvent::DragEnter && t != QEvent::DragMove && t != QEvent::Drop) {
         return false;
     }
@@ -295,15 +301,45 @@ bool WebView::maybeHandleDrop(QObject* watched, QEvent* event)
         return false;
     }
     if (t == QEvent::Drop) {
+        setDropHint(false);
         drop->setDropAction(Qt::CopyAction);
         drop->accept();
         handleFileDrop(paths);
     } else {
+        setDropHint(true);
         auto* move = static_cast<QDragMoveEvent*>(event);
         move->setDropAction(Qt::CopyAction);
         move->accept();
     }
     return true;
+}
+
+void WebView::setDropHint(bool on)
+{
+    if (m_dropHintHide != nullptr) {
+        m_dropHintHide->stop(); // any real activity cancels a pending hide
+    }
+    if (on == m_dropHintOn) {
+        return;
+    }
+    m_dropHintOn = on;
+    m_page->runJavaScript(u"window.__whatsieDropHint && window.__whatsieDropHint(%1)"_s.arg(
+                              on ? u"true"_s : u"false"_s),
+                          QWebEngineScript::MainWorld);
+}
+
+void WebView::hideDropHintSoon()
+{
+    if (!m_dropHintOn) {
+        return;
+    }
+    if (m_dropHintHide == nullptr) {
+        m_dropHintHide = new QTimer(this);
+        m_dropHintHide->setSingleShot(true);
+        m_dropHintHide->setInterval(80);
+        connect(m_dropHintHide, &QTimer::timeout, this, [this] { setDropHint(false); });
+    }
+    m_dropHintHide->start();
 }
 
 void WebView::handleFileDrop(const QStringList& paths)
@@ -313,21 +349,46 @@ void WebView::handleFileDrop(const QStringList& paths)
     connect(watcher, &QFutureWatcher<DropOutcome>::finished, this, [this, watcher] {
         const DropOutcome outcome = watcher->result();
         watcher->deleteLater();
-        if (!outcome.skipped.isEmpty()) {
-            qCWarning(lcWeb) << "drop skipped:" << outcome.skipped;
+        if (!outcome.files.isEmpty()) {
+            // A JSON array is valid JavaScript (base64/strings are properly
+            // escaped), so pass it straight as the call argument.
+            const QString arrayLiteral =
+                QString::fromUtf8(QJsonDocument(outcome.files).toJson(QJsonDocument::Compact));
+            m_page->runJavaScript(
+                u"window.__whatsieDropFiles && window.__whatsieDropFiles(%1)"_s.arg(arrayLiteral),
+                QWebEngineScript::MainWorld);
         }
-        if (outcome.files.isEmpty()) {
-            return;
+        const QString notice = dropFailureNotice(outcome);
+        if (!notice.isEmpty()) {
+            const QString arg =
+                QString::fromUtf8(QJsonDocument(QJsonArray{notice}).toJson(QJsonDocument::Compact));
+            m_page->runJavaScript(
+                u"window.__whatsieDropNotice && window.__whatsieDropNotice(%1[0])"_s.arg(arg),
+                QWebEngineScript::MainWorld);
         }
-        // A JSON array is valid JavaScript (base64/strings are properly escaped),
-        // so pass it straight as the call argument.
-        const QString arrayLiteral =
-            QString::fromUtf8(QJsonDocument(outcome.files).toJson(QJsonDocument::Compact));
-        m_page->runJavaScript(
-            u"window.__whatsieDropFiles && window.__whatsieDropFiles(%1)"_s.arg(arrayLiteral),
-            QWebEngineScript::MainWorld);
     });
     watcher->setFuture(QtConcurrent::run([paths] { return buildDropPayload(paths, kMaxDropBytesPerFile); }));
+}
+
+QString WebView::dropFailureNotice(const DropOutcome& outcome) const
+{
+    QStringList parts;
+    if (!outcome.unreadable.isEmpty()) {
+        if (platform::isSandboxed()) {
+            parts << tr("Couldn't attach %n file(s). In this sandboxed build files must live "
+                        "in a shared folder such as Downloads or Pictures — items in /tmp or "
+                        "other locations can't be read.",
+                        nullptr, static_cast<int>(outcome.unreadable.size()));
+        } else {
+            parts << tr("Couldn't read %n dropped file(s).", nullptr,
+                        static_cast<int>(outcome.unreadable.size()));
+        }
+    }
+    if (!outcome.tooLarge.isEmpty()) {
+        parts << tr("%n file(s) skipped — larger than the 64 MB limit.", nullptr,
+                    static_cast<int>(outcome.tooLarge.size()));
+    }
+    return parts.join(u" "_s);
 }
 
 void WebView::applyBlurLive()

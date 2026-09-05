@@ -21,6 +21,7 @@ namespace whatsie::web {
 class PermissionController;
 class WebPage;
 class WebProfile;
+struct DropOutcome;
 
 /// The widget that shows WhatsApp Web. Owns the profile and page; exposes
 /// only what the UI layer needs (zoom mode, unread count, chat links, crash
@@ -91,6 +92,9 @@ private:
     void handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost);
     bool maybeHandleDrop(class QObject* watched, class QEvent* event);
     void handleFileDrop(const QStringList& paths);
+    void setDropHint(bool on);
+    void hideDropHintSoon();
+    [[nodiscard]] QString dropFailureNotice(const DropOutcome& outcome) const;
 
     core::Settings& m_settings;
     core::ThemeService& m_theme;
@@ -101,6 +105,11 @@ private:
     core::ConnectionWatchdogPolicy m_watchdog;
     class QTimer* m_watchdogTimer = nullptr;
     QElapsedTimer m_clock;
+    // Debounced hide for the drag-and-drop hint overlay: DragLeave can fire
+    // spuriously between Chromium's nested widgets, so hide on a short delay
+    // that any further DragMove cancels.
+    class QTimer* m_dropHintHide = nullptr;
+    bool m_dropHintOn = false;
     bool m_maximizedMode = false;
     int m_unread = 0;
     // Current custom error page (if shown), remembered so it can be re-rendered
