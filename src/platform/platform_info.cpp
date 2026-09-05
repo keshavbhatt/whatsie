@@ -14,6 +14,7 @@ QString describeHost()
 {
     QStringList parts;
     parts << QSysInfo::prettyProductName();
+    parts << u"arch: %1"_s.arg(QSysInfo::currentCpuArchitecture());
     parts << u"Qt %1 (built against %2)"_s.arg(QString::fromLatin1(qVersion()),
                                                QLibraryInfo::version().toString());
     if (QGuiApplication::instance() != nullptr) {
