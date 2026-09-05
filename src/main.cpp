@@ -53,12 +53,19 @@ void applyInterfaceScaleEnv()
 // FEATURES S20: watch the log stream for a graphics-backend init failure so we
 // can fall back from a broken Wayland RHI to XCB, once.
 std::atomic<bool> g_graphicsFailed{false};
+// NVIDIA/Wayland renders the web view black via the GBM→Vulkan fallback while the
+// GPU process stays healthy, so no init failure or crash fires — XWayland fixes
+// it and keeps GPU acceleration (issue #351).
+std::atomic<bool> g_gpuBlackScreen{false};
 QtMessageHandler g_previousHandler = nullptr;
 
 void graphicsWatchHandler(QtMsgType type, const QMessageLogContext& context, const QString& message)
 {
     if (whatsie::core::isGraphicsInitFailure(message)) {
         g_graphicsFailed.store(true);
+    }
+    if (whatsie::core::isGbmVulkanFallback(message)) {
+        g_gpuBlackScreen.store(true);
     }
     if (g_previousHandler != nullptr) {
         g_previousHandler(type, context, message);
@@ -196,7 +203,7 @@ int main(int argc, char* argv[])
     if (!retried && QGuiApplication::platformName() == QLatin1StringView("wayland")) {
         QTimer::singleShot(3000, &window, [&app] {
             if (whatsie::core::shouldRetryUnderXcb(QLatin1StringView("wayland"), false,
-                                                   g_graphicsFailed.load())) {
+                                                   g_graphicsFailed.load() || g_gpuBlackScreen.load())) {
                 relaunchUnderXcb(app);
             }
         });
