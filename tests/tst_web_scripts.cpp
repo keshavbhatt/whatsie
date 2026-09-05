@@ -120,8 +120,9 @@ private Q_SLOTS:
 
         const auto outcome = whatsie::web::buildDropPayload(
             {ok, big, dir.filePath(u"adir"_s), dir.filePath(u"missing"_s)}, 1024);
-        QCOMPARE(outcome.files.size(), 1); // big skipped (cap), dir + missing ignored
-        QCOMPARE(outcome.skipped, QStringList{u"big.bin"_s});
+        QCOMPARE(outcome.files.size(), 1); // dir ignored
+        QCOMPARE(outcome.tooLarge, QStringList{u"big.bin"_s});   // over the cap
+        QCOMPARE(outcome.unreadable, QStringList{u"missing"_s}); // not visible / gone
         const QJsonObject f = outcome.files.first().toObject();
         QCOMPARE(f.value(u"name"_s).toString(), u"photo.png"_s);
         QCOMPARE(f.value(u"type"_s).toString(), u"image/png"_s);
