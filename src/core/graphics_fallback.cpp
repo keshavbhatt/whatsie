@@ -26,6 +26,13 @@ bool isGraphicsInitFailure(const QString& message)
     return false;
 }
 
+bool isGbmVulkanFallback(const QString& message)
+{
+    // Chromium/ozone emits this on the NVIDIA driver under Wayland when it cannot
+    // allocate GBM buffers; the Vulkan fallback then renders the page black.
+    return message.contains(QLatin1StringView("GBM is not supported"), Qt::CaseInsensitive);
+}
+
 bool shouldRetryUnderXcb(QLatin1StringView platformName, bool alreadyRetried, bool failureSeen)
 {
     return failureSeen && !alreadyRetried && platformName == QLatin1StringView("wayland");

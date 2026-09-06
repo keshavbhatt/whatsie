@@ -31,6 +31,26 @@ private Q_SLOTS:
         QCOMPARE(isGraphicsInitFailure(message), isFailure);
     }
 
+    void detectsGbmVulkanFallback_data()
+    {
+        QTest::addColumn<QString>("message");
+        QTest::addColumn<bool>("isFallback");
+        QTest::newRow("nvidia gbm") << u"GBM is not supported with the current configuration. "
+                                       "Fallback to Vulkan rendering in Chromium."_s
+                                    << true;
+        QTest::newRow("case") << u"gbm IS NOT SUPPORTED"_s << true;
+        QTest::newRow("normal gpu log") << u"Using GPU rasterization"_s << false;
+        QTest::newRow("real failure") << u"eglInitialize failed"_s << false;
+        QTest::newRow("empty") << QString() << false;
+    }
+
+    void detectsGbmVulkanFallback()
+    {
+        QFETCH(QString, message);
+        QFETCH(bool, isFallback);
+        QCOMPARE(isGbmVulkanFallback(message), isFallback);
+    }
+
     void retriesOnlyOnWaylandOnceAfterFailure()
     {
         QCOMPARE(shouldRetryUnderXcb("wayland"_L1, false, true), true);
