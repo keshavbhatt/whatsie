@@ -1,6 +1,7 @@
 #include "core/spellcheck.h"
 
 #include <QDir>
+#include <QFile>
 #include <QFileInfo>
 #include <QLocale>
 
@@ -45,6 +46,41 @@ QStringList availableDictionaries(const QString& dictionaryDir)
     }
     names.sort();
     return names;
+}
+
+QString prepareDictionaryDir(const QString& bundledDir, const QString& userDir)
+{
+    if (userDir.isEmpty()) {
+        return bundledDir; // nowhere writable — fall back to the bundled set
+    }
+    QDir dir(userDir);
+    if (!dir.exists() && !QDir().mkpath(userDir)) {
+        return bundledDir; // could not create the writable directory
+    }
+    // Drop every bundled symlink we previously created (valid or now-stale, e.g.
+    // a gone snap revision) so the set is rebuilt fresh; a user's own real .bdic
+    // is left untouched.
+    const auto present = dir.entryInfoList({u"*.bdic"_s}, QDir::Files | QDir::System);
+    for (const QFileInfo& entry : present) {
+        if (entry.isSymLink()) {
+            QFile::remove(entry.absoluteFilePath());
+        }
+    }
+    // Link the current bundled dictionaries in beside the user's own, never
+    // clobbering a real file the user dropped with the same name.
+    if (!bundledDir.isEmpty()) {
+        const auto bundled = QDir(bundledDir).entryInfoList({u"*.bdic"_s}, QDir::Files, QDir::Name);
+        for (const QFileInfo& entry : bundled) {
+            const QString dest = dir.filePath(entry.fileName());
+            if (QFileInfo::exists(dest)) {
+                continue; // a user override with the same name — keep theirs
+            }
+            if (!QFile::link(entry.absoluteFilePath(), dest)) {
+                QFile::copy(entry.absoluteFilePath(), dest); // symlinks unavailable
+            }
+        }
+    }
+    return userDir;
 }
 
 QString resolveDictionary(const QString& want, const QStringList& available)

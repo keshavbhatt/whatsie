@@ -111,6 +111,24 @@ Download the installer or portable build from the
 
 Windows 10/11, 64-bit; it bundles its own Qt runtime.
 
+## Spell check
+
+Whatsie bundles dictionaries for several languages (English, German, Spanish,
+French, Italian, Russian). Turn it on and pick a language in **Settings →
+Advanced → Spell check**.
+
+To add a language that isn't bundled, drop its Chromium `<code>.bdic` file into
+the dictionaries folder — the **Open folder…** button in that same settings
+section takes you straight there (then reopen the dialog to pick the language):
+
+- **Snap:** `~/snap/whatsie/current/.local/share/ktechpit/whatsie/qtwebengine_dictionaries/`
+- **Flatpak:** `~/.var/app/com.ktechpit.whatsie/data/ktechpit/whatsie/qtwebengine_dictionaries/`
+- **Other:** `~/.local/share/ktechpit/whatsie/qtwebengine_dictionaries/`
+
+`.bdic` is Chromium's compiled dictionary format. Convert a Hunspell `.dic`/`.aff`
+pair with the `qwebengine_convert_dict` tool that ships with Qt WebEngine, e.g.
+`qwebengine_convert_dict fr_FR.dic fr-FR.bdic`.
+
 ## Build from source
 
 Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub
