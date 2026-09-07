@@ -102,6 +102,15 @@
   </content_rating>
 
   <releases>
+    <release version="6.0.4" date="2026-09-07">
+      <description>
+        <p>Fixes:</p>
+        <ul>
+          <li>Spell check no longer silently fails to load its dictionaries, and you can now add languages yourself from Settings → Advanced → Spell check</li>
+          <li>On NVIDIA graphics under Wayland, Whatsie falls back to software rendering automatically instead of showing a black screen</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.0.3" date="2026-09-05">
       <description>
         <p>Fixes and small improvements:</p>

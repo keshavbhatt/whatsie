@@ -1,3 +1,11 @@
+whatsie (6.0.4) unstable; urgency=medium
+
+  * Spell check: fix dictionaries silently failing to load; allow adding
+    languages from Settings → Advanced → Spell check.
+  * NVIDIA/Wayland: fall back to software rendering instead of a black screen.
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Mon, 07 Sep 2026 12:00:00 +0530
+
 whatsie (6.0.3) unstable; urgency=medium
 
   * Drag-and-drop: show a drop hint and report files that can't be attached
