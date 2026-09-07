@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.21)
 
 project(whatsie
-    VERSION 6.0.3
+    VERSION 6.0.4
     DESCRIPTION "WhatsApp Web desktop client built with Qt WebEngine"
     HOMEPAGE_URL "https://github.com/keshavbhatt/whatsie"
     LANGUAGES CXX
