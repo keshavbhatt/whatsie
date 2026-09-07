@@ -20,6 +20,15 @@ namespace whatsie::core {
 /// sorted. Empty when the directory is missing or has none.
 [[nodiscard]] QStringList availableDictionaries(const QString& dictionaryDir);
 
+/// Prepares a single writable directory holding both the bundled dictionaries
+/// and any the user has sideloaded (issue #353). QtWebEngine only ever searches
+/// one directory, so the bundled `.bdic` files in `bundledDir` are symlinked
+/// (copied where symlinks are unavailable) into `userDir` beside the user's own
+/// files. Bundled symlinks are refreshed each call so they never go stale across
+/// an app update; a real file the user dropped is never overwritten. Returns the
+/// directory to point QtWebEngine at: `userDir` when usable, else `bundledDir`.
+[[nodiscard]] QString prepareDictionaryDir(const QString& bundledDir, const QString& userDir);
+
 /// Picks the installed dictionary to actually use for `want` (a name from
 /// dictionaryNameForLocale, e.g. "en-IN"): the exact one if present, else the
 /// bare language ("en"), else the first same-language variant ("en-GB"), else

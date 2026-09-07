@@ -468,6 +468,24 @@ QWidget* SettingsDialog::buildAdvancedTab()
         row->addRow(tr("Language:"), m_spellLanguage);
         spellLayout->addLayout(row);
     }
+
+    // Let users add languages we don't bundle by dropping .bdic files into the
+    // writable dictionaries folder QtWebEngine reads (issue #353).
+    const QString dictDir = qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH");
+    if (!dictDir.isEmpty()) {
+        auto* addRow = new QHBoxLayout;
+        auto* hint = new QLabel(tr("Missing a language? Drop its .bdic dictionary file into the "
+                                   "dictionaries folder, then reopen this dialog."),
+                                spellBox);
+        hint->setWordWrap(true);
+        hint->setStyleSheet(u"color: palette(placeholder-text);"_s);
+        auto* openDir = new QPushButton(tr("Open folder…"), spellBox);
+        connect(openDir, &QPushButton::clicked, this,
+                [dictDir] { QDesktopServices::openUrl(QUrl::fromLocalFile(dictDir)); });
+        addRow->addWidget(hint, 1);
+        addRow->addWidget(openDir, 0, Qt::AlignTop);
+        spellLayout->addLayout(addRow);
+    }
     outer->addWidget(spellBox);
 
     outer->addWidget(buildNetworkGroup());

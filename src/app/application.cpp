@@ -187,12 +187,19 @@ void Application::applyChromiumFlags()
 
 void Application::configureDictionaries()
 {
-    // Point QtWebEngine at bundled .bdic spell-check dictionaries (FEATURES L1),
-    // unless the environment already sets it. Roots cover dev, /usr, snap and
-    // flatpak; findDictionariesPath returns the qtwebengine_dictionaries dir.
+    // Point QtWebEngine at bundled .bdic spell-check dictionaries (FEATURES L1).
+    // An expert may override the location, but only honour a pre-set path that
+    // actually holds dictionaries — a stale or empty value (e.g. one a user
+    // exported while experimenting) must not silently disable spell check (#353).
     if (qEnvironmentVariableIsSet("QTWEBENGINE_DICTIONARIES_PATH")) {
-        return;
+        const QString preset = qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH");
+        if (!core::availableDictionaries(preset).isEmpty()) {
+            qCInfo(lcApp) << "spell-check dictionaries: using preset path" << preset;
+            return;
+        }
+        qCWarning(lcApp) << "ignoring QTWEBENGINE_DICTIONARIES_PATH (no .bdic in" << preset << ")";
     }
+    // Roots cover dev, /usr, snap and flatpak.
     QStringList roots;
     if (qEnvironmentVariableIsSet("SNAP")) {
         roots << qEnvironmentVariable("SNAP") + u"/usr/share/whatsie"_s;
@@ -200,10 +207,17 @@ void Application::configureDictionaries()
     const QString appDir = applicationDirPath();
     roots << QDir(appDir).filePath(u"../share/whatsie"_s) << appDir << u"/app/share/whatsie"_s
           << u"/usr/share/whatsie"_s;
-    const QString dir = core::findDictionariesPath(roots);
+    const QString bundled = core::findDictionariesPath(roots);
+
+    // Merge the bundled dictionaries with any the user has sideloaded into a
+    // single writable directory (issue #353) — QtWebEngine only searches one.
+    const QString userDir = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+                            + u"/qtwebengine_dictionaries"_s;
+    const QString dir = core::prepareDictionaryDir(bundled, userDir);
     if (!dir.isEmpty()) {
         qputenv("QTWEBENGINE_DICTIONARIES_PATH", QDir(dir).absolutePath().toUtf8());
-        qCInfo(lcApp) << "spell-check dictionaries:" << dir;
+        qCInfo(lcApp) << "spell-check dictionaries:" << dir
+                      << "(drop your own .bdic files here to add languages)";
     } else {
         qCInfo(lcApp) << "no bundled spell-check dictionaries found; relying on defaults";
     }
