@@ -54,8 +54,8 @@ void applyInterfaceScaleEnv()
 // can fall back from a broken Wayland RHI to XCB, once.
 std::atomic<bool> g_graphicsFailed{false};
 // NVIDIA/Wayland renders the web view black via the GBM→Vulkan fallback while the
-// GPU process stays healthy, so no init failure or crash fires — XWayland fixes
-// it and keeps GPU acceleration (issue #351).
+// GPU process stays healthy, so no init failure or crash fires — fall back to
+// software rendering, which recovers it (XWayland can fail to start; issue #351).
 std::atomic<bool> g_gpuBlackScreen{false};
 QtMessageHandler g_previousHandler = nullptr;
 
@@ -198,12 +198,24 @@ int main(int argc, char* argv[])
     // the crash probe so the next start is not treated as a GPU crash.
     QTimer::singleShot(20000, &app, [&app] { app.markGpuStable(); });
 
-    // Give the GPU stack time to fail, then fall back to XCB if it did (once).
-    const bool retried = qEnvironmentVariableIsSet("WHATSIE_XCB_RETRY");
-    if (!retried && QGuiApplication::platformName() == QLatin1StringView("wayland")) {
+    // Give the GPU/graphics stack time to fail, then self-heal (once).
+    if (QGuiApplication::platformName() == QLatin1StringView("wayland")) {
         QTimer::singleShot(3000, &window, [&app] {
-            if (whatsie::core::shouldRetryUnderXcb(QLatin1StringView("wayland"), false,
-                                                   g_graphicsFailed.load() || g_gpuBlackScreen.load())) {
+            // A silent black web view on NVIDIA/Wayland (GBM unavailable → Vulkan
+            // fallback) is recovered by software rendering: switching to XWayland
+            // can fail to start there entirely (issue #351). Only under Automatic
+            // and only once — persisting the fallback stops it recurring.
+            if (g_gpuBlackScreen.load()
+                && app.settings().hardwareAcceleration() == whatsie::core::HardwareAcceleration::Auto
+                && !app.settings().gpuAutoDisabled()) {
+                relaunchForGpuFallback(app);
+                return;
+            }
+            // A hard graphics-backend init failure on Wayland is retried under XCB
+            // once (FEATURES S20).
+            const bool retried = qEnvironmentVariableIsSet("WHATSIE_XCB_RETRY");
+            if (whatsie::core::shouldRetryUnderXcb(QLatin1StringView("wayland"), retried,
+                                                   g_graphicsFailed.load())) {
                 relaunchUnderXcb(app);
             }
         });

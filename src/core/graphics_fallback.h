@@ -14,8 +14,8 @@ namespace whatsie::core {
 /// True for the Chromium log line emitted on NVIDIA/Wayland when GBM buffers are
 /// unavailable and it falls back to Vulkan rendering — which paints the web view
 /// black while the GPU process stays healthy (issue #351). Not a hard init
-/// failure, so detected separately; on Wayland it warrants one retry under
-/// XWayland, where the NVIDIA driver renders correctly.
+/// failure, so detected separately; it warrants a one-shot fall back to software
+/// rendering (switching to XWayland can fail to start on these setups).
 [[nodiscard]] bool isGbmVulkanFallback(const QString& message);
 
 /// Relaunch under XCB only on Wayland, only once, and only if a graphics
