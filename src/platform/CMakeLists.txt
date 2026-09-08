@@ -7,6 +7,8 @@ qt_add_library(whatsie_platform STATIC
     crash_handler.h
     file_manager.h
     gpu_stderr_watch.h
+    launcher_badge.cpp
+    launcher_badge.h
     logging.cpp
     logging.h
     notifier_factory.cpp
@@ -30,6 +32,7 @@ if(LINUX)
         linux/dbus_image.h
         linux/file_manager_dbus.cpp
         linux/gpu_stderr_watch.cpp
+        linux/launcher_badge_dbus.cpp
         linux/freedesktop_notifier.cpp
         linux/freedesktop_notifier.h
         linux/portal_notifier.cpp
@@ -41,6 +44,7 @@ else()
         crash_handler_generic.cpp
         file_manager_generic.cpp
         gpu_stderr_watch_generic.cpp
+        launcher_badge_generic.cpp
     )
     if(WIN32)
         target_sources(whatsie_platform PRIVATE windows/autostart_registry.cpp)
