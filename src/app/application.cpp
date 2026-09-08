@@ -34,6 +34,21 @@ Application::Application(int& argc, char** argv)
     setOrganizationName(QString::fromLatin1(version::kOrganizationName));
     setOrganizationDomain(QString::fromLatin1(version::kOrganizationDomain));
     setDesktopFileName(QString::fromLatin1(version::kDesktopId));
+    // Under a snap, snapd exports the desktop file as "<snap>_<app>.desktop", not
+    // the reverse-DNS id — so a Wayland shell (e.g. GNOME) can't match the window
+    // to it and shows the raw app id with a generic icon (issue #357). Set the app
+    // id to the exported name so it resolves. (Flatpak exports the reverse-DNS
+    // name, which already matches, and native installs use it too.)
+    if (qEnvironmentVariableIsSet("SNAP")) {
+        QByteArray snap = qgetenv("SNAP_INSTANCE_NAME");
+        if (snap.isEmpty()) {
+            snap = qgetenv("SNAP_NAME");
+        }
+        if (!snap.isEmpty()) {
+            setDesktopFileName(
+                u"%1_%2"_s.arg(QString::fromUtf8(snap), QString::fromLatin1(version::kApplicationName)));
+        }
+    }
     setWindowIcon(QIcon(u":/icons/whatsie.svg"_s));
     setQuitOnLastWindowClosed(false); // the tray keeps us alive; MainWindow decides
 
