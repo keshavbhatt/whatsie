@@ -146,6 +146,10 @@ cmake --build build -j
 ctest --test-dir build --output-on-failure
 ```
 
+Packagers can bundle only selected spell-check dictionaries with, e.g.,
+`-DWHATSIE_DICTIONARIES="en-US;de-DE"` (empty — the default — bundles every
+Hunspell dictionary found in `-DWHATSIE_HUNSPELL_DIR`, `/usr/share/hunspell`).
+
 ## Project layout
 
 ```
