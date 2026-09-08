@@ -115,6 +115,12 @@ if(LINUX)
               /usr/lib/qt6/libexec /usr/libexec /usr/libexec/qt6
         PATH_SUFFIXES libexec qt6/libexec)
     set(WHATSIE_HUNSPELL_DIR "/usr/share/hunspell" CACHE PATH "hunspell .aff/.dic directory")
+    # Distro/lean builds can bundle only the dictionaries they want (issue #61),
+    # e.g. -DWHATSIE_DICTIONARIES="en-US;de-DE". Names match the .bdic; '-' and '_'
+    # are equivalent. Empty (the default) bundles every dictionary found.
+    set(WHATSIE_DICTIONARIES "" CACHE STRING
+        "Semicolon-separated spell-check dictionaries to bundle (empty = all found)")
+    string(REPLACE "_" "-" _whatsie_want "${WHATSIE_DICTIONARIES}")
     set(_whatsie_dicts_out "${CMAKE_BINARY_DIR}/qtwebengine_dictionaries")
     message(STATUS "whatsie: qwebengine_convert_dict = ${WHATSIE_CONVERT_DICT}")
     if(EXISTS "${WHATSIE_HUNSPELL_DIR}")
@@ -127,10 +133,14 @@ if(LINUX)
     if(WHATSIE_CONVERT_DICT AND EXISTS "${WHATSIE_HUNSPELL_DIR}")
         file(GLOB _whatsie_affs "${WHATSIE_HUNSPELL_DIR}/*.aff")
         file(MAKE_DIRECTORY "${_whatsie_dicts_out}")
+        set(_whatsie_built "")
         foreach(_aff ${_whatsie_affs})
             get_filename_component(_base "${_aff}" NAME_WE)
             if(EXISTS "${WHATSIE_HUNSPELL_DIR}/${_base}.dic")
                 string(REPLACE "_" "-" _dictname "${_base}")
+                if(_whatsie_want AND NOT _dictname IN_LIST _whatsie_want)
+                    continue() # not among the requested dictionaries
+                endif()
                 execute_process(
                     COMMAND "${WHATSIE_CONVERT_DICT}"
                             "${WHATSIE_HUNSPELL_DIR}/${_base}.dic"
@@ -138,7 +148,15 @@ if(LINUX)
                     RESULT_VARIABLE _rc OUTPUT_QUIET ERROR_QUIET)
                 if(_rc EQUAL 0)
                     message(STATUS "whatsie: bundled spell-check dictionary ${_dictname}")
+                    list(APPEND _whatsie_built "${_dictname}")
                 endif()
+            endif()
+        endforeach()
+        # Point out any requested dictionary that wasn't found, so a typo or a
+        # missing hunspell package in a lean build is obvious.
+        foreach(_w ${_whatsie_want})
+            if(NOT _w IN_LIST _whatsie_built)
+                message(WARNING "whatsie: requested dictionary '${_w}' not found in ${WHATSIE_HUNSPELL_DIR}")
             endif()
         endforeach()
     else()
