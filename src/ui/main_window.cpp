@@ -8,6 +8,7 @@
 #include "core/theme/theme_service.h"
 #include "core/zoom_policy.h"
 #include "platform/autostart.h"
+#include "platform/launcher_badge.h"
 #include "ui/about_dialog.h"
 #include "ui/actions.h"
 #include "ui/downloads_hub.h"
@@ -647,6 +648,10 @@ void MainWindow::syncAutostart()
 void MainWindow::handleUnread(int count)
 {
     m_tray->setUnreadCount(count); // unread shows on the tray; the window keeps the colour logo
+    // Also surface it on the launcher/taskbar button where the desktop supports it
+    // (FEATURES T8, issue #122). The app id matches the desktop file GNOME/KDE use,
+    // including the snapd-exported name under a snap.
+    platform::setLauncherCount(QGuiApplication::desktopFileName(), count);
 }
 
 void MainWindow::handleRenderProcessGaveUp()

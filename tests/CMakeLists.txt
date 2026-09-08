@@ -57,6 +57,7 @@ whatsie_add_test(tst_storage_and_flags   tst_storage_and_flags.cpp   whatsie_cor
 whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_core GUI)
 whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
 # platform
+whatsie_add_test(tst_launcher_badge      tst_launcher_badge.cpp      whatsie_platform)
 if(LINUX)
     whatsie_add_test(tst_freedesktop_notifier tst_freedesktop_notifier.cpp whatsie_platform GUI)
 endif()
