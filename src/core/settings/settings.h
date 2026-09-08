@@ -257,6 +257,8 @@ private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;
     /// Writes and returns true when the stored value actually changed.
     bool storeBool(QLatin1StringView key, bool def, bool value);
+    /// Moves settings off the reserved "general" INI group to their new keys (#171).
+    void migrateLegacyGeneralKeys();
 
     std::unique_ptr<QSettings> m_store;
     QString m_proxyPassword; // session-only, never persisted

@@ -27,7 +27,9 @@ inline constexpr QLatin1StringView kInterfaceScale{"view/interfaceScale"};
 inline constexpr QLatin1StringView kMuted{"view/muted"};
 
 // general/
-inline constexpr QLatin1StringView kAutostart{"general/autostart"};
+// "app/" not "general/": QSettings reserves the INI "General" section, so a
+// general/ key serialises to a malformed, unreadable [%General] (#171).
+inline constexpr QLatin1StringView kAutostart{"app/autostart"};
 
 // privacy/
 inline constexpr QLatin1StringView kMessageBlurLevel{"privacy/messageBlurLevel"};
