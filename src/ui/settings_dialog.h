@@ -7,6 +7,7 @@ class QComboBox;
 class QDoubleSpinBox;
 class QLabel;
 class QLineEdit;
+class QListWidget;
 class QSpinBox;
 class QTabWidget;
 class QWebEngineProfile;
@@ -63,6 +64,7 @@ private:
     QWidget* buildLockGroup();
     void updateProxyEnabled();
     void updateLockUi();
+    void applySpellLanguageChecks();
     void restoreDefaults();
 
     core::Settings& m_settings;
@@ -93,7 +95,7 @@ private:
     QComboBox* m_hardwareAcceleration = nullptr;
     QSpinBox* m_jsMemoryLimit = nullptr;
     QCheckBox* m_spellCheck = nullptr;
-    QComboBox* m_spellLanguage = nullptr;
+    QListWidget* m_spellLanguages = nullptr;
     QLabel* m_lockStatus = nullptr;
     QPushButton* m_lockSet = nullptr;
     QPushButton* m_lockRemove = nullptr;
