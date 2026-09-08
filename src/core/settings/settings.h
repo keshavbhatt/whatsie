@@ -152,6 +152,11 @@ public:
     [[nodiscard]] QStringList spellCheckLanguages() const;
     void setSpellCheckLanguages(const QStringList& languages);
 
+    /// Interface (UI) language as a locale name (e.g. "es", "pt_BR"); empty
+    /// follows the system locale. Applied at startup (#171).
+    [[nodiscard]] QString interfaceLanguage() const;
+    void setInterfaceLanguage(const QString& locale);
+
     // advanced/
     [[nodiscard]] HardwareAcceleration hardwareAcceleration() const;
     void setHardwareAcceleration(HardwareAcceleration mode);

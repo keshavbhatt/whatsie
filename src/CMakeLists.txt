@@ -52,3 +52,27 @@ install(TARGETS whatsie
     BUNDLE DESTINATION .
     RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
 )
+
+# Interface translations (issue #171). Compile src/i18n/<lang>.ts to .qm and
+# embed them at :/i18n so main.cpp can load one for the chosen or system locale.
+# Needs the Qt Linguist tools; where they are absent (some SDKs) the build
+# simply ships an English-only interface.
+find_package(Qt6 QUIET COMPONENTS LinguistTools)
+if(Qt6LinguistTools_FOUND)
+    qt_add_translations(whatsie
+        SOURCE_TARGETS whatsie_core whatsie_platform whatsie_web whatsie_ui whatsie_app
+        TS_FILES
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/de.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/es.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/fr.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/it.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/pt_BR.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/ru.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/zh_CN.ts
+        RESOURCE_PREFIX "/i18n"
+    )
+else()
+    message(WARNING
+        "whatsie: Qt Linguist tools not found; the interface will be English only. "
+        "Install them (qt6-l10n-tools on Debian/Ubuntu) to build translations.")
+endif()
