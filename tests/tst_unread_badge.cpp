@@ -4,6 +4,8 @@
 #include <QPainter>
 #include <QTest>
 
+#include <algorithm>
+
 using namespace Qt::StringLiterals;
 using namespace whatsie::core;
 
@@ -123,6 +125,44 @@ private Q_SLOTS:
     }
 
     void monochromeIconNullPassesThrough() { QVERIFY(monochromeIcon(QImage()).isNull()); }
+
+    void fitGlyphCentresAndScales()
+    {
+        // A 200x200 canvas with a 60x60 opaque block anchored top-left, like a
+        // symbolic SVG whose glyph sits small and off-centre in its padding.
+        QImage glyph(200, 200, QImage::Format_ARGB32_Premultiplied);
+        glyph.fill(Qt::transparent);
+        {
+            QPainter p(&glyph);
+            p.fillRect(QRect(0, 0, 60, 60), Qt::black);
+        }
+        const QImage out = fitGlyphToIcon(glyph, 128, 0.9);
+        QCOMPARE(out.size(), QSize(128, 128));
+
+        int minX = 128;
+        int minY = 128;
+        int maxX = -1;
+        int maxY = -1;
+        for (int y = 0; y < out.height(); ++y) {
+            const auto* line = reinterpret_cast<const QRgb*>(out.constScanLine(y));
+            for (int x = 0; x < out.width(); ++x) {
+                if (qAlpha(line[x]) != 0) {
+                    minX = std::min(minX, x);
+                    maxX = std::max(maxX, x);
+                    minY = std::min(minY, y);
+                    maxY = std::max(maxY, y);
+                }
+            }
+        }
+        // Scaled to ~0.9*128 ≈ 115 px (square block keeps its aspect ratio).
+        QVERIFY(maxX - minX + 1 >= 112 && maxX - minX + 1 <= 118);
+        QVERIFY(maxY - minY + 1 >= 112 && maxY - minY + 1 <= 118);
+        // Centred: margins on opposite sides are equal to within a pixel.
+        QVERIFY(qAbs(minX - (127 - maxX)) <= 1);
+        QVERIFY(qAbs(minY - (127 - maxY)) <= 1);
+    }
+
+    void fitGlyphNullPassesThrough() { QVERIFY(fitGlyphToIcon(QImage(), 128, 0.9).isNull()); }
 
 private:
     static QImage solid(int size, const QColor& color)

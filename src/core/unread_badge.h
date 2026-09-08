@@ -27,4 +27,9 @@ namespace whatsie::core {
 /// colour is not knowable and is independent of the app theme.
 [[nodiscard]] QImage monochromeIcon(const QImage& glyph);
 
+/// Trims the transparent margin around `glyph`, then centres it in a `size`×`size`
+/// square filling `fill` (0..1) of the box. A symbolic glyph with uneven internal
+/// padding otherwise renders small and off-centre next to other tray icons (#356).
+[[nodiscard]] QImage fitGlyphToIcon(const QImage& glyph, int size, qreal fill);
+
 } // namespace whatsie::core
