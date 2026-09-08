@@ -32,6 +32,7 @@
 #include <QInputDialog>
 #include <QLabel>
 #include <QLineEdit>
+#include <QListWidget>
 #include <QLocale>
 #include <QMessageBox>
 #include <QPushButton>
@@ -434,8 +435,8 @@ QWidget* SettingsDialog::buildAdvancedTab()
     m_spellCheck = new QCheckBox(tr("Check spelling as I type"), spellBox);
     connect(m_spellCheck, &QCheckBox::toggled, this, [this](bool on) {
         m_settings.setSpellCheckEnabled(on);
-        if (m_spellLanguage != nullptr) {
-            m_spellLanguage->setEnabled(on); // no point choosing a language while off
+        if (m_spellLanguages != nullptr) {
+            m_spellLanguages->setEnabled(on); // no point choosing languages while off
         }
     });
     spellLayout->addWidget(m_spellCheck);
@@ -448,25 +449,39 @@ QWidget* SettingsDialog::buildAdvancedTab()
         none->setStyleSheet(u"color: palette(placeholder-text);"_s);
         spellLayout->addWidget(none);
     } else {
-        auto* row = new QFormLayout;
-        m_spellLanguage = new QComboBox(spellBox);
+        // Several languages can be checked at once — WhatsApp Web spell-checks
+        // against every selected dictionary (issue #132).
+        auto* label = new QLabel(tr("Languages (check every one to spell-check against):"), spellBox);
+        label->setWordWrap(true);
+        spellLayout->addWidget(label);
+
+        m_spellLanguages = new QListWidget(spellBox);
+        m_spellLanguages->setMaximumHeight(160);
         for (const QString& code : available) {
             const QLocale loc(code);
-            const QString label = loc.language() == QLocale::AnyLanguage
-                                      ? code
-                                      : tr("%1 (%2) — %3")
-                                            .arg(QLocale::languageToString(loc.language()),
-                                                 QLocale::territoryToString(loc.territory()), code);
-            m_spellLanguage->addItem(label, code);
+            const QString text = loc.language() == QLocale::AnyLanguage
+                                     ? code
+                                     : tr("%1 (%2) — %3")
+                                           .arg(QLocale::languageToString(loc.language()),
+                                                QLocale::territoryToString(loc.territory()), code);
+            auto* item = new QListWidgetItem(text, m_spellLanguages);
+            item->setFlags(item->flags() | Qt::ItemIsUserCheckable);
+            item->setData(Qt::UserRole, code);
+            item->setCheckState(Qt::Unchecked);
         }
-        const QString effective =
-            core::resolveDictionary(m_settings.spellCheckLanguages().value(0), available);
-        m_spellLanguage->setCurrentIndex(std::max(0, m_spellLanguage->findData(effective)));
-        connect(m_spellLanguage, &QComboBox::currentIndexChanged, this, [this](int index) {
-            m_settings.setSpellCheckLanguages({m_spellLanguage->itemData(index).toString()});
+        // Connect after the checks are seeded (below) so populating doesn't write back.
+        connect(m_spellLanguages, &QListWidget::itemChanged, this, [this] {
+            QStringList chosen;
+            for (int i = 0; i < m_spellLanguages->count(); ++i) {
+                const QListWidgetItem* item = m_spellLanguages->item(i);
+                if (item->checkState() == Qt::Checked) {
+                    chosen << item->data(Qt::UserRole).toString();
+                }
+            }
+            m_settings.setSpellCheckLanguages(chosen);
         });
-        row->addRow(tr("Language:"), m_spellLanguage);
-        spellLayout->addLayout(row);
+        applySpellLanguageChecks();
+        spellLayout->addWidget(m_spellLanguages);
     }
 
     // Let users add languages we don't bundle by dropping .bdic files into the
@@ -698,6 +713,29 @@ void SettingsDialog::refreshStorageSizes()
     }
 }
 
+void SettingsDialog::applySpellLanguageChecks()
+{
+    if (m_spellLanguages == nullptr) {
+        return;
+    }
+    const QStringList available =
+        core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
+    QStringList selected;
+    for (const QString& want : m_settings.spellCheckLanguages()) {
+        const QString dict = core::resolveDictionary(want, available);
+        if (!dict.isEmpty() && !selected.contains(dict)) {
+            selected << dict;
+        }
+    }
+    const QSignalBlocker blocker(m_spellLanguages); // seeding checks must not write back
+    for (int i = 0; i < m_spellLanguages->count(); ++i) {
+        QListWidgetItem* item = m_spellLanguages->item(i);
+        item->setCheckState(selected.contains(item->data(Qt::UserRole).toString()) ? Qt::Checked
+                                                                                   : Qt::Unchecked);
+    }
+    m_spellLanguages->setEnabled(m_settings.spellCheckEnabled());
+}
+
 void SettingsDialog::loadValues()
 {
     m_closeAction->setCurrentIndex(m_closeAction->findData(static_cast<int>(m_settings.closeAction())));
@@ -725,15 +763,7 @@ void SettingsDialog::loadValues()
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_jsMemoryLimit->setValue(m_settings.jsMemoryLimitMb());
     m_spellCheck->setChecked(m_settings.spellCheckEnabled());
-    if (m_spellLanguage != nullptr) {
-        const QStringList available =
-            core::availableDictionaries(qEnvironmentVariable("QTWEBENGINE_DICTIONARIES_PATH"));
-        const QString effective =
-            core::resolveDictionary(m_settings.spellCheckLanguages().value(0), available);
-        const QSignalBlocker blocker(m_spellLanguage);
-        m_spellLanguage->setCurrentIndex(std::max(0, m_spellLanguage->findData(effective)));
-        m_spellLanguage->setEnabled(m_settings.spellCheckEnabled());
-    }
+    applySpellLanguageChecks();
     m_lockOnStart->setChecked(m_settings.lockOnStart());
     m_lockOnHide->setChecked(m_settings.lockOnHide());
     m_lockIdle->setValue(m_settings.lockIdleMinutes());
