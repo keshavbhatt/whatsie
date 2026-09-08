@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <TS version="2.1" language="de_DE" sourcelanguage="en">
 <context>
-    <name>AboutDialog</name>
+    <name>whatsie::ui::AboutDialog</name>
     <message>
         <location filename="../ui/about_dialog.cpp" line="44" />
         <source>%1 | About</source>
@@ -70,7 +70,7 @@
     </message>
 </context>
 <context>
-    <name>Actions</name>
+    <name>whatsie::ui::Actions</name>
     <message>
         <location filename="../ui/actions.cpp" line="28" />
         <source>Hide to tray</source>
@@ -153,7 +153,7 @@
     </message>
 </context>
 <context>
-    <name>BugReportDialog</name>
+    <name>whatsie::ui::BugReportDialog</name>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="35" />
         <source>Report a bug</source>
@@ -223,7 +223,7 @@
     </message>
 </context>
 <context>
-    <name>DownloadController</name>
+    <name>whatsie::web::DownloadController</name>
     <message>
         <location filename="../web/download_controller.cpp" line="54" />
         <source>Save file</source>
@@ -231,7 +231,7 @@
     </message>
 </context>
 <context>
-    <name>DownloadsDelegate</name>
+    <name>whatsie::ui::DownloadsDelegate</name>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="88" />
         <source>just now</source>
@@ -304,7 +304,7 @@
     </message>
 </context>
 <context>
-    <name>DownloadsDialog</name>
+    <name>whatsie::ui::DownloadsDialog</name>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="42" />
         <source>Downloads</source>
@@ -357,7 +357,7 @@
     </message>
 </context>
 <context>
-    <name>DownloadsHub</name>
+    <name>whatsie::ui::DownloadsHub</name>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="67" />
         <source>Downloads</source>
@@ -419,7 +419,7 @@
     </message>
 </context>
 <context>
-    <name>FreedesktopNotifier</name>
+    <name>whatsie::platform::linux_::FreedesktopNotifier</name>
     <message>
         <location filename="../platform/linux/freedesktop_notifier.cpp" line="74" />
         <source>Open</source>
@@ -427,7 +427,7 @@
     </message>
 </context>
 <context>
-    <name>LockScreen</name>
+    <name>whatsie::ui::LockScreen</name>
     <message>
         <location filename="../ui/lock_screen.cpp" line="42" />
         <source>Whatsie is locked</source>
@@ -450,7 +450,7 @@
     </message>
 </context>
 <context>
-    <name>MainWindow</name>
+    <name>whatsie::ui::MainWindow</name>
     <message>
         <location filename="../ui/main_window.cpp" line="242" />
         <source>Hardware acceleration turned off</source>
@@ -549,7 +549,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>NotificationHub</name>
+    <name>whatsie::ui::NotificationHub</name>
     <message>
         <location filename="../ui/notification_hub.cpp" line="38" />
         <location filename="../ui/notification_hub.cpp" line="40" />
@@ -563,7 +563,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>PasscodeDialog</name>
+    <name>whatsie::ui::PasscodeDialog</name>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="21" />
         <source>Change passcode</source>
@@ -659,7 +659,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>PermissionList</name>
+    <name>whatsie::ui::PermissionList</name>
     <message>
         <location filename="../ui/permission_list.cpp" line="41" />
         <source>Camera</source>
@@ -677,7 +677,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>PopupWindow</name>
+    <name>whatsie::web::PopupWindow</name>
     <message>
         <location filename="../web/popup_window.cpp" line="81" />
         <source>Press Esc to exit full screen</source>
@@ -685,7 +685,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>ProxyAuthDialog</name>
+    <name>whatsie::ui::ProxyAuthDialog</name>
     <message>
         <location filename="../ui/proxy_auth_dialog.cpp" line="16" />
         <source>Proxy authentication</source>
@@ -741,7 +741,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>ScreenPickerDialog</name>
+    <name>whatsie::ui::ScreenPickerDialog</name>
     <message>
         <location filename="../ui/screen_picker_dialog.cpp" line="18" />
         <source>Share your screen</source>
@@ -769,7 +769,7 @@ Ihre heruntergeladenen Dateien bleiben erhalten.</translation>
     </message>
 </context>
 <context>
-    <name>SettingsDialog</name>
+    <name>whatsie::ui::SettingsDialog</name>
     <message>
         <location filename="../ui/settings_dialog.cpp" line="72" />
         <location filename="../ui/settings_dialog.cpp" line="90" />
@@ -1328,7 +1328,7 @@ Ihr Sperr-Passcode bleibt erhalten. Einige Änderungen werden nach einem Neustar
     </message>
 </context>
 <context>
-    <name>ShortcutsDialog</name>
+    <name>whatsie::ui::ShortcutsDialog</name>
     <message>
         <location filename="../ui/shortcuts_dialog.cpp" line="18" />
         <source>Keyboard shortcuts</source>
@@ -1336,7 +1336,7 @@ Ihr Sperr-Passcode bleibt erhalten. Einige Änderungen werden nach einem Neustar
     </message>
 </context>
 <context>
-    <name>TrayController</name>
+    <name>whatsie::ui::TrayController</name>
     <message>
         <location filename="../ui/tray_controller.cpp" line="96" />
         <location filename="../ui/tray_controller.cpp" line="232" />
@@ -1385,7 +1385,7 @@ Ihr Sperr-Passcode bleibt erhalten. Einige Änderungen werden nach einem Neustar
     </message>
 </context>
 <context>
-    <name>WebPage</name>
+    <name>whatsie::web::WebPage</name>
     <message>
         <location filename="../web/web_page.cpp" line="93" />
         <source>Choose a file</source>
@@ -1408,7 +1408,7 @@ Ihr Sperr-Passcode bleibt erhalten. Einige Änderungen werden nach einem Neustar
     </message>
 </context>
 <context>
-    <name>WebView</name>
+    <name>whatsie::web::WebView</name>
     <message>
         <location filename="../web/web_view.cpp" line="240" />
         <source>You appear to be offline</source>
