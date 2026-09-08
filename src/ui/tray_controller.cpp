@@ -142,8 +142,11 @@ void TrayController::reloadBaseImage()
         // a dark panel. Panel colour is independent of the app theme, so render a
         // white glyph with a thin dark halo: visible on dark panels (white fill)
         // and light ones (dark outline).
-        const QImage glyph = QIcon(u":/icons/whatsie-symbolic.svg"_s).pixmap(QSize(128, 128)).toImage();
-        m_baseImage = core::monochromeIcon(glyph);
+        // Render large, then trim/centre/scale so the glyph fills the icon like
+        // the neighbouring panel icons rather than sitting small and off-centre
+        // inside its SVG padding (#356), before the white-fill + halo pass.
+        const QImage glyph = QIcon(u":/icons/whatsie-symbolic.svg"_s).pixmap(QSize(256, 256)).toImage();
+        m_baseImage = core::monochromeIcon(core::fitGlyphToIcon(glyph, 128, 0.9));
     } else {
         m_baseImage = QImage(u":/icons/hicolor/128x128/apps/com.ktechpit.whatsie.png"_s);
     }

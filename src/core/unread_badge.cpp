@@ -107,6 +107,42 @@ QImage monochromeIcon(const QImage& glyph)
     return out;
 }
 
+QImage fitGlyphToIcon(const QImage& glyph, int size, qreal fill)
+{
+    if (glyph.isNull() || size <= 0) {
+        return glyph;
+    }
+    const QImage src = glyph.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    int minX = src.width();
+    int minY = src.height();
+    int maxX = -1;
+    int maxY = -1;
+    for (int y = 0; y < src.height(); ++y) {
+        const auto* line = reinterpret_cast<const QRgb*>(src.scanLine(y));
+        for (int x = 0; x < src.width(); ++x) {
+            if (qAlpha(line[x]) != 0) {
+                minX = std::min(minX, x);
+                maxX = std::max(maxX, x);
+                minY = std::min(minY, y);
+                maxY = std::max(maxY, y);
+            }
+        }
+    }
+    if (maxX < minX || maxY < minY) {
+        return glyph; // nothing opaque to fit
+    }
+    const QImage cropped = src.copy(QRect(minX, minY, maxX - minX + 1, maxY - minY + 1));
+    const int box = std::max(1, qRound(size * std::clamp(fill, qreal(0.1), qreal(1.0))));
+    const QImage scaled = cropped.scaled(box, box, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+
+    QImage out(size, size, QImage::Format_ARGB32_Premultiplied);
+    out.fill(Qt::transparent);
+    QPainter painter(&out);
+    painter.drawImage(QPoint((size - scaled.width()) / 2, (size - scaled.height()) / 2), scaled);
+    painter.end();
+    return out;
+}
+
 QImage tintImage(const QImage& image, const QColor& color)
 {
     if (image.isNull()) {
