@@ -1,3 +1,15 @@
+whatsie (6.1.0) unstable; urgency=medium
+
+  * Interface translations: German, Spanish, French, Italian, Portuguese
+    (Brazil) and Russian, selectable in Settings → General.
+  * Unread count now shown as a launcher/taskbar badge.
+  * Spell check can use multiple languages at once (Settings → Advanced).
+  * New Settings → Advanced option to render at the display's refresh rate.
+  * Tray: centre and size the monochrome glyph correctly.
+  * Wayland: match the snap-exported desktop id so the app groups correctly.
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Wed, 09 Sep 2026 12:00:00 +0530
+
 whatsie (6.0.4) unstable; urgency=medium
 
   * Spell check: fix dictionaries silently failing to load; allow adding
