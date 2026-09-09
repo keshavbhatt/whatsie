@@ -120,6 +120,15 @@ private Q_SLOTS:
         QVERIFY(!capped.contains(u"--js-flags=--optimize-for-size"_s));
     }
 
+    void uncapFrameRateFlag()
+    {
+        // Off by default (#221); the flag appears only when explicitly enabled.
+        QVERIFY(!chromiumFlags(HardwareAcceleration::Auto, false, 0, false)
+                     .contains(u"--disable-frame-rate-limit"_s));
+        QVERIFY(chromiumFlags(HardwareAcceleration::Auto, false, 0, true)
+                    .contains(u"--disable-frame-rate-limit"_s));
+    }
+
     void userFlagsAreKeptAndDeduplicated()
     {
         const QString merged =

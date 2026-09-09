@@ -1326,6 +1326,14 @@ Your lock passcode is kept. Some changes take effect after you restart Whatsie.<
         <source>Reload WhatsApp (F5) for proxy changes to take effect. The password is never saved to disk.</source>
         <translation>Обновите WhatsApp (F5), чтобы изменения прокси вступили в силу. Пароль никогда не сохраняется на диск.</translation>
     </message>
+    <message>
+        <source>Render at the display's refresh rate</source>
+        <translation>Отрисовывать с частотой обновления дисплея</translation>
+    </message>
+    <message>
+        <source>Removes Chromium's 60 FPS cap so scrolling and animations run at your monitor's refresh rate. Uses more GPU and CPU. Takes effect after restarting Whatsie.</source>
+        <translation>Снимает ограничение Chromium в 60 кадров/с, чтобы прокрутка и анимация шли с частотой обновления вашего монитора. Потребляет больше ресурсов GPU и CPU. Вступает в силу после перезапуска Whatsie.</translation>
+    </message>
 </context>
 <context>
     <name>whatsie::ui::ShortcutsDialog</name>

@@ -1326,6 +1326,14 @@ Ihr Sperr-Passcode bleibt erhalten. Einige Änderungen werden nach einem Neustar
         <source>Reload WhatsApp (F5) for proxy changes to take effect. The password is never saved to disk.</source>
         <translation>Laden Sie WhatsApp neu (F5), damit die Proxy-Änderungen wirksam werden. Das Passwort wird niemals auf der Festplatte gespeichert.</translation>
     </message>
+    <message>
+        <source>Render at the display's refresh rate</source>
+        <translation>Mit der Bildwiederholrate des Displays rendern</translation>
+    </message>
+    <message>
+        <source>Removes Chromium's 60 FPS cap so scrolling and animations run at your monitor's refresh rate. Uses more GPU and CPU. Takes effect after restarting Whatsie.</source>
+        <translation>Entfernt das 60-FPS-Limit von Chromium, sodass Bildlauf und Animationen mit der Bildwiederholrate Ihres Monitors laufen. Benötigt mehr GPU und CPU. Wird nach einem Neustart von Whatsie wirksam.</translation>
+    </message>
 </context>
 <context>
     <name>whatsie::ui::ShortcutsDialog</name>

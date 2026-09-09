@@ -1326,6 +1326,14 @@ Se conserva tu código de bloqueo. Algunos cambios se aplican tras reiniciar Wha
         <source>Reload WhatsApp (F5) for proxy changes to take effect. The password is never saved to disk.</source>
         <translation>Recarga WhatsApp (F5) para que los cambios del proxy surtan efecto. La contraseña nunca se guarda en el disco.</translation>
     </message>
+    <message>
+        <source>Render at the display's refresh rate</source>
+        <translation>Renderizar a la frecuencia de actualización de la pantalla</translation>
+    </message>
+    <message>
+        <source>Removes Chromium's 60 FPS cap so scrolling and animations run at your monitor's refresh rate. Uses more GPU and CPU. Takes effect after restarting Whatsie.</source>
+        <translation>Elimina el límite de 60 FPS de Chromium para que el desplazamiento y las animaciones se ejecuten a la frecuencia de actualización de tu monitor. Usa más GPU y CPU. Se aplica tras reiniciar Whatsie.</translation>
+    </message>
 </context>
 <context>
     <name>whatsie::ui::ShortcutsDialog</name>

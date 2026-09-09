@@ -1326,6 +1326,14 @@ Votre code de verrouillage est conservé. Certains changements prennent effet ap
         <source>Reload WhatsApp (F5) for proxy changes to take effect. The password is never saved to disk.</source>
         <translation>Rechargez WhatsApp (F5) pour que les changements de proxy prennent effet. Le mot de passe n'est jamais enregistré sur le disque.</translation>
     </message>
+    <message>
+        <source>Render at the display's refresh rate</source>
+        <translation>Afficher à la fréquence de rafraîchissement de l'écran</translation>
+    </message>
+    <message>
+        <source>Removes Chromium's 60 FPS cap so scrolling and animations run at your monitor's refresh rate. Uses more GPU and CPU. Takes effect after restarting Whatsie.</source>
+        <translation>Supprime la limite de 60 FPS de Chromium afin que le défilement et les animations s'exécutent à la fréquence de rafraîchissement de votre écran. Consomme plus de GPU et de CPU. Prend effet après le redémarrage de Whatsie.</translation>
+    </message>
 </context>
 <context>
     <name>whatsie::ui::ShortcutsDialog</name>

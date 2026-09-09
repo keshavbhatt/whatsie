@@ -167,6 +167,10 @@ public:
     void setJsMemoryLimitMb(int mb);
     static constexpr int kMinJsMemoryLimitMb = 256;
     static constexpr int kMaxJsMemoryLimitMb = 8192;
+    /// Drop Chromium's 60 FPS cap so the page renders at the display's refresh
+    /// rate (#221). Costs more GPU/CPU. Applied to the Chromium flags at startup.
+    [[nodiscard]] bool uncapFrameRate() const;
+    void setUncapFrameRate(bool enabled);
     /// FEATURES P2: force WebRTC onto public interfaces only (privacy; can break
     /// LAN calls). Default off.
     [[nodiscard]] bool webrtcPublicInterfacesOnly() const;
@@ -252,6 +256,7 @@ Q_SIGNALS:
     void showDownloadsOnStartChanged(bool show);
     void hardwareAccelerationChanged(whatsie::core::HardwareAcceleration mode);
     void jsMemoryLimitMbChanged(int mb);
+    void uncapFrameRateChanged(bool enabled);
 
 private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;
