@@ -132,6 +132,28 @@ private Q_SLOTS:
         QCOMPARE(reloaded.settingsDialogGeometry(), QByteArrayLiteral("dlg"));
     }
 
+    void interfaceLanguageAndAutostartPersist()
+    {
+        // Regression for #171: these once used the reserved "general" INI group,
+        // which serialises to a malformed [%General] section that fails to read
+        // back — so the choice reset to the default on the next launch.
+        const QString path = m_settings->fileName();
+        m_settings->setInterfaceLanguage(u"fr"_s);
+        m_settings->setAutostart(true);
+        QCOMPARE(m_settings->interfaceLanguage(), u"fr"_s);
+        QCOMPARE(m_settings->autostart(), true);
+        m_settings.reset(); // destroy -> sync
+
+        Settings reloaded(path);
+        QCOMPARE(reloaded.interfaceLanguage(), u"fr"_s);
+        QCOMPARE(reloaded.autostart(), true);
+
+        // The values must land in a clean group, never the reserved [%General].
+        QSettings raw(path, QSettings::IniFormat);
+        QVERIFY(raw.childGroups().contains(u"app"_s));
+        QVERIFY(!raw.childGroups().contains(u"%General"_s));
+    }
+
     void garbageValuesFallBackToDefaults()
     {
         const QString path = m_settings->fileName();

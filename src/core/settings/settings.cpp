@@ -10,6 +10,7 @@
 #include <QStandardPaths>
 
 #include <algorithm>
+#include <utility>
 
 namespace whatsie::core {
 
@@ -103,6 +104,7 @@ Settings::Settings(QObject* parent)
     , m_store(std::make_unique<QSettings>())
 {
     qCDebug(lcSettings) << "settings store:" << m_store->fileName();
+    migrateLegacyGeneralKeys();
 }
 
 Settings::Settings(const QString& iniFilePath, QObject* parent)
@@ -110,6 +112,22 @@ Settings::Settings(const QString& iniFilePath, QObject* parent)
     , m_store(std::make_unique<QSettings>(iniFilePath, QSettings::IniFormat))
 {
     qCDebug(lcSettings) << "settings store (ini):" << m_store->fileName();
+    migrateLegacyGeneralKeys();
+}
+
+void Settings::migrateLegacyGeneralKeys()
+{
+    // These keys used the reserved "general" INI group, which serialises to a
+    // malformed, unreadable [%General] section on some Qt builds (#171). Move any
+    // still-readable value to its new key once, and drop the old key.
+    for (const auto& [oldKey, newKey] :
+         {std::pair{QLatin1StringView("general/autostart"), keys::kAutostart},
+          std::pair{QLatin1StringView("general/interfaceLanguage"), keys::kInterfaceLanguage}}) {
+        if (!m_store->contains(newKey) && m_store->contains(oldKey)) {
+            m_store->setValue(newKey, m_store->value(oldKey));
+        }
+        m_store->remove(oldKey);
+    }
 }
 
 Settings::~Settings()
@@ -602,6 +620,17 @@ void Settings::setSpellCheckLanguages(const QStringList& languages)
     }
     m_store->setValue(keys::kSpellCheckLanguages, languages);
     Q_EMIT spellCheckLanguagesChanged(languages);
+}
+
+QString Settings::interfaceLanguage() const
+{
+    return m_store->value(keys::kInterfaceLanguage).toString();
+}
+
+void Settings::setInterfaceLanguage(const QString& locale)
+{
+    m_store->setValue(keys::kInterfaceLanguage, locale);
+    m_store->sync(); // flush now so the choice survives even an unclean exit (#171)
 }
 
 // ---- lock/ (FEATURES P1) ---------------------------------------------------

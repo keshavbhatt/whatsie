@@ -11,6 +11,9 @@
 
 #include <QByteArray>
 #include <QCoreApplication>
+#include <QLibraryInfo>
+#include <QLocale>
+#include <QTranslator>
 #include <QDir>
 #include <QGuiApplication>
 #include <QProcess>
@@ -102,6 +105,39 @@ int installGracefulTermination()
 }
 #endif
 
+// Load the interface translation before any widget is built, so tr() strings
+// resolve to the chosen language (issue #171). An explicit choice wins; empty
+// follows the system locale. Only Whatsie's own UI is translated — the chat
+// content is WhatsApp Web's, chosen by WhatsApp from the account/browser.
+void installInterfaceTranslators(whatsie::app::Application& app)
+{
+    const QString chosen = app.settings().interfaceLanguage();
+    const QLocale locale = chosen.isEmpty() ? QLocale::system() : QLocale(chosen);
+
+    // Qt's own strings first (standard dialog buttons, shortcuts).
+    auto* qtTranslator = new QTranslator(&app);
+    if (qtTranslator->load(locale, QStringLiteral("qtbase"), QStringLiteral("_"),
+                           QLibraryInfo::path(QLibraryInfo::TranslationsPath))) {
+        QCoreApplication::installTranslator(qtTranslator);
+    }
+    // Then Whatsie's own, embedded by qt_add_translations at :/i18n/<name>.qm.
+    // Try the stored code verbatim (the .qm base name), then the locale's full
+    // name and bare language, so a persisted choice always resolves (#171).
+    auto* appTranslator = new QTranslator(&app);
+    QStringList candidates;
+    if (!chosen.isEmpty()) {
+        candidates << chosen;
+    }
+    candidates << locale.name() << locale.name().section(u'_', 0, 0);
+    for (const QString& candidate : candidates) {
+        if (appTranslator->load(QStringLiteral(":/i18n/%1.qm").arg(candidate))) {
+            QCoreApplication::installTranslator(appTranslator);
+            qInfo("interface language: %s", qUtf8Printable(candidate));
+            return;
+        }
+    }
+}
+
 void relaunchUnderXcb(whatsie::app::Application& app)
 {
     qputenv("QT_QPA_PLATFORM", "xcb");
@@ -180,6 +216,8 @@ int main(int argc, char* argv[])
         QObject::connect(gpuWatch, &whatsie::platform::GpuStderrWatch::gpuContextLostStorm, &app,
                          [&app] { relaunchForGpuFallback(app); });
     }
+
+    installInterfaceTranslators(app);
 
     whatsie::ui::MainWindow window(app.settings(), app.themeService());
     QObject::connect(&app, &whatsie::app::Application::raiseRequested, &window,

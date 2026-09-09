@@ -17,6 +17,7 @@
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
 #include <QComboBox>
+#include <QDir>
 #include <QScrollBar>
 #include <QSignalBlocker>
 #include <QWheelEvent>
@@ -203,6 +204,36 @@ QWidget* SettingsDialog::buildGeneralTab()
 {
     auto* page = new QWidget(this);
     auto* outer = new QVBoxLayout(page);
+
+    // Interface language (#171). The choices come from the embedded :/i18n/*.qm,
+    // so adding a translation needs no change here. Applied at the next start.
+    auto* langBox = new QGroupBox(tr("Language"), page);
+    auto* langForm = new QFormLayout(langBox);
+    m_interfaceLanguage = new QComboBox(langBox);
+    m_interfaceLanguage->addItem(tr("Automatic (system)"), QString());
+    // English is the source language (no .qm): picking it loads no translator,
+    // so it must be offered explicitly or a non-English system could not force it.
+    // Self-labeled like the native names below ("American English" reads oddly here).
+    m_interfaceLanguage->addItem(u"English"_s, u"en"_s);
+    for (const QString& qm : QDir(u":/i18n"_s).entryList({u"*.qm"_s}, QDir::Files, QDir::Name)) {
+        const QString code = QFileInfo(qm).completeBaseName(); // "es", "pt_BR"
+        const QLocale loc(code);
+        QString name = loc.nativeLanguageName();
+        name = name.isEmpty() ? code : name.left(1).toUpper() + name.mid(1);
+        if (code.contains(u'_') && !loc.nativeTerritoryName().isEmpty()) {
+            name += u" (%1)"_s.arg(loc.nativeTerritoryName());
+        }
+        m_interfaceLanguage->addItem(name, code);
+    }
+    connect(m_interfaceLanguage, &QComboBox::currentIndexChanged, this, [this](int index) {
+        m_settings.setInterfaceLanguage(m_interfaceLanguage->itemData(index).toString());
+    });
+    langForm->addRow(tr("Interface language:"), m_interfaceLanguage);
+    auto* langNote = new QLabel(tr("Applies after restarting Whatsie."), langBox);
+    langNote->setWordWrap(true);
+    langNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    langForm->addRow(QString(), langNote);
+    outer->addWidget(langBox);
 
     auto* windowBox = new QGroupBox(tr("Window"), page);
     auto* form = new QFormLayout(windowBox);
@@ -762,6 +793,11 @@ void SettingsDialog::loadValues()
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_jsMemoryLimit->setValue(m_settings.jsMemoryLimitMb());
+    if (m_interfaceLanguage != nullptr) {
+        const QSignalBlocker blocker(m_interfaceLanguage);
+        const int i = m_interfaceLanguage->findData(m_settings.interfaceLanguage());
+        m_interfaceLanguage->setCurrentIndex(i < 0 ? 0 : i);
+    }
     m_spellCheck->setChecked(m_settings.spellCheckEnabled());
     applySpellLanguageChecks();
     m_lockOnStart->setChecked(m_settings.lockOnStart());

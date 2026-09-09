@@ -152,6 +152,11 @@ public:
     [[nodiscard]] QStringList spellCheckLanguages() const;
     void setSpellCheckLanguages(const QStringList& languages);
 
+    /// Interface (UI) language as a locale name (e.g. "es", "pt_BR"); empty
+    /// follows the system locale. Applied at startup (#171).
+    [[nodiscard]] QString interfaceLanguage() const;
+    void setInterfaceLanguage(const QString& locale);
+
     // advanced/
     [[nodiscard]] HardwareAcceleration hardwareAcceleration() const;
     void setHardwareAcceleration(HardwareAcceleration mode);
@@ -252,6 +257,8 @@ private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;
     /// Writes and returns true when the stored value actually changed.
     bool storeBool(QLatin1StringView key, bool def, bool value);
+    /// Moves settings off the reserved "general" INI group to their new keys (#171).
+    void migrateLegacyGeneralKeys();
 
     std::unique_ptr<QSettings> m_store;
     QString m_proxyPassword; // session-only, never persisted

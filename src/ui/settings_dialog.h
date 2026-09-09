@@ -73,6 +73,7 @@ private:
     QWebEngineProfile& m_profile;
 
     QTabWidget* m_tabs = nullptr;
+    QComboBox* m_interfaceLanguage = nullptr;
     QComboBox* m_closeAction = nullptr;
     QCheckBox* m_startMinimized = nullptr;
     QCheckBox* m_trayLeftClick = nullptr;

@@ -27,7 +27,9 @@ inline constexpr QLatin1StringView kInterfaceScale{"view/interfaceScale"};
 inline constexpr QLatin1StringView kMuted{"view/muted"};
 
 // general/
-inline constexpr QLatin1StringView kAutostart{"general/autostart"};
+// "app/" not "general/": QSettings reserves the INI "General" section, so a
+// general/ key serialises to a malformed, unreadable [%General] (#171).
+inline constexpr QLatin1StringView kAutostart{"app/autostart"};
 
 // privacy/
 inline constexpr QLatin1StringView kMessageBlurLevel{"privacy/messageBlurLevel"};
@@ -47,6 +49,11 @@ inline constexpr QLatin1StringView kShowDownloadsOnStart{"downloads/showWindowOn
 
 // files/
 inline constexpr QLatin1StringView kLastOpenDirectory{"files/lastOpenDirectory"};
+
+// app/ — interface (UI) language; empty follows the system locale (#171). Kept
+// out of a "general" group on purpose: QSettings reserves the INI "General"
+// section, so a general/ key serialises to a malformed, unreadable [%General].
+inline constexpr QLatin1StringView kInterfaceLanguage{"app/interfaceLanguage"};
 
 // spellcheck/
 inline constexpr QLatin1StringView kSpellCheckEnabled{"spellcheck/enabled"};
