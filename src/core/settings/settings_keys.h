@@ -77,6 +77,8 @@ inline constexpr QLatin1StringView kGpuProbeStrikes{"advanced/gpuProbeStrikes"};
 inline constexpr QLatin1StringView kGpuFallbackNotice{"advanced/gpuFallbackNotice"};
 // V8 JavaScript heap cap in MB; 0 = automatic. Bounds WhatsApp Web's memory.
 inline constexpr QLatin1StringView kJsMemoryLimitMb{"advanced/jsMemoryLimitMb"};
+// Drop Chromium's 60 FPS cap so the page renders at the display's refresh rate.
+inline constexpr QLatin1StringView kUncapFrameRate{"advanced/uncapFrameRate"};
 
 // proxy/ (password is deliberately NOT a key — never persisted)
 inline constexpr QLatin1StringView kProxyMode{"proxy/mode"};

@@ -17,7 +17,7 @@ enum class HardwareAcceleration;
 /// (see useSoftwareGpu) it also enables SwiftShader so WhatsApp calls keep a
 /// software WebGL context instead of a blank remote video (ADR-032).
 [[nodiscard]] QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled = false,
-                                        int jsMemoryLimitMb = 0);
+                                        int jsMemoryLimitMb = 0, bool uncapFrameRate = false);
 
 /// Merges `userFlags` (existing env var content) with ours, deduplicated.
 [[nodiscard]] QString mergeChromiumFlags(const QString& userFlags, const QStringList& ours);

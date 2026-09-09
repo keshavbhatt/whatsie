@@ -569,6 +569,13 @@ QWidget* SettingsDialog::buildAdvancedTab()
     connect(m_webrtcPublicOnly, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setWebrtcPublicInterfacesOnly(on); });
     aform->addRow(QString(), m_webrtcPublicOnly);
+    m_uncapFrameRate = new QCheckBox(tr("Render at the display's refresh rate"), advBox);
+    m_uncapFrameRate->setToolTip(tr("Removes Chromium's 60 FPS cap so scrolling and animations run at "
+                                    "your monitor's refresh rate. Uses more GPU and CPU. Takes effect "
+                                    "after restarting Whatsie."));
+    connect(m_uncapFrameRate, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setUncapFrameRate(on); });
+    aform->addRow(QString(), m_uncapFrameRate);
     av->addLayout(aform);
 
     auto* hwNote =
@@ -793,6 +800,7 @@ void SettingsDialog::loadValues()
     m_hardwareAcceleration->setCurrentIndex(
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_jsMemoryLimit->setValue(m_settings.jsMemoryLimitMb());
+    m_uncapFrameRate->setChecked(m_settings.uncapFrameRate());
     if (m_interfaceLanguage != nullptr) {
         const QSignalBlocker blocker(m_interfaceLanguage);
         const int i = m_interfaceLanguage->findData(m_settings.interfaceLanguage());

@@ -21,7 +21,8 @@ bool useSoftwareGpu(HardwareAcceleration acceleration, bool autoDisabled)
     return autoDisabled;
 }
 
-QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, int jsMemoryLimitMb)
+QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, int jsMemoryLimitMb,
+                          bool uncapFrameRate)
 {
     QStringList flags{
         // Nothing here is a chat client's business.
@@ -75,6 +76,11 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
         flags << u"--js-flags=--max-old-space-size=%1"_s.arg(jsMemoryLimitMb);
     } else {
         flags << u"--js-flags=--optimize-for-size"_s;
+    }
+    // Opt-in: let the page paint at the display's refresh rate instead of
+    // Chromium's 60 FPS default (#221). Costs more GPU/CPU, hence off by default.
+    if (uncapFrameRate) {
+        flags << u"--disable-frame-rate-limit"_s;
     }
     return flags;
 }

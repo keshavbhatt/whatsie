@@ -39,6 +39,7 @@ constexpr bool kDefaultAskWhereToSave = false;
 constexpr bool kDefaultShowDownloadsOnStart = true;
 constexpr HardwareAcceleration kDefaultHardwareAcceleration = HardwareAcceleration::Auto;
 constexpr int kDefaultJsMemoryLimitMb = 0;
+constexpr bool kDefaultUncapFrameRate = false;
 constexpr bool kDefaultWebrtcPublicOnly = false;
 constexpr bool kDefaultSpellCheckEnabled = true;
 constexpr bool kDefaultLockOnStart = false;
@@ -454,6 +455,18 @@ void Settings::setJsMemoryLimitMb(int mb)
     }
     m_store->setValue(keys::kJsMemoryLimitMb, clamped);
     Q_EMIT jsMemoryLimitMbChanged(clamped);
+}
+
+bool Settings::uncapFrameRate() const
+{
+    return boolValue(keys::kUncapFrameRate, kDefaultUncapFrameRate);
+}
+
+void Settings::setUncapFrameRate(bool enabled)
+{
+    if (storeBool(keys::kUncapFrameRate, kDefaultUncapFrameRate, enabled)) {
+        Q_EMIT uncapFrameRateChanged(enabled);
+    }
 }
 
 bool Settings::webrtcPublicInterfacesOnly() const

@@ -95,6 +95,7 @@ private:
     QSpinBox* m_notificationTimeout = nullptr;
     QComboBox* m_hardwareAcceleration = nullptr;
     QSpinBox* m_jsMemoryLimit = nullptr;
+    QCheckBox* m_uncapFrameRate = nullptr;
     QCheckBox* m_spellCheck = nullptr;
     QListWidget* m_spellLanguages = nullptr;
     QLabel* m_lockStatus = nullptr;
