@@ -102,6 +102,22 @@
   </content_rating>
 
   <releases>
+    <release version="6.1.0" date="2026-09-09">
+      <description>
+        <p>New features:</p>
+        <ul>
+          <li>Whatsie's interface can now be translated — German, Spanish, French, Italian, Portuguese (Brazil) and Russian are included; pick one in Settings → General, or leave it on Automatic to follow your system</li>
+          <li>The unread message count now appears as a badge on the taskbar or dock launcher</li>
+          <li>Spell check can use several languages at the same time (Settings → Advanced)</li>
+          <li>New option to render at your display's refresh rate instead of the 60 FPS cap (Settings → Advanced)</li>
+        </ul>
+        <p>Fixes:</p>
+        <ul>
+          <li>The monochrome system-tray icon is now centred and sized correctly</li>
+          <li>On Wayland the app uses the correct desktop id, so it groups properly in the dock and task switcher</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.0.4" date="2026-09-07">
       <description>
         <p>Fixes:</p>
