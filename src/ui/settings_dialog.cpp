@@ -211,6 +211,10 @@ QWidget* SettingsDialog::buildGeneralTab()
     auto* langForm = new QFormLayout(langBox);
     m_interfaceLanguage = new QComboBox(langBox);
     m_interfaceLanguage->addItem(tr("Automatic (system)"), QString());
+    // English is the source language (no .qm): picking it loads no translator,
+    // so it must be offered explicitly or a non-English system could not force it.
+    // Self-labeled like the native names below ("American English" reads oddly here).
+    m_interfaceLanguage->addItem(u"English"_s, u"en"_s);
     for (const QString& qm : QDir(u":/i18n"_s).entryList({u"*.qm"_s}, QDir::Files, QDir::Name)) {
         const QString code = QFileInfo(qm).completeBaseName(); // "es", "pt_BR"
         const QLocale loc(code);
