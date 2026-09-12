@@ -546,6 +546,16 @@ void WebView::childEvent(QChildEvent* event)
 
 bool WebView::eventFilter(QObject* watched, QEvent* event)
 {
+    if (event->type() == QEvent::ShortcutOverride) {
+        auto* key = static_cast<QKeyEvent*>(event);
+        if (key->matches(QKeySequence::Paste)) {
+            // Own the shortcut before Qt WebEngine queues an edit command.
+            // Otherwise a fast Ctrl+V can deliver both that command and the
+            // keyboard event as separate pastes to WhatsApp's editor.
+            event->accept();
+            return true;
+        }
+    }
     if (maybeHandleDrop(watched, event)) {
         return true;
     }
@@ -563,6 +573,10 @@ bool WebView::eventFilter(QObject* watched, QEvent* event)
         auto* key = static_cast<QKeyEvent*>(event);
         if (key->matches(QKeySequence::Paste)) {
             ensureClipboardImageIsPng(*QApplication::clipboard());
+            // Deliver one paste operation instead of forwarding the shortcut
+            // through Chromium's asynchronous keyboard handling as well.
+            page()->triggerAction(QWebEnginePage::Paste);
+            return true;
         }
     }
     return QWebEngineView::eventFilter(watched, event);
