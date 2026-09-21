@@ -4,10 +4,11 @@
 
 namespace whatsie::core {
 
-ConnectionWatchdogPolicy::ConnectionWatchdogPolicy(ms grace, int maxReloads, ms cooldown)
+ConnectionWatchdogPolicy::ConnectionWatchdogPolicy(ms grace, int maxReloads, ms cooldown, ms slowRetry)
     : m_grace(grace)
     , m_maxReloads(std::max(1, maxReloads))
     , m_cooldown(cooldown)
+    , m_slowRetry(slowRetry)
 {}
 
 void ConnectionWatchdogPolicy::setConnected(bool connected, ms now)
@@ -47,13 +48,16 @@ bool ConnectionWatchdogPolicy::shouldReload(ms now) const
     if (m_connected || m_downSince.count() < 0) {
         return false;
     }
-    if (m_reloads >= m_maxReloads) {
-        return false;
-    }
     if (now - m_downSince < m_grace) {
         return false;
     }
-    if (m_lastReload.count() >= 0 && now - m_lastReload < m_cooldown) {
+    // The first `maxReloads` attempts run at the fast `cooldown` cadence; after
+    // that the watchdog keeps trying at the slower `slowRetry` cadence rather
+    // than giving up, so a long outage (e.g. Wi-Fi still down on resume from
+    // sleep) still recovers once the link returns, without needing the network-
+    // return signal that some Linux/Wayland/Flatpak stacks never deliver (#370).
+    const ms interval = m_reloads >= m_maxReloads ? m_slowRetry : m_cooldown;
+    if (m_lastReload.count() >= 0 && now - m_lastReload < interval) {
         return false;
     }
     return true;
