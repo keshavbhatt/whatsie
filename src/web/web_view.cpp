@@ -54,7 +54,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
     : QWebEngineView(parent)
     , m_settings(settings)
     , m_theme(theme)
-    , m_profile(new WebProfile(settings, this))
+    , m_profile(new WebProfile(settings, theme, this))
     , m_page(new WebPage(*m_profile, this))
     , m_permissions(new PermissionController(this))
 {
@@ -433,9 +433,13 @@ void WebView::applyThemeLive()
         mode = u"system"_s;
         break;
     }
-    m_page->runJavaScript(u"window.__whatsieSetTheme && window.__whatsieSetTheme('%1')"_s.arg(mode),
-                          QWebEngineScript::MainWorld);
-    qCDebug(lcWeb) << "theme pushed to page:" << mode;
+    // Pass the resolved effective scheme too, so System mode uses our reliable
+    // value instead of the page's own prefers-color-scheme (#367, #374).
+    const QString effective = m_theme.isDark() ? u"dark"_s : u"light"_s;
+    m_page->runJavaScript(
+        u"window.__whatsieSetTheme && window.__whatsieSetTheme('%1', '%2')"_s.arg(mode, effective),
+        QWebEngineScript::MainWorld);
+    qCDebug(lcWeb) << "theme pushed to page:" << mode << "effective:" << effective;
 }
 
 void WebView::handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost)

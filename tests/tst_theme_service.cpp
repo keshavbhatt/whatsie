@@ -49,6 +49,34 @@ private Q_SLOTS:
         QCOMPARE(service.effectiveScheme(), expected);
     }
 
+    void schemeProbeOverridesQtForSystem()
+    {
+        // The injected desktop probe (the portal on Linux) is authoritative for
+        // System mode, since QStyleHints is unreliable there (#367, #374).
+        QTemporaryDir dir;
+        Settings settings(dir.filePath(u"s.ini"_s));
+        settings.setTheme(Theme::System);
+        ThemeService service(settings);
+
+        QSignalSpy spy(&service, &ThemeService::effectiveSchemeChanged);
+        service.setSchemeProbe([] { return std::optional<Qt::ColorScheme>(Qt::ColorScheme::Dark); });
+        QCOMPARE(service.effectiveScheme(), Qt::ColorScheme::Dark);
+        QVERIFY(service.isDark());
+
+        // A probe that cannot decide falls back to Qt's value (never crashes).
+        service.setSchemeProbe([] { return std::optional<Qt::ColorScheme>(); });
+        const Qt::ColorScheme platform = QGuiApplication::styleHints()->colorScheme();
+        const Qt::ColorScheme expected =
+            platform == Qt::ColorScheme::Unknown ? Qt::ColorScheme::Light : platform;
+        QCOMPARE(service.effectiveScheme(), expected);
+
+        // An explicit setting ignores the probe entirely.
+        settings.setTheme(Theme::Light);
+        service.setSchemeProbe([] { return std::optional<Qt::ColorScheme>(Qt::ColorScheme::Dark); });
+        QCOMPARE(service.effectiveScheme(), Qt::ColorScheme::Light);
+        QVERIFY(spy.count() >= 1);
+    }
+
     void palettesDiffer()
     {
         QVERIFY(ThemeService::lightPalette().color(QPalette::Window) !=

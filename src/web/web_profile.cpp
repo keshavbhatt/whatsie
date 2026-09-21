@@ -2,6 +2,7 @@
 
 #include "core/settings/settings.h"
 #include "core/spellcheck.h"
+#include "core/theme/theme_service.h"
 #include "web/bridge.h"
 #include "web/logging.h"
 #include "web/proxy.h"
@@ -22,9 +23,10 @@ namespace {
 constexpr auto kProfileName = "whatsie";
 } // namespace
 
-WebProfile::WebProfile(core::Settings& settings, QObject* parent)
+WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObject* parent)
     : QWebEngineProfile(QString::fromLatin1(kProfileName), parent)
     , m_settings(settings)
+    , m_theme(theme)
     , m_bridge(std::make_unique<Bridge>())
     , m_scripts(std::make_unique<ScriptBundle>(*this))
 {
@@ -41,6 +43,10 @@ WebProfile::WebProfile(core::Settings& settings, QObject* parent)
     // WebView applies it live to the already-loaded page.
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { installBootstrap(); });
     connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { installBootstrap(); });
+    // Keep the seeded effective theme current when the desktop scheme changes in
+    // System mode, so a freshly loaded page starts at the right theme (#367, #374).
+    connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
+            [this](Qt::ColorScheme) { installBootstrap(); });
 
     // FEATURES P3: proxy is process-wide; set it before the first request and
     // re-apply whenever it changes (a page reload then picks it up).
@@ -161,6 +167,7 @@ void WebProfile::installBootstrap()
     m_scripts->installBootstrap(QJsonObject{
         {u"blurLevel"_s, m_settings.messageBlurLevel()},
         {u"colorScheme"_s, themeName(m_settings.theme())},
+        {u"effectiveTheme"_s, m_theme.isDark() ? u"dark"_s : u"light"_s},
     });
 }
 
