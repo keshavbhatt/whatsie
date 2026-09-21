@@ -42,6 +42,10 @@ struct NewChatRequest
 /// A send link (whatsapp://send, wa.me, ...) or a phone number returns empty.
 [[nodiscard]] QString inviteCodeFromUrl(const QString& link);
 
+/// The channel code from https://whatsapp.com/channel/<code> or the deep link
+/// whatsapp://channel/<code>. Anything else returns empty (issue #367).
+[[nodiscard]] QString channelCodeFromUrl(const QString& link);
+
 /// https://web.whatsapp.com/send?phone=<digits>&text=<encoded>
 [[nodiscard]] QUrl newChatUrl(const NewChatRequest& request);
 

@@ -70,7 +70,10 @@ private Q_SLOTS:
         QTest::newRow("web") << u"https://web.whatsapp.com/send?phone=15551234&text=x"_s << true
                              << u"15551234"_s << u"x"_s;
         QTest::newRow("plain phone") << u"+1 555 1234"_s << true << u"15551234"_s << QString();
-        QTest::newRow("no phone") << u"whatsapp://send?text=hi"_s << false << QString() << QString();
+        // A send link with only text (share to a chat the user picks) is valid;
+        // one with neither phone nor text is not (issue #367).
+        QTest::newRow("text only") << u"whatsapp://send?text=hi"_s << true << QString() << u"hi"_s;
+        QTest::newRow("empty send") << u"whatsapp://send"_s << false << QString() << QString();
         QTest::newRow("other scheme")
             << u"https://example.com/send?phone=1"_s << false << QString() << QString();
         QTest::newRow("garbage") << u"hello world"_s << false << QString() << QString();
@@ -102,6 +105,11 @@ private Q_SLOTS:
 
         const QUrl noText = newChatUrl({.phone = u"1"_s, .text = {}});
         QVERIFY(!noText.query().contains(u"text"_s));
+
+        // Text only: no phone parameter is emitted (issue #367).
+        const QUrl noPhone = newChatUrl({.phone = {}, .text = u"hi"_s});
+        QVERIFY(!noPhone.query().contains(u"phone"_s));
+        QVERIFY(noPhone.query(QUrl::FullyEncoded).contains(u"text=hi"_s));
     }
 
     void roundTripThroughOwnUrl()
@@ -125,6 +133,19 @@ private Q_SLOTS:
         QVERIFY(inviteCodeFromUrl(u"https://wa.me/15551234"_s).isEmpty());
         QVERIFY(inviteCodeFromUrl(u"+1 555 1234"_s).isEmpty());
         QVERIFY(inviteCodeFromUrl(QString()).isEmpty());
+    }
+
+    void parsesChannelCodes()
+    {
+        QCOMPARE(channelCodeFromUrl(u"https://whatsapp.com/channel/AbC123_-.xy"_s), u"AbC123_-.xy"_s);
+        QCOMPARE(channelCodeFromUrl(u"https://www.whatsapp.com/channel/Zz99"_s), u"Zz99"_s);
+        QCOMPARE(channelCodeFromUrl(u"  whatsapp.com/channel/Kk77  "_s), u"Kk77"_s); // trimmed, no scheme
+        QCOMPARE(channelCodeFromUrl(u"whatsapp://channel/Dd88"_s), u"Dd88"_s);
+        // Not channels: group invites, send links, plain numbers.
+        QVERIFY(channelCodeFromUrl(u"https://chat.whatsapp.com/AbC123"_s).isEmpty());
+        QVERIFY(channelCodeFromUrl(u"whatsapp://send?text=channel/NOPE"_s).isEmpty());
+        QVERIFY(channelCodeFromUrl(u"+1 555 1234"_s).isEmpty());
+        QVERIFY(channelCodeFromUrl(QString()).isEmpty());
     }
 };
 
