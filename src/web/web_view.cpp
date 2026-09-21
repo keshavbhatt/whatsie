@@ -261,14 +261,32 @@ void WebView::showLoadError(const QWebEngineLoadingInfo& info)
     m_errorTitle = title;
     m_errorDetail = detail;
     m_page->setHtml(errorPageHtml(m_theme.isDark(), title, detail));
+
+    // A connection/DNS failure replaces the live page with this data: error page,
+    // so the injected watchdog script that would report "down" is gone. Engage the
+    // watchdog directly and keep its timer running, so we keep retrying until the
+    // link returns instead of sitting on the offline page forever (#370).
+    if (info.errorDomain() == Domain::ConnectionErrorDomain
+        || info.errorDomain() == Domain::DnsErrorDomain) {
+        m_watchdog.setConnected(false, std::chrono::milliseconds(m_clock.elapsed()));
+        m_watchdogTimer->start();
+    }
 }
 
 void WebView::checkWatchdog()
 {
     const std::chrono::milliseconds now(m_clock.elapsed());
-    if (m_watchdog.shouldReload(now)) {
-        qCInfo(lcWeb) << "connection down; reloading (attempt" << m_watchdog.reloadsThisEpisode() + 1 << ")";
-        m_watchdog.noteReload(now);
+    if (!m_watchdog.shouldReload(now)) {
+        return;
+    }
+    qCInfo(lcWeb) << "connection down; reloading (attempt" << m_watchdog.reloadsThisEpisode() + 1 << ")";
+    m_watchdog.noteReload(now);
+    // From our own error page a plain reload() would just re-render the data:
+    // URL; navigate back to WhatsApp Web so the retry can actually reconnect
+    // once the link returns (#370). Otherwise reload the live page in place.
+    if (m_showingError) {
+        load(kWhatsAppUrl);
+    } else {
         reload();
     }
 }

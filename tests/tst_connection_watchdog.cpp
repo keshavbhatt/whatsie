@@ -33,6 +33,23 @@ private Q_SLOTS:
         QVERIFY(!p.shouldReload(70s)); // cap reached
     }
 
+    void slowRetryContinuesAfterCap()
+    {
+        // After the fast cap the watchdog does not give up: it keeps retrying at
+        // the slower slowRetry cadence, indefinitely, so a long outage recovers
+        // once the link returns even without a network-return signal (#370).
+        ConnectionWatchdogPolicy p(20s, 2, 15s, 60s);
+        p.setConnected(false, 0ms);
+        p.noteReload(20s); // attempt 1
+        p.noteReload(40s); // attempt 2 -> fast cap reached
+        QCOMPARE(p.reloadsThisEpisode(), 2);
+        QVERIFY(!p.shouldReload(70s));  // 30s after last reload: within slowRetry
+        QVERIFY(p.shouldReload(100s));  // 60s after last reload: slow retry due
+        p.noteReload(100s);
+        QVERIFY(!p.shouldReload(130s)); // within the next slow window
+        QVERIFY(p.shouldReload(160s));  // and again, never permanently stops
+    }
+
     void reconnectEndsEpisode()
     {
         ConnectionWatchdogPolicy p(20s, 2, 15s);
