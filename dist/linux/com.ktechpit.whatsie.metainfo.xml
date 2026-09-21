@@ -102,6 +102,17 @@
   </content_rating>
 
   <releases>
+    <release version="6.1.1" date="2026-09-21">
+      <description>
+        <p>Fixes and small improvements:</p>
+        <ul>
+          <li>The interface now follows the desktop's light/dark preference reliably on Linux, including after resuming from sleep, instead of sometimes starting or reverting to light</li>
+          <li>After resuming from sleep with the connection briefly down, Whatsie keeps retrying and reconnects on its own instead of getting stuck on the "You appear to be offline" page</li>
+          <li>The spell-check language list now shows every bundled dictionary, not just the first few</li>
+          <li>WhatsApp channel links now open the channel preview in the app, and "share text" links without a phone number are handled</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.1.0" date="2026-09-09">
       <description>
         <p>New features:</p>

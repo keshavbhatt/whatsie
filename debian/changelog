@@ -1,3 +1,13 @@
+whatsie (6.1.1) unstable; urgency=medium
+
+  * Theme: follow the desktop light/dark preference reliably on Linux via the
+    portal, including across suspend/resume.
+  * Reconnect on its own after resume instead of staying on the offline page.
+  * Spell check: list every bundled dictionary in Settings.
+  * Open WhatsApp channel links and text-only send links.
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Mon, 21 Sep 2026 12:00:00 +0530
+
 whatsie (6.1.0) unstable; urgency=medium
 
   * Interface translations: German, Spanish, French, Italian, Portuguese
