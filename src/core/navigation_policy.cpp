@@ -20,10 +20,13 @@ bool isHttp(const QUrl& url)
 std::optional<NewChatRequest> fromQuery(const QString& phone, const QUrlQuery& query)
 {
     const QString digits = normalizePhone(phone);
-    if (digits.isEmpty()) {
+    const QString text = query.queryItemValue(u"text"_s, QUrl::FullyDecoded);
+    // A send link needs a recipient or a message: "text" alone (share to a chat
+    // the user picks) is valid; neither means it is not a send link (issue #367).
+    if (digits.isEmpty() && text.isEmpty()) {
         return std::nullopt;
     }
-    return NewChatRequest{.phone = digits, .text = query.queryItemValue(u"text"_s, QUrl::FullyDecoded)};
+    return NewChatRequest{.phone = digits, .text = text};
 }
 
 } // namespace
@@ -138,11 +141,34 @@ QString inviteCodeFromUrl(const QString& link)
     return {};
 }
 
+QString channelCodeFromUrl(const QString& link)
+{
+    const QString trimmed = link.trimmed();
+    // A web channel link: https://whatsapp.com/channel/<code> (checked first so it
+    // wins regardless of scheme), or the deep link whatsapp://channel/<code>.
+    static const QRegularExpression web(u"whatsapp\\.com/channel/([A-Za-z0-9._-]+)"_s);
+    QRegularExpressionMatch m = web.match(trimmed);
+    if (m.hasMatch()) {
+        return m.captured(1);
+    }
+    if (trimmed.startsWith(u"whatsapp://channel/"_s, Qt::CaseInsensitive)) {
+        static const QRegularExpression deepLink(u"whatsapp://channel/([A-Za-z0-9._-]+)"_s);
+        m = deepLink.match(trimmed);
+        if (m.hasMatch()) {
+            return m.captured(1);
+        }
+    }
+    return {};
+}
+
 QUrl newChatUrl(const NewChatRequest& request)
 {
     QUrl url(u"https://web.whatsapp.com/send"_s);
     QUrlQuery query;
-    query.addQueryItem(u"phone"_s, normalizePhone(request.phone));
+    const QString phone = normalizePhone(request.phone);
+    if (!phone.isEmpty()) {
+        query.addQueryItem(u"phone"_s, phone);
+    }
     if (!request.text.isEmpty()) {
         query.addQueryItem(u"text"_s, QString::fromUtf8(QUrl::toPercentEncoding(request.text)));
     }
