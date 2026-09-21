@@ -7,6 +7,7 @@
 
 namespace whatsie::core {
 class Settings;
+class ThemeService;
 enum class Theme;
 } // namespace whatsie::core
 
@@ -24,7 +25,7 @@ class WebProfile : public QWebEngineProfile
     Q_DISABLE_COPY_MOVE(WebProfile)
 
 public:
-    explicit WebProfile(core::Settings& settings, QObject* parent = nullptr);
+    explicit WebProfile(core::Settings& settings, core::ThemeService& theme, QObject* parent = nullptr);
     ~WebProfile() override;
 
     [[nodiscard]] core::Settings& appSettings() { return m_settings; }
@@ -43,6 +44,7 @@ private:
     static QString themeName(core::Theme theme);
 
     core::Settings& m_settings;
+    core::ThemeService& m_theme;
     std::unique_ptr<Bridge> m_bridge;
     std::unique_ptr<ScriptBundle> m_scripts;
 };

@@ -39,10 +39,18 @@
         }
     }
 
-    function applyTheme(mode) {
-        var system = mode === 'system';
-        var theme = system ? osTheme() : (mode === 'dark' ? 'dark' : 'light');
+    function applyTheme(mode, effective) {
+        // In System mode use the app's resolved scheme (computed in C++ from a
+        // reliable desktop-portal read), not the browser's prefers-color-scheme,
+        // which is wrong on some Linux desktops and drifts across resume (#367,
+        // #374). Always drive WhatsApp explicitly and keep its own OS-following
+        // off, so a resume cannot revert the theme; C++ re-pushes when the desktop
+        // preference actually changes.
+        var theme = mode === 'system'
+            ? (effective || (api.config && api.config.effectiveTheme) || osTheme())
+            : (mode === 'dark' ? 'dark' : 'light');
         var isDark = theme === 'dark';
+        var system = false;
 
         // 1. WhatsApp's own preference + theme modules — but only if WhatsApp has
         //    already loaded them. Never require() a WAWeb module here: forcing
@@ -120,7 +128,7 @@
         }
     }
 
-    window.__whatsieSetTheme = function (mode) { applyTheme(mode); };
+    window.__whatsieSetTheme = function (mode, effective) { applyTheme(mode, effective); };
 
     // First paint: apply the configured theme, retrying briefly until WhatsApp's
     // modules are up (C++ also re-applies on every loadFinished).

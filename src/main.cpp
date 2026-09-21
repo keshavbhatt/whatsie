@@ -5,7 +5,9 @@
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
 #include "core/settings/settings_keys.h"
+#include "core/theme/theme_service.h"
 #include "platform/crash_handler.h"
+#include "platform/desktop_theme.h"
 #include "platform/gpu_stderr_watch.h"
 #include "ui/main_window.h"
 
@@ -218,6 +220,15 @@ int main(int argc, char* argv[])
     }
 
     installInterfaceTranslators(app);
+
+    // Resolve the System theme from the desktop portal, which is reliable where
+    // QStyleHints is not (Linux start-up and resume), and re-evaluate when the
+    // desktop's colour-scheme preference changes (#367, #374). Set before the
+    // window is built so the first paint already uses the correct scheme.
+    app.themeService().setSchemeProbe(&whatsie::platform::readDesktopColorScheme);
+    auto* themeWatcher = new whatsie::platform::DesktopThemeWatcher(&app);
+    QObject::connect(themeWatcher, &whatsie::platform::DesktopThemeWatcher::colorSchemeChanged,
+                     &app.themeService(), &whatsie::core::ThemeService::reevaluate);
 
     whatsie::ui::MainWindow window(app.settings(), app.themeService());
     QObject::connect(&app, &whatsie::app::Application::raiseRequested, &window,

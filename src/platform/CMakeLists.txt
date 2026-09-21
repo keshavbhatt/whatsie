@@ -5,6 +5,7 @@
 qt_add_library(whatsie_platform STATIC
     autostart.h
     crash_handler.h
+    desktop_theme.h
     file_manager.h
     gpu_stderr_watch.h
     launcher_badge.cpp
@@ -30,6 +31,7 @@ if(LINUX)
         linux/crash_handler_posix.cpp
         linux/dbus_image.cpp
         linux/dbus_image.h
+        linux/desktop_theme_dbus.cpp
         linux/file_manager_dbus.cpp
         linux/gpu_stderr_watch.cpp
         linux/launcher_badge_dbus.cpp
@@ -42,6 +44,7 @@ if(LINUX)
 else()
     target_sources(whatsie_platform PRIVATE
         crash_handler_generic.cpp
+        desktop_theme_generic.cpp
         file_manager_generic.cpp
         gpu_stderr_watch_generic.cpp
         launcher_badge_generic.cpp

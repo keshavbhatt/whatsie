@@ -8,10 +8,15 @@
 
 namespace whatsie::core {
 
-namespace {
-
-Qt::ColorScheme platformScheme()
+Qt::ColorScheme ThemeService::platformScheme() const
 {
+    // Prefer the injected desktop probe (the portal on Linux); QStyleHints is a
+    // fallback because it is unreliable on Linux at start-up and across resume.
+    if (m_probe) {
+        if (const std::optional<Qt::ColorScheme> scheme = m_probe()) {
+            return *scheme;
+        }
+    }
     if (QGuiApplication::instance() == nullptr) {
         return Qt::ColorScheme::Light;
     }
@@ -19,9 +24,9 @@ Qt::ColorScheme platformScheme()
     return scheme == Qt::ColorScheme::Unknown ? Qt::ColorScheme::Light : scheme;
 }
 
-Qt::ColorScheme resolve(Theme theme)
+Qt::ColorScheme ThemeService::resolve() const
 {
-    switch (theme) {
+    switch (m_settings.theme()) {
     case Theme::Light:
         return Qt::ColorScheme::Light;
     case Theme::Dark:
@@ -32,12 +37,10 @@ Qt::ColorScheme resolve(Theme theme)
     return platformScheme();
 }
 
-} // namespace
-
 ThemeService::ThemeService(Settings& settings, QObject* parent)
     : QObject(parent)
     , m_settings(settings)
-    , m_current(resolve(settings.theme()))
+    , m_current(resolve()) // m_probe (declared above) is already constructed
 {
     connect(&m_settings, &Settings::themeChanged, this, [this](Theme) { reevaluate(); });
     if (QGuiApplication::instance() != nullptr) {
@@ -48,6 +51,12 @@ ThemeService::ThemeService(Settings& settings, QObject* parent)
                     }
                 });
     }
+}
+
+void ThemeService::setSchemeProbe(SchemeProbe probe)
+{
+    m_probe = std::move(probe);
+    reevaluate();
 }
 
 Qt::ColorScheme ThemeService::effectiveScheme() const
@@ -62,7 +71,7 @@ bool ThemeService::followsSystem() const
 
 void ThemeService::reevaluate()
 {
-    const Qt::ColorScheme next = resolve(m_settings.theme());
+    const Qt::ColorScheme next = resolve();
     if (next == m_current) {
         return;
     }

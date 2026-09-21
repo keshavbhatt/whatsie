@@ -3,6 +3,9 @@
 #include <QObject>
 #include <QPalette>
 
+#include <functional>
+#include <optional>
+
 namespace whatsie::core {
 
 class Settings;
@@ -19,9 +22,21 @@ public:
     explicit ThemeService(Settings& settings, QObject* parent = nullptr);
     ~ThemeService() override = default;
 
+    /// Authoritative source of the desktop colour scheme for the System theme,
+    /// injected by the platform layer (core must not depend on D-Bus). Returns
+    /// nullopt when it cannot decide, in which case QStyleHints is used. Setting
+    /// it re-evaluates immediately. Needed because QStyleHints is unreliable on
+    /// Linux at start-up and across resume (#367, #374).
+    using SchemeProbe = std::function<std::optional<Qt::ColorScheme>()>;
+    void setSchemeProbe(SchemeProbe probe);
+
     [[nodiscard]] Qt::ColorScheme effectiveScheme() const;
     [[nodiscard]] bool isDark() const { return effectiveScheme() == Qt::ColorScheme::Dark; }
     [[nodiscard]] bool followsSystem() const;
+
+    /// Re-reads the effective scheme now and emits effectiveSchemeChanged if it
+    /// changed. Call when the desktop's colour-scheme signal fires.
+    void reevaluate();
 
     [[nodiscard]] static QPalette lightPalette();
     [[nodiscard]] static QPalette darkPalette();
@@ -31,9 +46,11 @@ Q_SIGNALS:
     void effectiveSchemeChanged(Qt::ColorScheme scheme);
 
 private:
-    void reevaluate();
+    [[nodiscard]] Qt::ColorScheme platformScheme() const;
+    [[nodiscard]] Qt::ColorScheme resolve() const;
 
     Settings& m_settings;
+    SchemeProbe m_probe;
     Qt::ColorScheme m_current = Qt::ColorScheme::Light;
 };
 
