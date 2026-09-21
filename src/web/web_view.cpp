@@ -91,6 +91,7 @@ WebView::WebView(core::Settings& settings, core::ThemeService& theme, QWidget* p
             applyBlurLive();
             applyThemeLive();
             flushPendingInvite();
+            flushPendingChannel();
         }
     });
     // Replace Chromium's stock error page (disabled in the profile) with our own.
@@ -489,6 +490,45 @@ void WebView::flushPendingInvite()
 })();
 )JS"_s;
     m_page->runJavaScript(kInviteScript.arg(code));
+}
+
+void WebView::openChannel(const QString& code)
+{
+    if (code.isEmpty()) {
+        return;
+    }
+    m_pendingChannel = code;
+    flushPendingChannel();
+}
+
+void WebView::flushPendingChannel()
+{
+    // Same deferral as a group invite: WhatsApp Web must be loaded so its own
+    // click handler turns the synthetic click into a channel preview.
+    if (m_pendingChannel.isEmpty() || m_showingError || !core::isWhatsAppWebUrl(url())) {
+        return;
+    }
+    const QString code = m_pendingChannel;
+    m_pendingChannel.clear();
+    qCInfo(lcWeb) << "opening channel";
+    // The code is validated to [A-Za-z0-9._-] by core::channelCodeFromUrl, so
+    // embedding it in the script is safe.
+    static const QString kChannelScript = uR"JS(
+(function () {
+    function go() {
+        if (!document.body) { setTimeout(go, 100); return; }
+        var a = document.createElement('a');
+        a.href = 'https://whatsapp.com/channel/%1';
+        a.rel = 'noopener';
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+        setTimeout(function () { a.remove(); }, 0);
+    }
+    go();
+})();
+)JS"_s;
+    m_page->runJavaScript(kChannelScript.arg(code));
 }
 
 QString WebView::userAgent() const

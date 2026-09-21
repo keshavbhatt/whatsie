@@ -401,6 +401,14 @@ void MainWindow::openChat(const QString& target)
         m_webView->openGroupInvite(invite);
         return;
     }
+    // A channel link opens its preview the same way (issue #367); checked before
+    // the send-link parse so a channel is never treated as a send.
+    const QString channel = core::channelCodeFromUrl(target);
+    if (!channel.isEmpty()) {
+        showAndRaise();
+        m_webView->openChannel(channel);
+        return;
+    }
     const auto request = core::parseChatLink(target);
     if (!request) {
         qCWarning(lcUi) << "not a chat link or phone number:" << target;

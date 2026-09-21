@@ -42,6 +42,9 @@ public:
     /// Opens WhatsApp Web's "Join group" preview for an invite code (issue #186).
     /// Deferred until the page has loaded if it is not ready yet.
     void openGroupInvite(const QString& code);
+    /// Opens a channel preview for a channel code, the same way as a group invite
+    /// (issue #367). Deferred until the page has loaded if it is not ready yet.
+    void openChannel(const QString& code);
 
     /// Selects which zoom setting applies (normal vs maximized/fullscreen).
     void setZoomMode(bool maximized);
@@ -89,6 +92,7 @@ private:
     void applyBlurLive();
     void applyThemeLive();
     void flushPendingInvite();
+    void flushPendingChannel();
     void handleProxyAuth(QAuthenticator* authenticator, const QString& proxyHost);
     bool maybeHandleDrop(class QObject* watched, class QEvent* event);
     void handleFileDrop(const QStringList& paths);
@@ -119,6 +123,8 @@ private:
     QString m_errorDetail;
     // A group-invite code awaiting a loaded WhatsApp Web page (issue #186).
     QString m_pendingInvite;
+    // A channel code awaiting a loaded WhatsApp Web page (issue #367).
+    QString m_pendingChannel;
 };
 
 } // namespace whatsie::web
