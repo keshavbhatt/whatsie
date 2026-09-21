@@ -487,7 +487,12 @@ QWidget* SettingsDialog::buildAdvancedTab()
         spellLayout->addWidget(label);
 
         m_spellLanguages = new QListWidget(spellBox);
-        m_spellLanguages->setMaximumHeight(160);
+        // Grow to fit the dictionaries so a large set (e.g. every French variant
+        // the snap bundles) is fully visible instead of hidden behind a short,
+        // scrolled list that looks like languages are missing (#369). The tab
+        // itself scrolls past a generous cap.
+        m_spellLanguages->setSizeAdjustPolicy(QAbstractScrollArea::AdjustToContents);
+        m_spellLanguages->setMaximumHeight(360);
         for (const QString& code : available) {
             const QLocale loc(code);
             const QString text = loc.language() == QLocale::AnyLanguage
