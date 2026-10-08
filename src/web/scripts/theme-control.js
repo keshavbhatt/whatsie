@@ -112,15 +112,13 @@
             root.setAttribute('data-color-mode', theme);
             root.style.colorScheme = theme;
             if (document.body) { document.body.classList.toggle('dark', isDark); }
-            localStorage.setItem('theme', theme);
-            if (system) {
-                localStorage.setItem('system-theme-mode', 'true');
-            } else {
-                localStorage.removeItem('system-theme-mode');
-            }
+            // WhatsApp stores these JSON-encoded ('"dark"', 'false'); a raw value
+            // fails its parse and it falls back to following the OS on next start.
+            localStorage.setItem('theme', JSON.stringify(theme));
+            localStorage.setItem('system-theme-mode', JSON.stringify(system));
             try {
                 window.dispatchEvent(new StorageEvent('storage', {
-                    key: 'theme', newValue: theme, storageArea: localStorage, url: location.href
+                    key: 'theme', newValue: JSON.stringify(theme), storageArea: localStorage, url: location.href
                 }));
             } catch (e) { /* StorageEvent ctor unsupported */ }
         } catch (e) {
