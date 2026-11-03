@@ -129,6 +129,17 @@ section takes you straight there (then reopen the dialog to pick the language):
 pair with the `qwebengine_convert_dict` tool that ships with Qt WebEngine, e.g.
 `qwebengine_convert_dict fr_FR.dic fr-FR.bdic`.
 
+## Custom CSS
+
+WhatsApp Web can be restyled without patching Whatsie. In **Settings → Appearance → Custom CSS**,
+pick a local `.css` file; it is injected into `web.whatsapp.com` on the next reload. Use any
+WhatsApp Web userstyle, for example the Catppuccin one:
+
+<https://github.com/catppuccin/userstyles/tree/main/styles/whatsapp-web>
+
+The CSS is applied only to the page, so the native tray menu and dialogs keep the selected
+WhatsApp light/dark palette.
+
 ## Build from source
 
 Requires Qt **6.11** (the version shipped by the snap `kf6-core24` runtime and the Flathub

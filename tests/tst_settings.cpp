@@ -34,6 +34,7 @@ private Q_SLOTS:
         QCOMPARE(m_settings->zoomFactor(), 1.0);
         QCOMPARE(m_settings->zoomFactorMaximized(), 1.0);
         QCOMPARE(m_settings->theme(), Theme::System);
+        QVERIFY(m_settings->customCss().isEmpty());
         QCOMPARE(m_settings->closeAction(), CloseAction::MinimizeToTray);
         QCOMPARE(m_settings->startMinimized(), false);
         QCOMPARE(m_settings->trayLeftClickToggles(), true);
@@ -83,6 +84,20 @@ private Q_SLOTS:
         QCOMPARE(spy.count(), 1);
     }
 
+    void customCssRoundTripAndSignal()
+    {
+        QSignalSpy spy(m_settings.get(), &Settings::customCssChanged);
+        m_settings->setCustomCss(u" /tmp/catppuccin.css "_s);
+        QCOMPARE(m_settings->customCss(), u"/tmp/catppuccin.css"_s);
+        QCOMPARE(spy.count(), 1);
+        QCOMPARE(spy.first().first().toString(), u"/tmp/catppuccin.css"_s);
+        m_settings->setCustomCss(u"/tmp/catppuccin.css"_s);
+        QCOMPARE(spy.count(), 1);
+        m_settings->setCustomCss({});
+        QCOMPARE(m_settings->customCss(), QString());
+        QCOMPARE(spy.count(), 2);
+    }
+
     void boolOptionsEmitOnlyOnChange()
     {
         QSignalSpy start(m_settings.get(), &Settings::startMinimizedChanged);
@@ -119,6 +134,7 @@ private Q_SLOTS:
         const QString path = m_settings->fileName();
         m_settings->setZoomFactor(2.0);
         m_settings->setTheme(Theme::Light);
+        m_settings->setCustomCss(u"/tmp/theme.css"_s);
         m_settings->setCloseAction(CloseAction::Quit);
         m_settings->setWindowGeometry(QByteArrayLiteral("geom"));
         m_settings->setSettingsDialogGeometry(QByteArrayLiteral("dlg"));
@@ -127,6 +143,7 @@ private Q_SLOTS:
         Settings reloaded(path);
         QCOMPARE(reloaded.zoomFactor(), 2.0);
         QCOMPARE(reloaded.theme(), Theme::Light);
+        QCOMPARE(reloaded.customCss(), u"/tmp/theme.css"_s);
         QCOMPARE(reloaded.closeAction(), CloseAction::Quit);
         QCOMPARE(reloaded.windowGeometry(), QByteArrayLiteral("geom"));
         QCOMPARE(reloaded.settingsDialogGeometry(), QByteArrayLiteral("dlg"));

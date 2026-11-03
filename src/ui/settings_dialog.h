@@ -85,6 +85,7 @@ private:
     QCheckBox* m_askWhereToSave = nullptr;
     QCheckBox* m_showDownloads = nullptr;
     QComboBox* m_theme = nullptr;
+    QLineEdit* m_customCss = nullptr;
     QDoubleSpinBox* m_zoom = nullptr;
     QDoubleSpinBox* m_zoomMaximized = nullptr;
     QCheckBox* m_smoothScrolling = nullptr;

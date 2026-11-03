@@ -23,10 +23,14 @@ public:
 
     void installResource(const QString& name, const QString& resourcePath,
                          QWebEngineScript::InjectionPoint point = QWebEngineScript::DocumentReady);
+    /// Installs user CSS into the page as a <style> element. Empty CSS removes it.
+    void installCustomCss(const QString& css);
     void remove(const QString& name);
     [[nodiscard]] bool isInstalled(const QString& name) const;
 
     [[nodiscard]] static QString readResource(const QString& resourcePath);
+    /// JavaScript that injects the given CSS at document creation.
+    [[nodiscard]] static QString customCssSource(const QString& css);
     [[nodiscard]] static QString scriptName(const QString& name);
 
     /// Names of the resources bundled into the bootstrap, in order.
