@@ -66,6 +66,7 @@ parts:
       - hunspell-es
       - hunspell-it
       - hunspell-ru
+      - hunspell-uk
     stage-packages:
       - libdrm2
       # libqxcb links against it; without it the snap does not start (W#320).
