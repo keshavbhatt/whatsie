@@ -2,17 +2,17 @@
 
 #include "core/gpu_storm_detector.h"
 
-#include <QByteArray>
 #include <QObject>
 
-class QSocketNotifier;
+#include <thread>
 
 namespace whatsie::platform {
 
 /// Watches stderr for a GPU context-loss storm. Chromium's GPU subprocess
 /// prints its EGL errors straight to fd 2, bypassing Qt's message handler, so
 /// we redirect stderr through a pipe (forwarding everything to the real stderr
-/// unchanged) and scan it. Linux only; a no-op stub elsewhere. Emits
+/// unchanged) and scan it on a reader thread, so a writer never waits on the GUI
+/// thread. Linux only; a no-op stub elsewhere. Emits
 /// gpuContextLostStorm() once, on the GUI thread.
 class GpuStderrWatch : public QObject
 {
@@ -32,13 +32,13 @@ Q_SIGNALS:
     void gpuContextLostStorm();
 
 private:
-    void onReadable();
+    void readLoop(); // reader thread only
 
-    core::GpuStormDetector m_detector;
-    QSocketNotifier* m_notifier = nullptr;
+    core::GpuStormDetector m_detector; // reader thread only
+    std::thread m_reader;
     int m_readFd = -1;
     int m_savedStderr = -1;
-    QByteArray m_buffer;
+    int m_stopFds[2] = {-1, -1}; // wakes the reader on destruction
 };
 
 } // namespace whatsie::platform

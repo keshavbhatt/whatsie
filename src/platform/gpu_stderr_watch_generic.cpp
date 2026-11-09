@@ -14,6 +14,6 @@ bool GpuStderrWatch::install()
     return false;
 }
 
-void GpuStderrWatch::onReadable() {}
+void GpuStderrWatch::readLoop() {}
 
 } // namespace whatsie::platform

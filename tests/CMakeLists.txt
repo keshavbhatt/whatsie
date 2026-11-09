@@ -58,6 +58,9 @@ whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_cor
 whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
 # platform
 whatsie_add_test(tst_launcher_badge      tst_launcher_badge.cpp      whatsie_platform)
+if(LINUX) # the watch is a no-op stub elsewhere
+    whatsie_add_test(tst_gpu_stderr_watch tst_gpu_stderr_watch.cpp  whatsie_platform)
+endif()
 if(LINUX)
     whatsie_add_test(tst_freedesktop_notifier tst_freedesktop_notifier.cpp whatsie_platform GUI)
 endif()
