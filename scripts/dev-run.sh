@@ -18,11 +18,11 @@ source "$DIR/scripts/snap-runtime-env.sh"
     echo "kf6-core24 runtime snap missing: sudo snap install kf6-core24" >&2; exit 1; }
 
 if [ "${1:-}" = "--ctest" ]; then
-    # ctest is a host binary: keep the host environment. The tests themselves
-    # get the runtime env through their CTest ENVIRONMENT property
+    # ctest from the cmake snap (libc only), so a broken host cmake cannot stop
+    # it. The tests get the runtime env through their CTest ENVIRONMENT property
     # (tests/CMakeLists.txt, from WHATSIE_SNAP_RUNTIME*).
     cd "$BUILD"
-    exec ctest --output-on-failure "${@:2}"
+    exec /snap/cmake/current/bin/ctest --output-on-failure "${@:2}"
 fi
 
 whatsie_prepare_runtime_farm "$BUILD"

@@ -14,11 +14,14 @@ WHATSIE_CORE24_BASE=/snap/core24/current/usr/lib/x86_64-linux-gnu
 
 # Some runtime-snap libs depend on Ubuntu base libraries the host may not
 # have (libselinux, liblerc, ...). Farm them from the core24 base snap,
-# EXCLUDING the glibc family — the host's newer glibc must stay
-# authoritative or the loader chokes on GLIBC_PRIVATE symbols.
+# excluding the glibc family and the C++ runtime: the host compiler built this
+# code, so its newer glibc and libstdc++ must stay authoritative (the loader
+# chokes on GLIBC_PRIVATE symbols, and code from a newer GCC needs a newer
+# libstdc++). The shipped snap is compiled on core24 and has neither problem.
 whatsie_prepare_runtime_farm() {
     local build="$1"
     local farm="$build/core24-libs"
+    rm -rf "$farm" # drop links an older exclusion list let in
     mkdir -p "$farm"
     local f b
     for f in "$WHATSIE_CORE24_BASE"/*.so*; do
@@ -26,7 +29,7 @@ whatsie_prepare_runtime_farm() {
         case "$b" in
             libc.so*|libm.so*|libmvec.so*|libpthread.so*|libdl.so*|librt.so*|\
             ld-linux*|libresolv.so*|libnsl.so*|libnss_*|libanl.so*|libutil.so*|\
-            libBrokenLocale.so*|libthread_db.so*) continue ;;
+            libBrokenLocale.so*|libthread_db.so*|libstdc++.so*|libgcc_s.so*) continue ;;
         esac
         ln -sf "$f" "$farm/$b"
     done
