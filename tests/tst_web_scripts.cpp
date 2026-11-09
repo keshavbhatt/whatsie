@@ -50,6 +50,42 @@ private Q_SLOTS:
         }
     }
 
+    // WhatsApp JSON-parses its 'theme' and 'system-theme-mode' localStorage keys
+    // on startup; a raw `dark` (or a missing mode key) makes it fall back to
+    // following the OS, so the chosen theme was lost on every restart.
+    void themeControlPersistsJsonForWhatsApp()
+    {
+        QJSEngine engine;
+        const QJSValue stubs = engine.evaluate(uR"(
+            var window = this;
+            var store = {};
+            var localStorage = {
+                setItem: function (k, v) { store[k] = String(v); },
+                removeItem: function (k) { delete store[k]; }
+            };
+            var document = {
+                readyState: 'complete',
+                body: null,
+                documentElement: { style: {}, setAttribute: function () {} },
+                querySelector: function () { return null; }
+            };
+            var location = { href: 'https://web.whatsapp.com/' };
+            function setTimeout() {}
+        )"_s);
+        QVERIFY2(!stubs.isError(), qPrintable(stubs.toString()));
+
+        const QString resource = u":/scripts/theme-control.js"_s;
+        const QJSValue loaded = engine.evaluate(ScriptBundle::readResource(resource), resource);
+        QVERIFY2(!loaded.isError(), qPrintable(loaded.toString()));
+
+        for (const QString& mode : {u"dark"_s, u"light"_s}) {
+            const QJSValue applied = engine.evaluate(u"__whatsieSetTheme('%1')"_s.arg(mode));
+            QVERIFY2(!applied.isError(), qPrintable(applied.toString()));
+            QCOMPARE(engine.evaluate(u"JSON.parse(store['theme'])"_s).toString(), mode);
+            QCOMPARE(engine.evaluate(u"JSON.parse(store['system-theme-mode'])"_s).toBool(), false);
+        }
+    }
+
     void bootstrapInstallsOnceAndReplaces()
     {
         QWebEngineProfile profile; // off-the-record
