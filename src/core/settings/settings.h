@@ -144,6 +144,9 @@ public:
     /// 0 = never; otherwise minutes of inactivity before locking.
     [[nodiscard]] int lockIdleMinutes() const;
     void setLockIdleMinutes(int minutes);
+    /// The "More apps from Ktechpit" link on the lock screen; on by default.
+    [[nodiscard]] bool showAppsOnLockScreen() const;
+    void setShowAppsOnLockScreen(bool enabled);
 
     // spellcheck/ (FEATURES L1)
     [[nodiscard]] bool spellCheckEnabled() const;

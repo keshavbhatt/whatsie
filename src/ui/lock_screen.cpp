@@ -1,6 +1,12 @@
 #include "ui/lock_screen.h"
 
+#include "AppCatalog.h"
+#include "AppStrip.h"
+
 #include <QEasingCurve>
+#include <QEvent>
+#include <QHideEvent>
+#include <QResizeEvent>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
@@ -12,7 +18,9 @@
 #include <QParallelAnimationGroup>
 #include <QPropertyAnimation>
 #include <QPushButton>
+#include <QApplication>
 #include <QShowEvent>
+#include <QTimer>
 #include <QVBoxLayout>
 
 using namespace Qt::StringLiterals;
@@ -74,6 +82,22 @@ LockScreen::LockScreen(QWidget* parent)
     card->addWidget(m_unlock, 0, Qt::AlignHCenter);
     card->addWidget(m_status);
 
+    // "More apps from Ktechpit" at the foot of the screen, on a panel like the
+    // card, under a muted heading so the card stays the first thing the eye lands
+    // on. The strip inside is rebuilt on every lock (setOtherAppsVisible()).
+    m_appsBox = new QFrame(this);
+    m_appsBox->setObjectName(u"lockMoreApps"_s);
+    m_appsBox->setMaximumWidth(760);
+    // Never let three cards set the window's minimum width: below 560 px the strip
+    // hides instead (updateOtherAppsVisibility()). Never taller than it needs, either:
+    // spare height in a tall window would stretch the cards.
+    m_appsBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+    auto* appsLayout = new QVBoxLayout(m_appsBox);
+    appsLayout->setContentsMargins(14, 12, 14, 14);
+    m_appsBox->hide(); // until MainWindow says otherwise
+    connect(ktechpit::AppCatalog::instance(), &ktechpit::AppCatalog::changed, this,
+            &LockScreen::updateOtherAppsVisibility);
+
     // Centre the card without stretching it across the whole view.
     auto* row = new QHBoxLayout;
     row->addStretch();
@@ -83,6 +107,13 @@ LockScreen::LockScreen(QWidget* parent)
     outer->addStretch();
     outer->addLayout(row);
     outer->addStretch();
+    // The apps sit at the foot; the card stays centred in the space above them.
+    auto* appsRow = new QHBoxLayout;
+    appsRow->addStretch();
+    appsRow->addWidget(m_appsBox, 1);
+    appsRow->addStretch();
+    outer->addLayout(appsRow);
+    outer->addSpacing(14);
 
     // A light-recoloured copy of the doodle for dark themes: the shipped strokes
     // are grey and vanish on a dark ground, so keep the shapes and repaint them
@@ -124,6 +155,8 @@ void LockScreen::showEvent(QShowEvent* event)
         layout()->activate();
     }
     animateIn();
+    // Watch focus coming back to the window only while the lock is up (see eventFilter()).
+    qApp->installEventFilter(this);
 }
 
 void LockScreen::animateIn()
@@ -147,6 +180,7 @@ void LockScreen::animateIn()
 
     auto* group = new QParallelAnimationGroup(this);
     group->addAnimation(fade);
+    fadeOtherApps(group, 0.0, 1.0, 320);
 
     // Only add the upward-glide when the card already has a real, laid-out
     // geometry; animating "geometry" from a zero rect (very first show, before
@@ -190,6 +224,7 @@ void LockScreen::playDismiss()
 
     auto* group = new QParallelAnimationGroup(this);
     group->addAnimation(fade);
+    fadeOtherApps(group, 1.0, 0.0, 300);
 
     const QRect home = m_card->geometry();
     const bool hasHome = home.isValid() && home.width() > 0 && home.height() > 0;
@@ -212,6 +247,82 @@ void LockScreen::playDismiss()
         Q_EMIT dismissed();
     });
     group->start(QAbstractAnimation::DeleteWhenStopped);
+}
+
+void LockScreen::fadeOtherApps(QAnimationGroup* group, qreal from, qreal to, int duration)
+{
+    if (m_appsBox->isHidden()) {
+        return;
+    }
+    // Attached only for the animation, as for the card (see animateIn()).
+    auto* effect = new QGraphicsOpacityEffect(m_appsBox);
+    m_appsBox->setGraphicsEffect(effect);
+    effect->setOpacity(from);
+    auto* fade = new QPropertyAnimation(effect, "opacity", group);
+    fade->setDuration(duration);
+    fade->setStartValue(from);
+    fade->setEndValue(to);
+    fade->setEasingCurve(to > from ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
+    group->addAnimation(fade);
+    connect(group, &QAnimationGroup::finished, m_appsBox, [this, effect] {
+        if (m_appsBox->graphicsEffect() == effect) {
+            m_appsBox->setGraphicsEffect(nullptr);
+        }
+    });
+}
+
+void LockScreen::setOtherAppsVisible(bool visible)
+{
+    m_appsWanted = visible;
+    // A new strip draws new apps, so each lock shows a different three.
+    delete m_appsStrip;
+    m_appsStrip = nullptr;
+    if (visible) {
+        m_appsStrip = new ktechpit::AppStrip(u"lock"_s, 3, ktechpit::AppStrip::Orientation::Horizontal, m_appsBox);
+        m_appsBox->layout()->addWidget(m_appsStrip);
+    }
+    updateOtherAppsVisibility();
+}
+
+void LockScreen::updateOtherAppsVisibility()
+{
+    // Too small a view and the strip would crowd the card: the card always wins.
+    const bool fits = height() >= 520 && width() >= 560;
+    m_appsBox->setVisible(m_appsWanted && m_appsStrip != nullptr && !m_appsStrip->isHidden() && fits);
+}
+
+void LockScreen::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    updateOtherAppsVisibility();
+}
+
+void LockScreen::hideEvent(QHideEvent* event)
+{
+    QWidget::hideEvent(event);
+    qApp->removeEventFilter(this);
+}
+
+bool LockScreen::eventFilter(QObject* watched, QEvent* event)
+{
+    // A dialog over the lock screen (See all) can leave the window's content
+    // unpainted when it closes: on the GPU-composited window (the web view makes
+    // it one) only the widgets that repaint themselves came back, the rest stayed
+    // black. Repaint the whole lock screen whenever its window becomes active again.
+    if (event->type() == QEvent::WindowActivate && watched == window()) {
+        QTimer::singleShot(0, this, [this] { update(); });
+    }
+    // Coming back to the window (from the browser, a store or the See all list)
+    // with focus on a card would make Enter open it instead of unlocking: hand
+    // focus back to the passcode. Tabbing or clicking into the apps is left alone.
+    if (event->type() == QEvent::FocusIn
+        && static_cast<QFocusEvent*>(event)->reason() == Qt::ActiveWindowFocusReason) {
+        auto* widget = qobject_cast<QWidget*>(watched);
+        if (widget != nullptr && m_appsBox->isAncestorOf(widget) && m_input->isEnabled()) {
+            QTimer::singleShot(0, m_input, [input = m_input] { input->setFocus(); });
+        }
+    }
+    return QWidget::eventFilter(watched, event);
 }
 
 void LockScreen::submit()

@@ -66,6 +66,8 @@ inline constexpr QLatin1StringView kLockIterations{"lock/iterations"};
 inline constexpr QLatin1StringView kLockOnStart{"lock/onStart"};
 inline constexpr QLatin1StringView kLockOnHide{"lock/onHide"};
 inline constexpr QLatin1StringView kLockIdleMinutes{"lock/idleMinutes"};
+// The "More apps from Ktechpit" link under the lock card.
+inline constexpr QLatin1StringView kLockShowOtherApps{"lock/showOtherApps"};
 
 // advanced/
 inline constexpr QLatin1StringView kHardwareAcceleration{"advanced/hardwareAcceleration"};

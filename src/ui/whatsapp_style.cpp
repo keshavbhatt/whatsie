@@ -158,6 +158,23 @@ QListView::item, QTreeView::item, QListWidget::item { padding: 4px; border-radiu
 QListView::item:selected, QTreeView::item:selected, QListWidget::item:selected {
     background: {{accent}}; color: #ffffff;
 }
+/* More apps from Ktechpit (the KtechpitApps module). Cards and the full list sit
+   on the panel colour: on the light theme's dialog background their grey text and
+   blue links are too faint. About holds its strip in a box like a group box. */
+QFrame#ktechpitAppCard {
+    background: {{panel}}; border: 1px solid {{border}}; border-radius: 8px;
+}
+QFrame#ktechpitAppCard:hover { background: {{hover}}; }
+QDialog#ktechpitMoreAppsDialog { background: {{panel}}; }
+QFrame#aboutMoreApps {
+    background: {{panel}}; border: 1px solid {{border}}; border-radius: 12px;
+}
+/* The lock screen's apps: a panel at the foot, with a muted heading so the lock
+   card stays the first thing the eye lands on. */
+QFrame#lockMoreApps {
+    background: {{panel}}; border: 1px solid {{border}}; border-radius: 12px;
+}
+QFrame#lockMoreApps QLabel#ktechpitAppStripTitle { color: {{muted}}; }
 )qss";
 
 } // namespace

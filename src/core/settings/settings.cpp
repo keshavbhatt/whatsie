@@ -45,6 +45,7 @@ constexpr bool kDefaultSpellCheckEnabled = true;
 constexpr bool kDefaultLockOnStart = false;
 constexpr bool kDefaultLockOnHide = false;
 constexpr int kDefaultLockIdleMinutes = 0;
+constexpr bool kDefaultShowAppsOnLockScreen = true;
 // Upper bound (24h) guards the idle-timer arithmetic (minutes * 60 * 1000) in
 // the UI against int overflow from a corrupted or hand-edited stored value.
 constexpr int kMaxLockIdleMinutes = 1440;
@@ -722,6 +723,18 @@ void Settings::setLockIdleMinutes(int minutes)
     }
     m_store->setValue(keys::kLockIdleMinutes, clamped);
     Q_EMIT lockConfigChanged();
+}
+
+bool Settings::showAppsOnLockScreen() const
+{
+    return boolValue(keys::kLockShowOtherApps, kDefaultShowAppsOnLockScreen);
+}
+
+void Settings::setShowAppsOnLockScreen(bool enabled)
+{
+    if (storeBool(keys::kLockShowOtherApps, kDefaultShowAppsOnLockScreen, enabled)) {
+        Q_EMIT lockConfigChanged();
+    }
 }
 
 // ---- appearance/ -----------------------------------------------------------

@@ -71,6 +71,7 @@ target_link_libraries(whatsie_ui
     PUBLIC
         whatsie_web
         whatsie_platform
+        ktechpit_apps
         Qt6::Widgets
         Qt6::Svg
         Qt6::Concurrent

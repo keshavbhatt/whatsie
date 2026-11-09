@@ -1,5 +1,7 @@
 #include "ui/about_dialog.h"
 
+#include "AppCatalog.h"
+#include "AppStrip.h"
 #include "core/settings/settings.h"
 #include "platform/file_manager.h"
 #include "ui/bug_report_dialog.h"
@@ -27,7 +29,6 @@ namespace {
 const QString kSourceUrl = u"https://github.com/keshavbhatt/whatsie"_s;
 const QString kDonateUrl = u"https://www.paypal.com/paypalme/keshavnrj/11"_s;
 const QString kRateUrl = u"snap://whatsie"_s;
-const QString kMoreAppsUrl = u"https://ktechpit.com/USS/public/products.php"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
 } // namespace
 
@@ -95,8 +96,21 @@ void AboutDialog::setupUi()
     actions->setSpacing(8);
     actions->addWidget(linkButton(tr("Donate PayPal"), kDonateUrl));
     actions->addWidget(linkButton(tr("Rate in Store"), kRateUrl));
-    actions->addWidget(linkButton(tr("More Applications"), kMoreAppsUrl));
     actions->addWidget(linkButton(tr("Source Code"), kSourceUrl));
+
+    // More apps from Ktechpit: two cards, drawn afresh each time About opens, in a
+    // panel box like the Settings group boxes (the cards' grey text and the See all
+    // link are too faint on the light theme's dialog background).
+    auto* appsBox = new QFrame(m_content);
+    appsBox->setObjectName(u"aboutMoreApps"_s);
+    auto* strip = new ktechpit::AppStrip(u"about"_s, 2, ktechpit::AppStrip::Orientation::Horizontal, appsBox);
+    auto* appsLayout = new QVBoxLayout(appsBox);
+    appsLayout->setContentsMargins(14, 12, 14, 14);
+    appsLayout->addWidget(strip);
+    // The strip hides itself when there is nothing to show; the box follows it.
+    const auto followStrip = [appsBox, strip] { appsBox->setVisible(!strip->isHidden()); };
+    followStrip();
+    connect(ktechpit::AppCatalog::instance(), &ktechpit::AppCatalog::changed, appsBox, followStrip);
 
     // A subtle, theme-neutral divider. A Sunken QFrame::HLine derives its light
     // edge from the palette and reads far too bright on the dark theme.
@@ -134,6 +148,7 @@ void AboutDialog::setupUi()
     content->setSpacing(10);
     content->addLayout(top);
     content->addLayout(actions);
+    content->addWidget(appsBox);
     content->addWidget(separator);
     content->addLayout(debugRow);
     content->addWidget(m_debugText);

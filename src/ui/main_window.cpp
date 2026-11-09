@@ -520,6 +520,7 @@ void MainWindow::lock()
     m_unlocking = false;
     m_locked = true;
     m_failedAttempts = 0;
+    m_lockScreen->setOtherAppsVisible(m_settings.showAppsOnLockScreen());
     m_lockScreen->reset();
     m_stack->setCurrentWidget(m_lockScreen);
     m_notifications->service().setLockSuppressed(true);

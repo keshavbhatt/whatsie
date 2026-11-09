@@ -657,6 +657,10 @@ QWidget* SettingsDialog::buildLockGroup()
     m_lockIdle->setSuffix(tr(" min"));
     connect(m_lockIdle, &QSpinBox::valueChanged, this, [this](int v) { m_settings.setLockIdleMinutes(v); });
     triggers->addRow(tr("Lock after idle:"), m_lockIdle);
+    m_lockShowApps = new QCheckBox(tr("Show other Ktechpit apps on the lock screen"), box);
+    connect(m_lockShowApps, &QCheckBox::toggled, this,
+            [this](bool on) { m_settings.setShowAppsOnLockScreen(on); });
+    triggers->addRow(QString(), m_lockShowApps);
     outer->addLayout(triggers);
 
     return box;
@@ -669,7 +673,7 @@ void SettingsDialog::updateLockUi()
                                       : tr("No passcode set. Set one to enable locking."));
     m_lockSet->setText(hasPasscode ? tr("Change passcode…") : tr("Set passcode…"));
     m_lockRemove->setEnabled(hasPasscode);
-    for (QWidget* w : QList<QWidget*>{m_lockOnStart, m_lockOnHide, m_lockIdle}) {
+    for (QWidget* w : QList<QWidget*>{m_lockOnStart, m_lockOnHide, m_lockIdle, m_lockShowApps}) {
         w->setEnabled(hasPasscode);
     }
 }
@@ -816,6 +820,7 @@ void SettingsDialog::loadValues()
     m_lockOnStart->setChecked(m_settings.lockOnStart());
     m_lockOnHide->setChecked(m_settings.lockOnHide());
     m_lockIdle->setValue(m_settings.lockIdleMinutes());
+    m_lockShowApps->setChecked(m_settings.showAppsOnLockScreen());
     updateLockUi();
     m_webrtcPublicOnly->setChecked(m_settings.webrtcPublicInterfacesOnly());
     m_proxyMode->setCurrentIndex(m_proxyMode->findData(static_cast<int>(m_settings.proxyMode())));

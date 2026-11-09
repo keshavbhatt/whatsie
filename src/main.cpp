@@ -9,7 +9,10 @@
 #include "platform/crash_handler.h"
 #include "platform/desktop_theme.h"
 #include "platform/gpu_stderr_watch.h"
+#include "platform/platform_info.h"
 #include "ui/main_window.h"
+
+#include "AppCatalog.h"
 
 #include <QByteArray>
 #include <QCoreApplication>
@@ -140,6 +143,26 @@ void installInterfaceTranslators(whatsie::app::Application& app)
     }
 }
 
+// More apps from Ktechpit (About, lock screen): the catalog needs to know which
+// app this is and how it was installed, so Get opens the right store.
+void initAppCatalog()
+{
+    ktechpit::CatalogConfig config;
+    config.hostAppId = QStringLiteral("whatsie");
+    config.source = QStringLiteral("whatsie"); // links carry ?ref=whatsie-<place>
+    config.oneLineText = true; // one line per name and description, with an ellipsis
+#ifdef Q_OS_WIN
+    config.package = ktechpit::Package::Windows;
+#else
+    const QString package = whatsie::platform::packageType();
+    config.package = package.startsWith(QLatin1StringView("snap"))      ? ktechpit::Package::Snap
+                     : package.startsWith(QLatin1StringView("flatpak")) ? ktechpit::Package::Flatpak
+                     : package == QLatin1StringView("AppImage")         ? ktechpit::Package::AppImage
+                                                                        : ktechpit::Package::Native;
+#endif
+    ktechpit::AppCatalog::init(config);
+}
+
 void relaunchUnderXcb(whatsie::app::Application& app)
 {
     qputenv("QT_QPA_PLATFORM", "xcb");
@@ -220,6 +243,7 @@ int main(int argc, char* argv[])
     }
 
     installInterfaceTranslators(app);
+    initAppCatalog();
 
     // Resolve the System theme from the desktop portal, which is reliable where
     // QStyleHints is not (Linux start-up and resume), and re-evaluate when the

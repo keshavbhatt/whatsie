@@ -41,6 +41,20 @@ private Q_SLOTS:
         QVERIFY(m_settings->windowGeometry().isEmpty());
         QVERIFY(m_settings->windowState().isEmpty());
         QVERIFY(m_settings->settingsDialogGeometry().isEmpty());
+        QCOMPARE(m_settings->showAppsOnLockScreen(), true);
+    }
+
+    void showAppsOnLockScreenRoundTrip()
+    {
+        QSignalSpy spy(m_settings.get(), &Settings::lockConfigChanged);
+        m_settings->setShowAppsOnLockScreen(false);
+        QCOMPARE(m_settings->showAppsOnLockScreen(), false);
+        QCOMPARE(spy.count(), 1);
+        m_settings->setShowAppsOnLockScreen(false); // same value: no signal
+        QCOMPARE(spy.count(), 1);
+        m_settings->setShowAppsOnLockScreen(true);
+        QCOMPARE(m_settings->showAppsOnLockScreen(), true);
+        QCOMPARE(spy.count(), 2);
     }
 
     void zoomFactorRoundTripAndSignal()

@@ -104,6 +104,7 @@ private:
     QCheckBox* m_lockOnStart = nullptr;
     QCheckBox* m_lockOnHide = nullptr;
     QSpinBox* m_lockIdle = nullptr;
+    QCheckBox* m_lockShowApps = nullptr;
     QCheckBox* m_webrtcPublicOnly = nullptr;
     QComboBox* m_proxyMode = nullptr;
     QComboBox* m_proxyType = nullptr;

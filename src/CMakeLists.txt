@@ -9,6 +9,9 @@
 add_subdirectory(core)
 add_subdirectory(platform)
 add_subdirectory(web)
+# More apps from Ktechpit (KtechpitApps, MIT, a subtree of github.com/keshavbhatt/ktechpit-apps),
+# in About and on the lock screen.
+add_subdirectory(modules/KtechpitApps)
 add_subdirectory(ui)
 add_subdirectory(app)
 
@@ -60,7 +63,7 @@ install(TARGETS whatsie
 find_package(Qt6 QUIET COMPONENTS LinguistTools)
 if(Qt6LinguistTools_FOUND)
     qt_add_translations(whatsie
-        SOURCE_TARGETS whatsie_core whatsie_platform whatsie_web whatsie_ui whatsie_app
+        SOURCE_TARGETS whatsie_core whatsie_platform whatsie_web whatsie_ui whatsie_app ktechpit_apps
         TS_FILES
             ${CMAKE_CURRENT_SOURCE_DIR}/i18n/de.ts
             ${CMAKE_CURRENT_SOURCE_DIR}/i18n/es.ts
