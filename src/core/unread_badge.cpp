@@ -133,7 +133,8 @@ QImage fitGlyphToIcon(const QImage& glyph, int size, qreal fill)
     }
     const QImage cropped = src.copy(QRect(minX, minY, maxX - minX + 1, maxY - minY + 1));
     const int box = std::max(1, qRound(size * std::clamp(fill, qreal(0.1), qreal(1.0))));
-    const QImage scaled = cropped.scaled(box, box, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    QImage scaled = cropped.scaled(box, box, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+    scaled.setDevicePixelRatio(1.0);
 
     QImage out(size, size, QImage::Format_ARGB32_Premultiplied);
     out.fill(Qt::transparent);
