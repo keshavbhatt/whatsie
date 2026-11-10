@@ -1,0 +1,27 @@
+<RCC>
+  <qresource prefix="/ktechpit-apps">
+    <file alias="catalog.json">resources/catalog.json</file>
+    <file alias="icons/arrowescape.png">resources/icons/arrowescape.png</file>
+    <file alias="icons/colorsmith.png">resources/icons/colorsmith.png</file>
+    <file alias="icons/colorwall.png">resources/icons/colorwall.png</file>
+    <file alias="icons/formatfactory.png">resources/icons/formatfactory.png</file>
+    <file alias="icons/glate.png">resources/icons/glate.png</file>
+    <file alias="icons/hungrysnake.png">resources/icons/hungrysnake.png</file>
+    <file alias="icons/music-radar.png">resources/icons/music-radar.png</file>
+    <file alias="icons/omnidict.png">resources/icons/omnidict.png</file>
+    <file alias="icons/orion.png">resources/icons/orion.png</file>
+    <file alias="icons/paraphrase.png">resources/icons/paraphrase.png</file>
+    <file alias="icons/pixelbatch.png">resources/icons/pixelbatch.png</file>
+    <file alias="icons/pixelfx.png">resources/icons/pixelfx.png</file>
+    <file alias="icons/playlist-dl.png">resources/icons/playlist-dl.png</file>
+    <file alias="icons/plumber.png">resources/icons/plumber.png</file>
+    <file alias="icons/qtube-dl.png">resources/icons/qtube-dl.png</file>
+    <file alias="icons/red.png">resources/icons/red.png</file>
+    <file alias="icons/torrhunt.png">resources/icons/torrhunt.png</file>
+    <file alias="icons/typingtutor.png">resources/icons/typingtutor.png</file>
+    <file alias="icons/ultimate-media-downloader.png">resources/icons/ultimate-media-downloader.png</file>
+    <file alias="icons/utube.png">resources/icons/utube.png</file>
+    <file alias="icons/whatsie.png">resources/icons/whatsie.png</file>
+    <file alias="icons/wonderwall.png">resources/icons/wonderwall.png</file>
+  </qresource>
+</RCC>

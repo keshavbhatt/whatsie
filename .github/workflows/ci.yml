@@ -1,0 +1,38 @@
+# Builds the module, its tests and the demo, and runs the tests, on every push and pull
+# request, against Qt 6.8 LTS (the oldest Qt the module's apps ship) and Qt 6.11.
+name: ci
+
+on:
+  push:
+    branches: [main]
+    tags: ['v*']
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-24.04
+    strategy:
+      fail-fast: false
+      matrix:
+        qt: ['6.8.*', '6.11.*']
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Install Qt
+        uses: jurplel/install-qt-action@v4
+        with:
+          version: ${{ matrix.qt }}
+          cache: true
+
+      - name: Install build tools
+        run: sudo apt-get update && sudo apt-get install -y ninja-build libgl1-mesa-dev libxkbcommon-dev
+
+      - name: Build
+        run: |
+          cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release \
+            -DKTECHPIT_APPS_BUILD_TESTS=ON -DKTECHPIT_APPS_BUILD_DEMO=ON \
+            -DCMAKE_CXX_FLAGS="-Wall -Wextra -Werror -DQT_NO_CAST_FROM_ASCII -DQT_NO_KEYWORDS -DQT_NO_FOREACH -DQT_USE_QSTRINGBUILDER"
+          cmake --build build --parallel
+
+      - name: Test
+        run: ctest --test-dir build --output-on-failure
