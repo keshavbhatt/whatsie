@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Outline (line-art) version of the Whatsie logo for the system tray, in the
+     style of KDE Breeze panel icons: a chat bubble with a "W", drawn as strokes
+     on transparency. The colour is applied at runtime to suit the panel. -->
+<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64">
+  <g fill="none" stroke="#000" stroke-width="4.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M 22.4 52.2 A 24 24 0 1 0 10.1 37.6 L 6.8 56.2 Z"/>
+    <path d="M 20.5 20.5 L 26 41 L 33 27.5 L 40 41 L 45.5 20.5"/>
+  </g>
+</svg>

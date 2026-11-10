@@ -57,6 +57,31 @@ QImage composeUnreadBadge(const QImage& base, int count)
     return out;
 }
 
+QImage composeUnreadDot(const QImage& base, int count, const QColor& color)
+{
+    if (count <= 0 || base.isNull()) {
+        return base;
+    }
+
+    QImage out = base.convertToFormat(QImage::Format_ARGB32_Premultiplied);
+    const double size = std::min(out.width(), out.height());
+    const double radius = size * 0.21;
+    const double gap = size * 0.07;
+    const QPointF centre(out.width() - radius, out.height() - radius);
+
+    QPainter painter(&out);
+    painter.setRenderHint(QPainter::Antialiasing, true);
+    painter.setPen(Qt::NoPen);
+    // Clear a ring around the dot so it stays distinct from the glyph's strokes.
+    painter.setCompositionMode(QPainter::CompositionMode_Clear);
+    painter.setBrush(Qt::black);
+    painter.drawEllipse(centre, radius + gap, radius + gap);
+    painter.setCompositionMode(QPainter::CompositionMode_SourceOver);
+    painter.setBrush(color);
+    painter.drawEllipse(centre, radius, radius);
+    return out;
+}
+
 QImage dimImage(const QImage& image, qreal amount)
 {
     if (image.isNull() || amount <= 0.0) {
