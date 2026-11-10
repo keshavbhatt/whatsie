@@ -1,12 +1,11 @@
 #include "ui/lock_screen.h"
 
 #include "AppCatalog.h"
-#include "AppStrip.h"
+#include "MoreAppsDialog.h"
 
 #include <QEasingCurve>
 #include <QEvent>
 #include <QHideEvent>
-#include <QResizeEvent>
 #include <QFrame>
 #include <QGraphicsOpacityEffect>
 #include <QHBoxLayout>
@@ -82,38 +81,32 @@ LockScreen::LockScreen(QWidget* parent)
     card->addWidget(m_unlock, 0, Qt::AlignHCenter);
     card->addWidget(m_status);
 
-    // "More apps from Ktechpit" at the foot of the screen, on a panel like the
-    // card, under a muted heading so the card stays the first thing the eye lands
-    // on. The strip inside is rebuilt on every lock (setOtherAppsVisible()).
-    m_appsBox = new QFrame(this);
-    m_appsBox->setObjectName(u"lockMoreApps"_s);
-    m_appsBox->setMaximumWidth(760);
-    // Never let three cards set the window's minimum width: below 560 px the strip
-    // hides instead (updateOtherAppsVisibility()). Never taller than it needs, either:
-    // spare height in a tall window would stretch the cards.
-    m_appsBox->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
-    auto* appsLayout = new QVBoxLayout(m_appsBox);
-    appsLayout->setContentsMargins(14, 12, 14, 14);
-    m_appsBox->hide(); // until MainWindow says otherwise
+    // "More apps from Ktechpit": one quiet link under the card, in the text colour
+    // (the palette's blue is too faint on the light doodle), that opens the full
+    // list. Nothing to look at until someone asks for it.
+    m_appsLink = new QPushButton(tr("More apps from Ktechpit"), this);
+    m_appsLink->setObjectName(u"lockMoreAppsLink"_s);
+    m_appsLink->setCursor(Qt::PointingHandCursor);
+    m_appsLink->setAutoDefault(false);
+    m_appsLink->hide(); // until MainWindow says otherwise
+    connect(m_appsLink, &QPushButton::clicked, this, &LockScreen::openOtherApps);
     connect(ktechpit::AppCatalog::instance(), &ktechpit::AppCatalog::changed, this,
             &LockScreen::updateOtherAppsVisibility);
+    connect(ktechpit::AppCatalog::instance(), &ktechpit::AppCatalog::enabledChanged, this,
+            &LockScreen::updateOtherAppsVisibility);
 
-    // Centre the card without stretching it across the whole view.
+    // Centre the card, with the link under it, without stretching either.
     auto* row = new QHBoxLayout;
     row->addStretch();
     row->addWidget(m_card);
     row->addStretch();
     auto* outer = new QVBoxLayout(this);
+    outer->setSpacing(0);
     outer->addStretch();
     outer->addLayout(row);
+    outer->addSpacing(18);
+    outer->addWidget(m_appsLink, 0, Qt::AlignHCenter);
     outer->addStretch();
-    // The apps sit at the foot; the card stays centred in the space above them.
-    auto* appsRow = new QHBoxLayout;
-    appsRow->addStretch();
-    appsRow->addWidget(m_appsBox, 1);
-    appsRow->addStretch();
-    outer->addLayout(appsRow);
-    outer->addSpacing(14);
 
     // A light-recoloured copy of the doodle for dark themes: the shipped strokes
     // are grey and vanish on a dark ground, so keep the shapes and repaint them
@@ -251,12 +244,12 @@ void LockScreen::playDismiss()
 
 void LockScreen::fadeOtherApps(QAnimationGroup* group, qreal from, qreal to, int duration)
 {
-    if (m_appsBox->isHidden()) {
+    if (m_appsLink->isHidden()) {
         return;
     }
     // Attached only for the animation, as for the card (see animateIn()).
-    auto* effect = new QGraphicsOpacityEffect(m_appsBox);
-    m_appsBox->setGraphicsEffect(effect);
+    auto* effect = new QGraphicsOpacityEffect(m_appsLink);
+    m_appsLink->setGraphicsEffect(effect);
     effect->setOpacity(from);
     auto* fade = new QPropertyAnimation(effect, "opacity", group);
     fade->setDuration(duration);
@@ -264,9 +257,9 @@ void LockScreen::fadeOtherApps(QAnimationGroup* group, qreal from, qreal to, int
     fade->setEndValue(to);
     fade->setEasingCurve(to > from ? QEasingCurve::OutCubic : QEasingCurve::InCubic);
     group->addAnimation(fade);
-    connect(group, &QAnimationGroup::finished, m_appsBox, [this, effect] {
-        if (m_appsBox->graphicsEffect() == effect) {
-            m_appsBox->setGraphicsEffect(nullptr);
+    connect(group, &QAnimationGroup::finished, m_appsLink, [this, effect] {
+        if (m_appsLink->graphicsEffect() == effect) {
+            m_appsLink->setGraphicsEffect(nullptr);
         }
     });
 }
@@ -274,27 +267,23 @@ void LockScreen::fadeOtherApps(QAnimationGroup* group, qreal from, qreal to, int
 void LockScreen::setOtherAppsVisible(bool visible)
 {
     m_appsWanted = visible;
-    // A new strip draws new apps, so each lock shows a different three.
-    delete m_appsStrip;
-    m_appsStrip = nullptr;
-    if (visible) {
-        m_appsStrip = new ktechpit::AppStrip(u"lock"_s, 3, ktechpit::AppStrip::Orientation::Horizontal, m_appsBox);
-        m_appsBox->layout()->addWidget(m_appsStrip);
-    }
     updateOtherAppsVisibility();
 }
 
 void LockScreen::updateOtherAppsVisibility()
 {
-    // Too small a view and the strip would crowd the card: the card always wins.
-    const bool fits = height() >= 520 && width() >= 560;
-    m_appsBox->setVisible(m_appsWanted && m_appsStrip != nullptr && !m_appsStrip->isHidden() && fits);
+    const ktechpit::AppCatalog* catalog = ktechpit::AppCatalog::instance();
+    m_appsLink->setVisible(m_appsWanted && catalog->isEnabled() && !catalog->allApps().isEmpty());
 }
 
-void LockScreen::resizeEvent(QResizeEvent* event)
+void LockScreen::openOtherApps()
 {
-    QWidget::resizeEvent(event);
-    updateOtherAppsVisibility();
+    if (const ktechpit::AppCatalog::ShowAll& showAll = ktechpit::AppCatalog::instance()->showAll()) {
+        showAll(u"lock"_s, window());
+        return;
+    }
+    ktechpit::MoreAppsDialog dialog(u"lock"_s, window());
+    dialog.exec();
 }
 
 void LockScreen::hideEvent(QHideEvent* event)
@@ -305,20 +294,20 @@ void LockScreen::hideEvent(QHideEvent* event)
 
 bool LockScreen::eventFilter(QObject* watched, QEvent* event)
 {
-    // A dialog over the lock screen (See all) can leave the window's content
+    // A dialog over the lock screen (the full list) can leave the window's content
     // unpainted when it closes: on the GPU-composited window (the web view makes
     // it one) only the widgets that repaint themselves came back, the rest stayed
     // black. Repaint the whole lock screen whenever its window becomes active again.
     if (event->type() == QEvent::WindowActivate && watched == window()) {
         QTimer::singleShot(0, this, [this] { update(); });
     }
-    // Coming back to the window (from the browser, a store or the See all list)
-    // with focus on a card would make Enter open it instead of unlocking: hand
-    // focus back to the passcode. Tabbing or clicking into the apps is left alone.
+    // Coming back to the window (from the list, a browser or a store) with focus
+    // on the link would make Enter open the list again instead of unlocking: hand
+    // focus back to the passcode. Tabbing to the link is left alone.
     if (event->type() == QEvent::FocusIn
         && static_cast<QFocusEvent*>(event)->reason() == Qt::ActiveWindowFocusReason) {
         auto* widget = qobject_cast<QWidget*>(watched);
-        if (widget != nullptr && m_appsBox->isAncestorOf(widget) && m_input->isEnabled()) {
+        if (widget == m_appsLink && m_input->isEnabled()) {
             QTimer::singleShot(0, m_input, [input = m_input] { input->setFocus(); });
         }
     }

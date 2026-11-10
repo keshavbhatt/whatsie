@@ -645,22 +645,27 @@ Click for details</source>
 <context>
     <name>whatsie::ui::LockScreen</name>
     <message>
-        <location filename="../ui/lock_screen.cpp" line="50"/>
+        <location filename="../ui/lock_screen.cpp" line="49"/>
         <source>Whatsie is locked</source>
         <translation>Whatsie заблоковано</translation>
     </message>
     <message>
-        <location filename="../ui/lock_screen.cpp" line="59"/>
+        <location filename="../ui/lock_screen.cpp" line="58"/>
         <source>Enter passcode</source>
         <translation>Введіть код доступу</translation>
     </message>
     <message>
-        <location filename="../ui/lock_screen.cpp" line="65"/>
+        <location filename="../ui/lock_screen.cpp" line="64"/>
         <source>Unlock</source>
         <translation>Розблокувати</translation>
     </message>
+    <message>
+        <location filename="../ui/lock_screen.cpp" line="87"/>
+        <source>More apps from Ktechpit</source>
+        <translation>Інші застосунки від Ktechpit</translation>
+    </message>
     <message numerus="yes">
-        <location filename="../ui/lock_screen.cpp" line="360"/>
+        <location filename="../ui/lock_screen.cpp" line="349"/>
         <source>Too many attempts. Try again in %n second(s).</source>
         <translation>
             <numerusform>Забагато спроб. Повторіть через %n секунду.</numerusform>

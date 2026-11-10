@@ -28,8 +28,8 @@ public:
     void showError(const QString& message);
     /// Disable entry and show a countdown; call with 0 to re-enable.
     void showThrottle(int secondsRemaining);
-    /// Show "More apps from Ktechpit" at the foot of the screen: three apps, drawn
-    /// afresh on every call. Hidden when the view is too small or the catalog empty.
+    /// Show the "More apps from Ktechpit" link under the card, which opens the full
+    /// list. Hidden when the catalog is off or empty.
     void setOtherAppsVisible(bool visible);
 
     /// Play the dismissal animation (card fades away); emits dismissed() when the
@@ -44,7 +44,6 @@ Q_SIGNALS:
 protected:
     bool eventFilter(QObject* watched, QEvent* event) override;
     void paintEvent(QPaintEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
     void showEvent(QShowEvent* event) override;
     void hideEvent(QHideEvent* event) override;
 
@@ -52,15 +51,15 @@ private:
     void submit();
     void animateIn();
     void updateOtherAppsVisibility();
-    /// Fades the apps along with the card, so they never linger on their own.
+    void openOtherApps();
+    /// Fades the link along with the card, so it never lingers on its own.
     void fadeOtherApps(QAnimationGroup* group, qreal from, qreal to, int duration);
 
     QFrame* m_card = nullptr;
     QLabel* m_status = nullptr;
     QLineEdit* m_input = nullptr;
     QPushButton* m_unlock = nullptr;
-    QFrame* m_appsBox = nullptr;
-    QWidget* m_appsStrip = nullptr; ///< a ktechpit::AppStrip, rebuilt on every lock
+    QPushButton* m_appsLink = nullptr;
     bool m_appsWanted = false;
     QPixmap m_doodle;       ///< as-shipped grey doodles, for light themes
     QPixmap m_doodleLight;  ///< strokes recoloured light, for dark themes

@@ -68,59 +68,49 @@ private Q_SLOTS:
         QCOMPARE(box->findChildren<QFrame*>(u"ktechpitAppCard"_s).size(), 2);
     }
 
-    void lockAppsFollowTheSetting()
+    void lockLinkFollowsTheSetting()
     {
         whatsie::ui::LockScreen lock;
         lock.resize(900, 600);
-        auto* box = lock.findChild<QFrame*>(u"lockMoreApps"_s);
-        QVERIFY(box != nullptr);
-        QVERIFY(!box->isVisibleTo(&lock)); // hidden until told
+        auto* link = lock.findChild<QPushButton*>(u"lockMoreAppsLink"_s);
+        QVERIFY(link != nullptr);
+        QVERIFY(!link->isVisibleTo(&lock)); // hidden until told
+        QVERIFY(lock.findChildren<QFrame*>(u"ktechpitAppCard"_s).isEmpty()); // a link, no cards
 
         lock.setOtherAppsVisible(true);
-        QVERIFY(box->isVisibleTo(&lock));
-        QCOMPARE(box->findChildren<QFrame*>(u"ktechpitAppCard"_s).size(), 3);
+        QVERIFY(link->isVisibleTo(&lock));
         lock.setOtherAppsVisible(false);
-        QVERIFY(!box->isVisibleTo(&lock));
-        QCOMPARE(box->findChildren<QFrame*>(u"ktechpitAppCard"_s).size(), 0);
+        QVERIFY(!link->isVisibleTo(&lock));
     }
 
-    void lockAppsGiveWayOnASmallView()
+    void lockLinkHidesWhenTheCatalogIsOff()
     {
         whatsie::ui::LockScreen lock;
-        lock.resize(900, 480);
-        lock.show(); // resize events reach only a shown widget
-        QVERIFY(QTest::qWaitForWindowExposed(&lock));
         lock.setOtherAppsVisible(true);
-        auto* box = lock.findChild<QFrame*>(u"lockMoreApps"_s);
-        QVERIFY(!box->isVisibleTo(&lock));
-        lock.resize(900, 600);
-        QVERIFY(box->isVisibleTo(&lock));
-        lock.resize(500, 600);
-        QVERIFY(!box->isVisibleTo(&lock));
+        auto* link = lock.findChild<QPushButton*>(u"lockMoreAppsLink"_s);
+        QVERIFY(link->isVisibleTo(&lock));
+        ktechpit::AppCatalog::instance()->setEnabled(false);
+        QVERIFY(!link->isVisibleTo(&lock));
+        ktechpit::AppCatalog::instance()->setEnabled(true);
+        QVERIFY(link->isVisibleTo(&lock));
     }
 
-    void lockAppsKeepTheirHeightInATallView()
+    void lockLinkSitsUnderTheCard()
     {
-        // A tall window must not stretch the cards (owner's screenshot, 2026-11-10).
         whatsie::ui::LockScreen lock;
         lock.resize(1600, 1050);
+        lock.setOtherAppsVisible(true);
         lock.show();
         QVERIFY(QTest::qWaitForWindowExposed(&lock));
-        lock.setOtherAppsVisible(true);
-        QTest::qWait(50);
-        auto* box = lock.findChild<QFrame*>(u"lockMoreApps"_s);
-        const auto cards = box->findChildren<QFrame*>(u"ktechpitAppCard"_s);
-        QCOMPARE(cards.size(), 3);
-        for (const QFrame* card : cards) {
-            QVERIFY2(card->height() <= card->sizeHint().height(),
-                     qPrintable(u"card %1 px tall, wants %2"_s.arg(card->height()).arg(card->sizeHint().height())));
-        }
-        QVERIFY2(box->height() <= box->sizeHint().height(),
-                 qPrintable(u"box %1 px tall, wants %2"_s.arg(box->height()).arg(box->sizeHint().height())));
+        QTest::qWait(500); // the card's rise
+        const QWidget* card = lock.findChild<QFrame*>(u"lockCard"_s);
+        const QWidget* link = lock.findChild<QPushButton*>(u"lockMoreAppsLink"_s);
+        QCOMPARE(link->geometry().top() - card->geometry().bottom() - 1, 18);
+        QCOMPARE(link->geometry().center().x(), card->geometry().center().x());
         grab(lock, u"lock-tall"_s);
     }
 
-    void lockAppsHandFocusBackToThePasscode()
+    void lockLinkHandsFocusBackToThePasscode()
     {
         whatsie::ui::LockScreen lock;
         lock.resize(900, 600);
@@ -132,13 +122,12 @@ private Q_SLOTS:
         auto* input = lock.findChild<QLineEdit*>();
         QTRY_VERIFY(input->hasFocus());
 
-        auto* get = lock.findChild<QFrame*>(u"lockMoreApps"_s)->findChild<QPushButton*>(u"ktechpitAppGet"_s);
-        QVERIFY(get != nullptr);
-        get->setFocus(Qt::TabFocusReason); // tabbing in is left alone
+        auto* link = lock.findChild<QPushButton*>(u"lockMoreAppsLink"_s);
+        link->setFocus(Qt::TabFocusReason); // tabbing in is left alone
         QTest::qWait(50);
-        QVERIFY(get->hasFocus());
-        lock.findChild<QPushButton*>()->setFocus(Qt::TabFocusReason); // so the next focus is new
-        get->setFocus(Qt::ActiveWindowFocusReason); // back from the browser: to the passcode
+        QVERIFY(link->hasFocus());
+        lock.findChild<QFrame*>(u"lockCard"_s)->findChild<QPushButton*>()->setFocus(Qt::TabFocusReason); // Unlock, so the next focus is new
+        link->setFocus(Qt::ActiveWindowFocusReason); // back from the list: to the passcode
         QTRY_VERIFY(input->hasFocus());
     }
 

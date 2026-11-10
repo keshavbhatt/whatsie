@@ -169,12 +169,16 @@ QDialog#ktechpitMoreAppsDialog { background: {{panel}}; }
 QFrame#aboutMoreApps {
     background: {{panel}}; border: 1px solid {{border}}; border-radius: 12px;
 }
-/* The lock screen's apps: a panel at the foot, with a muted heading so the lock
-   card stays the first thing the eye lands on. */
-QFrame#lockMoreApps {
-    background: {{panel}}; border: 1px solid {{border}}; border-radius: 12px;
+/* The lock screen's link to the full list: plain text in the text colour (the
+   palette's blue is too faint on the light doodle), underlined on hover or focus. */
+QPushButton#lockMoreAppsLink,
+QPushButton#lockMoreAppsLink:hover,
+QPushButton#lockMoreAppsLink:pressed,
+QPushButton#lockMoreAppsLink:focus {
+    background: transparent; border: none; color: {{text}};
+    padding: 2px 6px; min-height: 0; font-weight: 400;
 }
-QFrame#lockMoreApps QLabel#ktechpitAppStripTitle { color: {{muted}}; }
+QPushButton#lockMoreAppsLink:hover, QPushButton#lockMoreAppsLink:focus { text-decoration: underline; }
 )qss";
 
 } // namespace
