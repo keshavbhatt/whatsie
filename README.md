@@ -114,8 +114,8 @@ Windows 10/11, 64-bit; it bundles its own Qt runtime.
 ## Spell check
 
 Whatsie bundles dictionaries for several languages (English, German, Spanish,
-French, Italian, Russian). Turn it on and pick a language in **Settings →
-Advanced → Spell check**.
+French, Italian, Russian, Ukrainian). Turn it on and pick a language in
+**Settings → Advanced → Spell check**.
 
 To add a language that isn't bundled, drop its Chromium `<code>.bdic` file into
 the dictionaries folder — the **Open folder…** button in that same settings

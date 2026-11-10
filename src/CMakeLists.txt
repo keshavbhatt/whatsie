@@ -68,6 +68,7 @@ if(Qt6LinguistTools_FOUND)
             ${CMAKE_CURRENT_SOURCE_DIR}/i18n/it.ts
             ${CMAKE_CURRENT_SOURCE_DIR}/i18n/pt_BR.ts
             ${CMAKE_CURRENT_SOURCE_DIR}/i18n/ru.ts
+            ${CMAKE_CURRENT_SOURCE_DIR}/i18n/uk.ts
         RESOURCE_PREFIX "/i18n"
     )
 else()
