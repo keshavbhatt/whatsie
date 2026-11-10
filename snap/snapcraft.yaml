@@ -15,7 +15,8 @@ icon: snap/gui/icon.svg
 
 platforms:
   amd64:
-  arm64:
+  # arm64 is off while KDE publishes no arm64 kde-qt6-core24-sdk, which the
+  # kde-neon-6 extension needs to build. Add it back when the SDK returns.
 
 apps:
   whatsie:

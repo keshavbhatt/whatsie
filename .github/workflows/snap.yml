@@ -24,8 +24,10 @@ jobs:
         include:
           - arch: amd64
             runner: ubuntu-24.04
-          - arch: arm64
-            runner: ubuntu-24.04-arm
+          # arm64 is off while KDE publishes no arm64 kde-qt6-core24-sdk (see
+          # snap/snapcraft.yaml). Add it back with:
+          #   - arch: arm64
+          #     runner: ubuntu-24.04-arm
     runs-on: ${{ matrix.runner }}
     steps:
       - uses: actions/checkout@v5
