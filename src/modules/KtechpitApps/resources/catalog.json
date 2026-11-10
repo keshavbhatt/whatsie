@@ -1,0 +1,338 @@
+{
+    "schema": 1,
+    "generated": "2026-11-04T09:42:01Z",
+    "apps": [
+        {
+            "id": "colorsmith",
+            "name": "ColorSmith",
+            "title": "ColorSmith - Modern Color Picker",
+            "summary": "Professional color picker, gradient maker, and palette manager",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F01%2Ficon_ceVbiAf.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=colorsmith",
+            "snap": "colorsmith",
+            "flatpak": "com.ktechpit.colorsmith"
+        },
+        {
+            "id": "colorwall",
+            "name": "ColorWall",
+            "title": "ColorWall - Browse & Download Wallpapers",
+            "summary": "Browse & Download Free Ultra HD wallpapers for Desktop",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2023%2F04%2Ficon_InXhjPh.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=colorwall",
+            "snap": "colorwall",
+            "flatpak": "com.ktechpit.colorwall"
+        },
+        {
+            "id": "ultimate-media-downloader",
+            "name": "Ultimate Media Downloader",
+            "title": "Ultimate Media Downloader",
+            "summary": "Online video & audio downloader for Linux, 1450+ websites support",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": 1,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2022%2F07%2Ficon-256_JJoNAAt.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=ultimate-media-downloader",
+            "snap": "ultimate-media-downloader",
+            "flatpak": "com.ktechpit.ultimate-media-downloader"
+        },
+        {
+            "id": "orion",
+            "name": "Orion",
+            "title": "Orion - Torrent Client & Streamer",
+            "summary": "Complete torrent client and streamer for Linux Desktop",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": 2,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F06%2Ficon-256.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=orion",
+            "snap": "orion-desktop",
+            "flatpak": "com.ktechpit.orion"
+        },
+        {
+            "id": "torrhunt",
+            "name": "Torrhunt",
+            "title": "Torrhunt - Torrent Search Engine",
+            "summary": "Torrent Browser & Search Engine",
+            "type": "freemium",
+            "platforms": [
+                "Linux",
+                "Windows"
+            ],
+            "trending": 3,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2022%2F10%2Ficon-512.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=torrhunt",
+            "snap": "torrhunt",
+            "flatpak": "com.ktechpit.torrhunt"
+        },
+        {
+            "id": "playlist-dl",
+            "name": "Playlist-Dl",
+            "title": "Playlist-Dl - Download & Play Playlists",
+            "summary": "YouTube and SoundCloud playlist downloader, MP3 or video",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fplaylist-downloader-source.svg.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=playlist-dl",
+            "snap": "playlist-dl",
+            "flatpak": null
+        },
+        {
+            "id": "whatsie",
+            "name": "Whatsie",
+            "title": "Whatsie - Feature rich WhatsApp Client for Desktop",
+            "summary": "Feature rich WhatsApp Client for Linux Desktop",
+            "type": "freeware",
+            "platforms": [
+                "Linux",
+                "Windows"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2024%2F08%2Ficon.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=whatsie",
+            "snap": "whatsie",
+            "flatpak": "com.ktechpit.whatsie"
+        },
+        {
+            "id": "glate",
+            "name": "Glate",
+            "title": "Glate - Translation/Text to Speech tool",
+            "summary": "Google translator for Linux Desktop",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F03%2Ficon-256.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=glate",
+            "snap": "glate",
+            "flatpak": "com.ktechpit.glate"
+        },
+        {
+            "id": "pixelfx",
+            "name": "PixelFx",
+            "title": "PixelFx - Photo Editor (Beta)",
+            "summary": "Quick Image retouching application for Linux Desktop",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F03%2Ficon-256.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=pixelfx",
+            "snap": "pixelfx",
+            "flatpak": null
+        },
+        {
+            "id": "plumber",
+            "name": "Plumber",
+            "title": "Plumber - Media trimmer",
+            "summary": "Media trimmer/downloader for Linux Desktop",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F04%2Ficon-512.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=plumber",
+            "snap": "plumber",
+            "flatpak": null
+        },
+        {
+            "id": "music-radar",
+            "name": "MusicRadar",
+            "title": "MusicRadar - Identify music",
+            "summary": "Music Recognition app for Linux Desktop",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F04%2Ficon-512_xDKaPOR.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=music-radar",
+            "snap": "music-radar",
+            "flatpak": null
+        },
+        {
+            "id": "utube",
+            "name": "Utube",
+            "title": "Utube - Secure Youtube App for Linux",
+            "summary": "Play/Save Media from Youtube securely",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2021%2F03%2Ficon-512-0.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=utube",
+            "snap": "utube",
+            "flatpak": null
+        },
+        {
+            "id": "qtube-dl",
+            "name": "Qtube-Dl",
+            "title": "Qtube-Dl - Youtube player & downloader",
+            "summary": "GUI for Downloading and watching Youtube on Linux Desktop",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2020%2F09%2Ficon_XtK2HwG.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=qtube-dl",
+            "snap": "qtubedl",
+            "flatpak": null
+        },
+        {
+            "id": "wonderwall",
+            "name": "WonderWall",
+            "title": "WonderWall - UHD Wallpapers Store",
+            "summary": "Powerful Desktop Wallpaper manager for Linux Desktop",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2018%2F05%2Ficon_ocFwlch.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=wonderwall",
+            "snap": "wonderwall",
+            "flatpak": "com.ktechpit.wonderwall"
+        },
+        {
+            "id": "pixelbatch",
+            "name": "PixelBatch",
+            "title": "PixelBatch - Image Converter",
+            "summary": "Batch Image Converter for Linux Desktop",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2025%2F11%2Ficon.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=pixelbatch",
+            "snap": "pixelbatch",
+            "flatpak": "com.ktechpit.pixelbatch"
+        },
+        {
+            "id": "formatfactory",
+            "name": "FormatFactory",
+            "title": "FormatFactory - Media Converter on Linux",
+            "summary": "Fast batch converter for video, audio and image files",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F06%2Ficon_Saln4Gk.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=formatfactory",
+            "snap": "formatfactory",
+            "flatpak": "com.ktechpit.formatfactory"
+        },
+        {
+            "id": "arrowescape",
+            "name": "ArrowEscape",
+            "title": "ArrowEscape - Remove the Arrows",
+            "summary": "A Calm Arrow-Untangling Puzzle for Linux",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F07%2Fcom.ktechpit.arrowescape.svg.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=arrowescape",
+            "snap": "arrowescape",
+            "flatpak": null
+        },
+        {
+            "id": "hungrysnake",
+            "name": "Hungry Snake",
+            "title": "Hungry Snake - Eat. Grow. Survive. Customize. Repeat.",
+            "summary": "A charming arcade adventure where every apple makes survival a little harder.",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F07%2Ficon-256_8EqAZdW.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=hungrysnake",
+            "snap": "hungrysnake",
+            "flatpak": "com.ktechpit.hungrysnake"
+        },
+        {
+            "id": "red",
+            "name": "Red",
+            "title": "Red - Youtube Desktop Application",
+            "summary": "Secure Youtube Player and Downloader",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": 5,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fred.svg.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=red",
+            "snap": "red-app",
+            "flatpak": "com.ktechpit.red"
+        },
+        {
+            "id": "typingtutor",
+            "name": "TypingTutor",
+            "title": "TypingTutor - Touch typing tutor & typing speed",
+            "summary": "Typing Practice, Tests & Typing Tutor Software for Linux",
+            "type": "freemium",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": 4,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fcom.ktechpit.typingtutor.svg.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=typingtutor",
+            "snap": "typingtutor",
+            "flatpak": "com.ktechpit.typingtutor"
+        },
+        {
+            "id": "omnidict",
+            "name": "OmniDict",
+            "title": "OmniDict - offline dictionary for the Desktop",
+            "summary": "Offline dictionary for any language, with 600+ free dictionaries",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F09%2Fcom.ktechpit.omnidict.svg.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=omnidict",
+            "snap": "omnidict",
+            "flatpak": "com.ktechpit.omnidict"
+        },
+        {
+            "id": "paraphrase",
+            "name": "Paraphrase",
+            "title": "Paraphrase - offline AI writing",
+            "summary": "Private AI grammar checker, rewriter and smart reply writer that runs offline",
+            "type": "freeware",
+            "platforms": [
+                "Linux"
+            ],
+            "trending": null,
+            "icon": "https://res.cloudinary.com/canonical/image/fetch/f_auto,q_auto,fl_sanitize,w_120/https%3A%2F%2Fdashboard.snapcraft.io%2Fsite_media%2Fappmedia%2F2026%2F10%2Ficon.svg_2Zrs5AT.png",
+            "page": "https://ktechpit.com/USS/public/product.php?slug=paraphrase",
+            "snap": "paraphrase",
+            "flatpak": null
+        }
+    ]
+}
