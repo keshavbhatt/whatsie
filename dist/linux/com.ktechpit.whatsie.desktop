@@ -13,7 +13,7 @@ StartupNotify=true
 MimeType=x-scheme-handler/whatsapp;
 X-GNOME-UsesNotifications=true
 
-Actions=NewChat;Settings;
+Actions=NewChat;Settings;Quit;
 
 [Desktop Action NewChat]
 Name=New chat
@@ -22,3 +22,7 @@ Exec=whatsie --new-chat
 [Desktop Action Settings]
 Name=Settings
 Exec=whatsie --settings
+
+[Desktop Action Quit]
+Name=Quit
+Exec=whatsie --quit

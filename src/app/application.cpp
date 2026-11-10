@@ -78,6 +78,13 @@ Application::Application(int& argc, char** argv)
         m_exitCode = forwardToPrimary() ? 0 : 1;
         return;
     }
+    if (m_cli.quit) {
+        // Nothing is running to quit (a launcher's Quit action, say): do not start
+        // the whole app just to close it again.
+        qCInfo(lcApp) << "--quit: no running instance, nothing to do";
+        m_exitCode = 0;
+        return;
+    }
     connect(m_instance.get(), &SingleInstance::commandReceived, this, &Application::dispatchCommand);
 
     m_settings = std::make_unique<core::Settings>();
