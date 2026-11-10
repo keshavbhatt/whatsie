@@ -1,3 +1,16 @@
+whatsie (6.2.0) unstable; urgency=medium
+
+  * More apps from Ktechpit: two app cards in About, replacing the More
+    Applications button, and an optional link on the lock screen.
+  * Ukrainian interface translation, with a Ukrainian spell-check dictionary
+    in the snap.
+  * A Quit action in the launcher entry, for trays without menus (#402).
+  * Fix a hang when the graphics stack floods its error output (#387).
+  * Keep the chosen WhatsApp theme across restarts (#389).
+  * Size the monochrome tray icon correctly on HiDPI displays (#396).
+
+ -- Keshav Bhatt <keshavnrj@gmail.com>  Tue, 10 Nov 2026 12:00:00 +0530
+
 whatsie (6.1.1) unstable; urgency=medium
 
   * Theme: follow the desktop light/dark preference reliably on Linux via the

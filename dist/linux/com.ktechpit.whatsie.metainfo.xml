@@ -102,6 +102,22 @@
   </content_rating>
 
   <releases>
+    <release version="6.2.0" date="2026-11-10">
+      <description>
+        <p>New features:</p>
+        <ul>
+          <li>More apps from Ktechpit: About shows two other apps by the same developer in place of the More Applications button, and the lock screen has a link to the full list that can be turned off in Settings</li>
+          <li>Ukrainian interface translation</li>
+          <li>A Quit action in the launcher entry, for desktops whose tray cannot show the tray menu</li>
+        </ul>
+        <p>Fixes:</p>
+        <ul>
+          <li>Whatsie no longer hangs when the graphics stack writes a flood of warnings, which could freeze it at start-up on some systems</li>
+          <li>The WhatsApp theme you pick now survives a restart</li>
+          <li>The monochrome tray icon is sized correctly on HiDPI displays</li>
+        </ul>
+      </description>
+    </release>
     <release version="6.1.1" date="2026-09-21">
       <description>
         <p>Fixes and small improvements:</p>
