@@ -36,10 +36,14 @@ QByteArray derivePasscodeHash(const QString& passcode, const QByteArray& salt, i
     const std::array<char, 4> indexBe{0, 0, 0, 1}; // INT_32_BE(1)
     block.append(indexBe.data(), indexBe.size());
 
-    QByteArray u = QMessageAuthenticationCode::hash(block, key, QCryptographicHash::Sha256);
+    QMessageAuthenticationCode mac(QCryptographicHash::Sha256, key);
+    mac.addData(block);
+    QByteArray u = mac.result();
     QByteArray result = u;
     for (int i = 1; i < iterations; ++i) {
-        u = QMessageAuthenticationCode::hash(u, key, QCryptographicHash::Sha256);
+        mac.reset();
+        mac.addData(u);
+        u = mac.result();
         for (int j = 0; j < result.size(); ++j) {
             result[j] = static_cast<char>(result.at(j) ^ u.at(j));
         }
