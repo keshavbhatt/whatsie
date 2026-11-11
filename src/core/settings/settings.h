@@ -174,6 +174,11 @@ public:
     /// rate (#221). Costs more GPU/CPU. Applied to the Chromium flags at startup.
     [[nodiscard]] bool uncapFrameRate() const;
     void setUncapFrameRate(bool enabled);
+    /// IANA time-zone id (e.g. "America/Edmonton"); empty follows the system
+    /// zone. Exported as TZ before Chromium starts, so a change needs a restart
+    /// (#403). Applied at startup.
+    [[nodiscard]] QString timeZone() const;
+    void setTimeZone(const QString& id);
     /// FEATURES P2: force WebRTC onto public interfaces only (privacy; can break
     /// LAN calls). Default off.
     [[nodiscard]] bool webrtcPublicInterfacesOnly() const;
@@ -260,6 +265,7 @@ Q_SIGNALS:
     void hardwareAccelerationChanged(whatsie::core::HardwareAcceleration mode);
     void jsMemoryLimitMbChanged(int mb);
     void uncapFrameRateChanged(bool enabled);
+    void timeZoneChanged(const QString& id);
 
 private:
     [[nodiscard]] bool boolValue(QLatin1StringView key, bool def) const;

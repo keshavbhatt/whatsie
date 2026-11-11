@@ -6,6 +6,7 @@
 #include "core/settings/settings.h"
 #include "core/spellcheck.h"
 #include "core/storage_policy.h"
+#include "core/timezone.h"
 #include "core/zoom_policy.h"
 #include "platform/file_manager.h"
 #include "ui/passcode_dialog.h"
@@ -17,9 +18,11 @@
 #include <QAbstractSlider>
 #include <QAbstractSpinBox>
 #include <QComboBox>
+#include <QCompleter>
 #include <QDir>
 #include <QScrollBar>
 #include <QSignalBlocker>
+#include <QTimeZone>
 #include <QWheelEvent>
 #include <QDesktopServices>
 #include <QDialogButtonBox>
@@ -124,8 +127,47 @@ void SettingsDialog::setupUi()
 
 void SettingsDialog::closeEvent(QCloseEvent* event)
 {
+    // Commit a half-typed zone: editingFinished may not fire when the dialog is
+    // closed from the keyboard while the combo still has focus.
+    commitTimeZoneEdit();
     m_settings.setSettingsDialogGeometry(saveGeometry());
     QDialog::closeEvent(event);
+}
+
+void SettingsDialog::commitTimeZoneEdit()
+{
+    if (m_timeZone == nullptr) {
+        return;
+    }
+
+    const QString text = m_timeZone->currentText().trimmed();
+    // The first entry is "System default" (data is an empty string). Compare
+    // against its actual label so this also works with translations.
+    if (text.isEmpty() || text == m_timeZone->itemText(0)) {
+        m_settings.setTimeZone(QString());
+        m_timeZone->setCurrentIndex(0);
+        return;
+    }
+
+    const QTimeZone zone(text.toUtf8());
+    if (!zone.isValid()) {
+        // An invalid typed value must not be persisted: put the stored choice
+        // back so the UI keeps matching what will actually be used.
+        const int index = m_timeZone->findData(m_settings.timeZone());
+        m_timeZone->setCurrentIndex(index < 0 ? 0 : index);
+        return;
+    }
+
+    // Store the canonical id, which is what Qt's completer/list exposes.
+    const QString id = QString::fromUtf8(zone.id());
+    m_settings.setTimeZone(id);
+    int index = m_timeZone->findData(id);
+    if (index < 0) {
+        // Valid but absent from Qt's list (older bundled tzdata): show it.
+        m_timeZone->addItem(id, id);
+        index = m_timeZone->count() - 1;
+    }
+    m_timeZone->setCurrentIndex(index);
 }
 
 void SettingsDialog::installWheelGuards()
@@ -581,7 +623,52 @@ QWidget* SettingsDialog::buildAdvancedTab()
     connect(m_uncapFrameRate, &QCheckBox::toggled, this,
             [this](bool on) { m_settings.setUncapFrameRate(on); });
     aform->addRow(QString(), m_uncapFrameRate);
+
+#ifndef Q_OS_WIN
+    // Chromium reads TZ once, before the web profile exists, so this is a
+    // restart-to-apply setting (#403). The combo is editable so a zone can be
+    // found by typing; the completer filters the full IANA list.
+    m_timeZone = new QComboBox(advBox);
+    m_timeZone->setEditable(true);
+    m_timeZone->setInsertPolicy(QComboBox::NoInsert);
+    m_timeZone->setMaxVisibleItems(20);
+    m_timeZone->addItem(tr("System default"), QString());
+    const QList<QByteArray> zoneIds = QTimeZone::availableTimeZoneIds();
+    for (const QByteArray& id : zoneIds) {
+        const QString name = QString::fromUtf8(id);
+        m_timeZone->addItem(name, name);
+    }
+    if (QCompleter* completer = m_timeZone->completer(); completer != nullptr) {
+        completer->setCaseSensitivity(Qt::CaseInsensitive);
+        completer->setFilterMode(Qt::MatchContains);
+    }
+    m_timeZone->setToolTip(tr("The time zone WhatsApp Web uses for message times. Leave it on "
+                              "System default unless the times are wrong."));
+
+    connect(m_timeZone, &QComboBox::textActivated, this, &SettingsDialog::commitTimeZoneEdit);
+    connect(m_timeZone->lineEdit(), &QLineEdit::editingFinished, this,
+            &SettingsDialog::commitTimeZoneEdit);
+    aform->addRow(tr("Time zone:"), m_timeZone);
+#endif
+
     av->addLayout(aform);
+
+#ifndef Q_OS_WIN
+    auto* tzNote =
+        new QLabel(tr("System: %1. Only change this if message times are wrong; it takes effect "
+                      "after restarting Whatsie.")
+                       .arg(core::desktopTimeZoneId()),
+                   advBox);
+    tzNote->setWordWrap(true);
+    tzNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    av->addWidget(tzNote);
+#else
+    auto* tzNote = new QLabel(
+        tr("Time zone: %1 (follows Windows Settings).").arg(core::desktopTimeZoneId()), advBox);
+    tzNote->setWordWrap(true);
+    tzNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    av->addWidget(tzNote);
+#endif
 
     auto* hwNote =
         new QLabel(tr("Takes effect after restarting Whatsie. Turn off if the window stays blank."), advBox);
@@ -810,6 +897,24 @@ void SettingsDialog::loadValues()
         m_hardwareAcceleration->findData(static_cast<int>(m_settings.hardwareAcceleration())));
     m_jsMemoryLimit->setValue(m_settings.jsMemoryLimitMb());
     m_uncapFrameRate->setChecked(m_settings.uncapFrameRate());
+#ifndef Q_OS_WIN
+    if (m_timeZone != nullptr) {
+        const QSignalBlocker blocker(m_timeZone);
+        const QString stored = m_settings.timeZone();
+        int index = stored.isEmpty() ? 0 : m_timeZone->findData(stored);
+        if (index < 0 && QTimeZone(stored.toUtf8()).isValid()) {
+            // Valid, but missing from Qt's list (older bundled tzdata): add it
+            // so the user sees the zone that is actually in effect.
+            m_timeZone->addItem(stored, stored);
+            index = m_timeZone->count() - 1;
+        } else if (index < 0) {
+            // Hand-edited garbage: drop it rather than show a false selection.
+            m_settings.setTimeZone(QString());
+            index = 0;
+        }
+        m_timeZone->setCurrentIndex(index < 0 ? 0 : index);
+    }
+#endif
     if (m_interfaceLanguage != nullptr) {
         const QSignalBlocker blocker(m_interfaceLanguage);
         const int i = m_interfaceLanguage->findData(m_settings.interfaceLanguage());

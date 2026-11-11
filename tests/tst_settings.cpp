@@ -128,6 +128,24 @@ private Q_SLOTS:
         QCOMPARE(spy.count(), 1);
     }
 
+    void timeZoneRoundTripAndSignal()
+    {
+        QSignalSpy spy(m_settings.get(), &Settings::timeZoneChanged);
+        QCOMPARE(m_settings->timeZone(), QString());
+
+        m_settings->setTimeZone(u"  America/Edmonton  "_s);
+        QCOMPARE(m_settings->timeZone(), u"America/Edmonton"_s); // trimmed
+        QCOMPARE(spy.count(), 1);
+        QCOMPARE(spy.first().first().toString(), u"America/Edmonton"_s);
+
+        m_settings->setTimeZone(u"America/Edmonton"_s); // same value: no signal
+        QCOMPARE(spy.count(), 1);
+
+        m_settings->setTimeZone(QString()); // back to system
+        QCOMPARE(m_settings->timeZone(), QString());
+        QCOMPARE(spy.count(), 2);
+    }
+
     void persistsAcrossInstances()
     {
         const QString path = m_settings->fileName();

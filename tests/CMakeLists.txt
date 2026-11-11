@@ -54,6 +54,7 @@ whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_cor
 whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
 whatsie_add_test(tst_download_model      tst_download_model.cpp      whatsie_core)
 whatsie_add_test(tst_storage_and_flags   tst_storage_and_flags.cpp   whatsie_core)
+whatsie_add_test(tst_timezone            tst_timezone.cpp            whatsie_core)
 whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_core GUI)
 whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
 # platform

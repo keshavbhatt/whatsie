@@ -470,6 +470,25 @@ void Settings::setUncapFrameRate(bool enabled)
     }
 }
 
+QString Settings::timeZone() const
+{
+    return m_store->value(keys::kTimeZone).toString();
+}
+
+void Settings::setTimeZone(const QString& id)
+{
+    const QString trimmed = id.trimmed();
+    if (trimmed == timeZone()) {
+        return;
+    }
+    if (trimmed.isEmpty()) {
+        m_store->remove(keys::kTimeZone);
+    } else {
+        m_store->setValue(keys::kTimeZone, trimmed);
+    }
+    Q_EMIT timeZoneChanged(trimmed);
+}
+
 bool Settings::webrtcPublicInterfacesOnly() const
 {
     return boolValue(keys::kWebrtcPublicOnly, kDefaultWebrtcPublicOnly);

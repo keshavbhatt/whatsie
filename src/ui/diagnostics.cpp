@@ -2,9 +2,11 @@
 
 #include "core/log_sink.h"
 #include "core/settings/settings.h"
+#include "core/timezone.h"
 #include "platform/crash_handler.h"
 #include "platform/platform_info.h"
 
+#include <QByteArray>
 #include <QCoreApplication>
 #include <QRegularExpression>
 #include <QStandardPaths>
@@ -33,6 +35,17 @@ QString buildDiagnostics(const core::Settings& settings, const QString& userAgen
     out << u"- App: %1 %2"_s.arg(QCoreApplication::applicationName(), QCoreApplication::applicationVersion());
     out << u"- Host: %1"_s.arg(platform::describeHost());
     out << u"- Chromium: %1"_s.arg(chromiumVersion(userAgent));
+    // The zone Chromium actually received, plus what the desktop reports. This
+    // is the first thing to check for "timestamps are off" reports (#403).
+    const QString systemId = core::desktopTimeZoneId();
+    const QByteArray envTz = qgetenv("TZ");
+    const core::TimeZoneChoice tz = core::resolveTimeZone(
+        settings.timeZone(), QString::fromUtf8(envTz), systemId);
+    out << u"- Time zone: system=%1, override=%2, TZ=%3, effective=%4 (%5)"_s.arg(
+        systemId.isEmpty() ? u"unknown"_s : systemId,
+        settings.timeZone().isEmpty() ? u"(system)"_s : settings.timeZone(),
+        envTz.isEmpty() ? u"(unset)"_s : QString::fromUtf8(envTz),
+        tz.ianaId.isEmpty() ? u"unknown"_s : tz.ianaId, tz.source);
     out << u"- User agent: `%1`"_s.arg(userAgent);
     out << u"- Settings: `%1`"_s.arg(settings.fileName());
     out << u"- Data: `%1`"_s.arg(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation));
