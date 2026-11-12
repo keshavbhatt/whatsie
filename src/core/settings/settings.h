@@ -209,6 +209,9 @@ public:
     // appearance/
     [[nodiscard]] Theme theme() const;
     void setTheme(Theme theme);
+    /// Path to an optional user CSS file injected into WhatsApp Web.
+    [[nodiscard]] QString customCss() const;
+    void setCustomCss(const QString& path);
 
     // notifications/
     [[nodiscard]] bool notificationsEnabled() const;
@@ -249,6 +252,7 @@ Q_SIGNALS:
     void spellCheckEnabledChanged(bool enabled);
     void spellCheckLanguagesChanged(const QStringList& languages);
     void themeChanged(whatsie::core::Theme theme);
+    void customCssChanged(const QString& path);
     void notificationsEnabledChanged(bool enabled);
     void notificationSoundChanged(bool enabled);
     void notificationTimeoutSecChanged(int seconds);

@@ -753,6 +753,21 @@ void Settings::setTheme(Theme theme)
     Q_EMIT themeChanged(theme);
 }
 
+QString Settings::customCss() const
+{
+    return m_store->value(keys::kCustomCss).toString();
+}
+
+void Settings::setCustomCss(const QString& path)
+{
+    const QString clean = path.trimmed();
+    if (clean == customCss()) {
+        return;
+    }
+    m_store->setValue(keys::kCustomCss, clean);
+    Q_EMIT customCssChanged(clean);
+}
+
 // ---- notifications/ --------------------------------------------------------
 
 bool Settings::notificationsEnabled() const

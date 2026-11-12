@@ -112,6 +112,21 @@ private Q_SLOTS:
         QVERIFY(!bundle.isInstalled(u"bootstrap"_s));
     }
 
+    void customCssSourceIsEscapedAndRemovable()
+    {
+        QVERIFY(ScriptBundle::customCssSource({}).isEmpty());
+        const QString source = ScriptBundle::customCssSource(u"body { content: \"x\"; }"_s);
+        QVERIFY(source.contains(u"whatsie-custom-css"_s));
+        QVERIFY(source.contains(u"\\\"x\\\""_s));
+
+        QWebEngineProfile profile;
+        ScriptBundle bundle(profile);
+        bundle.installCustomCss(u"body { color: red; }"_s);
+        QVERIFY(bundle.isInstalled(u"custom-css"_s));
+        bundle.installCustomCss({});
+        QVERIFY(!bundle.isInstalled(u"custom-css"_s));
+    }
+
     void permissionPolicy()
     {
         using P = QWebEnginePermission::PermissionType;

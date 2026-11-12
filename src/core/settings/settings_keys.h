@@ -36,6 +36,7 @@ inline constexpr QLatin1StringView kMessageBlurLevel{"privacy/messageBlurLevel"}
 
 // appearance/
 inline constexpr QLatin1StringView kTheme{"appearance/theme"};
+inline constexpr QLatin1StringView kCustomCss{"appearance/customCss"};
 
 // notifications/
 inline constexpr QLatin1StringView kNotificationsEnabled{"notifications/enabled"};

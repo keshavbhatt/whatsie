@@ -327,6 +327,33 @@ QWidget* SettingsDialog::buildAppearanceTab()
             [this](int index) { m_settings.setTheme(static_cast<Theme>(m_theme->itemData(index).toInt())); });
     form->addRow(tr("Theme:"), m_theme);
 
+    m_customCss = new QLineEdit(page);
+    m_customCss->setPlaceholderText(tr("Path to a .css file"));
+    m_customCss->setClearButtonEnabled(true);
+    auto* cssBrowse = new QPushButton(tr("Browse…"), page);
+    auto* cssRow = new QHBoxLayout;
+    cssRow->addWidget(m_customCss, 1);
+    cssRow->addWidget(cssBrowse);
+    connect(cssBrowse, &QPushButton::clicked, this, [this] {
+        const QString path = QFileDialog::getOpenFileName(this, tr("Select custom CSS"), m_customCss->text(),
+                                                          tr("CSS files (*.css);;All files (*)"));
+        if (!path.isEmpty()) {
+            m_customCss->setText(path);
+            m_settings.setCustomCss(path);
+        }
+    });
+    connect(m_customCss, &QLineEdit::editingFinished, this,
+            [this] { m_settings.setCustomCss(m_customCss->text()); });
+    connect(&m_settings, &core::Settings::customCssChanged, this,
+            [this](const QString& path) { m_customCss->setText(path); });
+    form->addRow(tr("Custom CSS:"), cssRow);
+    auto* cssNote = new QLabel(tr("Applies to WhatsApp Web on the next reload. Use a local userstyle "
+                                  "such as Catppuccin."),
+                               page);
+    cssNote->setWordWrap(true);
+    cssNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    form->addRow(QString(), cssNote);
+
     auto makeZoom = [page] {
         auto* spin = new QDoubleSpinBox(page);
         spin->setRange(core::kMinZoom, core::kMaxZoom);
@@ -796,6 +823,7 @@ void SettingsDialog::loadValues()
     m_askWhereToSave->setChecked(m_settings.askWhereToSave());
     m_showDownloads->setChecked(m_settings.showDownloadsOnStart());
     m_theme->setCurrentIndex(m_theme->findData(static_cast<int>(m_settings.theme())));
+    m_customCss->setText(m_settings.customCss());
     m_zoom->setValue(m_settings.zoomFactor());
     m_zoomMaximized->setValue(m_settings.zoomFactorMaximized());
     m_smoothScrolling->setChecked(m_settings.smoothScrolling());

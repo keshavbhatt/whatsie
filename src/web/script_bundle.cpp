@@ -3,6 +3,7 @@
 #include "web/logging.h"
 
 #include <QFile>
+#include <QJsonArray>
 #include <QJsonDocument>
 #include <QtEnvironmentVariables>
 #include <QWebEngineProfile>
@@ -80,6 +81,29 @@ void ScriptBundle::installResource(const QString& name, const QString& resourceP
                                    QWebEngineScript::InjectionPoint point)
 {
     installSource(name, readResource(resourcePath), point);
+}
+
+QString ScriptBundle::customCssSource(const QString& css)
+{
+    if (css.isEmpty()) {
+        return {};
+    }
+    const QString literal = QString::fromUtf8(QJsonDocument(QJsonArray{css}).toJson(QJsonDocument::Compact));
+    return QStringLiteral(
+               "(function(){var css=%1[0];"
+               "function add(){var old=document.getElementById('whatsie-custom-css');"
+               "if(old){old.remove();}"
+               "var style=document.createElement('style');"
+               "style.id='whatsie-custom-css';style.textContent=css;"
+               "(document.head||document.documentElement).appendChild(style);}"
+               "if(document.head){add();}else{document.addEventListener('DOMContentLoaded',add,{once:true});}"
+               "})();")
+        .arg(literal);
+}
+
+void ScriptBundle::installCustomCss(const QString& css)
+{
+    installSource(u"custom-css"_s, customCssSource(css), QWebEngineScript::DocumentCreation);
 }
 
 void ScriptBundle::installSource(const QString& name, const QString& source,

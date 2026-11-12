@@ -40,6 +40,7 @@ private:
     void configureUserAgent();
     void configureAttributes();
     void installBootstrap();
+    void installCustomCss();
     void configureSpellCheck();
     static QString themeName(core::Theme theme);
 

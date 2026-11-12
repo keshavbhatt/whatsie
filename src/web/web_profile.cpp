@@ -10,6 +10,7 @@
 #include "web/user_agent.h"
 
 #include <QDir>
+#include <QFile>
 #include <QStandardPaths>
 #include <QWebEnginePermission>
 #include <QWebEngineSettings>
@@ -34,6 +35,7 @@ WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObj
     configureUserAgent();
     configureAttributes();
     installBootstrap();
+    installCustomCss();
     configureSpellCheck();
 
     connect(&m_settings, &core::Settings::smoothScrollingChanged, this, [this](bool enabled) {
@@ -43,6 +45,8 @@ WebProfile::WebProfile(core::Settings& settings, core::ThemeService& theme, QObj
     // WebView applies it live to the already-loaded page.
     connect(&m_settings, &core::Settings::messageBlurLevelChanged, this, [this](int) { installBootstrap(); });
     connect(&m_settings, &core::Settings::themeChanged, this, [this](core::Theme) { installBootstrap(); });
+    connect(&m_settings, &core::Settings::customCssChanged, this,
+            [this](const QString&) { installCustomCss(); });
     // Keep the seeded effective theme current when the desktop scheme changes in
     // System mode, so a freshly loaded page starts at the right theme (#367, #374).
     connect(&m_theme, &core::ThemeService::effectiveSchemeChanged, this,
@@ -122,6 +126,28 @@ void WebProfile::configureAttributes()
     s->setAttribute(QWebEngineSettings::ScrollAnimatorEnabled, m_settings.smoothScrolling());
     // FEATURES P2: keep WebRTC off private interfaces when the user asks.
     s->setAttribute(QWebEngineSettings::WebRTCPublicInterfacesOnly, m_settings.webrtcPublicInterfacesOnly());
+}
+
+void WebProfile::installCustomCss()
+{
+    const QString path = m_settings.customCss().trimmed();
+    if (path.isEmpty()) {
+        m_scripts->installCustomCss({});
+        return;
+    }
+    QFile file(path);
+    if (!file.open(QIODevice::ReadOnly)) {
+        qCWarning(lcWeb) << "custom CSS file cannot be read:" << path;
+        m_scripts->installCustomCss({});
+        return;
+    }
+    if (file.size() > 2 * 1024 * 1024) {
+        qCWarning(lcWeb) << "custom CSS file is too large (max 2 MiB):" << path;
+        m_scripts->installCustomCss({});
+        return;
+    }
+    m_scripts->installCustomCss(QString::fromUtf8(file.readAll()));
+    qCInfo(lcWeb) << "custom CSS installed from" << path;
 }
 
 QString WebProfile::themeName(core::Theme theme)
