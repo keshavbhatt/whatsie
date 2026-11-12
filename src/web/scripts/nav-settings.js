@@ -8,8 +8,9 @@
 //           QWebChannel bridge.
 // depends:  window.__whatsie.bridge.openSettings; the rail's <button> entries and
 //           the avatar (last rail button with an <img>). All obfuscated classes
-//           are avoided — entries are found by shape, not class.
-// verified: 2026-08-28 against WhatsApp Web 2.3000.x
+//           are avoided - entries are found by shape, not class.
+// verified: 2026-08-28 against WhatsApp Web 2.3000.x; status viewer fix
+//           2026-11-12 (issue #409)
 // on-fail:  no-op; the tray and Ctrl+, still open Settings
 (function () {
     'use strict';
@@ -25,14 +26,14 @@
     // Overlays that must freeze this script completely. The fullscreen media
     // viewer is the dangerous one: WhatsApp mounts it (data-testid
     // "drawer-fullscreen" / "media-viewer-modal") as a live, screen-covering,
-    // position:fixed subtree — and the "Media" rail entry can host it. If we
+    // position:fixed subtree - and the "Media" rail entry can host it. If we
     // re-clone the rail while that is up, cloneNode deep-copies the whole viewer
     // into our button, which then blankets the page and turns every click into
     // openSettings(). So while any of these is present we do not touch the DOM.
     var OVERLAY = '[role="dialog"],[aria-modal="true"],[data-animate-modal-popup],'
         + '[data-animate-modal-backdrop],[data-animate-media-viewer],'
         + '[data-testid="drawer-fullscreen"],[data-testid="media-viewer-modal"]';
-    // The "the media viewer is actually up" test — and ONLY that. Its single job
+    // The "the media viewer is actually up" test - and ONLY that. Its single job
     // is to stop us re-cloning the Media rail entry (the viewer's host) while the
     // viewer is mounted; nothing else needs to freeze the script or block a click
     // on our own button. It must therefore be a tight allowlist of the real viewer
@@ -44,6 +45,49 @@
     var OVERLAY_OPEN = '[data-animate-media-viewer],[data-testid="media-viewer-modal"]';
     function overlayOpen() {
         return !!document.querySelector(OVERLAY_OPEN);
+    }
+    // A rail entry is small. Anything inside one that renders bigger is a viewer
+    // or panel WhatsApp mounted there (the media viewer, and the status viewer in
+    // issue #409). Those are position:fixed, so they do NOT grow the entry's own
+    // box: the wrapper size check alone cannot see them, only their own boxes can.
+    // This test needs no WhatsApp markers, so it covers viewers we have not met.
+    // The bar is set well above an entry's size (a viewer covers most of the
+    // window) so a tooltip, label or click ripple inside a real entry never counts.
+    var MAX_W = 72;
+    var MAX_H = 120;
+    var VIEWER_MIN = 160;
+    function coversArea(el) {
+        var r = el.getBoundingClientRect();
+        return r.width >= VIEWER_MIN && r.height >= VIEWER_MIN;
+    }
+    function hostsOverlay(root) {
+        if (coversArea(root)) { return true; }
+        var all = root.querySelectorAll('*');
+        for (var i = 0; i < all.length; i++) {
+            if (coversArea(all[i])) { return true; }
+        }
+        return false;
+    }
+    // Copy just the chain of wrappers from `wrapper` down to `button`, plus the
+    // button itself: never the wrappers' other children. That keeps the look of a
+    // native entry while leaving out anything WhatsApp hosts beside the button,
+    // so a viewer can never ride along into our entry (where it would become a
+    // dead, page-covering copy that turns every click into openSettings()).
+    function cloneEntry(wrapper, button) {
+        if (wrapper === button) { return button.cloneNode(true); }
+        var path = [];
+        for (var n = button.parentElement; n && n !== wrapper; n = n.parentElement) {
+            path.unshift(n);
+        }
+        var root = wrapper.cloneNode(false);
+        var cur = root;
+        for (var i = 0; i < path.length; i++) {
+            var c = path[i].cloneNode(false);
+            cur.appendChild(c);
+            cur = c;
+        }
+        cur.appendChild(button.cloneNode(true));
+        return root;
     }
     function railButtons() {
         return Array.prototype.slice.call(document.querySelectorAll('button')).filter(function (b) {
@@ -65,7 +109,7 @@
         }
         return n >= 3;
     }
-    // Climb until `node` and `other` become siblings — the level rail entries
+    // Climb until `node` and `other` become siblings - the level rail entries
     // share, several wrappers above the <button> itself.
     function wrapperSharedWith(node, other) {
         while (node.parentElement) {
@@ -81,12 +125,12 @@
     //              and carries an <img>. We therefore take the last rail entry and
     //              require it to be an image: WhatsApp's "Meta AI" entry is also an
     //              <img> but sits in the TOP group (never last), so this excludes
-    //              it structurally — no locale-fragile label match. And before the
+    //              it structurally - no locale-fragile label match. And before the
     //              avatar has loaded the bottom entry is a plain icon, so we wait
     //              rather than latch onto Meta AI and land in the wrong group (the
     //              cause of the icon appearing up top, above Meta AI).
     //   template = the icon (svg-only) button directly above that avatar, in the
-    //              same group — cloned so our entry looks native and lands right
+    //              same group - cloned so our entry looks native and lands right
     //              above the profile.
     function anchors() {
         if (overlayOpen()) { return null; } // never mutate the DOM while a viewer/dialog is up
@@ -117,13 +161,15 @@
             return null;
         }
         // A rail entry is small. If the shared wrapper is large we have climbed
-        // into some other container (e.g. a media-viewer panel) — never clone
+        // into some other container (e.g. a media-viewer panel) - never clone
         // that, or the clone becomes a full-area click target that hijacks every
         // click in the region (owner report: clicking anywhere in the gallery
         // opened Settings).
         var box = templateWrapper.getBoundingClientRect();
-        if (box.width > 72 || box.height > 120) { return null; }
-        return { avatarWrapper: avatarWrapper, templateWrapper: templateWrapper };
+        if (box.width > MAX_W || box.height > MAX_H) { return null; }
+        // A viewer mounted inside the entry right now: wait until it closes.
+        if (hostsOverlay(templateWrapper)) { return null; }
+        return { avatarWrapper: avatarWrapper, templateWrapper: templateWrapper, template: template };
     }
 
     // Correctly placed only when our entry sits immediately above the CURRENT
@@ -131,21 +177,35 @@
     // remembered container": WhatsApp reveals the profile avatar late and rebuilds
     // the rail, so the anchor moves under us. Re-checking position each tick lets
     // install() lift a provisionally-placed button to the right spot once the
-    // avatar loads — and also catches WhatsApp re-parenting our entry out of the
+    // avatar loads - and also catches WhatsApp re-parenting our entry out of the
     // rail (then parentElement no longer matches and we re-place).
     function placed(a) {
         var entry = document.getElementById(ID);
         if (!entry || !entry.isConnected || !a) { return false; }
         // If our entry ever absorbed WhatsApp content (a stray data-testid means a
-        // real WA subtree rode in on a clone), it is not correctly placed — force a
+        // real WA subtree rode in on a clone), it is not correctly placed - force a
         // clean rebuild rather than leave a page-covering blob behind.
         if (entry.querySelector('[data-testid]')) { return false; }
+        if (hostsOverlay(entry)) { return false; }
         return entry.parentElement === a.avatarWrapper.parentElement &&
                entry.nextElementSibling === a.avatarWrapper;
     }
 
+    // Drop our entry at once if it ever holds something bigger than a rail entry,
+    // even while a viewer is up and anchors() refuses to re-place it: a copy like
+    // that covers the page and swallows every click (issue #409).
+    function dropIfOversized() {
+        var entry = document.getElementById(ID);
+        if (entry && hostsOverlay(entry)) {
+            entry.remove();
+            return true;
+        }
+        return false;
+    }
+
     function install() {
         try {
+            dropIfOversized();
             var a = anchors();
             if (!a) { return; }
             if (placed(a)) { return; }
@@ -155,9 +215,10 @@
             var avatarWrapper = a.avatarWrapper;
             var templateWrapper = a.templateWrapper;
 
-            // Clone a whole neighbouring entry so it looks native without relying
-            // on any obfuscated class; cloneNode drops its listeners.
-            var entry = templateWrapper.cloneNode(true);
+            // Clone a neighbouring entry so it looks native without relying on any
+            // obfuscated class; cloneNode drops its listeners. Only the path to the
+            // button is copied (see cloneEntry).
+            var entry = cloneEntry(templateWrapper, a.template);
             entry.id = ID;
             // Defence in depth: drop any WhatsApp-tagged descendant the clone may
             // carry, so our button can never smuggle in a live WA subtree (see the
@@ -177,7 +238,7 @@
                 svg.innerHTML = ICON;
             }
             // NB: the click is handled by ONE delegated listener on document (set
-            // up once, below) — deliberately NOT attached to this node. WhatsApp
+            // up once, below) - deliberately NOT attached to this node. WhatsApp
             // rebuilds the rail by cloning it, and cloneNode drops listeners, so a
             // per-node handler silently dies after a few navigations (the button
             // then looked right but stopped opening Settings). Delegation survives.
@@ -197,6 +258,10 @@
         if (!target || typeof target.closest !== 'function' || !target.closest('#' + ID)) {
             return;
         }
+        // Only a click on our own small button counts. A click that lands on
+        // anything bigger inside our entry is on a stray copy of a viewer: remove
+        // it and let the click through, never open Settings for it.
+        if (dropIfOversized()) { return; }
         ev.preventDefault();
         ev.stopPropagation();
         if (overlayOpen()) { return; } // never act while a viewer/overlay is up

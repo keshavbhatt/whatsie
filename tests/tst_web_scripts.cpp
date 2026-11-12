@@ -13,13 +13,74 @@
 #include <QJsonObject>
 #include <QMimeData>
 #include <QRegularExpression>
+#include <QSignalSpy>
 #include <QTemporaryDir>
 #include <QTest>
+#include <QWebEnginePage>
 #include <QWebEngineProfile>
 #include <QWebEngineScriptCollection>
+#include <QWebEngineView>
 
 using namespace Qt::StringLiterals;
 using namespace whatsie::web;
+
+namespace {
+
+// Runs `js` in the page and waits for its result.
+QVariant runJs(QWebEnginePage* page, const QString& js)
+{
+    QVariant out;
+    bool done = false;
+    page->runJavaScript(js, [&](const QVariant& v) {
+        out = v;
+        done = true;
+    });
+    if (!QTest::qWaitFor([&] { return done; }, 5000)) {
+        return u"<timeout>"_s;
+    }
+    return out;
+}
+
+// A cut-down WhatsApp nav rail: four icon entries up top, then an icon entry and
+// the profile avatar at the bottom. The bottom icon entry also hosts a
+// full-screen, position:fixed viewer (#viewer, with a "next" button), the way
+// WhatsApp mounts its status viewer (issue #409). The viewer does not grow its
+// entry's box, which is what fooled the old size check. The entry also carries a
+// wide tooltip, which must not count as a viewer.
+constexpr auto kRailFixture = R"(<!doctype html><html><head><style>
+body { margin: 0; }
+nav { position: fixed; left: 0; top: 0; width: 64px; height: 100vh;
+      display: flex; flex-direction: column; }
+.bottom { margin-top: auto; }
+.e { width: 48px; height: 48px; margin: 4px 8px; }
+.e button { width: 40px; height: 40px; padding: 0; }
+.e svg { width: 24px; height: 24px; }
+#viewer { position: fixed; inset: 0; background: #222; z-index: 10; }
+.tip { position: absolute; left: 60px; width: 150px; height: 28px; }
+#next { position: absolute; right: 20px; top: 300px; width: 40px; height: 40px; }
+</style></head><body>
+<nav>
+  <div class="top">
+    <div class="e"><div><button><svg viewBox="0 0 1 1"></svg></button></div></div>
+    <div class="e"><div><button><svg viewBox="0 0 1 1"></svg></button></div></div>
+    <div class="e"><div><button><svg viewBox="0 0 1 1"></svg></button></div></div>
+    <div class="e"><div><button><svg viewBox="0 0 1 1"></svg></button></div></div>
+  </div>
+  <div class="bottom">
+    <div class="e" id="tw"><div><button><svg viewBox="0 0 1 1"></svg></button></div>
+      <span class="tip">Media and starred</span>
+      <div id="host"><div id="viewer"><button id="next">next</button></div></div></div>
+    <div class="e" id="aw"><div><button><img width="32" height="32"
+      src="data:image/gif;base64,R0lGODlhAQABAAAAACw="></button></div></div>
+  </div>
+</nav>
+<script>
+window.__opened = 0;
+window.__whatsie = { bridge: { openSettings: function () { window.__opened++; } } };
+</script>
+</body></html>)";
+
+} // namespace
 
 class TestWebScripts : public QObject
 {
@@ -40,7 +101,7 @@ private Q_SLOTS:
     // Force-requiring a WhatsApp module resolves its whole dependency subtree
     // before WhatsApp has loaded it, which corrupts the module system and blocks
     // login. Scripts may inspect the registry (require('__debug')) but must never
-    // require('WAWeb…') — see scripts/README.md (the "stable tier" rule).
+    // require('WAWeb…'): see scripts/README.md (the "stable tier" rule).
     void noForcedWhatsAppModuleRequires()
     {
         static const QRegularExpression forbidden(u"\\brequire\\s*\\(\\s*['\"]WAWeb"_s);
@@ -110,6 +171,64 @@ private Q_SLOTS:
                     .contains(u"\"light\""_s));
         bundle.remove(u"bootstrap"_s);
         QVERIFY(!bundle.isInstalled(u"bootstrap"_s));
+    }
+
+    // Issue #409: with the status viewer open, our rail entry was rebuilt as a
+    // deep copy of the entry hosting the viewer. The dead copy covered the page,
+    // so tapping "next" or closing the status opened Whatsie's Settings.
+    void navSettingsNeverCopiesAHostedViewer()
+    {
+        QWebEngineProfile profile; // off-the-record
+        QWebEngineView view;
+        auto* page = new QWebEnginePage(&profile, &view);
+        view.setPage(page);
+        view.resize(1000, 700);
+        view.show();
+        QSignalSpy loaded(page, &QWebEnginePage::loadFinished);
+        page->setHtml(QString::fromUtf8(kRailFixture), QUrl(u"https://web.whatsapp.com/"_s));
+        QVERIFY(loaded.wait(15000));
+        QVERIFY(loaded.first().first().toBool());
+        runJs(page, ScriptBundle::readResource(u":/scripts/nav-settings.js"_s));
+
+        // Viewer up: let the 1 s timer run a few times.
+        QTest::qWait(2500);
+        const QString oversized = u"(function () {"
+                                  u"  var n = document.getElementById('whatsie-settings-nav');"
+                                  u"  if (!n) { return false; }"
+                                  u"  return Array.prototype.some.call(n.querySelectorAll('*'), function (e) {"
+                                  u"    var r = e.getBoundingClientRect();"
+                                  u"    return r.width > 72 || r.height > 120; });"
+                                  u"})()"_s;
+        QCOMPARE(runJs(page, oversized).toBool(), false);
+        // "next" reaches the viewer, not our button.
+        QCOMPARE(runJs(page, u"(function () { var e = document.elementFromPoint(950, 320);"
+                             u" e.click(); return e.closest('#whatsie-settings-nav') ? 'ours' : e.id; })()"_s)
+                     .toString(),
+                 u"next"_s);
+        QCOMPARE(runJs(page, u"window.__opened"_s).toInt(), 0);
+
+        // Viewer closed: our entry lands right above the avatar, without the host.
+        runJs(page, u"document.getElementById('viewer').remove()"_s);
+        const QString placed = u"(function () {"
+                               u"  var n = document.getElementById('whatsie-settings-nav');"
+                               u"  return !!n && n.nextElementSibling === document.getElementById('aw')"
+                               u"    && !n.querySelector('#host')"
+                               u"    && n.querySelector('svg').getAttribute('viewBox') === '0 0 64 64';"
+                               u"})()"_s;
+        QTRY_VERIFY_WITH_TIMEOUT(runJs(page, placed).toBool(), 5000);
+        runJs(page, u"document.querySelector('#whatsie-settings-nav button').click()"_s);
+        QCOMPARE(runJs(page, u"window.__opened"_s).toInt(), 1);
+
+        // A stray page-sized copy already inside our entry (users on 6.2.0) is
+        // dropped on click, never turned into Settings, and the entry comes back.
+        QCOMPARE(runJs(page, u"(function () { var d = document.createElement('div');"
+                             u" d.id = 'stray'; d.style.cssText = 'position:fixed;inset:0;z-index:20';"
+                             u" document.getElementById('whatsie-settings-nav').appendChild(d);"
+                             u" document.elementFromPoint(500, 300).click();"
+                             u" return [window.__opened, !!document.getElementById('stray')].join(); })()"_s)
+                     .toString(),
+                 u"1,false"_s);
+        QTRY_VERIFY_WITH_TIMEOUT(runJs(page, placed).toBool(), 5000);
     }
 
     void permissionPolicy()
