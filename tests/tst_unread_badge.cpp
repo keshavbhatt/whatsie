@@ -64,6 +64,29 @@ private Q_SLOTS:
 
     void nullImagePassesThrough() { QVERIFY(composeUnreadBadge(QImage(), 3).isNull()); }
 
+    void unreadDotZeroIsUnchanged()
+    {
+        QImage base(64, 64, QImage::Format_ARGB32_Premultiplied);
+        base.fill(Qt::white);
+        QCOMPARE(composeUnreadDot(base, 0, Qt::green), base);
+    }
+
+    void unreadDotDrawsColouredDotWithGap()
+    {
+        QImage base(100, 100, QImage::Format_ARGB32_Premultiplied);
+        base.fill(Qt::white); // an opaque glyph everywhere
+        const QImage out = composeUnreadDot(base, 3, QColor(0x2e, 0xc2, 0x6a));
+        QCOMPARE(out.size(), base.size());
+        // Dot centre (radius 21) is the dot colour.
+        QCOMPARE(out.pixelColor(79, 79), QColor(0x2e, 0xc2, 0x6a));
+        // Just outside the dot, inside the 7 px gap, the glyph is cleared.
+        QCOMPARE(out.pixelColor(79, 79 - 21 - 4).alpha(), 0);
+        // The top-left of the glyph is untouched.
+        QCOMPARE(out.pixelColor(10, 10), QColor(Qt::white));
+    }
+
+    void unreadDotNullPassesThrough() { QVERIFY(composeUnreadDot(QImage(), 3, Qt::green).isNull()); }
+
     void dimImageDesaturatesAndFades()
     {
         const QImage base = solid(16, QColor(0, 200, 0)); // saturated green

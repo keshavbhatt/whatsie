@@ -58,6 +58,7 @@ qt_add_resources(whatsie_ui "icons"
     FILES
         "${WHATSIE_ICON_DIR}/whatsie.svg"
         "${WHATSIE_ICON_DIR}/whatsie-symbolic.svg"
+        "${WHATSIE_ICON_DIR}/whatsie-tray-symbolic.svg"
         "${WHATSIE_ICON_DIR}/wa_bg.png"
         "${WHATSIE_ICON_DIR}/check.svg"
         "${WHATSIE_ICON_DIR}/chevron-down.svg"

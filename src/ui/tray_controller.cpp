@@ -3,14 +3,18 @@
 #include "core/notifications/dnd_controller.h"
 #include "core/settings/settings.h"
 #include "core/unread_badge.h"
+#include "platform/desktop_theme.h"
 #include "ui/actions.h"
 #include "ui/logging.h"
 
 #include <QAction>
 #include <QActionGroup>
+#include <QColor>
+#include <QGuiApplication>
 #include <QIcon>
 #include <QMenu>
 #include <QPixmap>
+#include <QStyleHints>
 #include <QSystemTrayIcon>
 
 using namespace Qt::StringLiterals;
@@ -135,18 +139,29 @@ void TrayController::setWindowVisible(bool visible)
     m_actions.showHide->setText(visible ? tr("Hide to tray") : tr("Show window"));
 }
 
+bool TrayController::panelIsDark() const
+{
+    // The panel follows the desktop's colour scheme (Plasma's Breeze style does),
+    // not Whatsie's own theme setting — so ask the desktop, not ThemeService.
+    if (const std::optional<Qt::ColorScheme> scheme = platform::readDesktopColorScheme()) {
+        return *scheme == Qt::ColorScheme::Dark;
+    }
+    if (QGuiApplication::instance() != nullptr) {
+        return QGuiApplication::styleHints()->colorScheme() != Qt::ColorScheme::Light;
+    }
+    return true; // most panels are dark
+}
+
 void TrayController::reloadBaseImage()
 {
     if (m_settings.traySymbolicIcon()) {
-        // The symbolic SVG is a solid-black glyph on transparency — invisible on
-        // a dark panel. Panel colour is independent of the app theme, so render a
-        // white glyph with a thin dark halo: visible on dark panels (white fill)
-        // and light ones (dark outline).
-        // Render large, then trim/centre/scale so the glyph fills the icon like
-        // the neighbouring panel icons rather than sitting small and off-centre
-        // inside its SVG padding (#356), before the white-fill + halo pass.
-        const QImage glyph = QIcon(u":/icons/whatsie-symbolic.svg"_s).pixmap(QSize(256, 256)).toImage();
-        m_baseImage = core::monochromeIcon(core::fitGlyphToIcon(glyph, 128, 0.9));
+        // Line-art logo in the style of KDE Breeze panel icons, coloured like the
+        // panel's own icons: Breeze's light text on a dark panel, dark text on a
+        // light one. Render large, then trim/centre/scale so it fills the icon
+        // like the neighbouring panel icons (#356).
+        const QImage glyph = QIcon(u":/icons/whatsie-tray-symbolic.svg"_s).pixmap(QSize(256, 256)).toImage();
+        const QColor ink = panelIsDark() ? QColor(0xfc, 0xfc, 0xfc) : QColor(0x23, 0x26, 0x29);
+        m_baseImage = core::tintImage(core::fitGlyphToIcon(glyph, 128, 0.94), ink);
     } else {
         m_baseImage = QImage(u":/icons/hicolor/128x128/apps/com.ktechpit.whatsie.png"_s);
     }
@@ -199,13 +214,30 @@ void TrayController::watchSettings()
         reloadBaseImage();
         rebuildIcon();
     });
+    // Re-colour the outline icon when the desktop switches light/dark. The portal
+    // watcher covers sandboxes and GNOME; QStyleHints covers a native Plasma.
+    const auto onSchemeChanged = [this] {
+        if (m_settings.traySymbolicIcon()) {
+            reloadBaseImage();
+            rebuildIcon();
+        }
+    };
+    auto* themeWatcher = new platform::DesktopThemeWatcher(this);
+    connect(themeWatcher, &platform::DesktopThemeWatcher::colorSchemeChanged, this, onSchemeChanged);
+    if (QGuiApplication::instance() != nullptr) {
+        connect(QGuiApplication::styleHints(), &QStyleHints::colorSchemeChanged, this, onSchemeChanged);
+    }
     connect(&m_settings, &core::Settings::trayDimWhenDisconnectedChanged, this, [this] { rebuildIcon(); });
     connect(&m_settings, &core::Settings::trayHiddenChanged, this, [this] { applyTrayVisibility(); });
 }
 
 void TrayController::rebuildIcon()
 {
-    QImage image = core::composeUnreadBadge(m_baseImage, m_unread);
+    // The outline icon marks unread with a small green dot (the exact count is
+    // in the tooltip); the colour logo keeps its numbered bubble.
+    QImage image = m_settings.traySymbolicIcon()
+        ? core::composeUnreadDot(m_baseImage, m_unread, QColor(0x2e, 0xc2, 0x6a))
+        : core::composeUnreadBadge(m_baseImage, m_unread);
     if (!m_connected && m_settings.trayDimWhenDisconnected()) {
         image = core::dimImage(image, 0.85);
     }

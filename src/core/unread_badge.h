@@ -14,6 +14,12 @@ namespace whatsie::core {
 /// `count <= 0` returns `base` unchanged. Counts above 99 render as "99+".
 [[nodiscard]] QImage composeUnreadBadge(const QImage& base, int count);
 
+/// Returns `base` with a small filled dot of `color` in the bottom-right corner,
+/// cut out from the glyph by a transparent gap so it reads on any panel — the
+/// unread marker for the outline tray icon (in the style of KDE panel icons).
+/// `count <= 0` returns `base` unchanged.
+[[nodiscard]] QImage composeUnreadDot(const QImage& base, int count, const QColor& color);
+
 /// Desaturates and fades `image` toward grey by `amount` in [0,1] — used to dim
 /// the tray icon while disconnected (FEATURES T6).
 [[nodiscard]] QImage dimImage(const QImage& image, qreal amount);

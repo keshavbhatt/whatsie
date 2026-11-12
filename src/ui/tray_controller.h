@@ -53,6 +53,7 @@ private:
     void buildMenu();
     QMenu* buildDndMenu();
     void reloadBaseImage();
+    [[nodiscard]] bool panelIsDark() const;
     void rebuildIcon();
     void updateTooltip();
     void applyTrayVisibility();
