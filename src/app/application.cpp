@@ -187,7 +187,8 @@ void Application::applyChromiumFlags()
     evaluateGpuStability();
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
     QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled(),
-                                           m_settings->jsMemoryLimitMb(), m_settings->uncapFrameRate());
+                                           m_settings->jsMemoryLimitMb(), m_settings->uncapFrameRate(),
+                                           m_settings->timeZone());
     // In a snap we pass --no-sandbox here (isolation comes from snap confinement,
     // ADR-008) rather than hard-coding it in the snap's environment: — that let
     // it override the user's QTWEBENGINE_CHROMIUM_FLAGS and blocked the expert

@@ -20,6 +20,7 @@
 #include <QPushButton>
 #include <QShowEvent>
 #include <QVBoxLayout>
+#include <QWebEnginePage>
 
 using namespace Qt::StringLiterals;
 
@@ -32,10 +33,12 @@ const QString kRateUrl = u"snap://whatsie"_s;
 const QString kWebsiteUrl = u"https://ktechpit.com"_s;
 } // namespace
 
-AboutDialog::AboutDialog(const core::Settings& settings, const QString& userAgent, QWidget* parent)
+AboutDialog::AboutDialog(const core::Settings& settings, const QString& userAgent, QWebEnginePage* page,
+                         QWidget* parent)
     : QDialog(parent)
     , m_settings(settings)
     , m_userAgent(userAgent)
+    , m_page(page)
 {
     setupUi();
 }
@@ -139,7 +142,7 @@ void AboutDialog::setupUi()
     m_debugText = new QPlainTextEdit(m_content);
     m_debugText->setReadOnly(true);
     m_debugText->setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
-    m_debugText->setPlainText(buildDiagnostics(m_settings, m_userAgent));
+    m_debugText->clear();
     m_debugText->setMinimumHeight(180);
     m_debugText->hide();
 
@@ -162,6 +165,9 @@ void AboutDialog::setupUi()
 void AboutDialog::toggleDebugInfo()
 {
     const bool show = !m_debugText->isVisible();
+    if (show) {
+        m_debugText->setPlainText(buildDiagnostics(m_settings, m_userAgent, m_page));
+    }
     m_debugText->setVisible(show);
     m_debugToggle->setText(show ? tr("Hide Debug Info") : tr("Show Debug Info"));
     // Force the layouts to release/claim the panel's space now, then fit the
@@ -203,12 +209,12 @@ void AboutDialog::showEvent(QShowEvent* event)
 
 void AboutDialog::copyDiagnostics()
 {
-    QApplication::clipboard()->setText(buildDiagnostics(m_settings, m_userAgent));
+    QApplication::clipboard()->setText(buildDiagnostics(m_settings, m_userAgent, m_page));
 }
 
 void AboutDialog::reportBug()
 {
-    BugReportDialog dialog(m_settings, m_userAgent, this);
+    BugReportDialog dialog(m_settings, m_userAgent, m_page, this);
     dialog.exec();
 }
 

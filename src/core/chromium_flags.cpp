@@ -22,7 +22,7 @@ bool useSoftwareGpu(HardwareAcceleration acceleration, bool autoDisabled)
 }
 
 QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisabled, int jsMemoryLimitMb,
-                          bool uncapFrameRate)
+                          bool uncapFrameRate, const QString& timeZone)
 {
     QStringList flags{
         // Nothing here is a chat client's business.
@@ -81,6 +81,9 @@ QStringList chromiumFlags(HardwareAcceleration acceleration, bool gpuAutoDisable
     // Chromium's 60 FPS default (#221). Costs more GPU/CPU, hence off by default.
     if (uncapFrameRate) {
         flags << u"--disable-frame-rate-limit"_s;
+    }
+    if (!timeZone.trimmed().isEmpty()) {
+        flags << u"--time-zone-for-testing=%1"_s.arg(timeZone.trimmed());
     }
     return flags;
 }

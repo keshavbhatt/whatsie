@@ -641,7 +641,7 @@ void MainWindow::toggleTheme()
 
 void MainWindow::showAbout()
 {
-    AboutDialog dialog(m_settings, m_webView->userAgent(), this);
+    AboutDialog dialog(m_settings, m_webView->userAgent(), m_webView->page(), this);
     dialog.exec();
 }
 

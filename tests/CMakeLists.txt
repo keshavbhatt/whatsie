@@ -54,6 +54,7 @@ whatsie_add_test(tst_log_sink            tst_log_sink.cpp            whatsie_cor
 whatsie_add_test(tst_theme_service       tst_theme_service.cpp       whatsie_core GUI)
 whatsie_add_test(tst_download_model      tst_download_model.cpp      whatsie_core)
 whatsie_add_test(tst_storage_and_flags   tst_storage_and_flags.cpp   whatsie_core)
+whatsie_add_test(tst_timezone            tst_timezone.cpp            whatsie_core)
 whatsie_add_test(tst_identicon           tst_identicon.cpp           whatsie_core GUI)
 whatsie_add_test(tst_notification_service tst_notification_service.cpp whatsie_core GUI)
 # platform
@@ -74,4 +75,5 @@ target_link_libraries(tst_web_scripts PRIVATE Qt6::Qml)
 whatsie_add_test(tst_cli_options         tst_cli_options.cpp         whatsie_app)
 whatsie_add_test(tst_single_instance     tst_single_instance.cpp     whatsie_app)
 whatsie_add_test(tst_smoke               tst_smoke.cpp               whatsie_ui  GUI)
+whatsie_add_test(tst_diagnostics          tst_diagnostics.cpp          whatsie_ui  GUI)
 whatsie_add_test(tst_more_apps           tst_more_apps.cpp           whatsie_ui  GUI)

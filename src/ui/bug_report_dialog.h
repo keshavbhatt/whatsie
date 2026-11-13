@@ -6,6 +6,7 @@ class QCheckBox;
 class QLabel;
 class QLineEdit;
 class QPlainTextEdit;
+class QWebEnginePage;
 
 namespace whatsie::core {
 class Settings;
@@ -22,7 +23,8 @@ class BugReportDialog : public QDialog
     Q_DISABLE_COPY_MOVE(BugReportDialog)
 
 public:
-    BugReportDialog(const core::Settings& settings, QString userAgent, QWidget* parent = nullptr);
+    BugReportDialog(const core::Settings& settings, QString userAgent, QWebEnginePage* page,
+                    QWidget* parent = nullptr);
     ~BugReportDialog() override = default;
 
 private:
@@ -33,6 +35,7 @@ private:
 
     const core::Settings& m_settings;
     QString m_userAgent;
+    QWebEnginePage* m_page = nullptr;
     QLineEdit* m_title = nullptr;
     QPlainTextEdit* m_description = nullptr;
     QCheckBox* m_includeCrash = nullptr;

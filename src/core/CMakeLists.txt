@@ -40,6 +40,8 @@ qt_add_library(whatsie_core STATIC
     storage_policy.h
     theme/theme_service.cpp
     theme/theme_service.h
+    timezone.cpp
+    timezone.h
     unread_badge.cpp
     unread_badge.h
     zoom_policy.cpp
