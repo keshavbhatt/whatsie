@@ -82,7 +82,7 @@ inline constexpr QLatin1StringView kJsMemoryLimitMb{"advanced/jsMemoryLimitMb"};
 // Drop Chromium's 60 FPS cap so the page renders at the display's refresh rate.
 inline constexpr QLatin1StringView kUncapFrameRate{"advanced/uncapFrameRate"};
 // IANA time-zone id (e.g. "America/Edmonton"); empty follows the system zone.
-// Exported as TZ before Chromium starts, so changing it needs a restart (#403).
+// Applied to Chromium at startup, so changing it needs a restart (#403).
 inline constexpr QLatin1StringView kTimeZone{"advanced/timeZone"};
 
 // proxy/ (password is deliberately NOT a key — never persisted)

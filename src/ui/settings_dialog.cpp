@@ -625,8 +625,8 @@ QWidget* SettingsDialog::buildAdvancedTab()
     aform->addRow(QString(), m_uncapFrameRate);
 
 #ifndef Q_OS_WIN
-    // Chromium reads TZ once, before the web profile exists, so this is a
-    // restart-to-apply setting (#403). The combo is editable so a zone can be
+    // Chromium reads the timezone switch before the web profile exists, so this
+    // is a restart-to-apply setting (#403). The combo is editable so a zone can be
     // found by typing; the completer filters the full IANA list.
     m_timeZone = new QComboBox(advBox);
     m_timeZone->setEditable(true);
@@ -649,6 +649,13 @@ QWidget* SettingsDialog::buildAdvancedTab()
     connect(m_timeZone->lineEdit(), &QLineEdit::editingFinished, this,
             &SettingsDialog::commitTimeZoneEdit);
     aform->addRow(tr("Time zone:"), m_timeZone);
+    auto* tzHint = new QLabel(
+        tr("If timestamps appear incorrect after a recent timezone rule change, try selecting "
+           "another timezone with the same UTC offset."),
+        advBox);
+    tzHint->setWordWrap(true);
+    tzHint->setStyleSheet(u"color: palette(placeholder-text);"_s);
+    aform->addRow(QString(), tzHint);
 #endif
 
     av->addLayout(aform);
@@ -657,14 +664,16 @@ QWidget* SettingsDialog::buildAdvancedTab()
     auto* tzNote =
         new QLabel(tr("System: %1. Only change this if message times are wrong; it takes effect "
                       "after restarting Whatsie.")
-                       .arg(core::desktopTimeZoneId()),
+                       .arg(QString::fromUtf8(QTimeZone::systemTimeZoneId())),
                    advBox);
     tzNote->setWordWrap(true);
     tzNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
     av->addWidget(tzNote);
 #else
     auto* tzNote = new QLabel(
-        tr("Time zone: %1 (follows Windows Settings).").arg(core::desktopTimeZoneId()), advBox);
+        tr("Time zone: %1 (follows Windows Settings).")
+            .arg(QString::fromUtf8(QTimeZone::systemTimeZoneId())),
+        advBox);
     tzNote->setWordWrap(true);
     tzNote->setStyleSheet(u"color: palette(placeholder-text);"_s);
     av->addWidget(tzNote);

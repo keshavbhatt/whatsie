@@ -175,8 +175,7 @@ public:
     [[nodiscard]] bool uncapFrameRate() const;
     void setUncapFrameRate(bool enabled);
     /// IANA time-zone id (e.g. "America/Edmonton"); empty follows the system
-    /// zone. Exported as TZ before Chromium starts, so a change needs a restart
-    /// (#403). Applied at startup.
+    /// zone. Applied to Chromium at startup, so a change needs a restart (#403).
     [[nodiscard]] QString timeZone() const;
     void setTimeZone(const QString& id);
     /// FEATURES P2: force WebRTC onto public interfaces only (privacy; can break

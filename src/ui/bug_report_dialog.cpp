@@ -13,6 +13,7 @@
 #include <QPlainTextEdit>
 #include <QPushButton>
 #include <QVBoxLayout>
+#include <QWebEnginePage>
 
 using namespace Qt::StringLiterals;
 
@@ -22,10 +23,12 @@ namespace {
 constexpr int kMaxTitle = 80;
 } // namespace
 
-BugReportDialog::BugReportDialog(const core::Settings& settings, QString userAgent, QWidget* parent)
+BugReportDialog::BugReportDialog(const core::Settings& settings, QString userAgent, QWebEnginePage* page,
+                                 QWidget* parent)
     : QDialog(parent)
     , m_settings(settings)
     , m_userAgent(std::move(userAgent))
+    , m_page(page)
 {
     setupUi();
 }
@@ -92,7 +95,7 @@ void BugReportDialog::setupUi()
 
 QString BugReportDialog::diagnostics() const
 {
-    return buildDiagnostics(m_settings, m_userAgent, 200, m_includeCrash->isChecked());
+    return buildDiagnostics(m_settings, m_userAgent, m_page, 200, m_includeCrash->isChecked());
 }
 
 void BugReportDialog::copyDiagnostics()

@@ -55,7 +55,7 @@ private Q_SLOTS:
     void aboutShowsTheStripInsteadOfTheButton()
     {
         applyTheme(true);
-        whatsie::ui::AboutDialog dialog(*m_settings, u"test agent"_s);
+        whatsie::ui::AboutDialog dialog(*m_settings, u"test agent"_s, nullptr);
         dialog.show();
         QVERIFY(QTest::qWaitForWindowExposed(&dialog));
 

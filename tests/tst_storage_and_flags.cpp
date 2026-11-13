@@ -129,6 +129,22 @@ private Q_SLOTS:
                     .contains(u"--disable-frame-rate-limit"_s));
     }
 
+    void timezoneOverrideIsOptInAndDoesNotTouchTzEnvironment()
+    {
+        const bool wasSet = qEnvironmentVariableIsSet("TZ");
+        const QByteArray original = qgetenv("TZ");
+        const QStringList defaults = chromiumFlags(HardwareAcceleration::Auto);
+        QVERIFY(!defaults.join(u' ').contains(u"time-zone"_s));
+        QCOMPARE(qEnvironmentVariableIsSet("TZ"), wasSet);
+        QCOMPARE(qgetenv("TZ"), original);
+
+        const QStringList overrideFlags =
+            chromiumFlags(HardwareAcceleration::Auto, false, 0, false, u"America/Regina"_s);
+        QVERIFY(overrideFlags.contains(u"--time-zone-for-testing=America/Regina"_s));
+        QCOMPARE(qEnvironmentVariableIsSet("TZ"), wasSet);
+        QCOMPARE(qgetenv("TZ"), original);
+    }
+
     void userFlagsAreKeptAndDeduplicated()
     {
         const QString merged =

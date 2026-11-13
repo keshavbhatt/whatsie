@@ -55,7 +55,6 @@ private:
     void applyIdentity();
     void setupLogging();
     void applyChromiumFlags();
-    void applyTimeZone();
     void evaluateGpuStability();
     [[nodiscard]] QString gpuProbeMarkerPath() const;
     void configureDictionaries();

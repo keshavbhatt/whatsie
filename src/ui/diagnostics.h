@@ -2,6 +2,8 @@
 
 #include <QString>
 
+class QWebEnginePage;
+
 namespace whatsie::core {
 class Settings;
 }
@@ -12,7 +14,8 @@ namespace whatsie::ui {
 /// (FEATURES P10, D1). Never includes message content or the session. The last
 /// crash (if any) is appended only when includeCrash is set.
 [[nodiscard]] QString buildDiagnostics(const core::Settings& settings, const QString& userAgent,
-                                       int logLines = 60, bool includeCrash = true);
+                                       QWebEnginePage* page, int logLines = 60,
+                                       bool includeCrash = true);
 
 /// A GitHub "new issue" URL for the whatsie repo, pre-filled with the user's
 /// title, description and a short environment block only. Logs never go in the

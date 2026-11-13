@@ -10,10 +10,8 @@
 #include "core/spellcheck.h"
 #include "core/storage_policy.h"
 #include "core/theme/theme_service.h"
-#include "core/timezone.h"
 #include "platform/platform_info.h"
 
-#include <QByteArray>
 #include <QDir>
 #include <QFile>
 #include <QIcon>
@@ -183,44 +181,14 @@ void Application::markGpuStable()
     }
 }
 
-void Application::applyTimeZone()
-{
-    const QString systemId = core::desktopTimeZoneId();
-#ifndef Q_OS_WIN
-    // Chromium/ICU reads the zone once, at process start, from TZ (falling back
-    // to /etc/localtime). A malformed or stale value there makes WhatsApp Web
-    // render every timestamp in the wrong zone (#403). Export a clean IANA id
-    // before the first QWebEngineProfile is created.
-    const QByteArray envTz = qgetenv("TZ");
-    const core::TimeZoneChoice choice =
-        core::resolveTimeZone(m_settings->timeZone(), QString::fromUtf8(envTz), systemId);
-
-    if (!choice.warning.isEmpty()) {
-        qCWarning(lcApp).noquote() << "timezone:" << choice.warning;
-    }
-    if (!choice.tzValue.isEmpty()) {
-        qputenv("TZ", choice.tzValue);
-    }
-    qCInfo(lcApp).noquote() << u"timezone: system=%1 env=%2 effective=%3 source=%4"_s.arg(
-        systemId.isEmpty() ? u"(unknown)"_s : systemId,
-        envTz.isEmpty() ? u"(unset)"_s : QString::fromUtf8(envTz),
-        choice.ianaId.isEmpty() ? u"(unchanged)"_s : choice.ianaId, choice.source);
-#else
-    // Chromium follows the Windows time-zone setting directly; TZ is ignored.
-    qCInfo(lcApp).noquote() << u"timezone: system=%1 (follows Windows Settings)"_s.arg(
-        systemId.isEmpty() ? u"(unknown)"_s : systemId);
-#endif
-}
-
 void Application::applyChromiumFlags()
 {
     // Must happen before the first QWebEngineProfile is created (FEATURES P6).
-    // Chromium reads TZ at start-up, so normalize it before the profile exists.
-    applyTimeZone();
     evaluateGpuStability();
     const QString existing = qEnvironmentVariable("QTWEBENGINE_CHROMIUM_FLAGS");
     QStringList ours = core::chromiumFlags(m_settings->hardwareAcceleration(), m_settings->gpuAutoDisabled(),
-                                           m_settings->jsMemoryLimitMb(), m_settings->uncapFrameRate());
+                                           m_settings->jsMemoryLimitMb(), m_settings->uncapFrameRate(),
+                                           m_settings->timeZone());
     // In a snap we pass --no-sandbox here (isolation comes from snap confinement,
     // ADR-008) rather than hard-coding it in the snap's environment: — that let
     // it override the user's QTWEBENGINE_CHROMIUM_FLAGS and blocked the expert
