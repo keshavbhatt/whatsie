@@ -391,63 +391,63 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="39"></location>
         <source>A pre-filled GitHub issue will open in your browser. The diagnostics are copied to your clipboard — paste them in at the end of the issue. No messages or chats are included.</source>
-        <translation type="unfinished">Uma issue do GitHub pré-preenchida será aberta no seu navegador. O diagnóstico é copiado para a área de transferência — cole-o ao final da issue. Nenhuma mensagem ou conversa é incluída.</translation>
+        <translation>Uma issue do GitHub pré-preenchida será aberta no seu navegador. O diagnóstico é copiado para a área de transferência — cole-o ao final da issue. Nenhuma mensagem ou conversa é incluída.</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="44"></location>
         <source>Title</source>
-        <translation type="unfinished">Título</translation>
+        <translation>Título</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="47"></location>
         <source>Short summary of the problem</source>
-        <translation type="unfinished">Breve resumo do problema</translation>
+        <translation>Breve resumo do problema</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="49"></location>
         <source>What happened?</source>
-        <translation type="unfinished">O que aconteceu?</translation>
+        <translation>O que aconteceu?</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="52"></location>
         <source>e.g. The window turns black after I close a chat, and only a restart fixes it.</source>
-        <translation type="unfinished">ex.: A janela fica preta depois que fecho uma conversa e só reiniciar resolve.</translation>
+        <translation>ex.: A janela fica preta depois que fecho uma conversa, e só um reinício resolve.</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="55"></location>
         <source>Include the last crash report</source>
-        <translation type="unfinished">Incluir o último relatório de falha</translation>
+        <translation>Incluir o último relatório de falha</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="64"></location>
         <source>Copy diagnostics</source>
-        <translation type="unfinished">Copiar diagnóstico</translation>
+        <translation>Copiar diagnóstico</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="65"></location>
         <source>Open GitHub Issue</source>
-        <translation type="unfinished">Abrir issue do GitHub</translation>
+        <translation>Abrir Issue do GitHub</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="68"></location>
         <source>Close</source>
-        <translation type="unfinished">Fechar</translation>
+        <translation>Fechar</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="101"></location>
         <source>Diagnostics copied to the clipboard.</source>
-        <translation type="unfinished">Diagnóstico copiado para a área de transferência.</translation>
+        <translation>Diagnóstico copiado para a área de transferência.</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="109"></location>
         <source>A GitHub issue is opening in your browser. Paste your clipboard (Ctrl+V) at the end of the issue to attach the diagnostics.</source>
-        <translation type="unfinished">Uma issue do GitHub está sendo aberta no seu navegador. Cole a área de transferência (Ctrl+V) ao final da issue para anexar o diagnóstico.</translation>
+        <translation>Uma issue do GitHub está a ser aberta no seu navegador. Cole a área de transferência (Ctrl+V) ao final da issue para anexar o diagnóstico.</translation>
     </message>
     <message>
         <location filename="../ui/bug_report_dialog.cpp" line="114"></location>
         <source>Couldn't open the browser automatically. Your report is on the clipboard — open this URL and paste it in:
 %1</source>
-        <translation type="unfinished">Não foi possível abrir o navegador automaticamente. Seu relatório está na área de transferência — abra esta URL e cole-o:
+        <translation>Não foi possível abrir o navegador automaticamente. Seu relatório está na área de transferência — abra esta URL e cole-o:
 %1</translation>
     </message>
 </context>
@@ -456,72 +456,72 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="88"></location>
         <source>just now</source>
-        <translation type="unfinished">agora mesmo</translation>
+        <translation>agora mesmo</translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/downloads_delegate.cpp" line="91"></location>
         <source>%n min ago</source>
-        <translation type="unfinished"><numerusform>há %n min</numerusform><numerusform>há %n min</numerusform></translation>
+        <translation><numerusform>há %n min</numerusform><numerusform>há %n min</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/downloads_delegate.cpp" line="94"></location>
         <source>%n h ago</source>
-        <translation type="unfinished"><numerusform>há %n h</numerusform><numerusform>há %n h</numerusform></translation>
+        <translation><numerusform>há %n h</numerusform><numerusform>há %n h</numerusform></translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="97"></location>
         <source>today %1</source>
-        <translation type="unfinished">hoje %1</translation>
+        <translation>hoje %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="100"></location>
         <source>yesterday %1</source>
-        <translation type="unfinished">ontem %1</translation>
+        <translation>ontem %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="114"></location>
         <source>%1 of %2</source>
-        <translation type="unfinished">%1 de %2</translation>
+        <translation>%1 de %2</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="117"></location>
         <source>%1/s</source>
-        <translation type="unfinished">%1/s</translation>
+        <translation>%1/s</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="124"></location>
         <source>Cancelled</source>
-        <translation type="unfinished">Cancelado</translation>
+        <translation>Cancelado</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="127"></location>
         <source>Failed</source>
-        <translation type="unfinished">Falhou</translation>
+        <translation>Falhou</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="127"></location>
         <source>Failed: %1</source>
-        <translation type="unfinished">Falhou: %1</translation>
+        <translation>Falhou: %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="146"></location>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="149"></location>
         <source>Open</source>
-        <translation type="unfinished">Abrir</translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="150"></location>
         <source>Show in folder</source>
-        <translation type="unfinished">Mostrar na pasta</translation>
+        <translation>Mostrar na pasta</translation>
     </message>
     <message>
         <location filename="../ui/downloads_delegate.cpp" line="152"></location>
         <source>Remove from list</source>
-        <translation type="unfinished">Remover da lista</translation>
+        <translation>Remover da lista</translation>
     </message>
 </context>
 <context>
@@ -529,52 +529,52 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="42"></location>
         <source>Downloads</source>
-        <translation type="unfinished">Downloads</translation>
+        <translation>Transferências</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="64"></location>
         <source>Files you download from WhatsApp will appear here.</source>
-        <translation type="unfinished">Os ficheiros que você baixar do WhatsApp aparecerão aqui.</translation>
+        <translation>Os ficheiros que transferir do WhatsApp aparecerão aqui.</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="75"></location>
         <source>Open folder</source>
-        <translation type="unfinished">Abrir pasta</translation>
+        <translation>Abrir pasta</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="77"></location>
         <source>Clear finished</source>
-        <translation type="unfinished">Limpar concluídos</translation>
+        <translation>Limpar concluídos</translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/downloads_dialog.cpp" line="96"></location>
         <source>%n download(s) in progress</source>
-        <translation type="unfinished"><numerusform>%n download em andamento</numerusform><numerusform>%n downloads em andamento</numerusform></translation>
+        <translation><numerusform>%n transferência(s) em curso</numerusform><numerusform>%n transferência(s) em curso</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/downloads_dialog.cpp" line="98"></location>
         <source>%n download(s)</source>
-        <translation type="unfinished"><numerusform>%n download</numerusform><numerusform>%n downloads</numerusform></translation>
+        <translation><numerusform>%n transferência(s)</numerusform><numerusform>%n transferência(s)</numerusform></translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="113"></location>
         <source>Cancel</source>
-        <translation type="unfinished">Cancelar</translation>
+        <translation>Cancelar</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="117"></location>
         <source>Open</source>
-        <translation type="unfinished">Abrir</translation>
+        <translation>Abrir</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="119"></location>
         <source>Show in folder</source>
-        <translation type="unfinished">Mostrar na pasta</translation>
+        <translation>Mostrar na pasta</translation>
     </message>
     <message>
         <location filename="../ui/downloads_dialog.cpp" line="122"></location>
         <source>Remove from list</source>
-        <translation type="unfinished">Remover da lista</translation>
+        <translation>Remover da lista</translation>
     </message>
 </context>
 <context>
@@ -582,48 +582,48 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="67"></location>
         <source>Downloads</source>
-        <translation type="unfinished">Downloads</translation>
+        <translation>Transferências</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="68"></location>
         <source>Couldn't open the downloads folder:
 %1</source>
-        <translation type="unfinished">Não foi possível abrir a pasta de downloads:
+        <translation>Não foi possível abrir a pasta de transferências:
 %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="104"></location>
         <source>Open download</source>
-        <translation type="unfinished">Abrir download</translation>
+        <translation>Abrir transferência</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="105"></location>
         <source>Couldn't open this file:
 %1</source>
-        <translation type="unfinished">Não foi possível abrir este ficheiro:
+        <translation>Não foi possível abrir este ficheiro:
 %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="111"></location>
         <source>Show in folder</source>
-        <translation type="unfinished">Mostrar na pasta</translation>
+        <translation>Mostrar na pasta</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="112"></location>
         <source>Couldn't show this file in the file manager:
 %1</source>
-        <translation type="unfinished">Não foi possível mostrar este ficheiro no gerenciador de ficheiros:
+        <translation>Não foi possível mostrar este ficheiro no gestor de ficheiros:
 %1</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="135"></location>
         <source>Download complete</source>
-        <translation type="unfinished">Download concluído</translation>
+        <translation>Transferência concluída</translation>
     </message>
     <message>
         <location filename="../ui/downloads_hub.cpp" line="139"></location>
         <source>Download failed</source>
-        <translation type="unfinished">Falha no download</translation>
+        <translation>Falha na transferência</translation>
     </message>
 </context>
 <context>
@@ -631,27 +631,27 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/lock_screen.cpp" line="49"></location>
         <source>Whatsie is locked</source>
-        <translation type="unfinished">O Whatsie está bloqueado</translation>
+        <translation>O Whatsie está trancado</translation>
     </message>
     <message>
         <location filename="../ui/lock_screen.cpp" line="58"></location>
         <source>Enter passcode</source>
-        <translation type="unfinished">Digite a senha</translation>
+        <translation>Digite o código-passe</translation>
     </message>
     <message>
         <location filename="../ui/lock_screen.cpp" line="64"></location>
         <source>Unlock</source>
-        <translation type="unfinished">Desbloquear</translation>
+        <translation>Destrancar</translation>
     </message>
     <message>
         <location filename="../ui/lock_screen.cpp" line="87"></location>
         <source>More apps from Ktechpit</source>
-        <translation type="unfinished">Mais aplicações da Ktechpit</translation>
+        <translation>Mais aplicações da Ktechpit</translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/lock_screen.cpp" line="349"></location>
         <source>Too many attempts. Try again in %n second(s).</source>
-        <translation type="unfinished"><numerusform>Muitas tentativas. Tente novamente em %n segundo.</numerusform><numerusform>Muitas tentativas. Tente novamente em %n segundos.</numerusform></translation>
+        <translation><numerusform>Demasiadas tentativas. Tente novamente em %n segundo(s).</numerusform><numerusform>Demasiadas tentativas. Tente novamente em %n segundo(s).</numerusform></translation>
     </message>
 </context>
 <context>
@@ -659,98 +659,98 @@ Clique para ver os detalhes</translation>
     <message>
         <location filename="../ui/main_window.cpp" line="242"></location>
         <source>Hardware acceleration turned off</source>
-        <translation type="unfinished">Aceleração por hardware desativada</translation>
+        <translation>Aceleração por hardware desativada</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="243"></location>
         <source>Whatsie hit a graphics-driver problem — often when a screen share is stopped — and switched to software rendering so it stays stable.
 
 Everything still works; you can turn hardware acceleration back on in Settings → Advanced.</source>
-        <translation type="unfinished">O Whatsie encontrou um problema no driver gráfico — geralmente ao encerrar um compartilhamento de ecrã — e passou para a renderização por software para se manter estável.
+        <translation>O Whatsie encontrou um problema no controlador gráfico — geralmente ao encerrar uma partilha de ecrã — e passou para a renderização por software para se manter estável.
 
-Tudo continua funcionando; você pode reativar a aceleração por hardware em Configurações → Avançado.</translation>
+Tudo continua a funcionar; pode reativar a aceleração por hardware em Configurações → Avançado.</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="373"></location>
         <source>Press Esc or F11 to exit full screen</source>
-        <translation type="unfinished">Pressione Esc ou F11 para sair da ecrã cheia</translation>
+        <translation>Prima Esc ou F11 para sair de ecrã inteiro</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="415"></location>
         <source>Cannot open chat</source>
-        <translation type="unfinished">Não é possível abrir a conversa</translation>
+        <translation>Não é possível abrir a conversa</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="416"></location>
         <source>"%1" is not a phone number or WhatsApp link.</source>
-        <translation type="unfinished">"%1" não é um número de telefone nem um link do WhatsApp.</translation>
+        <translation>"%1" não é um número de telefone nem um link do WhatsApp.</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="431"></location>
         <source>New chat</source>
-        <translation type="unfinished">Nova conversa</translation>
+        <translation>Nova conversa</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="431"></location>
         <source>Phone number with country code, or a wa.me link:</source>
-        <translation type="unfinished">Número de telefone com código do país, ou um link wa.me:</translation>
+        <translation>Número de telefone com código do país, ou um link wa.me:</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="500"></location>
         <source>Screen lock</source>
-        <translation type="unfinished">Bloqueio de ecrã</translation>
+        <translation>Bloqueio de ecrã</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="500"></location>
         <source>Set a passcode first to use the lock.
 
 Open Settings now?</source>
-        <translation type="unfinished">Defina uma senha primeiro para usar o bloqueio.
+        <translation>Defina um código-passe primeiro para usar o bloqueio.
 
 Abrir as configurações agora?</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="592"></location>
         <source>Incorrect passcode.</source>
-        <translation type="unfinished">Senha incorreta.</translation>
+        <translation>Código-passe incorreto.</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="670"></location>
         <source>WhatsApp Web keeps crashing</source>
-        <translation type="unfinished">O WhatsApp Web continua travando</translation>
+        <translation>O WhatsApp Web continua a crashar</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="671"></location>
         <source>The page's render process has crashed several times in a row.
 
 Reload to try again, or quit. If this keeps happening, use Settings → Privacy &amp; Advanced to find the log.</source>
-        <translation type="unfinished">O processo de renderização da página travou várias vezes seguidas.
+        <translation>O processo de renderização da página crashou várias vezes seguidas.
 
-Recarregue para tentar de novo, ou saia. Se continuar acontecendo, use Configurações → Privacidade &amp; Avançado para localizar o registro.</translation>
+Recarregue para tentar novamente, ou saia. Se continuar a acontecer, use Configurações → Privacidade &amp; Avançado para localizar o histórico.</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="693"></location>
         <source>Log out and clear session?</source>
-        <translation type="unfinished">Encerrar sessão e limpar os dados?</translation>
+        <translation>Encerrar sessão e limpar os dados?</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="694"></location>
         <source>This removes the WhatsApp session and all cached data from this computer. Whatsie will quit; when you start it again you link your phone with the QR code.
 
 Your downloaded files are kept.</source>
-        <translation type="unfinished">Isto remove a sessão do WhatsApp e todos os dados em cache deste computador. O Whatsie será encerrado; ao iniciá-lo novamente, você vincula seu telefone com o código QR.
+        <translation>Isto remove a sessão do WhatsApp e todos os dados na cache deste computador. O Whatsie será encerrado; ao iniciá-lo novamente, vincula o seu telefone com o código QR.
 
-Seus ficheiros baixados são mantidos.</translation>
+Os seus ficheiros trasnferidos são mantidos.</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="707"></location>
         <source>Cannot clear session</source>
-        <translation type="unfinished">Não é possível limpar a sessão</translation>
+        <translation>Não é possível limpar a sessão</translation>
     </message>
     <message>
         <location filename="../ui/main_window.cpp" line="707"></location>
         <source>Could not write %1.</source>
-        <translation type="unfinished">Não foi possível gravar %1.</translation>
+        <translation>Não foi possível escrever %1.</translation>
     </message>
 </context>
 <context>
@@ -759,12 +759,12 @@ Seus ficheiros baixados são mantidos.</translation>
         <location filename="../ui/notification_hub.cpp" line="38"></location>
         <location filename="../ui/notification_hub.cpp" line="40"></location>
         <source>Whatsie</source>
-        <translation type="unfinished">Whatsie</translation>
+        <translation>Whatsie</translation>
     </message>
     <message>
         <location filename="../ui/notification_hub.cpp" line="39"></location>
         <source>This is how a message notification looks.</source>
-        <translation type="unfinished">É assim que uma notificação de mensagem aparece.</translation>
+        <translation>É assim que uma notificação de mensagem aparece.</translation>
     </message>
 </context>
 <context>
@@ -772,37 +772,37 @@ Seus ficheiros baixados são mantidos.</translation>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="21"></location>
         <source>Change passcode</source>
-        <translation type="unfinished">Alterar senha</translation>
+        <translation>Alterar código-passe</translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="21"></location>
         <source>Set passcode</source>
-        <translation type="unfinished">Definir senha</translation>
+        <translation>Definir código-passe</translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="28"></location>
         <source>Current passcode:</source>
-        <translation type="unfinished">Senha atual:</translation>
+        <translation>Código-passe atual:</translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="32"></location>
         <source>New passcode:</source>
-        <translation type="unfinished">Nova senha:</translation>
+        <translation>Novo código-passe:</translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="35"></location>
         <source>Confirm:</source>
-        <translation type="unfinished">Confirmar:</translation>
+        <translation>Confirmar:</translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="60"></location>
         <source>The current passcode is incorrect.</source>
-        <translation type="unfinished">A senha atual está incorreta.</translation>
+        <translation>O código-passe atual está incorreto.</translation>
     </message>
     <message numerus="yes">
         <location filename="../ui/passcode_dialog.cpp" line="64"></location>
         <source>Use at least %n character(s).</source>
-        <translation type="unfinished"><numerusform>Use pelo menos %n caractere.</numerusform><numerusform>Use pelo menos %n caracteres.</numerusform></translation>
+        <translation><numerusform>Use pelo menos %n caractere(s).</numerusform><numerusform>Use pelo menos %n caractere(s).</numerusform></translation>
     </message>
     <message>
         <location filename="../ui/passcode_dialog.cpp" line="68"></location>
@@ -997,7 +997,7 @@ Sua senha de bloqueio é mantida. Algumas alterações têm efeito depois que vo
     <message>
         <location filename="../ui/settings_dialog.cpp" line="287"></location>
         <source>Downloads</source>
-        <translation type="unfinished">Downloads</translation>
+        <translation type="unfinished">Transferências</translation>
     </message>
     <message>
         <location filename="../ui/settings_dialog.cpp" line="291"></location>
@@ -1007,7 +1007,7 @@ Sua senha de bloqueio é mantida. Algumas alterações têm efeito depois que vo
     <message>
         <location filename="../ui/settings_dialog.cpp" line="294"></location>
         <source>Download folder</source>
-        <translation type="unfinished">Pasta de downloads</translation>
+        <translation type="unfinished">Pasta de transferências</translation>
     </message>
     <message>
         <location filename="../ui/settings_dialog.cpp" line="303"></location>
@@ -1022,7 +1022,7 @@ Sua senha de bloqueio é mantida. Algumas alterações têm efeito depois que vo
     <message>
         <location filename="../ui/settings_dialog.cpp" line="308"></location>
         <source>Show the Downloads window when a download starts</source>
-        <translation type="unfinished">Mostrar a janela de Downloads quando um download começa</translation>
+        <translation type="unfinished">Mostrar a janela de Transferências quando um transferência começa</translation>
     </message>
     <message>
         <location filename="../ui/settings_dialog.cpp" line="323"></location>
@@ -1581,7 +1581,7 @@ Sua senha de bloqueio é mantida. Algumas alterações têm efeito depois que vo
     <message numerus="yes">
         <location filename="../web/web_view.cpp" line="397"></location>
         <source>Couldn't attach %n file(s). In this sandboxed build files must live in a shared folder such as Downloads or Pictures — items in /tmp or other locations can't be read.</source>
-        <translation type="unfinished"><numerusform>Não foi possível anexar %n ficheiro. Nesta versão em sandbox os ficheiros devem estar em uma pasta compartilhada como Downloads ou Imagens — itens em /tmp ou outros locais não podem ser lidos.</numerusform><numerusform>Não foi possível anexar %n ficheiros. Nesta versão em sandbox os ficheiros devem estar em uma pasta compartilhada como Downloads ou Imagens — itens em /tmp ou outros locais não podem ser lidos.</numerusform></translation>
+        <translation type="unfinished"><numerusform>Não foi possível anexar %n ficheiro. Nesta versão em sandbox os ficheiros devem estar em uma pasta compartilhada como Transferências ou Imagens — itens em /tmp ou outros locais não podem ser lidos.</numerusform><numerusform>Não foi possível anexar %n ficheiros. Nesta versão em sandbox os ficheiros devem estar em uma pasta compartilhada como Transferências ou Imagens — itens em /tmp ou outros locais não podem ser lidos.</numerusform></translation>
     </message>
     <message numerus="yes">
         <location filename="../web/web_view.cpp" line="402"></location>
